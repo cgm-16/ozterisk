@@ -63,6 +63,15 @@ const en = {
     copied: "Result copied.",
     failed: "Could not share or copy the result.",
   },
+  answerSlot: {
+    filled: "Answer slot {position}: {digit}",
+    empty: "Answer slot {position}: empty",
+  },
+  tile: {
+    digitLabel: "Digit {digit}",
+    newLabel: "New tile",
+    discardLabel: "Marked for discard",
+  },
 } as const;
 
 const ko = {
@@ -120,6 +129,15 @@ const ko = {
   share: {
     copied: "결과를 복사했습니다.",
     failed: "결과를 공유하거나 복사하지 못했습니다.",
+  },
+  answerSlot: {
+    filled: "정답 칸 {position}: {digit}",
+    empty: "정답 칸 {position}: 비어 있음",
+  },
+  tile: {
+    digitLabel: "숫자 {digit}",
+    newLabel: "새 타일",
+    discardLabel: "버릴 타일로 표시됨",
   },
 } as const satisfies MessageShape<typeof en>;
 

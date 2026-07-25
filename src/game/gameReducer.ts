@@ -1,23 +1,35 @@
-import type { GameAction, GameState } from "./types";
+import type { Equation, GameAction, GameState, Tile } from "./types";
 import { sortTiles } from "./factories";
-import { constructAnswer, getAnswerLength, getOverflowCount } from "./selectors";
+import {
+  canAttemptEquation,
+  constructAnswer,
+  getAnswerLength,
+  getOverflowCount,
+  isDiscardReady,
+} from "./selectors";
+
+// Round 1, zero statistics, straight into answering — shared by START_RUN and
+// RESTART_RUN, which both begin a run from action-provided equation/inventory.
+function freshRunState(equation: Equation, inventory: Tile[]): GameState {
+  return {
+    phase: "answering",
+    equation,
+    inventory,
+    selectedTiles: [],
+    pendingDiscards: [],
+    score: 0,
+    round: 1,
+    totalRounds: 0,
+    currentStreak: 0,
+    longestStreak: 0,
+    lastResult: null,
+  };
+}
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "START_RUN":
-      return {
-        phase: "answering",
-        equation: action.equation,
-        inventory: action.inventory,
-        selectedTiles: [],
-        pendingDiscards: [],
-        score: 0,
-        round: 1,
-        totalRounds: 0,
-        currentStreak: 0,
-        longestStreak: 0,
-        lastResult: null,
-      };
+      return freshRunState(action.equation, action.inventory);
 
     case "SELECT_TILE": {
       if (state.phase !== "answering" || state.equation === null) return state;
@@ -96,11 +108,53 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
-    case "TOGGLE_DISCARD":
-    case "CONFIRM_DISCARD":
-    case "NEXT_ROUND":
+    case "TOGGLE_DISCARD": {
+      if (state.phase !== "overflow") return state;
+      const tile = state.inventory.find((item) => item.id === action.tileId);
+      if (!tile) return state;
+      const alreadyMarked = state.pendingDiscards.includes(action.tileId);
+      if (!alreadyMarked && state.pendingDiscards.length >= getOverflowCount(state.inventory)) {
+        return state;
+      }
+      return {
+        ...state,
+        pendingDiscards: alreadyMarked
+          ? state.pendingDiscards.filter((id) => id !== action.tileId)
+          : [...state.pendingDiscards, action.tileId],
+      };
+    }
+
+    case "CONFIRM_DISCARD": {
+      if (!isDiscardReady(state)) return state;
+      const discardIds = new Set(state.pendingDiscards);
+      return {
+        ...state,
+        phase: "feedback",
+        inventory: state.inventory.filter((tile) => !discardIds.has(tile.id)),
+        pendingDiscards: [],
+      };
+    }
+
+    case "NEXT_ROUND": {
+      if (state.phase !== "feedback") return state;
+      const nextInventory = state.inventory.map((tile) =>
+        tile.isNew ? { ...tile, isNew: false } : tile,
+      );
+      return {
+        ...state,
+        phase: canAttemptEquation(nextInventory, action.equation) ? "answering" : "gameOver",
+        equation: action.equation,
+        inventory: nextInventory,
+        selectedTiles: [],
+        pendingDiscards: [],
+        lastResult: null,
+        round: state.round + 1,
+      };
+    }
+
     case "RESTART_RUN":
-      return state;
+      if (state.phase !== "gameOver") return state;
+      return freshRunState(action.equation, action.inventory);
 
     default: {
       const exhaustiveCheck: never = action;

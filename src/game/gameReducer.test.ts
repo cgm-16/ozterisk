@@ -460,20 +460,23 @@ describe("TOGGLE_DISCARD", () => {
     expect(unmarked.pendingDiscards).toEqual([]);
   });
 
-  it("addresses duplicate-digit tiles as distinct entities by exact ID", () => {
+  it("accumulates marks up to the excess count and addresses duplicate-digit tiles independently by exact ID", () => {
     const equation = makeEquation(3, 3);
     const tileA = makeTile(5, "tile-a");
     const tileB = makeTile(5, "tile-b");
-    const rest = Array.from({ length: 9 }, (_, index) => makeTile((index % 9) as Digit, `tile-rest-${index}`));
+    const rest = Array.from({ length: 10 }, (_, index) => makeTile((index % 9) as Digit, `tile-rest-${index}`));
     const state = makeOverflowState(equation, {
-      inventory: [tileA, tileB, ...rest], // 11 tiles, excess 1
-      pendingDiscards: [tileA.id],
+      inventory: [tileA, tileB, ...rest], // 12 tiles, excess 2
     });
 
-    const next = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: tileB.id });
+    const afterA = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: tileA.id });
+    expect(afterA.pendingDiscards).toEqual([tileA.id]);
 
-    expect(next.pendingDiscards).toEqual([tileA.id]); // unchanged: marking tileB would exceed excess
-    expect(next).toBe(state);
+    const afterBoth = gameReducer(afterA, { type: "TOGGLE_DISCARD", tileId: tileB.id });
+    expect(afterBoth.pendingDiscards).toEqual([tileA.id, tileB.id]);
+
+    const afterUnmarkA = gameReducer(afterBoth, { type: "TOGGLE_DISCARD", tileId: tileA.id });
+    expect(afterUnmarkA.pendingDiscards).toEqual([tileB.id]); // tileA's digit-twin stays marked
   });
 
   it("is a no-op when marking would exceed the excess count", () => {
@@ -524,6 +527,9 @@ describe("CONFIRM_DISCARD", () => {
 
   it("removes exactly the marked tiles (new or old), clears pendingDiscards, and returns to feedback at capacity 10", () => {
     const equation = makeEquation(3, 3);
+    // oldTile/newTile share digits (2 and 4) with tiles inside `rest`, so a
+    // survival check by exact ID (not just by digit) is required for this
+    // assertion to pass.
     const oldTile = makeTile(2, "tile-old", false);
     const newTile = makeTile(4, "tile-new", true);
     const rest = Array.from({ length: 10 }, (_, index) => makeTile((index % 9) as Digit, `tile-rest-${index}`));
@@ -846,7 +852,7 @@ describe("reducer lifecycle invariants (§2.5)", () => {
 
     steps.push(
       {
-        label: "select the last remaining tile",
+        label: "select one of the final two tiles",
         getAction: (s) => ({ type: "SELECT_TILE", tileId: s.inventory[0]!.id }),
         expectedPhase: "answering",
       },

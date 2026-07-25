@@ -1,24 +1,49 @@
 .slots {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
   justify-content: center;
 }
 
 .slot {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: var(--tile-size);
+  min-height: var(--tile-size);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--color-border);
+  /* A dashed, heavier border keeps slots visually distinct from the solid
+     1px inventory tiles at every fill state (§1.12). Uses --color-text-muted
+     rather than --color-border: an empty slot sits on --color-canvas (no
+     fill contrast of its own), so the border is the only cue defining its
+     shape and needs the higher-contrast token to stay legible (>=3:1). */
+  border: 2px dashed var(--color-text-muted);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--color-canvas);
+  box-shadow: var(--shadow-inset);
   color: var(--color-text);
   font-size: 1.25rem;
   cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 100ms ease;
+}
+
+/* A slot is only ever disabled because it holds no tile (see
+   AnswerSlots.tsx: `disabled={!tile || disabled}`, and the group-level
+   `disabled` prop is always false while this component renders), so
+   :disabled reliably targets the empty state without any markup change. */
+.slot:not(:disabled) {
+  background: var(--color-surface);
 }
 
 .slot:disabled {
+  /* No opacity dimming: the empty state is already signaled by the absence
+     of a digit plus the dashed border, and dimming would push the border
+     back below the contrast floor established above. */
   cursor: default;
-  opacity: 0.6;
+}
+
+.slot:active:not(:disabled) {
+  transform: translateY(1px);
 }

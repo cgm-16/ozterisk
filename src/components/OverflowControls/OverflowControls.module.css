@@ -10,18 +10,25 @@
 }
 
 .confirm {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: var(--tile-size);
+  min-height: var(--tile-size);
   padding: var(--space-3) var(--space-6);
   border: none;
   border-radius: var(--radius-md);
-  background: var(--color-focus-ring);
-  color: #ffffff;
+  background: var(--color-accent);
+  color: var(--color-canvas);
   font-weight: 600;
   cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    transform 100ms ease;
 }
 
 .confirm:disabled {
   cursor: default;
   opacity: 0.6;
+}
+
+.confirm:active:not(:disabled) {
+  transform: translateY(1px);
 }

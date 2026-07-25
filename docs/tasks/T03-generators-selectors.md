@@ -92,6 +92,8 @@ const digit = Math.floor(random() * 10) as Digit;
 
 Throw `RangeError` if an injected random value is outside `[0,1)`, reward count is negative/non-integer, or pair lookup fails.
 
+> **Amendment (2026-07-25, Ori):** The literal `Math.floor(random() * binCount)` fails Step 1's own bin-edge test at indices 13 and 26 (IEEE-754: `13/45 * 45 = 12.999…`). The test governs: use an epsilon-nudged, clamped bin-index helper (see `sampleBinIndex` in `src/game/generators.ts`) that preserves uniform sampling and the sample-consumption contract. Any later task doing bin-index arithmetic must reuse that helper rather than the naive formula.
+
 - [ ] **Step 6: Verify**
 
 ```bash

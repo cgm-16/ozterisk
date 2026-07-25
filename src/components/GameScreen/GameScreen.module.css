@@ -3,25 +3,38 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-4);
-  max-width: 32rem;
+  max-width: var(--arena-max-width);
   margin: 0 auto;
   padding: var(--space-8) var(--space-4);
   text-align: center;
 }
 
 .action {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: var(--tile-size);
+  min-height: var(--tile-size);
   padding: var(--space-3) var(--space-6);
   border: none;
   border-radius: var(--radius-md);
-  background: var(--color-focus-ring);
-  color: #ffffff;
+  background: var(--color-accent);
+  color: var(--color-canvas);
   font-weight: 600;
   cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    transform 100ms ease;
 }
 
 .action:disabled {
   cursor: default;
   opacity: 0.6;
+}
+
+.action:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+@media (max-width: 40rem) {
+  .screen {
+    padding: var(--space-6) var(--space-3);
+  }
 }

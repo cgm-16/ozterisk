@@ -11,6 +11,20 @@
   font-weight: 600;
 }
 
+/* The headline text ("Correct"/"Incorrect") already carries the state
+   without color; these rules add color as reinforcement only (§1.12).
+   :has() keys off the branch-specific list already in the DOM
+   (.rewards on the correct branch, .comparison on the incorrect branch),
+   so no markup change is needed. If FeedbackPanel.tsx ever stops rendering
+   one of those elements, this coloring silently stops applying. */
+.panel:has(.rewards) .headline {
+  color: var(--color-correct);
+}
+
+.panel:has(.comparison) .headline {
+  color: var(--color-incorrect);
+}
+
 .rewards {
   display: flex;
   flex-wrap: wrap;
@@ -25,11 +39,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: 44px;
-  min-height: 44px;
-  border: 1px solid var(--color-focus-ring);
+  min-width: var(--tile-size);
+  min-height: var(--tile-size);
+  border: 1px solid var(--color-reward);
   border-radius: var(--radius-md);
   background: var(--color-surface);
+  box-shadow: var(--shadow-tile);
 }
 
 .rewardDigit {
@@ -41,7 +56,7 @@
   font-size: 0.625rem;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  color: var(--color-focus-ring);
+  color: var(--color-reward);
 }
 
 .comparison {

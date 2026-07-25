@@ -1,7 +1,14 @@
 .hud {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-6);
   justify-content: center;
+}
+
+@media (max-width: 40rem) {
+  .hud {
+    gap: var(--space-4);
+  }
 }
 
 .entry {

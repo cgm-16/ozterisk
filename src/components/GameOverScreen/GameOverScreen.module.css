@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-4);
-  max-width: 32rem;
+  max-width: var(--arena-max-width);
   margin: 0 auto;
   padding: var(--space-8) var(--space-4);
   text-align: center;
@@ -15,6 +15,7 @@
 
 .stats {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-6);
   justify-content: center;
 }
@@ -46,18 +47,27 @@
 
 .playAgain,
 .secondary {
-  min-width: 44px;
-  min-height: 44px;
+  min-width: var(--tile-size);
+  min-height: var(--tile-size);
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 100ms ease;
+}
+
+.playAgain:active,
+.secondary:active {
+  transform: translateY(1px);
 }
 
 .playAgain {
   border: none;
-  background: var(--color-focus-ring);
-  color: #ffffff;
+  background: var(--color-accent);
+  color: var(--color-canvas);
 }
 
 .secondary {
@@ -69,4 +79,18 @@
 .status {
   color: var(--color-text-muted);
   min-height: 1.25em;
+}
+
+@media (max-width: 40rem) {
+  .screen {
+    padding: var(--space-6) var(--space-3);
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .stats {
+    gap: var(--space-4);
+  }
 }

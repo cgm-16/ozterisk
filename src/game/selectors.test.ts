@@ -1,0 +1,161 @@
+import { describe, expect, it } from "vitest";
+import {
+  canAttemptEquation,
+  constructAnswer,
+  getAnswerLength,
+  getOverflowCount,
+  isDiscardReady,
+  isSubmissionReady,
+} from "./selectors";
+import { makeAnsweringState, makeEquation, makeTile } from "../test/fixtures";
+
+describe("getAnswerLength", () => {
+  it("returns 1 for a one-digit product", () => {
+    expect(getAnswerLength(makeEquation(3, 3))).toBe(1);
+  });
+
+  it("returns 2 for a two-digit product of 10", () => {
+    expect(getAnswerLength(makeEquation(2, 5))).toBe(2);
+  });
+
+  it("returns 2 for a two-digit product of 81", () => {
+    expect(getAnswerLength(makeEquation(9, 9))).toBe(2);
+  });
+});
+
+describe("constructAnswer", () => {
+  it("returns null when no tiles are selected", () => {
+    expect(constructAnswer([])).toBeNull();
+  });
+
+  it("constructs 56 from tiles selected in order [5, 6]", () => {
+    expect(constructAnswer([makeTile(5), makeTile(6)])).toBe(56);
+  });
+
+  it("constructs 65 from tiles selected in order [6, 5]", () => {
+    expect(constructAnswer([makeTile(6), makeTile(5)])).toBe(65);
+  });
+
+  it("constructs a single-digit answer from one selected tile", () => {
+    expect(constructAnswer([makeTile(7)])).toBe(7);
+  });
+});
+
+describe("canAttemptEquation", () => {
+  it("allows a one-digit equation when inventory has exactly 1 tile", () => {
+    const inventory = [makeTile(3)];
+    expect(canAttemptEquation(inventory, makeEquation(3, 3))).toBe(true);
+  });
+
+  it("disallows a two-digit equation when inventory has only 1 tile", () => {
+    const inventory = [makeTile(3)];
+    expect(canAttemptEquation(inventory, makeEquation(2, 5))).toBe(false);
+  });
+
+  it("allows a two-digit equation when inventory has exactly 2 tiles", () => {
+    const inventory = [makeTile(1), makeTile(0)];
+    expect(canAttemptEquation(inventory, makeEquation(2, 5))).toBe(true);
+  });
+
+  it("disallows any equation when inventory is empty", () => {
+    expect(canAttemptEquation([], makeEquation(3, 3))).toBe(false);
+  });
+});
+
+describe("getOverflowCount", () => {
+  it("returns 0 when inventory is under capacity", () => {
+    const inventory = Array.from({ length: 8 }, (_, index) => makeTile(0, `tile-${index}`));
+    expect(getOverflowCount(inventory)).toBe(0);
+  });
+
+  it("returns 0 when inventory is exactly at capacity", () => {
+    const inventory = Array.from({ length: 10 }, (_, index) => makeTile(0, `tile-${index}`));
+    expect(getOverflowCount(inventory)).toBe(0);
+  });
+
+  it("returns 1 when inventory has one tile over capacity", () => {
+    const inventory = Array.from({ length: 11 }, (_, index) => makeTile(0, `tile-${index}`));
+    expect(getOverflowCount(inventory)).toBe(1);
+  });
+
+  it("returns 3 when inventory has three tiles over capacity", () => {
+    const inventory = Array.from({ length: 13 }, (_, index) => makeTile(0, `tile-${index}`));
+    expect(getOverflowCount(inventory)).toBe(3);
+  });
+});
+
+describe("isSubmissionReady", () => {
+  it("is true in answering phase when selected tiles fill a one-digit answer", () => {
+    const state = makeAnsweringState(makeEquation(3, 3), {
+      selectedTiles: [makeTile(9)],
+    });
+    expect(isSubmissionReady(state)).toBe(true);
+  });
+
+  it("is true in answering phase when selected tiles fill a two-digit answer", () => {
+    const state = makeAnsweringState(makeEquation(2, 5), {
+      selectedTiles: [makeTile(1), makeTile(0)],
+    });
+    expect(isSubmissionReady(state)).toBe(true);
+  });
+
+  it("is false in answering phase when fewer tiles are selected than required", () => {
+    const state = makeAnsweringState(makeEquation(2, 5), {
+      selectedTiles: [makeTile(1)],
+    });
+    expect(isSubmissionReady(state)).toBe(false);
+  });
+
+  it("is false when no tiles are selected", () => {
+    const state = makeAnsweringState(makeEquation(3, 3), { selectedTiles: [] });
+    expect(isSubmissionReady(state)).toBe(false);
+  });
+
+  it("is false outside the answering phase even with a full selection", () => {
+    const state = makeAnsweringState(makeEquation(3, 3), {
+      phase: "feedback",
+      selectedTiles: [makeTile(9)],
+    });
+    expect(isSubmissionReady(state)).toBe(false);
+  });
+});
+
+describe("isDiscardReady", () => {
+  it("is true in overflow phase when marked discards equal the excess", () => {
+    const inventory = Array.from({ length: 11 }, (_, index) => makeTile(0, `tile-${index}`));
+    const state = makeAnsweringState(makeEquation(3, 3), {
+      phase: "overflow",
+      inventory,
+      pendingDiscards: ["tile-0"],
+    });
+    expect(isDiscardReady(state)).toBe(true);
+  });
+
+  it("is false in overflow phase when fewer discards are marked than the excess", () => {
+    const inventory = Array.from({ length: 13 }, (_, index) => makeTile(0, `tile-${index}`));
+    const state = makeAnsweringState(makeEquation(3, 3), {
+      phase: "overflow",
+      inventory,
+      pendingDiscards: ["tile-0"],
+    });
+    expect(isDiscardReady(state)).toBe(false);
+  });
+
+  it("is false in overflow phase when more discards are marked than the excess", () => {
+    const inventory = Array.from({ length: 11 }, (_, index) => makeTile(0, `tile-${index}`));
+    const state = makeAnsweringState(makeEquation(3, 3), {
+      phase: "overflow",
+      inventory,
+      pendingDiscards: ["tile-0", "tile-1"],
+    });
+    expect(isDiscardReady(state)).toBe(false);
+  });
+
+  it("is false outside the overflow phase", () => {
+    const state = makeAnsweringState(makeEquation(3, 3), {
+      phase: "answering",
+      pendingDiscards: [],
+    });
+    expect(isDiscardReady(state)).toBe(false);
+  });
+});

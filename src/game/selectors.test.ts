@@ -39,6 +39,12 @@ describe("constructAnswer", () => {
   it("constructs a single-digit answer from one selected tile", () => {
     expect(constructAnswer([makeTile(7)])).toBe(7);
   });
+
+  it("collapses a leading zero: [0, 9] constructs 9, not 09", () => {
+    // Documented for T05: this can never falsely match a two-digit product,
+    // since every two-slot equation's correct product is >= 10 and 9 < 10.
+    expect(constructAnswer([makeTile(0), makeTile(9)])).toBe(9);
+  });
 });
 
 describe("canAttemptEquation", () => {

@@ -37,7 +37,7 @@ function makeShareDependencies(): ShareDependencies {
 
 function renderApp(
   randomValues: number[],
-  options: { initialLanguage?: Language; gameUrl?: string } = {},
+  options: { initialLanguage?: Language; gameUrl?: string; strictMode?: boolean } = {},
 ) {
   const dependencies: AppDependencies = {
     random: sequenceRandom(...randomValues),
@@ -45,11 +45,12 @@ function renderApp(
     gameUrl: options.gameUrl ?? "https://example.test/",
   };
   const shareDependencies = makeShareDependencies();
-  const utils = render(
+  const tree = (
     <I18nProvider initialLanguage={options.initialLanguage}>
       <App dependencies={dependencies} shareDependencies={shareDependencies} />
-    </I18nProvider>,
+    </I18nProvider>
   );
+  const utils = render(options.strictMode ? <StrictMode>{tree}</StrictMode> : tree);
   return { ...utils, dependencies, shareDependencies };
 }
 
@@ -224,8 +225,15 @@ describe("App", () => {
 
   it("restarts via Enter on the game over screen, even when a non-Play-Again button has focus", async () => {
     const user = userEvent.setup();
+    // Exactly 12 (driveToGameOver) + 2 (the restart draw) = 14 values, rendered
+    // under Strict Mode: a doubled handleRestart would consume 2 extra samples
+    // and sequenceRandom would throw "Random sequence exhausted" rather than
+    // silently passing.
     const randomValues = [...lossRandomValues(), ...equationSamples(2, 3)];
-    const { shareDependencies } = renderApp(randomValues, { initialLanguage: "en" });
+    const { shareDependencies } = renderApp(randomValues, {
+      initialLanguage: "en",
+      strictMode: true,
+    });
 
     await driveToGameOver(user);
     screen.getByRole("button", { name: "Share" }).focus();

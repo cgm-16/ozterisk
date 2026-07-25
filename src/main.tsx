@@ -1,10 +1,25 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './styles/global.css'
-import App from './App.tsx'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { App, type AppDependencies } from "./app/App";
+import { I18nProvider } from "./i18n/I18nContext";
+import type { ShareDependencies } from "./services/sharing";
+import "./styles/global.css";
 
-createRoot(document.getElementById('root')!).render(
+const dependencies: AppDependencies = {
+  random: Math.random,
+  nextTileId: () => crypto.randomUUID(),
+  gameUrl: window.location.origin + window.location.pathname,
+};
+
+const shareDependencies: ShareDependencies = {
+  nativeShare: navigator.share?.bind(navigator),
+  writeClipboard: (text) => navigator.clipboard.writeText(text),
+};
+
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <I18nProvider>
+      <App dependencies={dependencies} shareDependencies={shareDependencies} />
+    </I18nProvider>
   </StrictMode>,
-)
+);

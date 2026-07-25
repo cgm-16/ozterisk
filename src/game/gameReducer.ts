@@ -1,6 +1,6 @@
 import type { GameAction, GameState } from "./types";
 import { sortTiles } from "./factories";
-import { getAnswerLength } from "./selectors";
+import { constructAnswer, getAnswerLength, getOverflowCount } from "./selectors";
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
@@ -42,8 +42,60 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
-    case "SUBMIT_CORRECT":
-    case "SUBMIT_INCORRECT":
+    case "SUBMIT_CORRECT": {
+      if (state.phase !== "answering" || state.equation === null) return state;
+      if (state.selectedTiles.length !== getAnswerLength(state.equation)) return state;
+      const submittedValue = constructAnswer(state.selectedTiles);
+      if (submittedValue === null || submittedValue !== state.equation.product) return state;
+      if (action.rewardTiles.length !== state.selectedTiles.length + 1) return state;
+      const inventoryIds = new Set(state.inventory.map((tile) => tile.id));
+      if (action.rewardTiles.some((tile) => inventoryIds.has(tile.id))) return state;
+
+      const newRewardTiles = action.rewardTiles.map((tile) => ({ ...tile, isNew: true }));
+      const nextInventory = sortTiles([...state.inventory, ...newRewardTiles]);
+      const nextCurrentStreak = state.currentStreak + 1;
+
+      return {
+        ...state,
+        phase: getOverflowCount(nextInventory) > 0 ? "overflow" : "feedback",
+        inventory: nextInventory,
+        selectedTiles: [],
+        score: state.score + 1,
+        currentStreak: nextCurrentStreak,
+        longestStreak: Math.max(state.longestStreak, nextCurrentStreak),
+        totalRounds: state.totalRounds + 1,
+        lastResult: {
+          kind: "correct",
+          submittedValue,
+          correctValue: state.equation.product,
+          submittedTiles: state.selectedTiles,
+          rewardTileIds: action.rewardTiles.map((tile) => tile.id),
+        },
+      };
+    }
+
+    case "SUBMIT_INCORRECT": {
+      if (state.phase !== "answering" || state.equation === null) return state;
+      if (state.selectedTiles.length !== getAnswerLength(state.equation)) return state;
+      const submittedValue = constructAnswer(state.selectedTiles);
+      if (submittedValue === null || submittedValue === state.equation.product) return state;
+
+      return {
+        ...state,
+        phase: "feedback",
+        selectedTiles: [],
+        currentStreak: 0,
+        totalRounds: state.totalRounds + 1,
+        lastResult: {
+          kind: "incorrect",
+          submittedValue,
+          correctValue: state.equation.product,
+          submittedTiles: state.selectedTiles,
+          rewardTileIds: [],
+        },
+      };
+    }
+
     case "TOGGLE_DISCARD":
     case "CONFIRM_DISCARD":
     case "NEXT_ROUND":

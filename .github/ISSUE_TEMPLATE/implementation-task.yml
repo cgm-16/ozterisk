@@ -1,0 +1,104 @@
+name: Implementation task
+description: Track one task from the 1-0 loop-agent plan (docs/tasks/T##-*.md).
+title: "[T##] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill in the §4.3 metadata fields below, then copy the task's Purpose,
+        Interfaces, Steps, Acceptance criteria, and Commit sections from its
+        `docs/tasks/T##-*.md` file into a comment or the issue body.
+  - type: input
+    id: task-id
+    attributes:
+      label: Task ID
+      description: Task identifier from docs/tasks (e.g. T07).
+      placeholder: T##
+    validations:
+      required: true
+  - type: input
+    id: milestone
+    attributes:
+      label: Milestone
+      description: Milestone this task belongs to, exactly as written in the task's YAML front matter.
+      placeholder: "M# — Milestone name"
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0
+        - P1
+    validations:
+      required: true
+  - type: dropdown
+    id: estimate
+    attributes:
+      label: Estimate
+      options:
+        - XS
+        - S
+        - M
+        - L
+    validations:
+      required: true
+  - type: input
+    id: wave
+    attributes:
+      label: Wave
+      description: DAG wave this task runs in.
+      placeholder: W#
+    validations:
+      required: true
+  - type: input
+    id: dependency-ids
+    attributes:
+      label: Dependency IDs
+      description: Comma-separated task IDs this task's `depends_on` lists. Leave blank if none.
+      placeholder: T01, T02
+  - type: dropdown
+    id: parallel-safe
+    attributes:
+      label: Parallel safe
+      description: Whether this task may run concurrently with others in its DAG wave.
+      options:
+        - "true"
+        - "false"
+    validations:
+      required: true
+  - type: textarea
+    id: owned-paths
+    attributes:
+      label: Owned paths
+      description: Exact paths (`paths:` from the task file) this task is allowed to touch, one per line.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-gate
+    attributes:
+      label: Acceptance gate
+      description: Exact commands or observable results (`acceptance_gate:` from the task file) that must pass before this task is done.
+      render: text
+    validations:
+      required: true
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Focused tests pass
+          required: true
+        - label: Full test suite passes
+          required: true
+        - label: Typecheck passes
+          required: true
+        - label: Lint passes
+          required: true
+        - label: Production build passes
+          required: true
+        - label: All `depends_on` tasks are merged and green
+          required: true

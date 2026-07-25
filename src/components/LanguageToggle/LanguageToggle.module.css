@@ -1,0 +1,20 @@
+.toggle {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.button[aria-pressed="true"] {
+  border-color: var(--color-focus-ring);
+  font-weight: 600;
+}

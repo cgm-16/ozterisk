@@ -20,8 +20,8 @@
   font-weight: 600;
   cursor: pointer;
   transition:
-    background-color 150ms ease,
-    transform 100ms ease;
+    background-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 .confirm:disabled {
@@ -30,5 +30,5 @@
 }
 
 .confirm:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(var(--press-offset));
 }

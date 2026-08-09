@@ -24,9 +24,9 @@
   font-size: 1.25rem;
   cursor: pointer;
   transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    transform 100ms ease;
+    background-color var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 /* A slot is only ever disabled because it holds no tile (see
@@ -45,5 +45,5 @@
 }
 
 .slot:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(var(--press-offset));
 }

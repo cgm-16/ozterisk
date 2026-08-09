@@ -20,7 +20,7 @@
 .details {
   width: 100%;
   text-align: left;
-  border: 1px solid var(--color-border);
+  border: var(--border-hairline) solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-3) var(--space-4);
 }
@@ -51,12 +51,12 @@
   font-weight: 600;
   cursor: pointer;
   transition:
-    background-color 150ms ease,
-    transform 100ms ease;
+    background-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 .start:active {
-  transform: translateY(1px);
+  transform: translateY(var(--press-offset));
 }
 
 @media (max-width: 40rem) {

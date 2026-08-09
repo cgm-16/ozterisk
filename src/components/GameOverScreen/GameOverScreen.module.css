@@ -54,14 +54,14 @@
   font-weight: 600;
   cursor: pointer;
   transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    transform 100ms ease;
+    background-color var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 .playAgain:active,
 .secondary:active {
-  transform: translateY(1px);
+  transform: translateY(var(--press-offset));
 }
 
 .playAgain {
@@ -71,7 +71,7 @@
 }
 
 .secondary {
-  border: 1px solid var(--color-border);
+  border: var(--border-hairline) solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
 }

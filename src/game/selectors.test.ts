@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   canAttemptEquation,
+  canConstruct,
   constructAnswer,
   getAnswerLength,
   getOverflowCount,
@@ -78,6 +79,31 @@ describe("canAttemptEquation", () => {
 
   it("disallows any equation when inventory is empty", () => {
     expect(canAttemptEquation([], makeEquation(3, 3))).toBe(false);
+  });
+});
+
+describe("canConstruct", () => {
+  const hand = [makeTile(1, "a"), makeTile(2, "b"), makeTile(4, "c")];
+
+  it("accepts a one-digit product whose digit is held", () => {
+    expect(canConstruct(hand, 4)).toBe(true);
+  });
+
+  it("accepts a two-digit product whose digits are both held", () => {
+    expect(canConstruct(hand, 42)).toBe(true);
+  });
+
+  it("rejects a product missing one digit", () => {
+    expect(canConstruct(hand, 45)).toBe(false);
+  });
+
+  it("requires two tiles for a repeated digit", () => {
+    expect(canConstruct([makeTile(1, "a")], 11)).toBe(false);
+    expect(canConstruct([makeTile(1, "a"), makeTile(1, "b")], 11)).toBe(true);
+  });
+
+  it("rejects everything from an empty hand", () => {
+    expect(canConstruct([], 4)).toBe(false);
   });
 });
 

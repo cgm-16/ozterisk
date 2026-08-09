@@ -24,6 +24,21 @@ export function canAttemptEquation(
   return inventory.length >= getAnswerLength(equation);
 }
 
+// Multiset check: a product needing two of a digit requires two tiles.
+export function canConstruct(inventory: readonly Tile[], product: number): boolean {
+  const available = new Map<number, number>();
+  for (const tile of inventory) {
+    available.set(tile.digit, (available.get(tile.digit) ?? 0) + 1);
+  }
+  for (const character of String(product)) {
+    const digit = Number(character);
+    const remaining = available.get(digit) ?? 0;
+    if (remaining === 0) return false;
+    available.set(digit, remaining - 1);
+  }
+  return true;
+}
+
 export function getOverflowCount(inventory: readonly Tile[]): number {
   return Math.max(0, inventory.length - INVENTORY_CAPACITY);
 }

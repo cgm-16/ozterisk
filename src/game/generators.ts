@@ -1,5 +1,6 @@
 import type { Digit, Equation, RandomSource, Tile, TileIdFactory } from "./types";
 import { OPERAND_MAX, OPERAND_MIN, REWARD_DIGIT_COUNT } from "./constants";
+import { canConstruct } from "./selectors";
 
 // The canonical 45-entry pool of unordered operand pairs (1 <= left <= right <= 9).
 const EQUATION_PAIRS: ReadonlyArray<readonly [number, number]> = (() => {
@@ -29,6 +30,15 @@ function sampleBinIndex(value: number, binCount: number): number {
   return Math.min(Math.floor(scaled), binCount - 1);
 }
 
+// Both generators end with the same order-flip; extracted once both call sites exist.
+function orientPair(pair: readonly [number, number], orderSample: number): Equation {
+  const [a, b] = pair;
+  const shouldReverse = orderSample >= 0.5;
+  const left = shouldReverse ? b : a;
+  const right = shouldReverse ? a : b;
+  return { left, right, product: left * right };
+}
+
 export function generateEquation(random: RandomSource): Equation {
   const pairSample = readRandomSample(random);
   const pairIndex = sampleBinIndex(pairSample, EQUATION_PAIRS.length);
@@ -38,12 +48,28 @@ export function generateEquation(random: RandomSource): Equation {
   }
 
   const orderSample = readRandomSample(random);
-  const shouldReverse = orderSample >= 0.5;
+  return orientPair(pair, orderSample);
+}
 
-  const [a, b] = pair;
-  const left = shouldReverse ? b : a;
-  const right = shouldReverse ? a : b;
-  return { left, right, product: left * right };
+export function generateKindEquation(
+  random: RandomSource,
+  inventory: readonly Tile[],
+  kindRate: number,
+): Equation {
+  const gateSample = readRandomSample(random);
+  if (gateSample >= kindRate) return generateEquation(random);
+
+  const constructible = EQUATION_PAIRS.filter(([left, right]) =>
+    canConstruct(inventory, left * right),
+  );
+  // An empty subset means the hand can spell nothing at all. Fall back to
+  // the uniform draw; sampling an empty pool would throw.
+  if (constructible.length === 0) return generateEquation(random);
+
+  const pairSample = readRandomSample(random);
+  const pair = constructible[sampleBinIndex(pairSample, constructible.length)];
+  if (!pair) throw new RangeError(`No constructible pair at sample ${pairSample}`);
+  return orientPair(pair, readRandomSample(random));
 }
 
 export function generateRewardTiles(

@@ -4,9 +4,10 @@ import { GameOverScreen } from "../components/GameOverScreen/GameOverScreen";
 import { GameScreen } from "../components/GameScreen/GameScreen";
 import { LanguageToggle } from "../components/LanguageToggle/LanguageToggle";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
+import { KIND_EQUATION_RATE } from "../game/balance";
 import { createInitialInventory, createTitleState } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
-import { generateEquation, generateRewardTiles } from "../game/generators";
+import { generateKindEquation, generateRewardTiles } from "../game/generators";
 import { constructAnswer, getRewardCount } from "../game/selectors";
 import type { RandomSource, TileIdFactory } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
@@ -28,13 +29,13 @@ export function App({ dependencies, shareDependencies }: AppProps) {
 
   const handleStart = useCallback(() => {
     const inventory = createInitialInventory(dependencies.nextTileId);
-    const equation = generateEquation(dependencies.random);
+    const equation = generateKindEquation(dependencies.random, inventory, KIND_EQUATION_RATE);
     dispatch({ type: "START_RUN", equation, inventory });
   }, [dependencies]);
 
   const handleRestart = useCallback(() => {
     const inventory = createInitialInventory(dependencies.nextTileId);
-    const equation = generateEquation(dependencies.random);
+    const equation = generateKindEquation(dependencies.random, inventory, KIND_EQUATION_RATE);
     dispatch({ type: "RESTART_RUN", equation, inventory });
   }, [dependencies]);
 
@@ -56,9 +57,11 @@ export function App({ dependencies, shareDependencies }: AppProps) {
   }, [state.equation, state.selectedTiles, dependencies]);
 
   const handleNextRound = useCallback(() => {
-    const equation = generateEquation(dependencies.random);
+    // state.inventory is already final (post-discard) at `feedback`; a stale
+    // capture here would silently bias equations against the previous round's hand.
+    const equation = generateKindEquation(dependencies.random, state.inventory, KIND_EQUATION_RATE);
     dispatch({ type: "NEXT_ROUND", equation });
-  }, [dependencies]);
+  }, [dependencies, state.inventory]);
 
   // §1.11: gameOver's Enter shortcut restarts the run, equivalent to Play
   // Again, regardless of which button currently has focus. useGameKeyboard

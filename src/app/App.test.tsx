@@ -17,14 +17,17 @@ for (let left = 1; left <= 9; left++) {
   for (let right = left; right <= 9; right++) EQUATION_POOL.push([left, right]);
 }
 
-function equationSamples(left: number, right: number): [number, number] {
+function equationSamples(left: number, right: number): [number, number, number] {
   const a = Math.min(left, right);
   const b = Math.max(left, right);
   const index = EQUATION_POOL.findIndex(([l, r]) => l === a && r === b);
   if (index === -1) throw new Error(`No pool entry for ${left}x${right}`);
+  // 0.99 clears KIND_EQUATION_RATE, forcing the uniform draw so a test can
+  // still name its equation by operands. Kind-bias behaviour is covered in
+  // generators.test.ts instead.
   // 0.25 stays under the 0.5 reverse threshold, so the equation keeps the
   // pool's natural (a, b) order: equation.left === a, equation.right === b.
-  return [index / EQUATION_POOL.length, 0.25];
+  return [0.99, index / EQUATION_POOL.length, 0.25];
 }
 
 function rewardSample(digit: number): number {
@@ -225,8 +228,8 @@ describe("App", () => {
 
   it("restarts via Enter on the game over screen, even when a non-Play-Again button has focus", async () => {
     const user = userEvent.setup();
-    // Exactly 12 (driveToGameOver) + 2 (the restart draw) = 14 values, rendered
-    // under Strict Mode: a doubled handleRestart would consume 2 extra samples
+    // Exactly 18 (driveToGameOver) + 3 (the restart draw) = 21 values, rendered
+    // under Strict Mode: a doubled handleRestart would consume 3 extra samples
     // and sequenceRandom would throw "Random sequence exhausted" rather than
     // silently passing.
     const randomValues = [...lossRandomValues(), ...equationSamples(2, 3)];
@@ -313,17 +316,17 @@ describe("App", () => {
     expect(calls).toBe(0); // mounting/rendering the title screen consumes nothing
 
     await user.click(screen.getByRole("button", { name: "Start Run" }));
-    expect(calls).toBe(2); // START_RUN: one equation draw, not doubled by Strict Mode
+    expect(calls).toBe(3); // START_RUN: one equation draw (gate + pair + order), not doubled by Strict Mode
 
     await user.click(screen.getByRole("button", { name: "Digit 6" }));
     await user.click(screen.getByRole("button", { name: "Submit" }));
-    expect(calls).toBe(4); // SUBMIT_CORRECT: two reward tiles
+    expect(calls).toBe(5); // SUBMIT_CORRECT: two reward tiles
 
     await user.click(screen.getByRole("button", { name: "Digit 9" }));
     await user.click(screen.getByRole("button", { name: "Confirm Discard" }));
-    expect(calls).toBe(4); // CONFIRM_DISCARD draws no randomness
+    expect(calls).toBe(5); // CONFIRM_DISCARD draws no randomness
 
     await user.click(screen.getByRole("button", { name: "Next Round" }));
-    expect(calls).toBe(6); // NEXT_ROUND: one more equation draw
+    expect(calls).toBe(8); // NEXT_ROUND: one more equation draw (gate + pair + order)
   });
 });

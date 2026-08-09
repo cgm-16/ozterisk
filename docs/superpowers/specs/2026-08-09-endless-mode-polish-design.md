@@ -2,8 +2,12 @@
 
 Date: 2026-08-09
 Status: approved for planning
-Supersedes: nothing. Amends `docs/spec/product.md` (§ Kind equation bias,
-§ Discard confirmation, § Clear selection) once implemented.
+Supersedes: nothing.
+Once implemented, amends `docs/spec/product.md` (§ Kind equation bias,
+§ Discard confirmation, § Clear selection), `docs/spec/architecture.md`
+(§ Tuning surface), and `AGENTS.md` (the `balance.ts` collaboration rule).
+Planning rationale: `docs/plan/tuning-and-design-system.md`.
+Decision record: `docs/journal/journal-2026-08-09.md`.
 
 ## 1. Context
 
@@ -186,7 +190,7 @@ Implemented **additively**, leaving the existing generator untouched:
   `generateEquation(random)`. Otherwise sample uniformly from the
   constructible subset of `EQUATION_PAIRS`. **If that subset is empty, fall
   back to `generateEquation`**, or it throws.
-- `constants.ts` — `KIND_EQUATION_RATE = 0.2`, one named constant so
+- `balance.ts` (§3.5) — `KIND_EQUATION_RATE = 0.2`, one named dial so
   retuning is a one-line change.
 - `App.tsx` — swap all three call sites. `START_RUN` and `RESTART_RUN` pass
   the freshly built inventory, available in the same handler and moot anyway
@@ -208,6 +212,83 @@ Endless is a survival mode, so rounds survived becomes the primary figure.
 - `services/sharing.ts` leads the share text with rounds.
 - The terminal equation stays excluded from the count, per the 1.0 release
   smoke test.
+
+### 3.5 Tuning surface
+
+This build changes how the game feels, so it will be hand-tuned across many
+iterations. The tuning infrastructure rides along because this build already
+edits `constants.ts`, `App.tsx`, and the CSS modules, and already introduces
+a new dial. Rationale and the full audit are in
+`docs/plan/tuning-and-design-system.md`.
+
+**`src/game/balance.ts` — split from `constants.ts` by safety.** A tuning
+surface is only usable if every value in it is safe to change:
+
+- `balance.ts` — **dials**: `INVENTORY_CAPACITY`, `REWARD_BONUS`,
+  `KIND_EQUATION_RATE`.
+- `constants.ts` — **domain definitions** whose change alters what the game
+  *is*: `OPERAND_MIN`, `OPERAND_MAX`, and the digit-spread value currently
+  private at `generators.ts:4`.
+
+Named exports, matching the existing `constants.ts` style. Each dial
+documents units, safe range, and economy effect so the file teaches what
+moves what:
+
+```ts
+/**
+ * Extra tiles returned above the number spent on a correct answer.
+ * Net inventory change per correct answer is exactly +REWARD_BONUS.
+ * Economy: drift = b·REWARD_BONUS − (1−b)·1.71  (§1.2)
+ * Range: 1 = shipped. 0 removes overflow entirely, deleting the discard
+ * mechanic. Above 1 makes runs unloseable at any realistic b.
+ */
+export const REWARD_BONUS = 1;
+```
+
+**Remove the `+1` duplication.** `App.tsx:48` generates the reward count and
+`gameReducer.ts:62` validates it, both as the literal `selectedTiles.length
++ 1`. Changing one without the other makes the guard reject the action and
+return unchanged state — every correct answer silently stops working, with
+no error. Add `getRewardCount(spentCount: number): number` to `selectors.ts`
+and use it at both sites so generator and validator cannot disagree. Both
+call sites are already being edited by this build.
+
+**Motion and hairline tokens.** `150ms ease`, `100ms ease`, and
+`translateY(1px)` are duplicated across 7 CSS modules, so retuning press
+feel means editing seven files. Add to `global.css` and substitute:
+
+```css
+--duration-fast: 100ms;    /* press / transform response */
+--duration-base: 150ms;    /* color and border state changes */
+--ease-standard: ease;
+--press-offset: 1px;       /* :active translateY */
+--border-hairline: 1px;    /* the repeated 1px solid border */
+```
+
+The `prefers-reduced-motion` block (`global.css:98-114`) overrides
+`transition-duration` and `*:active { transform }` with `!important`, so
+tokenizing the source values does not weaken it — verify explicitly.
+
+**`balance.test.ts` — the economy model as an executable invariant.** This is
+what stops later agent work from quietly breaking hand-tuned values.
+
+- Model helper in `src/test/economy.ts` (test-only, so nothing ships):
+  `projectBuildableRate(handSize)` implementing `1 − 2(0.9)ⁿ + (0.8)ⁿ`
+  weighted 13/32, and `projectDrift(b)`.
+- Assert drift at capacity stays negative with a documented margin: runs
+  must remain finite.
+- **The failure message must print** computed `b`, the cliff (0.631), and
+  the margin. A bare assertion tells whoever tripped it nothing; the point is
+  to explain *why* the economy broke.
+- Analytic model assuming a uniform hand, not a simulation. No Monte Carlo —
+  slow and flaky.
+
+**`AGENTS.md` collaboration rule.** Agents may *add* dials to `balance.ts`
+and must document each one's economy effect; agents must **not change the
+value** of an existing dial without explicit instruction, since those are
+hand-tuned. Tuning commits use `tune(balance):`; feature commits never carry
+value changes. This separates the two kinds of edit by file and by commit so
+git stops manufacturing conflicts between them.
 
 ## 4. Explicitly not doing
 
@@ -238,6 +319,16 @@ Gates: `npm run lint && npm run typecheck && npm test && npm run build`.
   `requiredCount === 1`; Confirm still rendered for multi-tile; Clear
   enable/disable.
 - New — overflow digit-key handling in `useGameKeyboard`.
+- `src/game/balance.test.ts` — **confirm the guardrail fails** by temporarily
+  setting `KIND_EQUATION_RATE` to 0.35, and that the message names `b`, the
+  cliff, and the margin. A guardrail never observed failing is not known to
+  work.
+- The `getRewardCount` extraction is behaviour-preserving: the existing
+  `gameReducer.test.ts` submission suite must stay **green untouched**. If it
+  needs edits, the refactor changed semantics — stop and reassess.
+- Motion tokens are a pure substitution with no visual diff. Check a press
+  interaction in `npm run dev`, then re-check under OS "reduce motion" to
+  confirm `global.css:98-114` still wins.
 
 Manual check in `npm run dev`, since the goal is feel: play ~20 rounds and
 confirm a correct answer costs *tap tile → next* rather than three actions;

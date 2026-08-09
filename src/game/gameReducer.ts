@@ -5,6 +5,7 @@ import {
   constructAnswer,
   getAnswerLength,
   getOverflowCount,
+  getRewardCount,
   isDiscardReady,
 } from "./selectors";
 
@@ -59,7 +60,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (state.selectedTiles.length !== getAnswerLength(state.equation)) return state;
       const submittedValue = constructAnswer(state.selectedTiles);
       if (submittedValue === null || submittedValue !== state.equation.product) return state;
-      if (action.rewardTiles.length !== state.selectedTiles.length + 1) return state;
+      if (action.rewardTiles.length !== getRewardCount(state.selectedTiles.length)) return state;
       const inventoryIds = new Set(state.inventory.map((tile) => tile.id));
       if (action.rewardTiles.some((tile) => inventoryIds.has(tile.id))) return state;
 

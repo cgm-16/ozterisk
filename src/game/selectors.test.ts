@@ -4,10 +4,23 @@ import {
   constructAnswer,
   getAnswerLength,
   getOverflowCount,
+  getRewardCount,
   isDiscardReady,
   isSubmissionReady,
 } from "./selectors";
+import { REWARD_BONUS } from "./balance";
 import { makeAnsweringState, makeEquation, makeTile } from "../test/fixtures";
+
+describe("getRewardCount", () => {
+  it("returns one more tile than was spent", () => {
+    expect(getRewardCount(1)).toBe(2);
+    expect(getRewardCount(2)).toBe(3);
+  });
+
+  it("tracks REWARD_BONUS rather than a hardcoded increment", () => {
+    expect(getRewardCount(2)).toBe(2 + REWARD_BONUS);
+  });
+});
 
 describe("getAnswerLength", () => {
   it("returns 1 for a one-digit product", () => {

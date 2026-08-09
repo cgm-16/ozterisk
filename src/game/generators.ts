@@ -1,7 +1,5 @@
 import type { Digit, Equation, RandomSource, Tile, TileIdFactory } from "./types";
-import { OPERAND_MAX, OPERAND_MIN } from "./constants";
-
-const REWARD_DIGIT_COUNT = 10;
+import { OPERAND_MAX, OPERAND_MIN, REWARD_DIGIT_COUNT } from "./constants";
 
 // The canonical 45-entry pool of unordered operand pairs (1 <= left <= right <= 9).
 const EQUATION_PAIRS: ReadonlyArray<readonly [number, number]> = (() => {

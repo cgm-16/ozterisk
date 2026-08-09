@@ -7,7 +7,7 @@ import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { createInitialInventory, createTitleState } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
 import { generateEquation, generateRewardTiles } from "../game/generators";
-import { constructAnswer } from "../game/selectors";
+import { constructAnswer, getRewardCount } from "../game/selectors";
 import type { RandomSource, TileIdFactory } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
 import styles from "./App.module.css";
@@ -45,7 +45,7 @@ export function App({ dependencies, shareDependencies }: AppProps) {
     const submittedValue = constructAnswer(state.selectedTiles);
     if (submittedValue === state.equation.product) {
       const rewardTiles = generateRewardTiles(
-        state.selectedTiles.length + 1,
+        getRewardCount(state.selectedTiles.length),
         dependencies.random,
         dependencies.nextTileId,
       );

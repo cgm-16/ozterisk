@@ -9,6 +9,16 @@
 | `M2 — Playable Bilingual PoC` | Complete mouse/touch/keyboard run loop | T08–T12 merged; integration suite green |
 | `M3 — Release Candidate` | Responsive, accessible, deployable release | T13–T14 merged; release checklist and production smoke pass |
 
+M0–M3 are closed; 1.0 shipped as `eb6cc67`. Post-release milestones follow.
+Their planning lives in `docs/plan/tuning-and-design-system.md` and the
+design docs under `docs/superpowers/specs/`.
+
+| Milestone | Outcome | Exit gate |
+|---|---|---|
+| `M4 — Endless Polish and Tuning Surface` | Reduced round friction, kind equation bias, and a single documented tuning surface | Discard collapse, Clear action, overflow keyboard access, `balance.ts`, and `balance.test.ts` merged; economy invariant green |
+| `M5 — States Gallery` | Every component state viewable without playing to it | Dev-only `gallery.html` serves all five phases; absent from `dist/` after `npm run build` |
+| `M6 — Classic Mode` | Second mode: shrinking capacity, special tiles, definite run arc | Mode select, `getCapacity(round)`, and the face-set tile mechanism merged; both modes' economy invariants green |
+
 ## 5. Dependency DAG and Execution Waves
 
 ```mermaid

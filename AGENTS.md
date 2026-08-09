@@ -98,6 +98,13 @@ Closes #<issue>
 - [ ] Relevant acceptance path exercised
 ```
 
+### 4.5 Tuning values
+
+Agents may **add** dials to `src/game/balance.ts` and must document each
+one's economy effect. Agents must **not change the value** of an existing
+dial without explicit instruction — those are hand-tuned. Tuning commits
+use `tune(balance):`; feature commits never carry value changes.
+
 ## Loop-Agent Operating Protocol
 
 ### 7.1 Start-of-loop procedure

@@ -4,15 +4,20 @@
 // not Monte Carlo simulation.
 import { OPERAND_MAX, OPERAND_MIN, REWARD_DIGIT_COUNT } from "../game/constants";
 import { REWARD_BONUS } from "../game/balance";
+import { getAnswerLength } from "../game/selectors";
 
 // Splits the 45-entry operand-pair pool (1 <= left <= right <= 9) by answer
 // length, mirroring the EQUATION_PAIRS construction in generators.ts.
+// Delegates to getAnswerLength() rather than restating its >= 10 threshold:
+// if that rule ever changes, the model must track it automatically, or this
+// guard would keep silently protecting a rule the game no longer runs.
 function pairsByAnswerLength(): { oneDigit: number; twoDigit: number } {
   let oneDigit = 0;
   let twoDigit = 0;
   for (let left = OPERAND_MIN; left <= OPERAND_MAX; left++) {
     for (let right = left; right <= OPERAND_MAX; right++) {
-      if (left * right < 10) {
+      const answerLength = getAnswerLength({ left, right, product: left * right });
+      if (answerLength === 1) {
         oneDigit++;
       } else {
         twoDigit++;

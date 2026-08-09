@@ -134,16 +134,17 @@ describe("App", () => {
     expect(hudField("Streak")).toBe("1");
     expect(screen.getByRole("status")).toHaveTextContent("Correct");
     expect(screen.getByText("Choose 1 tile(s) to discard.")).toBeInTheDocument();
-
-    const confirmButton = screen.getByRole("button", { name: "Confirm Discard" });
-    expect(confirmButton).toBeDisabled();
-
-    // Discard an old (non-reward) tile so both rewards stay visible below.
-    await user.click(screen.getByRole("button", { name: "Digit 9" }));
-    expect(confirmButton).toBeEnabled();
-    await user.click(confirmButton);
-
     expect(screen.queryByRole("button", { name: "Confirm Discard" })).not.toBeInTheDocument();
+
+    // A forced single-tile excess collapses to one tap: marking an old
+    // (non-reward) tile completes the discard immediately, no Confirm needed.
+    await user.click(screen.getByRole("button", { name: "Digit 9" }));
+
+    // Confirm's absence at requiredCount 1 doesn't by itself prove the discard
+    // completed (it's also hidden while still overflowing at count 1), so
+    // check the overflow instruction itself is gone: that only happens once
+    // CONFIRM_DISCARD has actually advanced the phase past "overflow".
+    expect(screen.queryByText("Choose 1 tile(s) to discard.")).not.toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Correct");
     expect(screen.getByRole("button", { name: "Digit 0, New tile" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Digit 1, New tile" })).toBeInTheDocument();
@@ -173,8 +174,7 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Start Run" }));
     await user.click(screen.getByRole("button", { name: "Digit 6" }));
     await user.click(screen.getByRole("button", { name: "Submit" }));
-    await user.click(screen.getByRole("button", { name: "Digit 9" }));
-    await user.click(screen.getByRole("button", { name: "Confirm Discard" }));
+    await user.click(screen.getByRole("button", { name: "Digit 9" })); // completes the forced single discard
     await user.click(screen.getByRole("button", { name: "Next Round" }));
 
     expect(hudField("Streak")).toBe("1");
@@ -322,8 +322,7 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Submit" }));
     expect(calls).toBe(5); // SUBMIT_CORRECT: two reward tiles
 
-    await user.click(screen.getByRole("button", { name: "Digit 9" }));
-    await user.click(screen.getByRole("button", { name: "Confirm Discard" }));
+    await user.click(screen.getByRole("button", { name: "Digit 9" })); // completes the forced single discard
     expect(calls).toBe(5); // CONFIRM_DISCARD draws no randomness
 
     await user.click(screen.getByRole("button", { name: "Next Round" }));

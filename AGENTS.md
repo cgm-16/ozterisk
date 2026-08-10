@@ -73,12 +73,8 @@ coherent commit each, and one PR closes every issue in that milestone.
 - Commit: Conventional Commit with `Task: T##` in the body. One commit per
   task, independently reviewable.
 - PR title: `[M#] Imperative outcome`.
-- PR body must contain a `Closes #<issue>` line per task issue, plus:
-
-M0–M3 used one branch and PR *per task* (`feat/T##-…`, `[T##] …`), which was
-right for fourteen tasks building a codebase from nothing. From M4 the suite
-is comprehensive and milestones are small, so the merge unit is the
-milestone. Older PR history reflects the previous convention.
+- PR body must contain a `Closes #<issue>` line per task issue, plus the
+  template below.
 
 ```markdown
 Closes #<issue>
@@ -97,6 +93,11 @@ Closes #<issue>
 ## Manual checks
 - [ ] Relevant acceptance path exercised
 ```
+
+M0–M3 used one branch and PR *per task* (`feat/T##-…`, `[T##] …`), which was
+right for fourteen tasks building a codebase from nothing. From M4 the suite
+is comprehensive and milestones are small, so the merge unit is the
+milestone. Older PR history reflects the previous convention.
 
 ### 4.5 Tuning values
 

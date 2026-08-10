@@ -47,7 +47,10 @@
 /* A filled slot is clickable (it returns its tile to inventory); signal that
    with a border/background shift rather than a "×" glyph, since ::before/
    ::after generated content can leak into the accessibility tree and this
-   slot already carries a full aria-label (AnswerSlots.tsx:21-23). */
+   slot already carries a full aria-label (AnswerSlots.tsx:21-23). Background
+   shifts to --color-canvas, not --color-surface: the rest state above already
+   sets a filled slot's background to --color-surface, so --color-surface here
+   would be a no-op and the shift would have no visible effect. */
 .slot:not(:disabled):hover,
 .slot:not(:disabled):focus-visible {
   border-color: var(--color-accent);

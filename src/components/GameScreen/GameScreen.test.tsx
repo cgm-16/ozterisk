@@ -113,6 +113,28 @@ describe("GameScreen interactions", () => {
     expect(dispatch).toHaveBeenCalledWith({ type: "RETURN_TILE", tileId: "second" });
   });
 
+  // 4b. Escape clears the entire selection
+  it("dispatches CLEAR_SELECTION on Escape when tiles are selected", async () => {
+    const equation = makeEquation(7, 8); // product 56, two slots
+    const selectedTiles = [makeTile(5, "first"), makeTile(6, "second")];
+    const state = makeAnsweringState(equation, { inventory: [], selectedTiles });
+    const { dispatch } = renderScreen(state);
+
+    await userEvent.keyboard("{Escape}");
+
+    expect(dispatch).toHaveBeenCalledWith({ type: "CLEAR_SELECTION" });
+  });
+
+  it("does not dispatch on Escape when nothing is selected", async () => {
+    const equation = makeEquation(7, 8);
+    const state = makeAnsweringState(equation, { inventory: [], selectedTiles: [] });
+    const { dispatch } = renderScreen(state);
+
+    await userEvent.keyboard("{Escape}");
+
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
   // 5. Enter submits only when ready
   it("submits on Enter when all answer slots are filled", async () => {
     const equation = makeEquation(7, 8);
@@ -222,6 +244,39 @@ describe("GameScreen interactions", () => {
     await userEvent.click(submitButton);
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
+
+  // 10. Clear button visibility follows selection state
+  it("disables Clear when nothing is selected", () => {
+    const equation = makeEquation(5, 6);
+    const state = makeAnsweringState(equation, { inventory: [], selectedTiles: [] });
+    renderScreen(state);
+
+    expect(screen.getByRole("button", { name: "Clear" })).toBeDisabled();
+  });
+
+  it("enables Clear once a tile is chosen", () => {
+    const equation = makeEquation(5, 6);
+    const state = makeAnsweringState(equation, {
+      inventory: [],
+      selectedTiles: [makeTile(3, "sel")],
+    });
+    renderScreen(state);
+
+    expect(screen.getByRole("button", { name: "Clear" })).toBeEnabled();
+  });
+
+  it("dispatches CLEAR_SELECTION when Clear is clicked", async () => {
+    const equation = makeEquation(5, 6);
+    const state = makeAnsweringState(equation, {
+      inventory: [],
+      selectedTiles: [makeTile(3, "sel")],
+    });
+    const { dispatch } = renderScreen(state);
+
+    await userEvent.click(screen.getByRole("button", { name: "Clear" }));
+
+    expect(dispatch).toHaveBeenCalledWith({ type: "CLEAR_SELECTION" });
   });
 
   // Regression coverage: the phase action button (Next Round / Confirm
@@ -467,5 +522,36 @@ describe("GameScreen overflow collapse", () => {
     await userEvent.keyboard("5");
 
     expect(dispatch).not.toHaveBeenCalled();
+  });
+});
+
+// Regression coverage for useGameKeyboard's effect-registered `keydown`
+// listener. Unlike a plain onClick (which cannot double-fire under
+// StrictMode — only render bodies, reducers, and effect setup/cleanup are
+// double-invoked), a dropped `useEffect` cleanup here would leave two
+// `window.addEventListener("keydown", ...)` registrations live, so a single
+// key press would dispatch twice. Escape is used because exactly one press
+// yields exactly one action, making a doubled dispatch immediately visible
+// in the asserted sequence.
+describe("useGameKeyboard under React.StrictMode", () => {
+  it("dispatches CLEAR_SELECTION exactly once for a single Escape press", async () => {
+    const user = userEvent.setup();
+    const equation = makeEquation(7, 8);
+    const state = makeAnsweringState(equation, {
+      inventory: [],
+      selectedTiles: [makeTile(5, "a"), makeTile(6, "b")],
+    });
+    const dispatch = vi.fn();
+    render(
+      <StrictMode>
+        <I18nProvider initialLanguage="en">
+          <GameScreen state={state} dispatch={dispatch} onSubmit={vi.fn()} onNextRound={vi.fn()} />
+        </I18nProvider>
+      </StrictMode>,
+    );
+
+    await user.keyboard("{Escape}");
+
+    expect(dispatch.mock.calls.map(([action]) => action.type)).toEqual(["CLEAR_SELECTION"]);
   });
 });

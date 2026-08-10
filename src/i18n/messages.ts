@@ -29,11 +29,12 @@ const en = {
     progress:
       "Score counts correct answers, streak counts consecutive correct answers, and round shows which equation is currently on screen. Rounds played counts every equation you have submitted, correct or incorrect. The run ends once you hold fewer tiles than the next answer requires.",
     keyboard:
-      "Press a digit key to select a matching tile, Backspace to return the most recently selected tile, and Enter to submit, confirm a discard, or continue.",
+      "Press a digit key to select a matching tile, Backspace to return the most recently selected tile, Escape to clear your selection, and Enter to submit, confirm a discard, or continue.",
   },
   action: {
     start: "Start Run",
     submit: "Submit",
+    clear: "Clear",
     next: "Next Round",
     confirmDiscard: "Confirm Discard",
     playAgain: "Play Again",
@@ -96,11 +97,12 @@ const ko = {
     progress:
       "점수는 정답 횟수를, 연속 정답은 이어지는 정답 횟수를 나타내며, 라운드는 현재 화면에 표시된 문제의 번호입니다. 진행한 라운드는 정답과 오답을 포함해 지금까지 제출한 문제 수를 나타냅니다. 다음 정답에 필요한 타일보다 보유한 타일이 적어지면 게임이 종료됩니다.",
     keyboard:
-      "숫자 키를 누르면 일치하는 타일을 선택하고, Backspace 키로 가장 최근에 선택한 타일을 되돌리며, Enter 키로 제출하거나 버리기를 확정하거나 다음으로 진행합니다.",
+      "숫자 키를 누르면 일치하는 타일을 선택하고, Backspace 키로 가장 최근에 선택한 타일을 되돌리고, Escape 키로 선택을 지우며, Enter 키로 제출하거나 버리기를 확정하거나 다음으로 진행합니다.",
   },
   action: {
     start: "게임 시작",
     submit: "제출",
+    clear: "지우기",
     next: "다음 라운드",
     confirmDiscard: "버리기 확정",
     playAgain: "다시 하기",

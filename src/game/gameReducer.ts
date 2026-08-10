@@ -157,6 +157,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (state.phase !== "gameOver") return state;
       return freshRunState(action.equation, action.inventory);
 
+    case "CLEAR_SELECTION": {
+      if (state.phase !== "answering") return state;
+      if (state.selectedTiles.length === 0) return state;
+      return {
+        ...state,
+        inventory: sortTiles([...state.inventory, ...state.selectedTiles]),
+        selectedTiles: [],
+      };
+    }
+
     default: {
       const exhaustiveCheck: never = action;
       return exhaustiveCheck;

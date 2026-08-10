@@ -53,14 +53,25 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
       {lastResult !== null && <FeedbackPanel result={lastResult} rewardTiles={rewardTiles} />}
 
       {state.phase === "answering" && (
-        <button
-          type="button"
-          className={styles.action}
-          onClick={onSubmit}
-          disabled={!isSubmissionReady(state)}
-        >
-          {t("action.submit")}
-        </button>
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className={styles.action}
+            onClick={onSubmit}
+            disabled={!isSubmissionReady(state)}
+          >
+            {t("action.submit")}
+          </button>
+
+          <button
+            type="button"
+            className={styles.secondaryAction}
+            onClick={() => dispatch({ type: "CLEAR_SELECTION" })}
+            disabled={state.selectedTiles.length === 0}
+          >
+            {t("action.clear")}
+          </button>
+        </div>
       )}
 
       {state.phase === "feedback" && (

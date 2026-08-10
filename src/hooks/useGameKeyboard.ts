@@ -42,6 +42,13 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
           return;
         }
 
+        if (event.key === "Escape") {
+          if (state.selectedTiles.length === 0) return;
+          event.preventDefault();
+          dispatch({ type: "CLEAR_SELECTION" });
+          return;
+        }
+
         if (event.key === "Enter") {
           if (!isSubmissionReady(state)) return;
           event.preventDefault();

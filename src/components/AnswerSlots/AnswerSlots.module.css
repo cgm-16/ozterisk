@@ -44,6 +44,16 @@
   cursor: default;
 }
 
+/* A filled slot is clickable (it returns its tile to inventory); signal that
+   with a border/background shift rather than a "×" glyph, since ::before/
+   ::after generated content can leak into the accessibility tree and this
+   slot already carries a full aria-label (AnswerSlots.tsx:21-23). */
+.slot:not(:disabled):hover,
+.slot:not(:disabled):focus-visible {
+  border-color: var(--color-accent);
+  background: var(--color-canvas);
+}
+
 .slot:active:not(:disabled) {
   transform: translateY(var(--press-offset));
 }

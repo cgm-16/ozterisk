@@ -774,6 +774,30 @@ function assertInvariants(state: GameState): void {
   }
 }
 
+describe("CLEAR_SELECTION", () => {
+  it("returns every selected tile to a sorted inventory", () => {
+    const state = makeAnsweringState(makeEquation(4, 5), {
+      inventory: [makeTile(1, "a")],
+      selectedTiles: [makeTile(3, "b"), makeTile(0, "c")],
+    });
+
+    const next = gameReducer(state, { type: "CLEAR_SELECTION" });
+
+    expect(next.selectedTiles).toEqual([]);
+    expect(next.inventory.map((tile) => tile.digit)).toEqual([0, 1, 3]);
+  });
+
+  it("is a no-op when nothing is selected", () => {
+    const state = makeAnsweringState(makeEquation(4, 5));
+    expect(gameReducer(state, { type: "CLEAR_SELECTION" })).toBe(state);
+  });
+
+  it("is a no-op outside answering", () => {
+    const state = { ...makeAnsweringState(makeEquation(4, 5)), phase: "feedback" as const };
+    expect(gameReducer(state, { type: "CLEAR_SELECTION" })).toBe(state);
+  });
+});
+
 describe("reducer lifecycle invariants (§2.5)", () => {
   it("walks a full legal lifecycle path, asserting every §2.5 invariant after each transition", () => {
     interface Step {

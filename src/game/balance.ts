@@ -1,6 +1,8 @@
 /**
- * Tuning dials. Every value here is safe to change by hand; the economy
- * invariant in balance.test.ts guards the combinations that break a run.
+ * Tuning dials. Changing a value by hand is not automatically safe — check
+ * the economy invariant in balance.test.ts, which guards the combinations
+ * that break a run, and see INVENTORY_CAPACITY below for a dial whose safe
+ * range is currently a single value.
  *
  * Domain definitions that change what the game *is* — operand range, digit
  * spread — live in constants.ts instead.
@@ -8,9 +10,20 @@
 
 /**
  * Tiles the inventory holds before overflow forces a discard.
- * Economy: raising this raises the buildable rate b. b(10) ~= 48%,
- * b(13) ~= 60%, b(14) ~= 64%. Drift crosses zero at b ~= 63%, so 13 is the
- * highest value that keeps runs finite without another counterweight.
+ * Economy: raising this raises the unbiased buildable rate b. Unbiased,
+ * b(10) ~= 48%, b(11) ~= 52%, b(12) ~= 57%, b(13) ~= 60%. KIND_EQUATION_RATE
+ * biases every draw toward products the current hand can already spell,
+ * which pushes the *effective* rate b' well above the unbiased figure: at
+ * the shipped KIND_EQUATION_RATE = 0.2, b'(10) ~= 58%, b'(11) ~= 62%,
+ * b'(12) ~= 65%, b'(13) ~= 68%, against a cliff at b' ~= 63% where drift
+ * flips positive and runs stop ending. Capacity 11 already crosses the
+ * cliff's safety margin and fails balance.test.ts, so at the shipped kind
+ * rate 10 is the only value this dial can currently hold — raising it
+ * requires first lowering KIND_EQUATION_RATE, or adding another
+ * counterweight. Lowering it is not free either: createInitialInventory
+ * (factories.ts) hardcodes ten starting tiles via ALL_DIGITS, uncoupled
+ * from this dial, so a capacity below 10 starts every run already over
+ * capacity — that fails loudly, across many unrelated tests, not silently.
  */
 export const INVENTORY_CAPACITY = 10;
 

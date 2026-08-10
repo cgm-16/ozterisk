@@ -30,7 +30,8 @@
 }
 
 /* Rounds survived is Endless's win condition, so it gets the next step up
-   the existing type scale. */
-.primary {
+   the existing type scale. `dd.primary` ties specificity with `.entry dd`
+   above (0,1,1 each) so source order decides and this rule actually wins. */
+dd.primary {
   font-size: 1.5rem;
 }

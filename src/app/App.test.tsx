@@ -131,6 +131,26 @@ describe("App", () => {
     expect(score.compareDocumentPosition(streak) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
+  // Regression guard for the `.primary` emphasis class actually winning the
+  // cascade: `.entry dd` and `.primary` alone are NOT equal specificity
+  // (0,1,1 vs 0,1,0), so `.entry dd` silently wins regardless of source
+  // order and the emphasis never renders. Reading getComputedStyle catches
+  // that class of bug; comparing className strings would not.
+  it("renders Round's value at a larger computed font size than Score's", async () => {
+    const user = userEvent.setup();
+    renderApp([...equationSamples(2, 3)], { initialLanguage: "en" });
+
+    await user.click(screen.getByRole("button", { name: "Start Run" }));
+
+    const roundValue = screen.getByText("Round").nextElementSibling as HTMLElement;
+    const scoreValue = screen.getByText("Score").nextElementSibling as HTMLElement;
+
+    const roundFontSize = parseFloat(getComputedStyle(roundValue).fontSize);
+    const scoreFontSize = parseFloat(getComputedStyle(scoreValue).fontSize);
+
+    expect(roundFontSize).toBeGreaterThan(scoreFontSize);
+  });
+
   it("resolves a correct answer through reward, overflow, exact discard, and Next Round", async () => {
     const user = userEvent.setup();
     const randomValues = [

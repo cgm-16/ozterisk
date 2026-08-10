@@ -40,12 +40,12 @@ export function GameOverScreen({ stats, url, dependencies, onPlayAgain }: GameOv
       <h1 className={styles.title}>{t("gameOver.title")}</h1>
       <dl className={styles.stats}>
         <div className={styles.entry}>
-          <dt>{t("hud.score")}</dt>
-          <dd>{stats.score}</dd>
-        </div>
-        <div className={styles.entry}>
           <dt>{t("gameOver.rounds")}</dt>
           <dd>{stats.totalRounds}</dd>
+        </div>
+        <div className={styles.entry}>
+          <dt>{t("hud.score")}</dt>
+          <dd>{stats.score}</dd>
         </div>
         <div className={styles.entry}>
           <dt>{t("gameOver.longestStreak")}</dt>

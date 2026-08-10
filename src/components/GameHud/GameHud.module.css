@@ -28,3 +28,9 @@
   font-size: 1.25rem;
   font-weight: 600;
 }
+
+/* Rounds survived is Endless's win condition, so it gets the next step up
+   the existing type scale. */
+.primary {
+  font-size: 1.5rem;
+}

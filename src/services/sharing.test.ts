@@ -5,13 +5,13 @@ import type { ShareDependencies } from "./sharing";
 describe("formatShareText", () => {
   it("formats the English share text exactly", () => {
     const text = formatShareText(
-      { score: 7, totalRounds: 9, longestStreak: 4 },
+      { score: 7, totalRounds: 12, longestStreak: 4 },
       "en",
       "https://example.test/",
     );
 
     expect(text).toBe(
-      "1-0 — Score: 7\nRounds: 9\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/",
+      "1-0 — Rounds: 12\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/",
     );
 
     const lines = text.split("\n");
@@ -22,13 +22,13 @@ describe("formatShareText", () => {
 
   it("formats the Korean share text exactly", () => {
     const text = formatShareText(
-      { score: 7, totalRounds: 9, longestStreak: 4 },
+      { score: 7, totalRounds: 12, longestStreak: 4 },
       "ko",
       "https://example.test/",
     );
 
     expect(text).toBe(
-      "1-0 — 점수: 7\n라운드: 9\n최장 연속 정답: 4\n\n이 기록을 넘을 수 있나요?\nhttps://example.test/",
+      "1-0 — 라운드: 12\n점수: 7\n최장 연속 정답: 4\n\n이 기록을 넘을 수 있나요?\nhttps://example.test/",
     );
 
     const lines = text.split("\n");
@@ -39,7 +39,7 @@ describe("formatShareText", () => {
 });
 
 describe("shareResult", () => {
-  const text = "1-0 — Score: 7\nRounds: 9\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
+  const text = "1-0 — Rounds: 9\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
   const url = "https://example.test/";
 
   it("shares natively when available and never touches the clipboard", async () => {
@@ -88,7 +88,7 @@ describe("shareResult", () => {
 });
 
 describe("copyResult", () => {
-  const text = "1-0 — Score: 7\nRounds: 9\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
+  const text = "1-0 — Rounds: 9\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
 
   it("resolves to copied when the clipboard write succeeds", async () => {
     const writeClipboard = vi.fn().mockResolvedValue(undefined);

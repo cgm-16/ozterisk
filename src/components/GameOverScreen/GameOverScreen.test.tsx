@@ -9,9 +9,9 @@ import { GameOverScreen, type GameOverScreenProps } from "./GameOverScreen";
 const STATS = { score: 7, totalRounds: 9, longestStreak: 4 };
 const URL = "https://example.test/";
 const EN_TEXT =
-  "1-0 — Score: 7\nRounds: 9\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
+  "1-0 — Rounds: 9\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
 const KO_TEXT =
-  "1-0 — 점수: 7\n라운드: 9\n최장 연속 정답: 4\n\n이 기록을 넘을 수 있나요?\nhttps://example.test/";
+  "1-0 — 라운드: 9\n점수: 7\n최장 연속 정답: 4\n\n이 기록을 넘을 수 있나요?\nhttps://example.test/";
 
 function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
   const onPlayAgain = vi.fn();

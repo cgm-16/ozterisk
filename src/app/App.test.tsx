@@ -116,6 +116,21 @@ describe("App", () => {
     expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
   });
 
+  it("orders the HUD Round, Score, Streak so rounds survived reads as the headline stat", async () => {
+    const user = userEvent.setup();
+    renderApp([...equationSamples(2, 3)], { initialLanguage: "en" });
+
+    await user.click(screen.getByRole("button", { name: "Start Run" }));
+
+    const round = screen.getByText("Round");
+    const score = screen.getByText("Score");
+    const streak = screen.getByText("Streak");
+
+    // DOCUMENT_POSITION_FOLLOWING (4) means the argument node comes after `this` node.
+    expect(round.compareDocumentPosition(score) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(score.compareDocumentPosition(streak) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("resolves a correct answer through reward, overflow, exact discard, and Next Round", async () => {
     const user = userEvent.setup();
     const randomValues = [

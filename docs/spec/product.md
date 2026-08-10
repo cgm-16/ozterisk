@@ -17,7 +17,7 @@ The PoC validates whether this loop is understandable and engaging. It does not 
 
 - Operands are integers `1` through `9`, inclusive.
 - The sampling pool contains the 45 unordered pairs `(a, b)` where `1 <= a <= b <= 9`.
-- Every new equation draws a gate sample first. At or above `KIND_EQUATION_RATE` the pair is drawn uniformly with replacement from the full pool; below it, the pair is drawn uniformly from only those pairs whose product the current inventory can spell.
+- Every new equation draws a gate sample first. At or above the kind-equation rate (a tuning dial; see § Tuning surface in the technical contract) the pair is drawn uniformly with replacement from the full pool; below it, the pair is drawn uniformly from only those pairs whose product the current inventory can spell.
 - If the inventory can spell no product at all, the kind draw falls back to the uniform draw.
 - The bias is a generosity dial, not a difficulty curve: it never adapts to player skill, and its rate is fixed for the run. `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` §1.1 derives why the rate must stay below the economy cliff.
 - Immediate repetition is legal.

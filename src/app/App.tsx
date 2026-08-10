@@ -4,7 +4,6 @@ import { GameOverScreen } from "../components/GameOverScreen/GameOverScreen";
 import { GameScreen } from "../components/GameScreen/GameScreen";
 import { LanguageToggle } from "../components/LanguageToggle/LanguageToggle";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
-import { KIND_EQUATION_RATE } from "../game/balance";
 import { createInitialInventory, createTitleState } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
 import { generateKindEquation, generateRewardTiles } from "../game/generators";
@@ -29,13 +28,13 @@ export function App({ dependencies, shareDependencies }: AppProps) {
 
   const handleStart = useCallback(() => {
     const inventory = createInitialInventory(dependencies.nextTileId);
-    const equation = generateKindEquation(dependencies.random, inventory, KIND_EQUATION_RATE);
+    const equation = generateKindEquation(dependencies.random, inventory);
     dispatch({ type: "START_RUN", equation, inventory });
   }, [dependencies]);
 
   const handleRestart = useCallback(() => {
     const inventory = createInitialInventory(dependencies.nextTileId);
-    const equation = generateKindEquation(dependencies.random, inventory, KIND_EQUATION_RATE);
+    const equation = generateKindEquation(dependencies.random, inventory);
     dispatch({ type: "RESTART_RUN", equation, inventory });
   }, [dependencies]);
 
@@ -59,7 +58,7 @@ export function App({ dependencies, shareDependencies }: AppProps) {
   const handleNextRound = useCallback(() => {
     // state.inventory is already final (post-discard) at `feedback`; a stale
     // capture here would silently bias equations against the previous round's hand.
-    const equation = generateKindEquation(dependencies.random, state.inventory, KIND_EQUATION_RATE);
+    const equation = generateKindEquation(dependencies.random, state.inventory);
     dispatch({ type: "NEXT_ROUND", equation });
   }, [dependencies, state.inventory]);
 

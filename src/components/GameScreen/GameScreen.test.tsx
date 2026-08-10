@@ -467,7 +467,10 @@ describe("GameScreen overflow collapse", () => {
     const state = makeOverflowState(equation, { inventory: TWELVE_TILE_INVENTORY }); // required 2
     const { dispatch } = renderScreen(state);
 
-    expect(screen.getByRole("button", { name: "Confirm Discard" })).toBeInTheDocument();
+    // Disabled until enough tiles are marked. This is the only assertion on
+    // the isDiscardReady wire: without it, OverflowControls could be handed a
+    // hardcoded disabled={false} and the whole suite would still pass.
+    expect(screen.getByRole("button", { name: "Confirm Discard" })).toBeDisabled();
 
     await userEvent.click(screen.getByRole("button", { name: "Digit 5" }));
 

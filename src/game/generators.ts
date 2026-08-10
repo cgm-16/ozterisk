@@ -1,4 +1,5 @@
 import type { Digit, Equation, RandomSource, Tile, TileIdFactory } from "./types";
+import { KIND_EQUATION_RATE } from "./balance";
 import { OPERAND_MAX, OPERAND_MIN, REWARD_DIGIT_COUNT } from "./constants";
 import { canConstruct } from "./selectors";
 
@@ -51,13 +52,9 @@ export function generateEquation(random: RandomSource): Equation {
   return orientPair(pair, orderSample);
 }
 
-export function generateKindEquation(
-  random: RandomSource,
-  inventory: readonly Tile[],
-  kindRate: number,
-): Equation {
+export function generateKindEquation(random: RandomSource, inventory: readonly Tile[]): Equation {
   const gateSample = readRandomSample(random);
-  if (gateSample >= kindRate) return generateEquation(random);
+  if (gateSample >= KIND_EQUATION_RATE) return generateEquation(random);
 
   const constructible = EQUATION_PAIRS.filter(([left, right]) =>
     canConstruct(inventory, left * right),

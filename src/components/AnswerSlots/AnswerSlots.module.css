@@ -24,9 +24,9 @@
   font-size: 1.25rem;
   cursor: pointer;
   transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    transform 100ms ease;
+    background-color var(--duration-base) var(--ease-standard),
+    border-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
 /* A slot is only ever disabled because it holds no tile (see
@@ -44,6 +44,19 @@
   cursor: default;
 }
 
+/* A filled slot is clickable (it returns its tile to inventory); signal that
+   with a border/background shift rather than a "×" glyph, since ::before/
+   ::after generated content can leak into the accessibility tree and this
+   slot already carries a full aria-label (AnswerSlots.tsx:21-23). Background
+   shifts to --color-canvas, not --color-surface: the rest state above already
+   sets a filled slot's background to --color-surface, so --color-surface here
+   would be a no-op and the shift would have no visible effect. */
+.slot:not(:disabled):hover,
+.slot:not(:disabled):focus-visible {
+  border-color: var(--color-accent);
+  background: var(--color-canvas);
+}
+
 .slot:active:not(:disabled) {
-  transform: translateY(1px);
+  transform: translateY(var(--press-offset));
 }

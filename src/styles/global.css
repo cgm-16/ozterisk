@@ -76,6 +76,15 @@ input {
      minimum target (§1.12) and the physical-piece tile/slot size. */
   --tile-size: 44px;
 
+  /* Motion. The reduced-motion block below neutralizes these wholesale; they
+     exist so press feel is retuned in one place rather than seven. */
+  --duration-fast: 100ms;    /* press / transform response */
+  --duration-base: 150ms;    /* color and border state changes */
+  --ease-standard: ease;
+  --press-offset: 1px;       /* :active translateY */
+
+  --border-hairline: 1px;    /* the repeated 1px solid border */
+
   /* Restrained shadows for the "simple physical piece" tile look. */
   --shadow-tile: 0 1px 2px rgb(0 0 0 / 10%);
   --shadow-inset: inset 0 1px 2px rgb(0 0 0 / 8%);

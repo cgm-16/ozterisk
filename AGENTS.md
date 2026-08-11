@@ -59,11 +59,22 @@ plan, so cross-references resolve across files.
 
 ### 4.4 Branch and PR convention
 
-- Branch: `feat/T##-short-kebab-name`.
-- Commit: Conventional Commit with the task ID in body.
-- One task per PR unless a dependency task is fewer than 20 changed lines and cannot be reviewed meaningfully alone.
-- PR title: `[T##] Imperative outcome`.
-- PR body must contain:
+**A task is a unit of review, not a unit of merge.** It keeps its task file,
+its issue, its own commit, and its own review gate. It does not own a PR.
+
+**The PR is the milestone.** One branch carries a milestone's tasks as one
+coherent commit each, and one PR closes every issue in that milestone.
+
+- **A milestone must therefore be a reasonable PR-sized goal.** If planning
+  shows it is not, split the milestone in `docs/plan/roadmap.md` *before*
+  work starts. The unit of merge moves deliberately and on the record, never
+  ad hoc at branch time.
+- Branch: `feat/M#-short-kebab-name`.
+- Commit: Conventional Commit with `Task: T##` in the body. One commit per
+  task, independently reviewable.
+- PR title: `[M#] Imperative outcome`.
+- PR body must contain a `Closes #<issue>` line per task issue, plus the
+  template below.
 
 ```markdown
 Closes #<issue>
@@ -82,6 +93,18 @@ Closes #<issue>
 ## Manual checks
 - [ ] Relevant acceptance path exercised
 ```
+
+M0–M3 used one branch and PR *per task* (`feat/T##-…`, `[T##] …`), which was
+right for fourteen tasks building a codebase from nothing. From M4 the suite
+is comprehensive and milestones are small, so the merge unit is the
+milestone. Older PR history reflects the previous convention.
+
+### 4.5 Tuning values
+
+Agents may **add** dials to `src/game/balance.ts` and must document each
+one's economy effect. Agents must **not change the value** of an existing
+dial without explicit instruction — those are hand-tuned. Tuning commits
+use `tune(balance):`; feature commits never carry value changes.
 
 ## Loop-Agent Operating Protocol
 

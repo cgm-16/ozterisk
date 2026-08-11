@@ -9,9 +9,9 @@ import { GameOverScreen, type GameOverScreenProps } from "./GameOverScreen";
 const STATS = { score: 7, totalRounds: 9, longestStreak: 4 };
 const URL = "https://example.test/";
 const EN_TEXT =
-  "1-0 — Score: 7\nRounds: 9\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
+  "1-0 — Rounds: 9\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
 const KO_TEXT =
-  "1-0 — 점수: 7\n라운드: 9\n최장 연속 정답: 4\n\n이 기록을 넘을 수 있나요?\nhttps://example.test/";
+  "1-0 — 라운드: 9\n점수: 7\n최장 연속 정답: 4\n\n이 기록을 넘을 수 있나요?\nhttps://example.test/";
 
 function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
   const onPlayAgain = vi.fn();
@@ -42,6 +42,33 @@ describe("GameOverScreen", () => {
     expect(screen.getByText("9")).toBeInTheDocument();
     expect(screen.getByText("Longest streak")).toBeInTheDocument();
     expect(screen.getByText("4")).toBeInTheDocument();
+  });
+
+  it("orders the statistics rounds, score, longest streak", () => {
+    renderScreen();
+
+    const rounds = screen.getByText("Rounds played");
+    const score = screen.getByText("Score");
+    const streak = screen.getByText("Longest streak");
+
+    // DOCUMENT_POSITION_FOLLOWING (4) means the argument node comes after `this` node.
+    expect(rounds.compareDocumentPosition(score) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(score.compareDocumentPosition(streak) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  // Mirrors the HUD's emphasis guard in App.test.tsx: reading getComputedStyle
+  // catches a `.primary` rule that loses the cascade, which a className
+  // assertion would not.
+  it("renders the rounds value at a larger computed font size than score", () => {
+    renderScreen();
+
+    const roundsValue = screen.getByText("Rounds played").nextElementSibling as HTMLElement;
+    const scoreValue = screen.getByText("Score").nextElementSibling as HTMLElement;
+
+    const roundsFontSize = parseFloat(getComputedStyle(roundsValue).fontSize);
+    const scoreFontSize = parseFloat(getComputedStyle(scoreValue).fontSize);
+
+    expect(roundsFontSize).toBeGreaterThan(scoreFontSize);
   });
 
   it("invokes the Play Again callback", async () => {

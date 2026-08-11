@@ -52,11 +52,12 @@ Every task inherits these.
 - **Accessibility:** interactive targets keep the 44px `--tile-size`
   minimum; state is never signalled by color alone.
 - **Commits:** Conventional Commits with `-m "Task: T##"` as the second
-  line. Branch `feat/T##-short-kebab-name` off `main`; never commit to
-  `main`.
+  line. One commit per task on the milestone branch
+  `feat/M4-endless-polish`; the PR is the milestone, not the task
+  (`AGENTS.md` §4.4). Never commit to `main`.
 - **Tuning values are hand-set.** Add dials to `balance.ts` with their
   economy effect documented; never change an existing dial's value as part
-  of a feature task (`docs/plan/github.md` §4.5).
+  of a feature task (`AGENTS.md` §4.5).
 
 ## Tasks
 

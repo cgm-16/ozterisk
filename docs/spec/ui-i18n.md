@@ -42,6 +42,7 @@ The implementation may improve punctuation but may not change rule meaning.
 | `title.howToPlay` | `How to Play` | `게임 방법` |
 | `action.start` | `Start Run` | `게임 시작` |
 | `action.submit` | `Submit` | `제출` |
+| `action.clear` | `Clear` | `지우기` |
 | `action.next` | `Next Round` | `다음 라운드` |
 | `action.confirmDiscard` | `Confirm Discard` | `버리기 확정` |
 | `action.playAgain` | `Play Again` | `다시 하기` |
@@ -87,8 +88,8 @@ The expanded rules must explain:
 English format:
 
 ```text
-1-0 — Score: {score}
-Rounds: {totalRounds}
+1-0 — Rounds: {totalRounds}
+Score: {score}
 Longest streak: {longestStreak}
 
 Can you beat it?
@@ -98,8 +99,8 @@ Can you beat it?
 Korean format:
 
 ```text
-1-0 — 점수: {score}
-라운드: {totalRounds}
+1-0 — 라운드: {totalRounds}
+점수: {score}
 최장 연속 정답: {longestStreak}
 
 이 기록을 넘을 수 있나요?

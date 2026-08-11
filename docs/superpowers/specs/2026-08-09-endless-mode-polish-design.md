@@ -185,11 +185,16 @@ Implemented **additively**, leaving the existing generator untouched:
   check over the product's digits. Written multiset-correct even though no
   product in range has a repeated digit, because Classic's face-set tiles
   will need it.
-- `generators.ts` — new `generateKindEquation(random, inventory, kindRate)`.
-  Draw a gate sample; at `>= kindRate` delegate to the untouched
+- `generators.ts` — new `generateKindEquation(random, inventory)`. Draw a
+  gate sample; at `>= KIND_EQUATION_RATE` delegate to the untouched
   `generateEquation(random)`. Otherwise sample uniformly from the
   constructible subset of `EQUATION_PAIRS`. **If that subset is empty, fall
   back to `generateEquation`**, or it throws.
+
+  > Shipped without the `kindRate` parameter this section originally
+  > specified. A dial threaded through call sites is a dial each call site
+  > can silently override, which defeats the tuning surface in §3.5; the
+  > generator imports it directly, as `getRewardCount` does `REWARD_BONUS`.
 - `balance.ts` (§3.5) — `KIND_EQUATION_RATE = 0.2`, one named dial so
   retuning is a one-line change.
 - `App.tsx` — swap all three call sites. `START_RUN` and `RESTART_RUN` pass

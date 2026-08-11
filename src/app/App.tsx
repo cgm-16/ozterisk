@@ -6,8 +6,8 @@ import { LanguageToggle } from "../components/LanguageToggle/LanguageToggle";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { createInitialInventory, createTitleState } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
-import { generateEquation, generateRewardTiles } from "../game/generators";
-import { constructAnswer } from "../game/selectors";
+import { generateKindEquation, generateRewardTiles } from "../game/generators";
+import { constructAnswer, getRewardCount } from "../game/selectors";
 import type { RandomSource, TileIdFactory } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
 import styles from "./App.module.css";
@@ -28,13 +28,13 @@ export function App({ dependencies, shareDependencies }: AppProps) {
 
   const handleStart = useCallback(() => {
     const inventory = createInitialInventory(dependencies.nextTileId);
-    const equation = generateEquation(dependencies.random);
+    const equation = generateKindEquation(dependencies.random, inventory);
     dispatch({ type: "START_RUN", equation, inventory });
   }, [dependencies]);
 
   const handleRestart = useCallback(() => {
     const inventory = createInitialInventory(dependencies.nextTileId);
-    const equation = generateEquation(dependencies.random);
+    const equation = generateKindEquation(dependencies.random, inventory);
     dispatch({ type: "RESTART_RUN", equation, inventory });
   }, [dependencies]);
 
@@ -45,7 +45,7 @@ export function App({ dependencies, shareDependencies }: AppProps) {
     const submittedValue = constructAnswer(state.selectedTiles);
     if (submittedValue === state.equation.product) {
       const rewardTiles = generateRewardTiles(
-        state.selectedTiles.length + 1,
+        getRewardCount(state.selectedTiles.length),
         dependencies.random,
         dependencies.nextTileId,
       );
@@ -56,9 +56,11 @@ export function App({ dependencies, shareDependencies }: AppProps) {
   }, [state.equation, state.selectedTiles, dependencies]);
 
   const handleNextRound = useCallback(() => {
-    const equation = generateEquation(dependencies.random);
+    // state.inventory is already final (post-discard) at `feedback`; a stale
+    // capture here would silently bias equations against the previous round's hand.
+    const equation = generateKindEquation(dependencies.random, state.inventory);
     dispatch({ type: "NEXT_ROUND", equation });
-  }, [dependencies]);
+  }, [dependencies, state.inventory]);
 
   // §1.11: gameOver's Enter shortcut restarts the run, equivalent to Play
   // Again, regardless of which button currently has focus. useGameKeyboard

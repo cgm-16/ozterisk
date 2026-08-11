@@ -13,16 +13,16 @@ export function GameHud({ score, currentStreak, round }: GameHudProps) {
   return (
     <dl className={styles.hud}>
       <div className={styles.entry}>
+        <dt>{t("hud.round")}</dt>
+        <dd className={styles.primary}>{round}</dd>
+      </div>
+      <div className={styles.entry}>
         <dt>{t("hud.score")}</dt>
         <dd>{score}</dd>
       </div>
       <div className={styles.entry}>
         <dt>{t("hud.streak")}</dt>
         <dd>{currentStreak}</dd>
-      </div>
-      <div className={styles.entry}>
-        <dt>{t("hud.round")}</dt>
-        <dd>{round}</dd>
       </div>
     </dl>
   );

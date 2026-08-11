@@ -33,6 +33,14 @@ paths:
   - `canConstruct(inventory: readonly Tile[], product: number): boolean`
   - `generateKindEquation(random: RandomSource, inventory: readonly Tile[], kindRate: number): Equation`
 
+> **Shipped without the `kindRate` parameter.** The final review found that a
+> dial threaded through call sites is a dial each call site can silently
+> override — swapping in a literal left every test green. The generator
+> imports `KIND_EQUATION_RATE` directly instead, so the signature is
+> `generateKindEquation(random, inventory)` and the three `App.tsx` call
+> sites below pass two arguments. `docs/spec/architecture.md` is canonical;
+> the code blocks further down record the task as planned.
+
 ## Why
 
 At capacity 10 only ~48% of equations can be spelled from a drifted hand.

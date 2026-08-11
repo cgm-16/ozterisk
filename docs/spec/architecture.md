@@ -1,7 +1,7 @@
 # 1-0 Technical Contract
 
-File map, domain types, pure and browser-bound interfaces, reducer invariants,
-and test fixture conventions (§2).
+File map, domain types, pure and browser-bound interfaces, the tuning surface,
+reducer invariants, and test fixture conventions (§2).
 
 ### 2.1 Canonical file map
 
@@ -58,6 +58,8 @@ and test fixture conventions (§2).
 │   │       ├── TitleScreen.test.tsx
 │   │       └── TitleScreen.tsx
 │   ├── game/
+│   │   ├── balance.test.ts
+│   │   ├── balance.ts
 │   │   ├── constants.ts
 │   │   ├── factories.test.ts
 │   │   ├── factories.ts
@@ -82,6 +84,7 @@ and test fixture conventions (§2).
 │   ├── styles/
 │   │   └── global.css
 │   ├── test/
+│   │   ├── economy.ts
 │   │   ├── fixtures.ts
 │   │   └── setup.ts
 │   ├── main.tsx
@@ -149,6 +152,7 @@ export type GameAction =
   | { type: "START_RUN"; equation: Equation; inventory: Tile[] }
   | { type: "SELECT_TILE"; tileId: string }
   | { type: "RETURN_TILE"; tileId: string }
+  | { type: "CLEAR_SELECTION" }
   | { type: "SUBMIT_CORRECT"; rewardTiles: Tile[] }
   | { type: "SUBMIT_INCORRECT" }
   | { type: "TOGGLE_DISCARD"; tileId: string }
@@ -163,15 +167,25 @@ export type TileIdFactory = () => string;
 ### 2.3 Pure interfaces
 
 ```ts
+// game/balance.ts — hand-tuned dials (see § Tuning surface)
 export const INVENTORY_CAPACITY = 10;
+export const REWARD_BONUS = 1;
+export const KIND_EQUATION_RATE = 0.2;
+
+// game/constants.ts — domain definitions
 export const OPERAND_MIN = 1;
 export const OPERAND_MAX = 9;
+export const REWARD_DIGIT_COUNT = 10;
 
 export function createTitleState(): GameState;
 export function createInitialInventory(idFactory: TileIdFactory): Tile[];
 export function sortTiles(tiles: readonly Tile[]): Tile[];
 
 export function generateEquation(random: RandomSource): Equation;
+export function generateKindEquation(
+  random: RandomSource,
+  inventory: readonly Tile[],
+): Equation;
 export function generateRewardTiles(
   count: number,
   random: RandomSource,
@@ -185,11 +199,40 @@ export function canAttemptEquation(
   equation: Equation,
 ): boolean;
 export function getOverflowCount(inventory: readonly Tile[]): number;
+export function getRewardCount(spentCount: number): number;
+export function canConstruct(inventory: readonly Tile[], product: number): boolean;
 export function isSubmissionReady(state: GameState): boolean;
 export function isDiscardReady(state: GameState): boolean;
 
 export function gameReducer(state: GameState, action: GameAction): GameState;
 ```
+
+### Tuning surface
+
+The values that decide how the game *feels* live in one data-only module,
+`src/game/balance.ts`, so hand-tuning never means hunting through logic.
+
+| Concern | File | Change means |
+|---|---|---|
+| Feel | `game/balance.ts` | Retuning a shipped game. Safe to edit by hand, within the range each dial documents. |
+| Domain | `game/constants.ts` | Changing what the game *is* — operand range, digit spread. Not a tuning knob. |
+| Motion and metrics | `styles/global.css` tokens | Retuning press feel and hairlines in one place; no module hardcodes them. |
+
+Rules that keep the surface durable:
+
+- **One binding per dial.** A dial is imported by the module that uses it, never
+  threaded through a call site as a parameter. Injection is reserved for
+  impurity (`RandomSource`, `TileIdFactory`), not for constants — a dial passed
+  as an argument is a dial that can be silently overridden.
+- **Every dial documents its economy effect**, its safe range, and what breaks
+  outside that range.
+- **`game/balance.test.ts` is an executable invariant**, not a unit test. It
+  asserts that the shipped combination of dials still ends runs, and that a
+  `CLIFF_MARGIN` gap below the buildable-rate cliff remains. It models the
+  economy through `test/economy.ts`, which ships nothing.
+- **Agents may add dials; agents may not change a dial's value** without
+  explicit instruction (AGENTS.md §4.5). Tuning commits use `tune(balance):`
+  and carry nothing else, so tuning and feature work never collide in git.
 
 ### 2.4 Browser-bound interfaces
 

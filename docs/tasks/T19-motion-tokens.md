@@ -30,8 +30,8 @@ paths:
 
 > `FeedbackPanel.module.css` has **no** transition — it is in scope only for
 > the hairline token at line 44, which uses `var(--color-reward)` rather
-> than `var(--color-border)`. Seven modules duplicate motion; eight carry a
-> hairline.
+> than `var(--color-border)`. Seven modules duplicate motion; five hairlines
+> are in scope across those modules.
 
 **Interfaces**
 

@@ -13,11 +13,29 @@ M0–M3 are closed; 1.0 shipped as `eb6cc67`. Post-release milestones follow.
 Their planning lives in `docs/plan/tuning-and-design-system.md` and the
 design docs under `docs/superpowers/specs/`.
 
+**A milestone is the unit of merge** (AGENTS.md §4.4), so **every milestone
+below must be a reasonable PR-sized goal.** If planning shows one is not, it
+is split here before work starts — deliberately and on the record, never ad
+hoc at branch time.
+
 | Milestone | Outcome | Exit gate |
 |---|---|---|
 | `M4 — Endless Polish and Tuning Surface` | Reduced round friction, kind equation bias, and a single documented tuning surface | Discard collapse, Clear action, overflow keyboard access, `balance.ts`, and `balance.test.ts` merged; economy invariant green |
 | `M5 — States Gallery` | Every component state viewable without playing to it | Dev-only `gallery.html` serves all five phases; absent from `dist/` after `npm run build` |
-| `M6 — Classic Mode` | Second mode: shrinking capacity, special tiles, definite run arc | Mode select, `getCapacity(round)`, and the face-set tile mechanism merged; both modes' economy invariants green |
+| `M6 — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(round)` merged; both modes' economy invariants green |
+| `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
+
+**Why M6 was split.** As originally scoped, `M6 — Classic Mode` bundled
+shrinking capacity, mode select, *and* the face-set tile mechanism. The
+face-set change alone spreads across `constructAnswer`, the closed `Digit`
+union, `factories.ts`, `generators.ts`, `TileInventory.tsx`, and the
+`tile.digitLabel` i18n key, plus a digit-picker UI — on its own comparable
+in size to all of M4. Bundled, it failed the PR-sized bar.
+
+The seam is principled rather than convenient: **M6 delivers a playable
+mode, M7 adds content to it.** Shrinking capacity is what makes Classic a
+different game; special tiles are what make it a deep one. Each ships
+independently.
 
 ## 5. Dependency DAG and Execution Waves
 

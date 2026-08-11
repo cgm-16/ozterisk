@@ -9,28 +9,50 @@
   text-align: center;
 }
 
-.action {
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.action,
+.secondaryAction {
   min-width: var(--tile-size);
   min-height: var(--tile-size);
   padding: var(--space-3) var(--space-6);
-  border: none;
   border-radius: var(--radius-md);
-  background: var(--color-accent);
-  color: var(--color-canvas);
   font-weight: 600;
   cursor: pointer;
   transition:
-    background-color 150ms ease,
-    transform 100ms ease;
+    background-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-fast) var(--ease-standard);
 }
 
-.action:disabled {
+.action:disabled,
+.secondaryAction:disabled {
   cursor: default;
   opacity: 0.6;
 }
 
-.action:active:not(:disabled) {
-  transform: translateY(1px);
+.action:active:not(:disabled),
+.secondaryAction:active:not(:disabled) {
+  transform: translateY(var(--press-offset));
+}
+
+.action {
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-canvas);
+}
+
+/* Lower-emphasis sibling of .action: same footprint and press behavior, but
+   an outlined, neutral-surface treatment so Clear reads as secondary to
+   Submit's solid accent fill. */
+.secondaryAction {
+  border: var(--border-hairline) solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
 }
 
 @media (max-width: 40rem) {

@@ -17,14 +17,17 @@ for (let left = 1; left <= 9; left++) {
   for (let right = left; right <= 9; right++) EQUATION_POOL.push([left, right]);
 }
 
-function equationSamples(left: number, right: number): [number, number] {
+function equationSamples(left: number, right: number): [number, number, number] {
   const a = Math.min(left, right);
   const b = Math.max(left, right);
   const index = EQUATION_POOL.findIndex(([l, r]) => l === a && r === b);
   if (index === -1) throw new Error(`No pool entry for ${left}x${right}`);
+  // 0.99 clears KIND_EQUATION_RATE, forcing the uniform draw so a test can
+  // still name its equation by operands. Kind-bias behaviour is covered in
+  // generators.test.ts instead.
   // 0.25 stays under the 0.5 reverse threshold, so the equation keeps the
   // pool's natural (a, b) order: equation.left === a, equation.right === b.
-  return [index / EQUATION_POOL.length, 0.25];
+  return [0.99, index / EQUATION_POOL.length, 0.25];
 }
 
 function rewardSample(digit: number): number {
@@ -113,6 +116,41 @@ describe("App", () => {
     expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
   });
 
+  it("orders the HUD Round, Score, Streak so rounds survived reads as the headline stat", async () => {
+    const user = userEvent.setup();
+    renderApp([...equationSamples(2, 3)], { initialLanguage: "en" });
+
+    await user.click(screen.getByRole("button", { name: "Start Run" }));
+
+    const round = screen.getByText("Round");
+    const score = screen.getByText("Score");
+    const streak = screen.getByText("Streak");
+
+    // DOCUMENT_POSITION_FOLLOWING (4) means the argument node comes after `this` node.
+    expect(round.compareDocumentPosition(score) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(score.compareDocumentPosition(streak) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  // Regression guard for the `.primary` emphasis class actually winning the
+  // cascade: `.entry dd` and `.primary` alone are NOT equal specificity
+  // (0,1,1 vs 0,1,0), so `.entry dd` silently wins regardless of source
+  // order and the emphasis never renders. Reading getComputedStyle catches
+  // that class of bug; comparing className strings would not.
+  it("renders Round's value at a larger computed font size than Score's", async () => {
+    const user = userEvent.setup();
+    renderApp([...equationSamples(2, 3)], { initialLanguage: "en" });
+
+    await user.click(screen.getByRole("button", { name: "Start Run" }));
+
+    const roundValue = screen.getByText("Round").nextElementSibling as HTMLElement;
+    const scoreValue = screen.getByText("Score").nextElementSibling as HTMLElement;
+
+    const roundFontSize = parseFloat(getComputedStyle(roundValue).fontSize);
+    const scoreFontSize = parseFloat(getComputedStyle(scoreValue).fontSize);
+
+    expect(roundFontSize).toBeGreaterThan(scoreFontSize);
+  });
+
   it("resolves a correct answer through reward, overflow, exact discard, and Next Round", async () => {
     const user = userEvent.setup();
     const randomValues = [
@@ -131,16 +169,17 @@ describe("App", () => {
     expect(hudField("Streak")).toBe("1");
     expect(screen.getByRole("status")).toHaveTextContent("Correct");
     expect(screen.getByText("Choose 1 tile(s) to discard.")).toBeInTheDocument();
-
-    const confirmButton = screen.getByRole("button", { name: "Confirm Discard" });
-    expect(confirmButton).toBeDisabled();
-
-    // Discard an old (non-reward) tile so both rewards stay visible below.
-    await user.click(screen.getByRole("button", { name: "Digit 9" }));
-    expect(confirmButton).toBeEnabled();
-    await user.click(confirmButton);
-
     expect(screen.queryByRole("button", { name: "Confirm Discard" })).not.toBeInTheDocument();
+
+    // A forced single-tile excess collapses to one tap: marking an old
+    // (non-reward) tile completes the discard immediately, no Confirm needed.
+    await user.click(screen.getByRole("button", { name: "Digit 9" }));
+
+    // Confirm's absence at requiredCount 1 doesn't by itself prove the discard
+    // completed (it's also hidden while still overflowing at count 1), so
+    // check the overflow instruction itself is gone: that only happens once
+    // CONFIRM_DISCARD has actually advanced the phase past "overflow".
+    expect(screen.queryByText("Choose 1 tile(s) to discard.")).not.toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Correct");
     expect(screen.getByRole("button", { name: "Digit 0, New tile" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Digit 1, New tile" })).toBeInTheDocument();
@@ -170,8 +209,7 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Start Run" }));
     await user.click(screen.getByRole("button", { name: "Digit 6" }));
     await user.click(screen.getByRole("button", { name: "Submit" }));
-    await user.click(screen.getByRole("button", { name: "Digit 9" }));
-    await user.click(screen.getByRole("button", { name: "Confirm Discard" }));
+    await user.click(screen.getByRole("button", { name: "Digit 9" })); // completes the forced single discard
     await user.click(screen.getByRole("button", { name: "Next Round" }));
 
     expect(hudField("Streak")).toBe("1");
@@ -225,8 +263,8 @@ describe("App", () => {
 
   it("restarts via Enter on the game over screen, even when a non-Play-Again button has focus", async () => {
     const user = userEvent.setup();
-    // Exactly 12 (driveToGameOver) + 2 (the restart draw) = 14 values, rendered
-    // under Strict Mode: a doubled handleRestart would consume 2 extra samples
+    // Exactly 18 (driveToGameOver) + 3 (the restart draw) = 21 values, rendered
+    // under Strict Mode: a doubled handleRestart would consume 3 extra samples
     // and sequenceRandom would throw "Random sequence exhausted" rather than
     // silently passing.
     const randomValues = [...lossRandomValues(), ...equationSamples(2, 3)];
@@ -313,17 +351,16 @@ describe("App", () => {
     expect(calls).toBe(0); // mounting/rendering the title screen consumes nothing
 
     await user.click(screen.getByRole("button", { name: "Start Run" }));
-    expect(calls).toBe(2); // START_RUN: one equation draw, not doubled by Strict Mode
+    expect(calls).toBe(3); // START_RUN: one equation draw (gate + pair + order), not doubled by Strict Mode
 
     await user.click(screen.getByRole("button", { name: "Digit 6" }));
     await user.click(screen.getByRole("button", { name: "Submit" }));
-    expect(calls).toBe(4); // SUBMIT_CORRECT: two reward tiles
+    expect(calls).toBe(5); // SUBMIT_CORRECT: two reward tiles
 
-    await user.click(screen.getByRole("button", { name: "Digit 9" }));
-    await user.click(screen.getByRole("button", { name: "Confirm Discard" }));
-    expect(calls).toBe(4); // CONFIRM_DISCARD draws no randomness
+    await user.click(screen.getByRole("button", { name: "Digit 9" })); // completes the forced single discard
+    expect(calls).toBe(5); // CONFIRM_DISCARD draws no randomness
 
     await user.click(screen.getByRole("button", { name: "Next Round" }));
-    expect(calls).toBe(6); // NEXT_ROUND: one more equation draw
+    expect(calls).toBe(8); // NEXT_ROUND: one more equation draw (gate + pair + order)
   });
 });

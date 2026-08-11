@@ -74,7 +74,7 @@ describe("TitleScreen", () => {
     ).toBeInTheDocument();
     // score, streak, round, and loss rules
     expect(
-      screen.getByText(/Score counts correct answers, streak counts consecutive correct answers/),
+      screen.getByText(/Round shows which equation is currently on screen, score counts correct answers/),
     ).toBeInTheDocument();
     // keyboard controls
     expect(

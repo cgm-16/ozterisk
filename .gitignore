@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 .vercel
 .env*
+
+# Browser-automation scratch output
+.playwright-mcp/

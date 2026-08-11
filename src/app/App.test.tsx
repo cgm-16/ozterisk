@@ -240,6 +240,9 @@ describe("App", () => {
 
     expect(screen.getByRole("heading", { name: "Game Over" })).toBeInTheDocument();
     expect(screen.getByText("9 × 9 =")).toBeInTheDocument(); // terminal equation stays visible (§1.10)
+    // §1.8 keeps the equation to explain the loss, so the explanation has to be
+    // on screen too. Without it the equation reads as an unanswered prompt.
+    expect(screen.getByText("Not enough tiles left to answer.")).toBeInTheDocument();
     expect(hudField("Score")).toBe("0"); // every submission above was incorrect
     expect(hudField("Rounds played")).toBe("5");
     expect(hudField("Longest streak")).toBe("0");

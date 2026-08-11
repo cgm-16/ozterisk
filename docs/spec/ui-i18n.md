@@ -57,6 +57,7 @@ The implementation may improve punctuation but may not change rule meaning.
 | `result.answer` | `Correct answer: {value}` | `정답: {value}` |
 | `overflow.instruction` | `Choose {count} tile(s) to discard.` | `버릴 타일 {count}개를 선택하세요.` |
 | `gameOver.title` | `Game Over` | `게임 종료` |
+| `gameOver.reason` | `Not enough tiles left to answer.` | `답을 만들 타일이 부족합니다.` |
 | `gameOver.rounds` | `Rounds played` | `진행한 라운드` |
 | `gameOver.longestStreak` | `Longest streak` | `최장 연속 정답` |
 | `share.copied` | `Result copied.` | `결과를 복사했습니다.` |

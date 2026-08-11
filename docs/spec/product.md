@@ -120,7 +120,10 @@ Loss is based only on tile count versus answer-slot count:
 inventory.length < getAnswerLength(equation)
 ```
 
-The terminal equation remains visible to explain why the run ended. It is not counted as a submitted round.
+The terminal equation remains visible to explain why the run ended, alongside a
+stated reason. The equation on its own reads as a question still awaiting an
+answer, so it explains nothing without the accompanying line. It is not counted
+as a submitted round.
 
 ### 1.9 Statistics semantics
 
@@ -171,6 +174,7 @@ The terminal equation remains visible to explain why the run ended. It is not co
 #### `gameOver`
 
 - Keep the terminal equation visible.
+- State why the run ended, grouped with the terminal equation rather than with the statistics, so it reads as a caption on the equation instead of a result.
 - Show total submitted rounds first, then score and longest streak. Rounds carries the same primary emphasis it holds in the HUD.
 - Show **Play Again**, **Share**, and **Copy Result**.
 - **Play Again** starts a fresh Round 1 immediately without returning to title.

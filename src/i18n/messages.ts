@@ -57,6 +57,7 @@ const en = {
   },
   gameOver: {
     title: "Game Over",
+    reason: "Not enough tiles left to answer.",
     rounds: "Rounds played",
     longestStreak: "Longest streak",
   },
@@ -125,6 +126,7 @@ const ko = {
   },
   gameOver: {
     title: "게임 종료",
+    reason: "답을 만들 타일이 부족합니다.",
     rounds: "진행한 라운드",
     longestStreak: "최장 연속 정답",
   },

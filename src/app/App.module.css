@@ -19,6 +19,15 @@
   gap: var(--space-4);
 }
 
+/* Sits between the terminal equation and the results block. The arena gap
+   above it is smaller than GameOverScreen's top padding below it, so it reads
+   as a caption on the equation rather than as the first result. */
+.reason {
+  padding: 0 var(--space-4);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
 @media (max-width: 40rem) {
   .languageBar {
     padding: var(--space-3) var(--space-3) 0;

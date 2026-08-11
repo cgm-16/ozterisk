@@ -88,8 +88,8 @@ The expanded rules must explain:
 English format:
 
 ```text
-1-0 — Score: {score}
-Rounds: {totalRounds}
+1-0 — Rounds: {totalRounds}
+Score: {score}
 Longest streak: {longestStreak}
 
 Can you beat it?
@@ -99,8 +99,8 @@ Can you beat it?
 Korean format:
 
 ```text
-1-0 — 점수: {score}
-라운드: {totalRounds}
+1-0 — 라운드: {totalRounds}
+점수: {score}
 최장 연속 정답: {longestStreak}
 
 이 기록을 넘을 수 있나요?

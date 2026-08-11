@@ -44,6 +44,33 @@ describe("GameOverScreen", () => {
     expect(screen.getByText("4")).toBeInTheDocument();
   });
 
+  it("orders the statistics rounds, score, longest streak", () => {
+    renderScreen();
+
+    const rounds = screen.getByText("Rounds played");
+    const score = screen.getByText("Score");
+    const streak = screen.getByText("Longest streak");
+
+    // DOCUMENT_POSITION_FOLLOWING (4) means the argument node comes after `this` node.
+    expect(rounds.compareDocumentPosition(score) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(score.compareDocumentPosition(streak) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  // Mirrors the HUD's emphasis guard in App.test.tsx: reading getComputedStyle
+  // catches a `.primary` rule that loses the cascade, which a className
+  // assertion would not.
+  it("renders the rounds value at a larger computed font size than score", () => {
+    renderScreen();
+
+    const roundsValue = screen.getByText("Rounds played").nextElementSibling as HTMLElement;
+    const scoreValue = screen.getByText("Score").nextElementSibling as HTMLElement;
+
+    const roundsFontSize = parseFloat(getComputedStyle(roundsValue).fontSize);
+    const scoreFontSize = parseFloat(getComputedStyle(scoreValue).fontSize);
+
+    expect(roundsFontSize).toBeGreaterThan(scoreFontSize);
+  });
+
   it("invokes the Play Again callback", async () => {
     const { onPlayAgain } = renderScreen();
     await userEvent.click(screen.getByRole("button", { name: "Play Again" }));

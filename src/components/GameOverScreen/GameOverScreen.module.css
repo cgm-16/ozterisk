@@ -38,6 +38,13 @@
   font-weight: 600;
 }
 
+/* Mirrors the HUD headline: rounds survived is Endless's win condition.
+   `dd.primary` ties specificity with `.entry dd` (0,1,1 each), so source
+   order decides and this rule wins. */
+dd.primary {
+  font-size: 1.5rem;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

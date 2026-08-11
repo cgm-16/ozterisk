@@ -41,7 +41,7 @@ export function GameOverScreen({ stats, url, dependencies, onPlayAgain }: GameOv
       <dl className={styles.stats}>
         <div className={styles.entry}>
           <dt>{t("gameOver.rounds")}</dt>
-          <dd>{stats.totalRounds}</dd>
+          <dd className={styles.primary}>{stats.totalRounds}</dd>
         </div>
         <div className={styles.entry}>
           <dt>{t("hud.score")}</dt>

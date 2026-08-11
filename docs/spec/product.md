@@ -171,7 +171,7 @@ The terminal equation remains visible to explain why the run ended. It is not co
 #### `gameOver`
 
 - Keep the terminal equation visible.
-- Show total submitted rounds first, then score and longest streak.
+- Show total submitted rounds first, then score and longest streak. Rounds carries the same primary emphasis it holds in the HUD.
 - Show **Play Again**, **Share**, and **Copy Result**.
 - **Play Again** starts a fresh Round 1 immediately without returning to title.
 

@@ -9,6 +9,7 @@ import { gameReducer } from "../game/gameReducer";
 import { generateKindEquation, generateRewardTiles } from "../game/generators";
 import { constructAnswer, getRewardCount } from "../game/selectors";
 import type { RandomSource, TileIdFactory } from "../game/types";
+import { useI18n } from "../i18n/I18nContext";
 import type { ShareDependencies } from "../services/sharing";
 import styles from "./App.module.css";
 
@@ -24,6 +25,7 @@ export interface AppProps {
 }
 
 export function App({ dependencies, shareDependencies }: AppProps) {
+  const { t } = useI18n();
   const [state, dispatch] = useReducer(gameReducer, undefined, createTitleState);
 
   const handleStart = useCallback(() => {
@@ -104,6 +106,11 @@ export function App({ dependencies, shareDependencies }: AppProps) {
       {state.phase === "gameOver" && state.equation !== null && (
         <div className={styles.gameOverArena}>
           <EquationBoard equation={state.equation} />
+          {/* §1.8 keeps the terminal equation on screen to explain the loss, but
+              the equation alone reads as a live prompt. The reason sits with the
+              equation rather than inside the results block, so it defuses the
+              thing it explains. */}
+          <p className={styles.reason}>{t("gameOver.reason")}</p>
           <GameOverScreen
             stats={{
               score: state.score,

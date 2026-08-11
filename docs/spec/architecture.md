@@ -331,4 +331,36 @@ export const makeAnsweringState = (
   round: 1,
   ...overrides,
 });
+
+// A §2.5-legal feedback-phase state: lastResult is non-null and round === totalRounds.
+export const makeFeedbackState = (
+  equation: Equation,
+  overrides: Partial<GameState> = {},
+): GameState => ({
+  ...makeAnsweringState(equation, { round: 1, totalRounds: 1 }),
+  phase: "feedback",
+  lastResult: {
+    kind: "incorrect",
+    submittedValue: 1,
+    correctValue: equation.product,
+    submittedTiles: [],
+    rewardTileIds: [],
+  },
+  ...overrides,
+});
+
+// A §2.5-legal overflow-phase state: inventory exceeds capacity (excess 1 by
+// default), lastResult is non-null, and round === totalRounds.
+export const makeOverflowState = (
+  equation: Equation,
+  overrides: Partial<GameState> = {},
+): GameState => ({
+  ...makeFeedbackState(equation, {
+    inventory: Array.from({ length: 11 }, (_, index) =>
+      makeTile((index % 9) as Digit, `tile-${index}`),
+    ),
+  }),
+  phase: "overflow",
+  ...overrides,
+});
 ```

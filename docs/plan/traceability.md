@@ -35,3 +35,12 @@ M4 — Endless Polish and Tuning Surface:
 | R-24 selection is clearable with a visible affordance | T18 | reducer tests for `CLEAR_SELECTION`; Clear button and `Escape` component tests |
 | R-25 motion and hairline values live in tokens | T19 | no module hardcodes a duration, press offset, or hairline; reduced-motion override still wins |
 | R-26 rounds survived is the headline stat | T20 | HUD order, game-over order, and share-text tests; emphasis asserted by computed font size |
+
+M5 — States Gallery:
+
+| Requirement | Owning task(s) | Required evidence |
+|---|---|---|
+| R-27 gallery states compose from the shared test fixtures | T21, T24 | `makeFeedbackState`, `makeOverflowState`, and `makeGameOverState` are exported from `src/test/fixtures.ts` and defined nowhere else; §2.6 reproduces the file |
+| R-28 game over is one renderable component | T22 | the terminal equation and its reason render inside `GameOverScreen`'s `main` landmark; `App.test.tsx` passes unedited |
+| R-29 every phase is viewable without playing to it | T23, T24 | `GALLERY_STATES` is typed `Record<GamePhase, GalleryEntry[]>`; tests assert no group is empty and that every entry renders in both languages |
+| R-30 the gallery never ships | T23 | `npm run build` emits no `dist/gallery.html`, checked by `ls dist/`; `vite.config.ts` unchanged |

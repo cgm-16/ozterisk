@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { Equation } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import {
   copyResult,
@@ -8,16 +9,24 @@ import {
   type ShareOutcome,
   type ShareStats,
 } from "../../services/sharing";
+import { EquationBoard } from "../EquationBoard/EquationBoard";
 import styles from "./GameOverScreen.module.css";
 
 export interface GameOverScreenProps {
+  equation: Equation;
   stats: ShareStats;
   url: string;
   dependencies: ShareDependencies;
   onPlayAgain(): void;
 }
 
-export function GameOverScreen({ stats, url, dependencies, onPlayAgain }: GameOverScreenProps) {
+export function GameOverScreen({
+  equation,
+  stats,
+  url,
+  dependencies,
+  onPlayAgain,
+}: GameOverScreenProps) {
   const { t, language } = useI18n();
   // "shared" renders no inline message: a successful native share hands off
   // to the OS share sheet, so there is nothing further to confirm here.
@@ -37,6 +46,14 @@ export function GameOverScreen({ stats, url, dependencies, onPlayAgain }: GameOv
 
   return (
     <main className={styles.screen}>
+      <div className={styles.terminal}>
+        <EquationBoard equation={equation} />
+        {/* §1.8 keeps the terminal equation on screen to explain the loss, but
+            the equation alone reads as a live prompt. The reason sits with the
+            equation rather than inside the results block, so it defuses the
+            thing it explains. */}
+        <p className={styles.reason}>{t("gameOver.reason")}</p>
+      </div>
       <h1 className={styles.title}>{t("gameOver.title")}</h1>
       <dl className={styles.stats}>
         <div className={styles.entry}>

@@ -355,18 +355,32 @@ export const makeFeedbackState = (
   ...overrides,
 });
 
+// Overflow inventories are defined by size alone; the digits only need to
+// exist. `size - INVENTORY_CAPACITY` is the excess the player must discard.
+export const makeOverflowInventory = (size: number): Tile[] =>
+  Array.from({ length: size }, (_, index) => makeTile((index % 9) as Digit, `tile-${index}`));
+
 // A §2.5-legal overflow-phase state: inventory exceeds capacity (excess 1 by
 // default), lastResult is non-null, and round === totalRounds.
 export const makeOverflowState = (
   equation: Equation,
   overrides: Partial<GameState> = {},
 ): GameState => ({
-  ...makeFeedbackState(equation, {
-    inventory: Array.from({ length: 11 }, (_, index) =>
-      makeTile((index % 9) as Digit, `tile-${index}`),
-    ),
-  }),
+  ...makeFeedbackState(equation, { inventory: makeOverflowInventory(11) }),
   phase: "overflow",
+  ...overrides,
+});
+
+// A §2.5-legal gameOver state: round === totalRounds + 1 and the terminal
+// equation is still on screen (§1.8).
+export const makeGameOverState = (
+  equation: Equation,
+  overrides: Partial<GameState> = {},
+): GameState => ({
+  ...makeAnsweringState(equation, { round: 13, totalRounds: 12 }),
+  phase: "gameOver",
+  score: 7,
+  longestStreak: 4,
   ...overrides,
 });
 ```
@@ -400,3 +414,10 @@ each calling `preventDefault()` on the same keypress. Rendering one state at a
 time also means each renders at the page's real width. Neither the picker's
 `<nav>` nor the stage `<div>` is a `<main>`, because several rendered states
 (`TitleScreen`, `GameOverScreen`) own that landmark themselves.
+
+The catalogue's phase coverage is enforced, not just conventional:
+`GALLERY_STATES`'s `Record<GamePhase, GalleryEntry[]>` type fails `tsc` the
+moment a new `GamePhase` member ships without a matching key, and
+`src/gallery/states.test.tsx` asserts every key's array is non-empty, which
+catches the type check's own blind spot — an empty array added just to
+satisfy the compiler.

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { GameOverScreen } from "../components/GameOverScreen/GameOverScreen";
 import { GameScreen } from "../components/GameScreen/GameScreen";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
+import { gameReducer } from "../game/gameReducer";
 import type { GamePhase, GameState } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
 import {
@@ -49,6 +50,21 @@ function renderGameOverScreen(state: GameState, dependencies: ShareDependencies)
 }
 
 const ANSWERING_EQUATION = makeEquation(3, 4); // product 12: two answer slots
+const ANSWERING_BASE_STATE = makeAnsweringState(ANSWERING_EQUATION);
+
+// Built by running the real reducer rather than hand-assembling a
+// GameState: SELECT_TILE moves a tile out of inventory into selectedTiles,
+// so these conserve the fixed 10 live tiles the shipped game shows at this
+// moment. Selecting digit 1 then digit 2 spells 12, the correct answer,
+// matching what a player building this hand would actually do.
+const ANSWERING_PARTIAL_STATE = gameReducer(ANSWERING_BASE_STATE, {
+  type: "SELECT_TILE",
+  tileId: "tile-1",
+});
+const ANSWERING_FULL_STATE = gameReducer(ANSWERING_PARTIAL_STATE, {
+  type: "SELECT_TILE",
+  tileId: "tile-2",
+});
 
 // score and currentStreak/longestStreak reflect the round this correct
 // answer just won, matching what SUBMIT_CORRECT actually produces instead of
@@ -80,14 +96,41 @@ const FEEDBACK_INCORRECT_STATE = makeFeedbackState(makeEquation(6, 7));
 
 // Endless's only overflow case: excess 1 completes on the marking tap alone
 // (see GameScreen's onTile handler), so OverflowControls never renders
-// Confirm.
-const OVERFLOW_REQUIRED_1_STATE = makeOverflowState(makeEquation(3, 3));
+// Confirm. Overflow always follows SUBMIT_CORRECT (only a correct answer
+// grows the inventory past capacity), so lastResult is overridden to
+// "correct" here — makeFeedbackState/makeOverflowState default to
+// "incorrect", which the shipped game can never show during overflow.
+// getRewardCount(1) = 1 + REWARD_BONUS = 2, so one spent tile earns two
+// reward tiles: 10 - 1 + 2 = 11, matching makeOverflowState's default
+// 11-tile inventory, and the two newest ids in that inventory are tile-9
+// and tile-10.
+const OVERFLOW_REQUIRED_1_STATE = makeOverflowState(makeEquation(3, 3), {
+  lastResult: {
+    kind: "correct",
+    submittedValue: 9,
+    correctValue: 9,
+    submittedTiles: [makeTile(9, "spent-0")],
+    rewardTileIds: ["tile-9", "tile-10"],
+  },
+});
 
 // Classic's case: excess 2 needs an explicit Confirm click. Classic mode
 // doesn't exist in the shipped game, so this state is otherwise unreachable
-// by playing.
+// by playing. lastResult is "correct" for the same reason as required-1
+// above; its three reward tiles reflect REWARD_BONUS = 2, which only
+// Classic would need (Endless ships REWARD_BONUS = 1), so that reward count
+// is unreachable for the same reason the inventory size is: 10 - 1 + 3 = 12,
+// matching makeOverflowInventory(12), whose three newest ids are tile-9,
+// tile-10, and tile-11.
 const OVERFLOW_REQUIRED_2_STATE = makeOverflowState(makeEquation(3, 3), {
   inventory: makeOverflowInventory(12),
+  lastResult: {
+    kind: "correct",
+    submittedValue: 9,
+    correctValue: 9,
+    submittedTiles: [makeTile(9, "spent-0")],
+    rewardTileIds: ["tile-9", "tile-10", "tile-11"],
+  },
 });
 
 const GAME_OVER_STATE = makeGameOverState(makeEquation(7, 8));
@@ -114,27 +157,17 @@ export const GALLERY_STATES: Record<GamePhase, GalleryEntry[]> = {
     {
       id: "answering-empty",
       label: "Answering — empty slots",
-      render: () => renderGameScreen(makeAnsweringState(ANSWERING_EQUATION)),
+      render: () => renderGameScreen(ANSWERING_BASE_STATE),
     },
     {
       id: "answering-partial",
       label: "Answering — partially filled",
-      render: () =>
-        renderGameScreen(
-          makeAnsweringState(ANSWERING_EQUATION, {
-            selectedTiles: [makeTile(1, "selected-0")],
-          }),
-        ),
+      render: () => renderGameScreen(ANSWERING_PARTIAL_STATE),
     },
     {
       id: "answering-full",
       label: "Answering — all slots filled",
-      render: () =>
-        renderGameScreen(
-          makeAnsweringState(ANSWERING_EQUATION, {
-            selectedTiles: [makeTile(1, "selected-0"), makeTile(2, "selected-1")],
-          }),
-        ),
+      render: () => renderGameScreen(ANSWERING_FULL_STATE),
     },
   ],
   feedback: [

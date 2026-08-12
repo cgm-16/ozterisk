@@ -30,6 +30,35 @@ describe("gallery catalogue", () => {
     expect(inventoryTiles.length + filledSlots.length).toBe(INVENTORY_CAPACITY);
   });
 
+  // makeOverflowInventory (src/test/fixtures.ts) is shared with the rest of
+  // the suite, so a future change to its id format or size handling could
+  // make rewardTileIds.includes(tile.id) match nothing inside
+  // makeOverflowInventoryWithRewards (states.tsx), silently dropping every
+  // tray New-tile badge while the render-without-throwing test below stays
+  // green. Expected counts are named here rather than derived from
+  // states.tsx, so a break in the stamping logic can't also break the value
+  // this test compares against.
+  const OVERFLOW_ENTRY_REWARD_COUNTS: Record<string, number> = {
+    "overflow-required-1": 2,
+    "overflow-required-2": 3,
+  };
+
+  it("badges exactly as many overflow-tray tiles New as each entry's reward count", () => {
+    for (const entry of GALLERY_STATES.overflow) {
+      const expectedCount = OVERFLOW_ENTRY_REWARD_COUNTS[entry.id];
+      if (expectedCount === undefined) {
+        throw new Error(`no expected reward count recorded for gallery entry "${entry.id}"`);
+      }
+
+      render(<I18nProvider initialLanguage="en">{entry.render()}</I18nProvider>);
+      const badgedTiles = screen.getAllByRole("button", { name: /New tile$/ });
+      expect(badgedTiles, `expected ${expectedCount} New-badged tray tiles for ${entry.id}`).toHaveLength(
+        expectedCount,
+      );
+      cleanup();
+    }
+  });
+
   // Every entry must render in both languages (not just en): a translation
   // path that only a Korean render exercises is exactly the kind of bug this
   // gallery exists to surface, so a test that only tried en would not fail

@@ -2,8 +2,9 @@ import type { ReactNode } from "react";
 import { GameOverScreen } from "../components/GameOverScreen/GameOverScreen";
 import { GameScreen } from "../components/GameScreen/GameScreen";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
+import { sortTiles } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
-import type { GamePhase, GameState } from "../game/types";
+import type { GamePhase, GameState, Tile } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
 import {
   makeAnsweringState,
@@ -94,23 +95,42 @@ const FEEDBACK_CORRECT_STATE = makeFeedbackState(makeEquation(3, 3), {
 // override is needed here.
 const FEEDBACK_INCORRECT_STATE = makeFeedbackState(makeEquation(6, 7));
 
+// Overflow always follows SUBMIT_CORRECT, which stamps every newly granted
+// tile isNew: true and files the result through sortTiles (gameReducer.ts).
+// This builds a same-shaped overflow inventory from makeOverflowInventory:
+// rewardTileIds is the one list that names which tiles are "new", so the
+// reward badges FeedbackPanel draws from lastResult.rewardTileIds and the
+// New-tile badges TileInventory draws from tile.isNew can't drift apart, and
+// the digits land where sortTiles would actually file them instead of at
+// the end of the row.
+function makeOverflowInventoryWithRewards(size: number, rewardTileIds: readonly string[]): Tile[] {
+  return sortTiles(
+    makeOverflowInventory(size).map((tile) =>
+      rewardTileIds.includes(tile.id) ? { ...tile, isNew: true } : tile,
+    ),
+  );
+}
+
 // Endless's only overflow case: excess 1 completes on the marking tap alone
 // (see GameScreen's onTile handler), so OverflowControls never renders
 // Confirm. Overflow always follows SUBMIT_CORRECT (only a correct answer
-// grows the inventory past capacity), so lastResult is overridden to
-// "correct" here — makeFeedbackState/makeOverflowState default to
-// "incorrect", which the shipped game can never show during overflow.
-// getRewardCount(1) = 1 + REWARD_BONUS = 2, so one spent tile earns two
-// reward tiles: 10 - 1 + 2 = 11, matching makeOverflowState's default
-// 11-tile inventory, and the two newest ids in that inventory are tile-9
-// and tile-10.
+// grows the inventory past capacity), so lastResult is "correct" here —
+// makeFeedbackState/makeOverflowState default to "incorrect", which the
+// shipped game can never show during overflow. getRewardCount(1) =
+// 1 + REWARD_BONUS = 2, so one spent tile earns two reward tiles:
+// 10 - 1 + 2 = 11. Sorted, this 11-tile hand reads 0 0 1 1 2 3 4 5 6 7 8,
+// with the reward tiles landing on the second 0 (tile-9) and the second 1
+// (tile-10) — a hand a real correct answer on 3 x 3 could plausibly leave.
+const OVERFLOW_REQUIRED_1_REWARD_TILE_IDS = ["tile-9", "tile-10"];
+
 const OVERFLOW_REQUIRED_1_STATE = makeOverflowState(makeEquation(3, 3), {
+  inventory: makeOverflowInventoryWithRewards(11, OVERFLOW_REQUIRED_1_REWARD_TILE_IDS),
   lastResult: {
     kind: "correct",
     submittedValue: 9,
     correctValue: 9,
     submittedTiles: [makeTile(9, "spent-0")],
-    rewardTileIds: ["tile-9", "tile-10"],
+    rewardTileIds: OVERFLOW_REQUIRED_1_REWARD_TILE_IDS,
   },
 });
 
@@ -119,17 +139,21 @@ const OVERFLOW_REQUIRED_1_STATE = makeOverflowState(makeEquation(3, 3), {
 // by playing. lastResult is "correct" for the same reason as required-1
 // above; its three reward tiles reflect REWARD_BONUS = 2, which only
 // Classic would need (Endless ships REWARD_BONUS = 1), so that reward count
-// is unreachable for the same reason the inventory size is: 10 - 1 + 3 = 12,
-// matching makeOverflowInventory(12), whose three newest ids are tile-9,
-// tile-10, and tile-11.
+// is unreachable for the same reason the inventory size is: 10 - 1 + 3 = 12.
+// Sorted, this 12-tile hand reads 0 0 1 1 2 2 3 4 5 6 7 8: the reward tiles
+// land on the second 0 (tile-9) and second 1 (tile-10) as above, but on the
+// *first* of the two 2s (tile-11) — sortTiles breaks digit ties by comparing
+// ids as strings, and "tile-11" sorts before "tile-2".
+const OVERFLOW_REQUIRED_2_REWARD_TILE_IDS = ["tile-9", "tile-10", "tile-11"];
+
 const OVERFLOW_REQUIRED_2_STATE = makeOverflowState(makeEquation(3, 3), {
-  inventory: makeOverflowInventory(12),
+  inventory: makeOverflowInventoryWithRewards(12, OVERFLOW_REQUIRED_2_REWARD_TILE_IDS),
   lastResult: {
     kind: "correct",
     submittedValue: 9,
     correctValue: 9,
     submittedTiles: [makeTile(9, "spent-0")],
-    rewardTileIds: ["tile-9", "tile-10", "tile-11"],
+    rewardTileIds: OVERFLOW_REQUIRED_2_REWARD_TILE_IDS,
   },
 });
 

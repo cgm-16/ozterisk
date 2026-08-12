@@ -57,6 +57,11 @@ reducer invariants, and test fixture conventions (§2).
 │   │       ├── TitleScreen.module.css
 │   │       ├── TitleScreen.test.tsx
 │   │       └── TitleScreen.tsx
+│   ├── gallery/
+│   │   ├── Gallery.module.css
+│   │   ├── Gallery.tsx
+│   │   ├── main.tsx
+│   │   └── states.tsx
 │   ├── game/
 │   │   ├── balance.test.ts
 │   │   ├── balance.ts
@@ -91,6 +96,7 @@ reducer invariants, and test fixture conventions (§2).
 │   └── vite-env.d.ts
 ├── AGENTS.md
 ├── eslint.config.js
+├── gallery.html
 ├── index.html
 ├── package-lock.json
 ├── package.json
@@ -364,3 +370,33 @@ export const makeOverflowState = (
   ...overrides,
 });
 ```
+
+### 2.7 Dev-only states gallery
+
+`gallery.html` is a second root HTML entry, parallel to `index.html`, that
+loads `src/gallery/main.tsx` instead of `src/main.tsx`. It mounts `Gallery`
+(`src/gallery/Gallery.tsx`) under the same `StrictMode` and `I18nProvider` as
+the real app, so every rendered state gets real i18n and the double-render
+behavior that catches `StrictMode`-only bugs.
+
+Vite's default build input is `index.html` alone; it does not auto-discover
+sibling root HTML files. `npm run build && ls dist/` confirms `dist/` holds
+only `assets/`, `favicon.svg`, and `index.html` — `gallery.html` never ships.
+The dev server serves it anyway, since `vite dev` transforms any HTML file
+under the project root on request, not just the configured build input. (Full
+probe record: `docs/journal/journal-2026-08-12.md`.)
+
+The catalogue, `src/gallery/states.tsx`, exports
+`GALLERY_STATES: Record<GamePhase, GalleryEntry[]>`. Keying by phase rather
+than a flat array means adding a member to `GamePhase` fails `tsc` until the
+gallery covers it — a flat array with a hand-written phase list would rot
+silently instead.
+
+`Gallery` renders exactly one entry at a time, chosen from a picker, rather
+than every state at once. `GameScreen` calls `useGameKeyboard`
+(`src/hooks/useGameKeyboard.ts`), which attaches a window-level `keydown`
+listener per mounted instance; N simultaneous screens would mean N listeners
+each calling `preventDefault()` on the same keypress. Rendering one state at a
+time also means each renders at the page's real width. Neither the picker's
+`<nav>` nor the stage `<div>` is a `<main>`, because several rendered states
+(`TitleScreen`, `GameOverScreen`) own that landmark themselves.

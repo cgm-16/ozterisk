@@ -18,7 +18,7 @@ An audit of the 1.0 codebase found the weak spot is not where it looks.
 
 ## 2. Audit
 
-### 2.1 Visual layer — already 80% there
+### 2.1 Visual layer — consistency already 80% there
 
 `src/styles/global.css` defines 25 tokens, and **all 11 CSS modules use zero
 hardcoded colors**. The discipline exists and is being followed.
@@ -30,6 +30,12 @@ The gap is that the most feel-critical values are the *least* tokenized.
 retuning how a button press feels currently means editing seven files and
 keeping them consistent by hand. A hairline `1px solid var(--color-border)`
 repeats across five.
+
+**What this section does not measure.** Everything above is about whether the
+visual layer is *internally consistent* — tokens defined, tokens used, values
+not copy-pasted. It says nothing about whether the result looks good, and the
+audit never asked. `M5.5 — Design Pass` (#52) covers that axis; read "80%
+there" as a claim about token discipline only, not about visual quality.
 
 ### 2.2 Balance layer — the real gap
 
@@ -61,6 +67,11 @@ the visual system needs finishing rather than building.**
 | Live tuning panel (sliders bound to balance values) | **Rejected.** Runtime code needing `import.meta.env.DEV` gating, for a workflow a file edit already serves |
 | Figma ↔ code token sync | **Rejected.** Overkill at 25 tokens with no designer handoff. Revisit only if visual work is brought to someone else |
 | Sequencing | Cheap parts fold into the Endless build; the gallery gets its own build after |
+
+Each decision above answers "how do we keep the visual layer consistent and
+the balance dials safe to touch". None of them answers "does the game look
+good" — that axis was out of scope here and is planned as `M5.5 — Design
+Pass` (#52), which runs once the Part 2 gallery makes every state viewable.
 
 The fold is near-free: the Endless build already edits `constants.ts`,
 `App.tsx`, and the CSS modules, and already introduces a new dial
@@ -116,6 +127,9 @@ root `index.html` alone, and the current config sets no
 States compose from the existing `src/test/fixtures.ts` helpers, so gallery
 states cannot drift away from the states the tests assert against.
 
+The gallery is a tool, not an end: `M5.5 — Design Pass` (#52) is the build
+that consumes it, walking every state in its catalogue.
+
 ## 6. Sequencing
 
 1. **Part 0** — this document, the decision journal, and forward roadmap
@@ -123,6 +137,9 @@ states cannot drift away from the states the tests assert against.
 2. **Endless spec amendment** — Part 1 added as a spec section.
 3. **Implementation plan** — combined Endless + Part 1 build.
 4. **Part 2** — its own spec and build after Endless lands.
+5. **`M5.5 — Design Pass`** (#52) — the visual quality pass, once Part 2's
+   gallery exists to run it against. Phase 1 works inside `ui-i18n.md` §1.12;
+   phase 2 proposes an amendment to it with gallery screens as evidence.
 
 Steps 1–2 are documentation only and can go up as a single PR before any
 source file changes.

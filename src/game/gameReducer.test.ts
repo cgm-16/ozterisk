@@ -1,41 +1,16 @@
 import { describe, expect, it } from "vitest";
-import type { Digit, Equation, GameAction, GameState } from "./types";
+import type { Digit, GameAction, GameState } from "./types";
 import { gameReducer } from "./gameReducer";
 import { createInitialInventory, createTitleState, sortTiles } from "./factories";
 import { getAnswerLength } from "./selectors";
-import { makeAnsweringState, makeEquation, makeTile, sequentialIds } from "../test/fixtures";
-
-// A §2.5-legal feedback-phase state: lastResult is non-null and round === totalRounds.
-const makeFeedbackState = (
-  equation: Equation,
-  overrides: Partial<GameState> = {},
-): GameState => ({
-  ...makeAnsweringState(equation, { round: 1, totalRounds: 1 }),
-  phase: "feedback",
-  lastResult: {
-    kind: "incorrect",
-    submittedValue: 1,
-    correctValue: 9,
-    submittedTiles: [],
-    rewardTileIds: [],
-  },
-  ...overrides,
-});
-
-// A §2.5-legal overflow-phase state: inventory exceeds capacity (excess 1 by
-// default), lastResult is non-null, and round === totalRounds.
-const makeOverflowState = (
-  equation: Equation,
-  overrides: Partial<GameState> = {},
-): GameState => ({
-  ...makeFeedbackState(equation, {
-    inventory: Array.from({ length: 11 }, (_, index) =>
-      makeTile((index % 9) as Digit, `tile-${index}`),
-    ),
-  }),
-  phase: "overflow",
-  ...overrides,
-});
+import {
+  makeAnsweringState,
+  makeEquation,
+  makeFeedbackState,
+  makeOverflowState,
+  makeTile,
+  sequentialIds,
+} from "../test/fixtures";
 
 describe("START_RUN", () => {
   it("starts a new run in the answering phase at round 1 with the provided inventory and reset statistics", () => {

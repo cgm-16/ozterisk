@@ -2,52 +2,23 @@ import { StrictMode } from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import type { Digit, Equation, GameState } from "../../game/types";
+import type { GameState } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
-import { makeAnsweringState, makeEquation, makeTile } from "../../test/fixtures";
+import {
+  makeAnsweringState,
+  makeEquation,
+  makeFeedbackState,
+  makeOverflowInventory,
+  makeOverflowState,
+  makeTile,
+} from "../../test/fixtures";
 import { GameScreen, type GameScreenProps } from "./GameScreen";
 
-// A §2.5-legal feedback-phase state: lastResult is non-null and round === totalRounds.
-// Mirrors the local fixture pattern in src/game/gameReducer.test.ts.
-const makeFeedbackState = (
-  equation: Equation,
-  overrides: Partial<GameState> = {},
-): GameState => ({
-  ...makeAnsweringState(equation, { round: 1, totalRounds: 1 }),
-  phase: "feedback",
-  inventory: [],
-  lastResult: {
-    kind: "incorrect",
-    submittedValue: 1,
-    correctValue: equation.product,
-    submittedTiles: [],
-    rewardTileIds: [],
-  },
-  ...overrides,
-});
-
-// A §2.5-legal overflow-phase state: inventory exceeds capacity (excess 1 by
-// default), lastResult is non-null, and round === totalRounds.
-const makeOverflowState = (
-  equation: Equation,
-  overrides: Partial<GameState> = {},
-): GameState => ({
-  ...makeFeedbackState(equation, {
-    inventory: Array.from({ length: 11 }, (_, index) =>
-      makeTile((index % 9) as Digit, `tile-${index}`),
-    ),
-  }),
-  phase: "overflow",
-  ...overrides,
-});
-
 // A 12-tile inventory (excess 2) for exercising the multi-tile Confirm path.
-// The 11-tile default above collapses at requiredCount === 1, so covering
-// Confirm's continued existence needs an inventory override, not a change to
-// that default (which every other overflow test still relies on).
-const TWELVE_TILE_INVENTORY = Array.from({ length: 12 }, (_, index) =>
-  makeTile((index % 9) as Digit, `tile-${index}`),
-);
+// makeOverflowState's 11-tile default collapses at requiredCount === 1, so
+// covering Confirm's continued existence needs an inventory override, not a
+// change to that default (which every other overflow test still relies on).
+const TWELVE_TILE_INVENTORY = makeOverflowInventory(12);
 
 function renderScreen(state: GameState) {
   const dispatch = vi.fn();

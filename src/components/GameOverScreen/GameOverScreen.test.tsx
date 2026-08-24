@@ -1,12 +1,14 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "../../i18n/I18nContext";
 import type { ShareDependencies } from "../../services/sharing";
+import { makeEquation } from "../../test/fixtures";
 import { LanguageToggle } from "../LanguageToggle/LanguageToggle";
 import { GameOverScreen, type GameOverScreenProps } from "./GameOverScreen";
 
 const STATS = { score: 7, totalRounds: 9, longestStreak: 4 };
+const EQUATION = makeEquation(2, 3);
 const URL = "https://example.test/";
 const EN_TEXT =
   "1-0 — Rounds: 9\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
@@ -21,6 +23,7 @@ function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
   render(
     <I18nProvider initialLanguage="en">
       <GameOverScreen
+        equation={EQUATION}
         stats={STATS}
         url={URL}
         dependencies={dependencies}
@@ -33,6 +36,14 @@ function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
 }
 
 describe("GameOverScreen", () => {
+  it("renders the terminal equation and its reason inside the main landmark", () => {
+    renderScreen({ equation: makeEquation(7, 8) });
+
+    const main = screen.getByRole("main");
+    expect(within(main).getByText("7 × 8 =")).toBeInTheDocument();
+    expect(within(main).getByText("Not enough tiles left to answer.")).toBeInTheDocument();
+  });
+
   it("shows the run statistics", () => {
     renderScreen();
     expect(screen.getByRole("heading", { name: "Game Over" })).toBeInTheDocument();
@@ -148,6 +159,7 @@ describe("GameOverScreen", () => {
       <I18nProvider initialLanguage="en">
         <LanguageToggle />
         <GameOverScreen
+          equation={EQUATION}
           stats={STATS}
           url={URL}
           dependencies={{ nativeShare, writeClipboard }}

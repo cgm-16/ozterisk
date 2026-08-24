@@ -39,7 +39,7 @@ driving a full run to Game Over twice — once at 1920px, once at 320px.
 
 Probed on this branch before this task was written:
 
-```
+```bash
 printf '<!doctype html><title>probe</title>' > gallery.html
 npm run build && ls dist/
 ```

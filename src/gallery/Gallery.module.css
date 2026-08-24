@@ -66,6 +66,10 @@
 @media (max-width: 40rem) {
   .gallery {
     flex-direction: column;
+    /* Stacked, the picker and stage should span the column. Without this they
+       are cross-axis sized to their content and only reach full width while
+       an entry label happens to be wider than the viewport. */
+    align-items: stretch;
   }
 
   .picker {

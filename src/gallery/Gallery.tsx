@@ -35,7 +35,12 @@ export function Gallery() {
           </div>
         ))}
       </nav>
-      <div className={styles.stage}>{selected?.render()}</div>
+      {/* Entries that share a root component type (the three gameOver
+          entries do) reconcile into one instance without an identity
+          key, carrying that component's local state across a switch. */}
+      <div key={selected?.id} className={styles.stage}>
+        {selected?.render()}
+      </div>
     </div>
   );
 }

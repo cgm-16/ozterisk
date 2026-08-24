@@ -37,11 +37,19 @@ honest and the journal intact.
 **Why the pass is split in two.** §1.12 mandates the "minimal number-board
 aesthetic", "neutral surfaces, restrained accent use", and no decorative
 motion, and `src/styles/global.css` implements exactly that. The current look
-is a faithful reading of the contract, not a sloppy one, so a pass confined to
-§1.12 can fix hierarchy, type scale, spacing, and density but cannot introduce
-a hue, a dark mode, or a motion-based closure moment. Phase 1 does what the
-contract permits; phase 2 proposes the specific amendment with gallery screens
-as evidence, so the ruling is made against real states rather than taste.
+is a faithful reading of the contract — but not the only one. §1.12 constrains
+*surfaces* to neutral and asks only that accent use be **restrained**, not that
+it be achromatic: the near-black `--color-accent: #27272a` is the
+implementation's choice, and the state and focus tokens already carry hue. So a
+pass confined to §1.12 can reach hierarchy, type scale, spacing, density, and
+the accent itself.
+
+What it cannot reach is a chromatic surface tint, which "neutral surfaces"
+forbids outright; a motion-based closure moment, which "no decorative motion"
+forbids outright; and a dark mode, which the spec does not mention at all and
+so would need a rule added rather than relaxed. Phase 1 does what the contract
+permits; phase 2 proposes the specific §1.12 change with gallery screens as
+evidence, so the ruling is made against real states rather than taste.
 
 **Why M6 was split.** As originally scoped, `M6 — Classic Mode` bundled
 shrinking capacity, mode select, *and* the face-set tile mechanism. The

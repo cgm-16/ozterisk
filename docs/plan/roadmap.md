@@ -22,8 +22,34 @@ hoc at branch time.
 |---|---|---|
 | `M4 — Endless Polish and Tuning Surface` | Reduced round friction, kind equation bias, and a single documented tuning surface | Discard collapse, Clear action, overflow keyboard access, `balance.ts`, and `balance.test.ts` merged; economy invariant green |
 | `M5 — States Gallery` | Every component state viewable without playing to it | Dev-only `gallery.html` serves all five phases; absent from `dist/` after `npm run build` |
+| `M5.5 — Design Pass` | Every state the gallery renders passes a visual quality bar | Phase 1 merged inside §1.12; phase 2 either merged as a §1.12 amendment or explicitly declined |
 | `M6 — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(round)` merged; both modes' economy invariants green |
 | `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
+
+**Why M5.5 is a fraction.** The design pass was not on the roadmap when M6
+and M7 were numbered, and it has to run once the gallery exists — the gallery
+is what makes every state viewable without playing to it, which is the
+precondition for tuning them. Renumbering `M6` and `M7` down would touch
+`docs/journal/journal-2026-08-09.md`, which is a historical record: rewriting
+it to match a later decision would falsify it. A fraction keeps the sequence
+honest and the journal intact.
+
+**Why the pass is split in two.** §1.12 mandates the "minimal number-board
+aesthetic", "neutral surfaces, restrained accent use", and no decorative
+motion, and `src/styles/global.css` implements exactly that. The current look
+is a faithful reading of the contract — but not the only one. §1.12 constrains
+*surfaces* to neutral and asks only that accent use be **restrained**, not that
+it be achromatic: the near-black `--color-accent: #27272a` is the
+implementation's choice, and the state and focus tokens already carry hue. So a
+pass confined to §1.12 can reach hierarchy, type scale, spacing, density, and
+the accent itself.
+
+What it cannot reach is a chromatic surface tint, which "neutral surfaces"
+forbids outright; a motion-based closure moment, which "no decorative motion"
+forbids outright; and a dark mode, which the spec does not mention at all and
+so would need a rule added rather than relaxed. Phase 1 does what the contract
+permits; phase 2 proposes the specific §1.12 change with gallery screens as
+evidence, so the ruling is made against real states rather than taste.
 
 **Why M6 was split.** As originally scoped, `M6 — Classic Mode` bundled
 shrinking capacity, mode select, *and* the face-set tile mechanism. The

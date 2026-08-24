@@ -56,7 +56,9 @@ export const makeFeedbackState = (
   phase: "feedback",
   lastResult: {
     kind: "incorrect",
-    submittedValue: 1,
+    // Operands are 1..9, so no product is ever 0: this cannot collide with
+    // correctValue the way a literal 1 does against the equation 1 x 1.
+    submittedValue: 0,
     correctValue: equation.product,
     submittedTiles: [],
     rewardTileIds: [],

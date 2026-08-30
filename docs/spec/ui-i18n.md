@@ -18,10 +18,14 @@ section wins.
 - Mobile changes spacing, wrapping, and control size, not information architecture.
 - The inventory rack is ten fixed sockets in a `5 × 2` grid at every breakpoint. The
   grid never resizes as tiles are lost, because the empty sockets are the score.
-- Rack sizing has three tiers: below `360px`, tiles are `52 × 64` with an `8px` gap;
-  from `360px`, `66 × 64` with a `12px` gap; from `48rem`, `64 × 80` with a `12px`
+- Rack sizing has three tiers: below `400px`, tiles are `52 × 64` with an `8px` gap;
+  from `400px`, `66 × 64` with a `12px` gap; from `48rem`, `64 × 80` with a `12px`
   gap. Every tier must satisfy the `44 × 44` target minimum and the `320px`
-  no-horizontal-scroll rule below.
+  no-horizontal-scroll rule below. A tier's rack width — five tiles plus four gaps
+  — must also leave room for the arena's horizontal padding at that tier's lower
+  bound: `292px` inside `320px`, and `378px` inside `400px`. (The design document
+  draws this tier at `390px`; the spec raises the boundary to `400px` because
+  `378px` plus usable padding does not fit `390px`.)
 
 **Material and colour**
 
@@ -60,7 +64,9 @@ section wins.
 - Motion is budgeted by frequency: what happens every round is fastest and quietest;
   what happens once a run may be theatrical.
 - Permitted motion is the **named inventory** in `docs/design-system/decisions.md`
-  — the sixteen storyboard moments, each with an assigned duration and easing. Motion
+  — the sixteen named storyboard moments. A moment whose duration and easing are
+  not yet assigned in `docs/design-system/tokens/motion.css` gets them assigned by
+  the milestone that implements it, and that assignment is not an amendment. Motion
   outside that inventory is not permitted; extending the inventory amends this
   section.
 - Respect `prefers-reduced-motion` by removing nonessential motion wholesale,

@@ -171,8 +171,9 @@ socket appears.
   tile faces at 34px, the wordmark at 52px. Choosing a serif for numerals is the
   single most identity-defining decision in the system: it makes a digit an
   object rather than a readout.
-- **Zen Kaku Gothic New** sets interface text, instructions, and buttons, in both
-  locales.
+- **Zen Kaku Gothic New** sets Latin interface text, instructions, and buttons. It
+  is a Japanese family and serves no Hangul subset, so the `ko` locale needs a
+  Hangul-capable companion face (Noto Sans KR) appended to `--font-ui`.
 - **IBM Plex Mono** sets labels, HUD captions, and share strings — always
   uppercase with `0.14–0.2em` tracking at 9–11px. This is the only tracked type
   in the system.

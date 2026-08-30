@@ -1,6 +1,8 @@
 /* ozterisk uses three Google-hosted families. No binaries ship with the system;
    consumers load them from Google Fonts, which is how the app loads them too.
    EB Garamond      — display, numerals, equations
-   Zen Kaku Gothic New — interface text, and the Korean locale's primary face
+   Zen Kaku Gothic New — Latin interface text; it serves no Hangul subset, so the
+                         ko locale needs a Hangul-capable face (Noto Sans KR)
+                         appended to --font-ui
    IBM Plex Mono    — labels, meta, HUD counters, share strings */
 @import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");

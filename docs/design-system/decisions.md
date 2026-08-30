@@ -295,6 +295,9 @@ in `--gold-500`. Rendered as text, never as an image.
   frames at all. Only `2d`, the six-chip burst, has to be authored from nothing.
   The canvas frames hold across a 2.6s infinite loop, so each must be renormalised
   to 0–100% of its useful range when retimed to a one-shot duration.
+  **Timing correction:** the durations claim above is wrong — `2d`, `7b`, `7c`,
+  `8a`, `8c`, `10i` and `11a` have no duration or easing in `tokens/motion.css`
+  either, and the milestone that implements each one assigns them.
 - **Verification against the shipped app.** The overflow panel is where the
   storyboard and the codebase disagree most; the redesign wins on visuals, but
   the *states* should be checked against `src/components/OverflowControls/`.

@@ -22,7 +22,13 @@ hoc at branch time.
 |---|---|---|
 | `M4 — Endless Polish and Tuning Surface` | Reduced round friction, kind equation bias, and a single documented tuning surface | Discard collapse, Clear action, overflow keyboard access, `balance.ts`, and `balance.test.ts` merged; economy invariant green |
 | `M5 — States Gallery` | Every component state viewable without playing to it | Dev-only `gallery.html` serves all five phases; absent from `dist/` after `npm run build` |
-| `M5.5 — Design Pass` | Every state the gallery renders passes a visual quality bar | Phase 1 merged inside §1.12; phase 2 either merged as a §1.12 amendment or explicitly declined |
+| `M5.5a — Design Contract Amendments` | The specification permits the Tile House system | §1.12, §1.14, §1.15, `product.md` §1.10 and the AGENTS.md motion constraint amended; `docs/design-system/` adopted; `T25`–`T27` filed |
+| `M5.5b — Foundations and Identity` | Tile House tokens, self-hosted fonts, and the `ozterisk` wordmark | Token partials and global keyframes land; zero non-origin requests in a full run; Korean renders in a Hangul-capable face; focus indicator ≥ `3:1` on felt and ceramic |
+| `M5.5c — Tile and Action Primitives` | One `Tile` and one `ActionButton`, replacing three and seven copies | Both primitives wired at every call site; accessible names unchanged; suite green |
+| `M5.5d — Board Surfaces` | The rack, slots, equation, HUD and capacity meter wear the system | Rack holds ten sockets at every tier; a selected tile keeps its socket; round retains primary emphasis |
+| `M5.5e — Flow Screens` | Title, feedback, overflow and game over wear the system | Answer slots stay mounted through feedback; `role="status"` regions intact |
+| `M5.5f — Motion` | The sixteen named moments | Every moment in the §1.12 inventory implemented; `prefers-reduced-motion` neutralises all of them |
+| `M5.5g — Visual Verification` | The gallery proves it | Gallery covers hover, focus-visible, disabled and reduced-motion; §8.5 walked with measured evidence at 320px |
 | `M6 — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(round)` merged; both modes' economy invariants green |
 | `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
 
@@ -34,22 +40,25 @@ precondition for tuning them. Renumbering `M6` and `M7` down would touch
 it to match a later decision would falsify it. A fraction keeps the sequence
 honest and the journal intact.
 
-**Why the pass is split in two.** §1.12 mandates the "minimal number-board
-aesthetic", "neutral surfaces, restrained accent use", and no decorative
-motion, and `src/styles/global.css` implements exactly that. The current look
-is a faithful reading of the contract — but not the only one. §1.12 constrains
-*surfaces* to neutral and asks only that accent use be **restrained**, not that
-it be achromatic: the near-black `--color-accent: #27272a` is the
-implementation's choice, and the state and focus tokens already carry hue. So a
-pass confined to §1.12 can reach hierarchy, type scale, spacing, density, and
-the accent itself.
+**Why the pass was split into seven.** It was originally scoped as two phases:
+one working inside §1.12, one proposing an amendment to it with gallery screens
+as evidence. That framing assumed the design work did not exist yet. It does —
+`docs/design-system/` is a complete visual and motion system derived from this
+codebase, and it contradicts §1.12, §1.14, §1.15, `product.md` §1.10 and the
+AGENTS.md motion constraint. So the amendment is not the *last* step argued from
+screens; it is the *first* step, argued from the design record, and everything
+after it is compliant by construction.
 
-What it cannot reach is a chromatic surface tint, which "neutral surfaces"
-forbids outright; a motion-based closure moment, which "no decorative motion"
-forbids outright; and a dark mode, which the spec does not mention at all and
-so would need a rule added rather than relaxed. Phase 1 does what the contract
-permits; phase 2 proposes the specific §1.12 change with gallery screens as
-evidence, so the ruling is made against real states rather than taste.
+The earlier two-phase reasoning is preserved in
+`docs/journal/journal-2026-08-29.md`, which is a historical record and is not
+rewritten to match this decision.
+
+**Why seven and not one.** A milestone is the unit of merge, and one PR
+carrying a token replacement, two new primitives, ten restyled components,
+sixteen animations and a rename is not reviewable. §4.4 requires the split to
+happen here, before work starts, rather than at branch time. `M5.5a` is
+documentation only; `M5.5b` and `M5.5c` are strictly serial because everything
+downstream consumes them; `M5.5d` fans out across non-overlapping components.
 
 **Why M6 was split.** As originally scoped, `M6 — Classic Mode` bundled
 shrinking capacity, mode select, *and* the face-set tile mechanism. The

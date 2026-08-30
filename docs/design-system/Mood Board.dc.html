@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;700;800&family=Archivo+Black&family=Courier+Prime:wght@400;700&family=Archivo:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;600&family=EB+Garamond:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #e9e7e2; }
+  .mb *, .mb *::before, .mb *::after { box-sizing: border-box; }
+  .mb h1, .mb h2, .mb h3, .mb p, .mb ul, .mb li { margin: 0; padding: 0; }
+  .mb li { list-style: none; }
+  a { color: #1a1a1a; }
+  a:hover { color: #ff3b00; }
+</style>
+</helmet>
+
+<section id="t1" style="padding:44px 48px 40px;background:#e9e7e2;font-family:'Archivo',system-ui,sans-serif;color:#141414">
+  <div style="display:flex;align-items:baseline;gap:12px;margin-bottom:8px">
+    <a href="#t1" style="font:700 10px/1 ui-monospace,Menlo,monospace;padding:4px 8px;background:#141414;color:#fff;border-radius:4px;text-decoration:none">1</a>
+    <h1 style="font:900 15px/1.2 'Archivo',sans-serif;letter-spacing:-0.01em">Mood board — four worlds for <span style="font-family:'JetBrains Mono',monospace">1-0</span></h1>
+  </div>
+  <p style="max-width:70ch;font:400 12.5px/1.6 'Archivo',sans-serif;color:rgba(20,20,20,0.62);margin-bottom:30px;text-wrap:pretty">The game is an endless arithmetic survival loop where a digit is currency: you spend tiles to answer, get them back only when you are right, and drown if your hand outgrows its capacity. Every direction below answers the same question differently — <em>what does spending a number feel like?</em> Pick one, or mix parts across them.</p>
+
+  <div style="display:flex;flex-wrap:wrap;gap:30px;align-items:flex-start">
+
+    <div id="1a" style="display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 'Archivo',sans-serif;color:rgba(20,20,20,0.55)">
+        <a href="#1a" style="font:700 10.5px/1 ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(20,20,20,0.09);color:#141414;border-radius:5px;text-decoration:none">1a</a>
+        <span>Coin-op survival — the high-score cabinet</span>
+      </div>
+      <div style="width:470px;border:1px solid rgba(20,20,20,0.1);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
+        <div style="background:#05060a;background-image:repeating-linear-gradient(180deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 3px);padding:26px 26px 28px;display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <h2 style="font:400 26px/1 'Silkscreen',monospace;color:#39ff88;text-shadow:0 0 14px rgba(57,255,136,0.55)">ARCADE DECAY</h2>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <span style="font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;padding:6px 9px;border:1px solid rgba(57,255,136,0.45);color:#39ff88;border-radius:3px">phosphor</span>
+              <span style="font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;padding:6px 9px;border:1px solid rgba(77,226,255,0.45);color:#4de2ff;border-radius:3px">high score</span>
+              <span style="font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;padding:6px 9px;border:1px solid rgba(255,46,108,0.5);color:#ff2e6c;border-radius:3px">jeopardy</span>
+              <span style="font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;padding:6px 9px;border:1px solid rgba(255,210,63,0.45);color:#ffd23f;border-radius:3px">one more run</span>
+              <span style="font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:0.1em;text-transform:uppercase;padding:6px 9px;border:1px solid rgba(255,255,255,0.22);color:rgba(255,255,255,0.65);border-radius:3px">scanline</span>
+            </div>
+            <p style="font:400 11.5px/1.65 'JetBrains Mono',monospace;color:rgba(255,255,255,0.6);text-wrap:pretty">Tiles glow because they are power. Spending one dims the board. The HUD is a scoreboard that never stops counting, and Game Over is a hard cut to black — the direction leans on dread and momentum rather than charm.</p>
+          </div>
+
+          <div style="display:flex;gap:0;border-radius:4px;overflow:hidden">
+            <div style="flex:1;height:52px;background:#05060a;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'JetBrains Mono',monospace;color:rgba(255,255,255,0.45)">05060A</div>
+            <div style="flex:1;height:52px;background:#101728;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'JetBrains Mono',monospace;color:rgba(255,255,255,0.5)">101728</div>
+            <div style="flex:1;height:52px;background:#39ff88;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'JetBrains Mono',monospace;color:#05060a">39FF88</div>
+            <div style="flex:1;height:52px;background:#4de2ff;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'JetBrains Mono',monospace;color:#05060a">4DE2FF</div>
+            <div style="flex:1;height:52px;background:#ffd23f;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'JetBrains Mono',monospace;color:#05060a">FFD23F</div>
+            <div style="flex:1;height:52px;background:#ff2e6c;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'JetBrains Mono',monospace;color:#05060a">FF2E6C</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-end;gap:18px">
+            <span style="font:400 62px/0.8 'Silkscreen',monospace;color:#fff;text-shadow:0 0 18px rgba(77,226,255,0.5)">42</span>
+            <div style="display:flex;flex-direction:column;gap:7px;padding-bottom:3px">
+              <span style="font:400 13px/1 'Silkscreen',monospace;color:rgba(255,255,255,0.85)">0123456789</span>
+              <span style="font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:0.14em;color:rgba(255,255,255,0.4);text-transform:uppercase">Silkscreen / JetBrains Mono</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;height:46px;border-radius:4px;background:repeating-linear-gradient(180deg,rgba(57,255,136,0.22) 0 1px,transparent 1px 4px),#0b1220;border:1px solid rgba(57,255,136,0.25)"></div>
+            <div style="flex:1;height:46px;border-radius:4px;background:radial-gradient(circle at 50% 120%,rgba(77,226,255,0.55),transparent 68%),#0b1220;border:1px solid rgba(77,226,255,0.25)"></div>
+            <div style="flex:1;height:46px;border-radius:4px;background:repeating-linear-gradient(90deg,#ff2e6c 0 6px,#0b1220 6px 12px);opacity:0.55"></div>
+          </div>
+
+          <div style="border-top:1px dashed rgba(255,255,255,0.16);padding-top:20px;display:flex;flex-direction:column;align-items:center;gap:14px">
+            <span style="font:400 22px/1 'Silkscreen',monospace;color:#fff">7 × 6 =</span>
+            <div style="display:flex;gap:8px">
+              <span style="width:46px;height:52px;display:flex;align-items:center;justify-content:center;font:400 22px/1 'Silkscreen',monospace;color:#39ff88;background:#0b1220;border:2px solid #39ff88;border-radius:3px;box-shadow:0 0 16px rgba(57,255,136,0.35),inset 0 0 12px rgba(57,255,136,0.12)">4</span>
+              <span style="width:46px;height:52px;display:flex;align-items:center;justify-content:center;font:400 22px/1 'Silkscreen',monospace;color:rgba(255,255,255,0.2);background:#0b1220;border:2px dashed rgba(255,255,255,0.25);border-radius:3px">_</span>
+            </div>
+            <span style="font:700 10px/1 'JetBrains Mono',monospace;letter-spacing:0.2em;text-transform:uppercase;padding:11px 22px;background:#ff2e6c;color:#05060a;border-radius:3px;box-shadow:0 0 20px rgba(255,46,108,0.45)">Submit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="1b" style="display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 'Archivo',sans-serif;color:rgba(20,20,20,0.55)">
+        <a href="#1b" style="font:700 10.5px/1 ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(20,20,20,0.09);color:#141414;border-radius:5px;text-decoration:none">1b</a>
+        <span>Riso schoolroom — printed maths, misregistered</span>
+      </div>
+      <div style="width:470px;border:1px solid rgba(20,20,20,0.1);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
+        <div style="background:#f4ece0;background-image:radial-gradient(rgba(31,27,22,0.055) 1px, transparent 1px);background-size:4px 4px;padding:26px 26px 28px;display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <h2 style="font:400 27px/1 'Archivo Black',sans-serif;color:#1f1b16;letter-spacing:-0.02em"><span style="color:#ff5a45;mix-blend-mode:multiply">RISO</span> <span style="color:#2f5fd8;mix-blend-mode:multiply">SCHOOLROOM</span></h2>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <span style="font:700 9.5px/1 'Courier Prime',monospace;letter-spacing:0.08em;text-transform:uppercase;padding:6px 9px;background:#2f5fd8;color:#f4ece0;border-radius:2px">overprint</span>
+              <span style="font:700 9.5px/1 'Courier Prime',monospace;letter-spacing:0.08em;text-transform:uppercase;padding:6px 9px;background:#ff5a45;color:#f4ece0;border-radius:2px">exercise book</span>
+              <span style="font:700 9.5px/1 'Courier Prime',monospace;letter-spacing:0.08em;text-transform:uppercase;padding:6px 9px;background:#1f1b16;color:#f4ece0;border-radius:2px">handmade</span>
+              <span style="font:700 9.5px/1 'Courier Prime',monospace;letter-spacing:0.08em;text-transform:uppercase;padding:6px 9px;border:1px solid #1f1b16;color:#1f1b16;border-radius:2px">warm</span>
+              <span style="font:700 9.5px/1 'Courier Prime',monospace;letter-spacing:0.08em;text-transform:uppercase;padding:6px 9px;border:1px solid #1f1b16;color:#1f1b16;border-radius:2px">grid paper</span>
+            </div>
+            <p style="font:400 11.5px/1.65 'Courier Prime',monospace;color:rgba(31,27,22,0.72);text-wrap:pretty">Tiles are paper chits stamped in two inks that never quite line up. Errors are red overprints, rewards are a fresh stamp. Friendly and analogue — it makes arithmetic feel like a well-loved workbook rather than a test.</p>
+          </div>
+
+          <div style="display:flex;gap:0;border-radius:2px;overflow:hidden;border:1px solid rgba(31,27,22,0.15)">
+            <div style="flex:1;height:52px;background:#f4ece0;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Courier Prime',monospace;color:#1f1b16">F4ECE0</div>
+            <div style="flex:1;height:52px;background:#e2d6c2;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Courier Prime',monospace;color:#1f1b16">E2D6C2</div>
+            <div style="flex:1;height:52px;background:#2f5fd8;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Courier Prime',monospace;color:#f4ece0">2F5FD8</div>
+            <div style="flex:1;height:52px;background:#ff5a45;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Courier Prime',monospace;color:#f4ece0">FF5A45</div>
+            <div style="flex:1;height:52px;background:#f5c518;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Courier Prime',monospace;color:#1f1b16">F5C518</div>
+            <div style="flex:1;height:52px;background:#1f1b16;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Courier Prime',monospace;color:#f4ece0">1F1B16</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-end;gap:18px">
+            <span style="position:relative;font:400 66px/0.78 'Archivo Black',sans-serif;color:#2f5fd8;letter-spacing:-0.04em"><span style="position:absolute;left:3px;top:2px;color:#ff5a45;mix-blend-mode:multiply">42</span><span style="position:relative">42</span></span>
+            <div style="display:flex;flex-direction:column;gap:7px;padding-bottom:5px">
+              <span style="font:400 14px/1 'Archivo Black',sans-serif;color:#1f1b16;letter-spacing:-0.02em">0123456789</span>
+              <span style="font:700 9px/1 'Courier Prime',monospace;letter-spacing:0.1em;color:rgba(31,27,22,0.5);text-transform:uppercase">Archivo Black / Courier Prime</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;height:46px;border-radius:2px;background:linear-gradient(#e2d6c2,#e2d6c2),repeating-linear-gradient(0deg,rgba(47,95,216,0.35) 0 1px,transparent 1px 8px);background-blend-mode:multiply;border:1px solid rgba(31,27,22,0.18)"></div>
+            <div style="flex:1;height:46px;border-radius:2px;background:radial-gradient(#ff5a45 1.4px,transparent 1.6px) 0 0/6px 6px,#f4ece0;border:1px solid rgba(31,27,22,0.18)"></div>
+            <div style="flex:1;height:46px;border-radius:2px;background:repeating-linear-gradient(0deg,rgba(31,27,22,0.14) 0 1px,transparent 1px 7px),repeating-linear-gradient(90deg,rgba(31,27,22,0.14) 0 1px,transparent 1px 7px),#f4ece0;border:1px solid rgba(31,27,22,0.18)"></div>
+          </div>
+
+          <div style="border-top:1px solid rgba(31,27,22,0.2);padding-top:20px;display:flex;flex-direction:column;align-items:center;gap:14px">
+            <span style="font:400 24px/1 'Archivo Black',sans-serif;color:#1f1b16;letter-spacing:-0.02em">7 × 6 =</span>
+            <div style="display:flex;gap:8px">
+              <span style="width:46px;height:52px;display:flex;align-items:center;justify-content:center;font:400 24px/1 'Archivo Black',sans-serif;color:#f4ece0;background:#2f5fd8;border-radius:2px;box-shadow:3px 3px 0 #ff5a45">4</span>
+              <span style="width:46px;height:52px;display:flex;align-items:center;justify-content:center;font:400 24px/1 'Archivo Black',sans-serif;color:rgba(31,27,22,0.25);background:#f4ece0;border:2px dashed rgba(31,27,22,0.4);border-radius:2px">?</span>
+            </div>
+            <span style="font:700 10px/1 'Courier Prime',monospace;letter-spacing:0.16em;text-transform:uppercase;padding:12px 22px;background:#1f1b16;color:#f4ece0;border-radius:2px;box-shadow:3px 3px 0 #f5c518">Submit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="1c" style="display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 'Archivo',sans-serif;color:rgba(20,20,20,0.55)">
+        <a href="#1c" style="font:700 10.5px/1 ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(20,20,20,0.09);color:#141414;border-radius:5px;text-decoration:none">1c</a>
+        <span>Swiss instrument — arithmetic as measurement</span>
+      </div>
+      <div style="width:470px;border:1px solid rgba(20,20,20,0.1);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
+        <div style="background:#fbfaf8;padding:26px 26px 28px;display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <h2 style="font:900 27px/1 'Archivo',sans-serif;letter-spacing:-0.045em;color:#0a0a0a">SWISS INSTRUMENT</h2>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <span style="font:600 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;padding:6px 9px;background:#0a0a0a;color:#fbfaf8">precise</span>
+              <span style="font:600 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;padding:6px 9px;background:#ff3b00;color:#fbfaf8">signal red</span>
+              <span style="font:600 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;padding:6px 9px;border:1px solid #0a0a0a;color:#0a0a0a">hairline</span>
+              <span style="font:600 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;padding:6px 9px;border:1px solid #0a0a0a;color:#0a0a0a">austere</span>
+              <span style="font:600 9.5px/1 'IBM Plex Mono',monospace;letter-spacing:0.08em;text-transform:uppercase;padding:6px 9px;border:1px solid #0a0a0a;color:#0a0a0a">no radius</span>
+            </div>
+            <p style="font:400 11.5px/1.65 'Archivo',sans-serif;color:rgba(10,10,10,0.62);text-wrap:pretty">The board is a measuring device. Numerals are enormous and set tight; everything else is a hairline rule, a label, or a red mark for the one thing that matters right now. Zero decoration — the tension comes from ruthless scale contrast.</p>
+          </div>
+
+          <div style="display:flex;gap:0">
+            <div style="flex:1;height:52px;background:#fbfaf8;border:1px solid #0a0a0a;border-right:none;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'IBM Plex Mono',monospace;color:#0a0a0a">FBFAF8</div>
+            <div style="flex:1;height:52px;background:#eceae5;border:1px solid #0a0a0a;border-right:none;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'IBM Plex Mono',monospace;color:#0a0a0a">ECEAE5</div>
+            <div style="flex:1;height:52px;background:#c8c6c1;border:1px solid #0a0a0a;border-right:none;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'IBM Plex Mono',monospace;color:#0a0a0a">C8C6C1</div>
+            <div style="flex:1;height:52px;background:#0a0a0a;border:1px solid #0a0a0a;border-right:none;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'IBM Plex Mono',monospace;color:#fbfaf8">0A0A0A</div>
+            <div style="flex:1;height:52px;background:#ff3b00;border:1px solid #0a0a0a;border-right:none;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'IBM Plex Mono',monospace;color:#fbfaf8">FF3B00</div>
+            <div style="flex:1;height:52px;background:#0047ff;border:1px solid #0a0a0a;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'IBM Plex Mono',monospace;color:#fbfaf8">0047FF</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-end;gap:18px">
+            <span style="font:900 70px/0.74 'Archivo',sans-serif;letter-spacing:-0.07em;color:#0a0a0a">42</span>
+            <div style="display:flex;flex-direction:column;gap:7px;padding-bottom:6px">
+              <span style="font:900 15px/1 'Archivo',sans-serif;letter-spacing:-0.04em;color:#0a0a0a">0123456789</span>
+              <span style="font:600 9px/1 'IBM Plex Mono',monospace;letter-spacing:0.1em;color:rgba(10,10,10,0.5);text-transform:uppercase">Archivo 900 / IBM Plex Mono</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;height:46px;background:repeating-linear-gradient(90deg,#0a0a0a 0 1px,transparent 1px 9px);border-bottom:1px solid #0a0a0a"></div>
+            <div style="flex:1;height:46px;background:#0a0a0a;position:relative"><span style="position:absolute;right:0;bottom:0;width:16px;height:16px;background:#ff3b00"></span></div>
+            <div style="flex:1;height:46px;border:1px solid #0a0a0a;background:linear-gradient(135deg,transparent 49.5%,#0a0a0a 49.5% 50.5%,transparent 50.5%)"></div>
+          </div>
+
+          <div style="border-top:1px solid #0a0a0a;padding-top:20px;display:flex;flex-direction:column;align-items:center;gap:14px">
+            <span style="font:900 26px/1 'Archivo',sans-serif;letter-spacing:-0.05em;color:#0a0a0a">7 × 6 =</span>
+            <div style="display:flex;gap:6px">
+              <span style="width:46px;height:52px;display:flex;align-items:center;justify-content:center;font:900 26px/1 'Archivo',sans-serif;letter-spacing:-0.05em;color:#fbfaf8;background:#0a0a0a">4</span>
+              <span style="width:46px;height:52px;display:flex;align-items:center;justify-content:center;font:900 26px/1 'Archivo',sans-serif;color:#c8c6c1;border:1px solid #0a0a0a;background:#fbfaf8"></span>
+            </div>
+            <span style="font:600 10px/1 'IBM Plex Mono',monospace;letter-spacing:0.18em;text-transform:uppercase;padding:12px 24px;background:#ff3b00;color:#fbfaf8">Submit</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="1d" style="display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px">
+      <div style="display:flex;align-items:baseline;gap:9px;font:400 11px/1.3 'Archivo',sans-serif;color:rgba(20,20,20,0.55)">
+        <a href="#1d" style="font:700 10.5px/1 ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(20,20,20,0.09);color:#141414;border-radius:5px;text-decoration:none">1d</a>
+        <span>Tile house — mahjong weight, lacquer and bone</span>
+      </div>
+      <div style="width:470px;border:1px solid rgba(20,20,20,0.1);border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.07)">
+        <div style="background:#14342a;background-image:radial-gradient(ellipse at 50% 0%,rgba(201,165,74,0.16),transparent 62%);padding:26px 26px 28px;display:flex;flex-direction:column;gap:22px">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <h2 style="font:500 30px/1 'EB Garamond',serif;color:#f0e7d6;letter-spacing:0.01em">Tile House <span style="color:#c9a54a">·</span> <span style="font:500 20px/1 'Zen Kaku Gothic New',sans-serif;color:#c9a54a">牌</span></h2>
+            <div style="display:flex;flex-wrap:wrap;gap:6px">
+              <span style="font:500 9.5px/1 'Zen Kaku Gothic New',sans-serif;letter-spacing:0.12em;text-transform:uppercase;padding:6px 10px;border:1px solid rgba(201,165,74,0.5);color:#c9a54a;border-radius:999px">weight</span>
+              <span style="font:500 9.5px/1 'Zen Kaku Gothic New',sans-serif;letter-spacing:0.12em;text-transform:uppercase;padding:6px 10px;border:1px solid rgba(240,231,214,0.3);color:rgba(240,231,214,0.8);border-radius:999px">ritual</span>
+              <span style="font:500 9.5px/1 'Zen Kaku Gothic New',sans-serif;letter-spacing:0.12em;text-transform:uppercase;padding:6px 10px;border:1px solid rgba(240,231,214,0.3);color:rgba(240,231,214,0.8);border-radius:999px">bone &amp; lacquer</span>
+              <span style="font:500 9.5px/1 'Zen Kaku Gothic New',sans-serif;letter-spacing:0.12em;text-transform:uppercase;padding:6px 10px;border:1px solid rgba(181,67,47,0.6);color:#e2795f;border-radius:999px">cinnabar</span>
+              <span style="font:500 9.5px/1 'Zen Kaku Gothic New',sans-serif;letter-spacing:0.12em;text-transform:uppercase;padding:6px 10px;border:1px solid rgba(240,231,214,0.3);color:rgba(240,231,214,0.8);border-radius:999px">quiet</span>
+            </div>
+            <p style="font:400 12px/1.7 'EB Garamond',serif;color:rgba(240,231,214,0.72);text-wrap:pretty">Digits are physical objects with thickness — ivory faces, warm edges, a soft shadow on green felt. Placing one is deliberate and satisfying; discarding hurts. The calmest of the four, and the only one where the tile itself is the hero.</p>
+          </div>
+
+          <div style="display:flex;gap:0;border-radius:6px;overflow:hidden">
+            <div style="flex:1;height:52px;background:#0e2620;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Zen Kaku Gothic New',sans-serif;color:rgba(240,231,214,0.75)">0E2620</div>
+            <div style="flex:1;height:52px;background:#14342a;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Zen Kaku Gothic New',sans-serif;color:rgba(240,231,214,0.75)">14342A</div>
+            <div style="flex:1;height:52px;background:#f0e7d6;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Zen Kaku Gothic New',sans-serif;color:#14342a">F0E7D6</div>
+            <div style="flex:1;height:52px;background:#d9c9ad;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Zen Kaku Gothic New',sans-serif;color:#14342a">D9C9AD</div>
+            <div style="flex:1;height:52px;background:#c9a54a;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Zen Kaku Gothic New',sans-serif;color:#14342a">C9A54A</div>
+            <div style="flex:1;height:52px;background:#b5432f;display:flex;align-items:flex-end;padding:5px;font:400 7.5px/1 'Zen Kaku Gothic New',sans-serif;color:#f0e7d6">B5432F</div>
+          </div>
+
+          <div style="display:flex;align-items:flex-end;gap:18px">
+            <span style="font:600 68px/0.8 'EB Garamond',serif;color:#f0e7d6">42</span>
+            <div style="display:flex;flex-direction:column;gap:7px;padding-bottom:5px">
+              <span style="font:500 16px/1 'EB Garamond',serif;color:rgba(240,231,214,0.9)">0123456789</span>
+              <span style="font:500 9px/1 'Zen Kaku Gothic New',sans-serif;letter-spacing:0.12em;color:rgba(240,231,214,0.5);text-transform:uppercase">EB Garamond / Zen Kaku Gothic</span>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;height:46px;border-radius:5px;background:linear-gradient(#1a4034,#0e2620);box-shadow:inset 0 0 0 1px rgba(201,165,74,0.22)"></div>
+            <div style="flex:1;height:46px;border-radius:5px;background:linear-gradient(160deg,#f7f0e2,#d9c9ad);box-shadow:inset 0 -3px 0 rgba(20,52,42,0.18)"></div>
+            <div style="flex:1;height:46px;border-radius:5px;background:linear-gradient(160deg,#c9552f,#8f3220)"></div>
+          </div>
+
+          <div style="border-top:1px solid rgba(201,165,74,0.28);padding-top:20px;display:flex;flex-direction:column;align-items:center;gap:14px">
+            <span style="font:600 26px/1 'EB Garamond',serif;color:#f0e7d6">7 × 6 =</span>
+            <div style="display:flex;gap:10px">
+              <span style="width:46px;height:58px;display:flex;align-items:center;justify-content:center;font:600 26px/1 'EB Garamond',serif;color:#14342a;background:linear-gradient(160deg,#fdf8ec,#e2d4b8);border-radius:7px;box-shadow:0 4px 0 #b3a184,0 6px 10px rgba(0,0,0,0.35)">4</span>
+              <span style="width:46px;height:58px;display:flex;align-items:center;justify-content:center;font:600 26px/1 'EB Garamond',serif;color:rgba(240,231,214,0.35);background:rgba(0,0,0,0.18);border:1px solid rgba(201,165,74,0.3);border-radius:7px">·</span>
+            </div>
+            <span style="font:500 10px/1 'Zen Kaku Gothic New',sans-serif;letter-spacing:0.2em;text-transform:uppercase;padding:12px 24px;background:#b5432f;color:#f7f0e2;border-radius:6px;box-shadow:0 3px 0 rgba(0,0,0,0.3)">Submit</span>
+            </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p style="margin-top:24px;font:400 12px/1.6 'Archivo',sans-serif;color:rgba(20,20,20,0.5)">Try next: "build the design system from <a href="#1a" style="font:700 10.5px/1 ui-monospace,Menlo,monospace;padding:2px 6px;background:rgba(20,20,20,0.09);border-radius:5px;text-decoration:none">1a</a>" · "<a href="#1d" style="font:700 10.5px/1 ui-monospace,Menlo,monospace;padding:2px 6px;background:rgba(20,20,20,0.09);border-radius:5px;text-decoration:none">1d</a>'s tiles with <a href="#1c" style="font:700 10.5px/1 ui-monospace,Menlo,monospace;padding:2px 6px;background:rgba(20,20,20,0.09);border-radius:5px;text-decoration:none">1c</a>'s type" · "more directions, weirder"</p>
+</section>
+
+</x-dc>
+</body>
+</html>

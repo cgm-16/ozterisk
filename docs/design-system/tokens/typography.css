@@ -1,0 +1,33 @@
+:root {
+  --font-display: "EB Garamond", "Times New Roman", serif;
+  --font-ui: "Zen Kaku Gothic New", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Numerals — equations, tile faces, HUD values. Always the display serif:
+     ozterisk's numbers are objects, not data. */
+  --font-numeral: var(--font-display);
+
+  --size-wordmark: 52px;
+  --size-equation: 68px;   /* the round's equation, the largest type in the app */
+  --size-tile: 34px;       /* engraved digit on a 64x80 tile */
+  --size-tile-sm: 19px;    /* engraved digit on a 30x38 compact tile */
+  --size-display: 34px;
+  --size-title: 24px;
+  --size-body: 16px;
+  --size-body-sm: 13.5px;
+  --size-label: 11px;      /* mono, uppercase, tracked */
+  --size-micro: 9px;
+
+  --leading-tight: 1;
+  --leading-snug: 1.4;
+  --leading-body: 1.65;
+
+  --track-label: 0.2em;    /* mono uppercase labels */
+  --track-label-tight: 0.14em;
+  --track-wordmark: 0.02em;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+}

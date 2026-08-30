@@ -1,0 +1,18 @@
+:root {
+  /* Tiles are fired ceramic: a hard bottom edge (thickness) plus a soft
+     contact shadow. Never a blurred all-round drop shadow. */
+  --shadow-tile: 0 5px 0 var(--clay-400), 0 10px 18px rgb(0 0 0 / 45%);
+  --shadow-tile-sm: 0 3px 0 var(--clay-400);
+  --shadow-tile-lifted: 0 9px 0 var(--clay-400), 0 16px 26px rgb(0 0 0 / 50%);
+  --shadow-tile-pressed: 0 2px 0 var(--clay-400), 0 4px 8px rgb(0 0 0 / 40%);
+
+  /* Sockets are cut into the felt: inset only, plus a hairline rim. */
+  --shadow-socket: inset 0 4px 9px rgb(0 0 0 / 70%);
+  --shadow-socket-sm: inset 0 3px 7px rgb(0 0 0 / 70%);
+  --rim-socket: inset 0 0 0 1px var(--hair-200);
+  /* A socket whose tile is out in the answer slots — owed back, not lost. */
+  --rim-socket-lifted: inset 0 0 0 1px rgb(201 165 74 / 34%);
+
+  --shadow-panel: 0 24px 60px rgb(0 0 0 / 45%);
+  --glow-reward: 0 0 12px rgba(201, 165, 74, 0.6);
+}

@@ -1,0 +1,48 @@
+<!-- @dsCard group="Components" viewport="700x260" name="HUD — buttons, counters, capacity" subtitle="ActionButton variants, GameHud, CapacityMeter, LanguageToggle" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HUD components</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { background: var(--surface-table); background-image: repeating-linear-gradient(48deg, rgba(255,255,255,.022) 0 2px, transparent 2px 4px); padding: var(--space-6); }
+  .row { display: flex; align-items: flex-end; gap: var(--space-6); flex-wrap: wrap; }
+  .cell { display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }
+  .cap { font: var(--weight-medium) var(--size-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--text-meta); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const NS = window.OzteriskDesignSystem || window.Ozterisk || window.ozterisk ||
+  Object.values(window).find((v) => v && typeof v === "object" && v.ActionButton && v.GameHud) || {};
+const { ActionButton, GameHud, CapacityMeter, LanguageToggle } = NS;
+
+function Demo() {
+  const [lang, setLang] = React.useState("en");
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
+      <div className="row">
+        <div className="cell"><span className="cap">primary</span><ActionButton>Submit</ActionButton></div>
+        <div className="cell"><span className="cap">secondary</span><ActionButton variant="secondary">Share</ActionButton></div>
+        <div className="cell"><span className="cap">ghost</span><ActionButton variant="ghost">Copy Result</ActionButton></div>
+        <div className="cell"><span className="cap">disabled — flat</span><ActionButton disabled>Submit</ActionButton></div>
+        <div className="cell"><span className="cap">locale</span><LanguageToggle language={lang} onChange={setLang} /></div>
+      </div>
+      <div className="row" style={{ alignItems: "flex-start" }}>
+        <div className="cell"><span className="cap">hud</span><GameHud round={14} score={11} currentStreak={8} /></div>
+        <div className="cell"><span className="cap">capacity — safe</span><CapacityMeter held={6} /></div>
+        <div className="cell"><span className="cap">capacity — danger</span><CapacityMeter held={10} /></div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

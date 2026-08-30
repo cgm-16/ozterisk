@@ -1,0 +1,53 @@
+<!-- @dsCard group="Components" viewport="700x330" name="Game — tiles, rack, slots" subtitle="Tile states, ten-socket rack, answer slots" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Game components</title>
+<link rel="stylesheet" href="../../styles.css">
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { background: var(--surface-table); background-image: repeating-linear-gradient(48deg, rgba(255,255,255,.022) 0 2px, transparent 2px 4px); padding: var(--space-6); }
+  .row { display: flex; align-items: flex-end; gap: var(--space-6); flex-wrap: wrap; }
+  .cell { display: flex; flex-direction: column; gap: var(--space-2); align-items: flex-start; }
+  .cap { font: var(--weight-medium) var(--size-micro)/1 var(--font-mono); letter-spacing: var(--track-label); text-transform: uppercase; color: var(--text-meta); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const NS = window.OzteriskDesignSystem || window.Ozterisk || window.ozterisk ||
+  Object.values(window).find((v) => v && typeof v === "object" && v.Tile && v.TileInventory) || {};
+const { Tile, TileInventory, AnswerSlots, EquationBoard } = NS;
+const t = (d, i, isNew) => ({ id: "t" + i, digit: d, isNew: !!isNew });
+
+function Demo() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-6)" }}>
+      <div className="row">
+        <div className="cell"><span className="cap">resting</span><Tile digit={7} /></div>
+        <div className="cell"><span className="cap">lifted</span><Tile digit={4} state="lifted" /></div>
+        <div className="cell"><span className="cap">reward</span><Tile digit={2} state="reward" /></div>
+        <div className="cell"><span className="cap">marked</span><Tile digit={9} state="marked" /></div>
+        <div className="cell"><span className="cap">disabled</span><Tile digit={5} state="disabled" /></div>
+        <div className="cell"><span className="cap">small</span><Tile digit={3} size="sm" /></div>
+      </div>
+      <div className="row">
+        <div className="cell"><span className="cap">slots — 1 of 2 filled</span>
+          <AnswerSlots slotCount={2} selectedTiles={[t(4, "a")]} />
+        </div>
+        <div className="cell"><span className="cap">equation</span><EquationBoard equation={{ left: 7, right: 6, product: 42 }} /></div>
+      </div>
+      <div className="cell"><span className="cap">rack — 8 of 10, two dead sockets</span>
+        <TileInventory tiles={[t(1,1),t(2,2),t(3,3),t(5,5),t(6,6),t(7,7),t(9,9),t(0,0)]} />
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

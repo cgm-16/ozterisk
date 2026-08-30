@@ -1,4 +1,4 @@
-# 1-0 Technical Contract
+# ozterisk Technical Contract
 
 File map, domain types, pure and browser-bound interfaces, the tuning surface,
 reducer invariants, and test fixture conventions (§2).

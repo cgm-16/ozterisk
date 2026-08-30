@@ -1,11 +1,11 @@
-# 1-0 Product Specification
+# ozterisk Product Specification
 
 Canonical game rules (§1.1–§1.11, §1.17). The visual, language, copy, sharing,
 and persistence contracts (§1.12–§1.16) live in `docs/spec/ui-i18n.md`.
 
 ### 1.1 Product thesis
 
-`1-0` is an endless arithmetic inventory game. A digit tile is simultaneously:
+`ozterisk` is an endless arithmetic inventory game. A digit tile is simultaneously:
 
 1. a resource required to construct an answer;
 2. a consumable spent on every submission; and
@@ -139,7 +139,7 @@ as a submitted round.
 
 #### `title`
 
-- Working title `1-0`.
+- Wordmark `ozterisk`.
 - Three-line rules summary.
 - Expandable **How to Play**.
 - Visible `English / 한국어` language selector.
@@ -148,10 +148,12 @@ as a submitted round.
 #### `answering`
 
 - HUD order: round, score, current streak. Round carries primary emphasis — Endless is a survival mode, so rounds survived is the headline figure.
+- A capacity meter states tiles held against the ten-tile capacity. It sits below the three HUD figures; it does not displace round's primary emphasis and does not reorder them.
 - Equation and exact answer-slot count.
 - Submit and Clear actions. Clear is disabled while nothing is selected.
 - Filled answer slots are clickable to return a single tile, and show a hover/focus affordance.
 - Sorted digit inventory.
+- Selecting a tile leaves its socket in place, marked as on loan rather than empty. The rack neither compacts nor re-sorts until the round resolves.
 - Mouse, touch, and keyboard input.
 
 #### `feedback`
@@ -174,6 +176,9 @@ as a submitted round.
 #### `gameOver`
 
 - Keep the terminal equation visible.
+- Print the product on the board. `gameOver` is the only phase that does: during
+  play the answer slots complete the equation, and the feedback text is the only
+  place the real value is stated.
 - State why the run ended, grouped with the terminal equation rather than with the statistics, so it reads as a caption on the equation instead of a result.
 - Show total submitted rounds first, then score and longest streak. Rounds carries the same primary emphasis it holds in the HUD.
 - Show **Play Again**, **Share**, and **Copy Result**.

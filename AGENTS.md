@@ -1,9 +1,9 @@
-# AGENTS.md — 1-0 Agent Kernel
+# AGENTS.md — ozterisk Agent Kernel
 
 This file is loaded for every agent working in this repository. Everything else
 is read on demand through the routing map below.
 
-**Goal:** Build and deploy a responsive, bilingual, fully client-side proof of concept for `1-0`, an endless multiplication game in which digit tiles are both answer inputs and a managed inventory.
+**Goal:** Build and deploy a responsive, bilingual, fully client-side proof of concept for `ozterisk`, an endless multiplication game in which digit tiles are both answer inputs and a managed inventory.
 
 **Architecture:** A Vite + React + TypeScript single-page application uses a deterministic `useReducer` state machine for the five game phases. Pure domain utilities own equation generation, rewards, answer construction, sorting, loss detection, and share formatting; React owns rendering and event orchestration. Random values and tile IDs are injected at the boundary so all game rules remain deterministic in tests.
 
@@ -37,13 +37,20 @@ plan, so cross-references resolve across files.
 
 ## Global Constraints
 
-- Product name is the working title `1-0`.
+- Product name is `ozterisk`.
 - Use Vite + React + TypeScript; do not use Next.js.
 - Run entirely in the browser; no backend, database, account, leaderboard, API, analytics, or anti-cheat system.
 - Use React `useReducer`; do not add Zustand, Redux, or another state library.
 - Keep the reducer pure and deterministic; never call `Math.random()`, `crypto.randomUUID()`, browser APIs, or storage APIs inside it.
-- Use CSS Modules plus one global stylesheet; do not add Tailwind, a component library, or an animation library.
-- Use CSS transitions only, and only for functional state changes.
+- Use CSS Modules plus one global stylesheet; do not add Tailwind, a component
+  library, or an animation library. The global stylesheet may `@import` token
+  partials under `src/styles/tokens/`, which is where global `@keyframes` live —
+  a CSS Module would scope the animation names and silently no-op every animation.
+- Self-host fonts and serve them same-origin; a full run makes zero non-origin
+  network requests.
+- Use CSS transitions for functional state changes, plus the named keyframe
+  inventory in `docs/spec/ui-i18n.md` §1.12. Motion outside that inventory is not
+  permitted; extending it amends §1.12 first.
 - Support responsive desktop and mobile layouts with mouse, touch, and keyboard input.
 - Support English and Korean through a typed in-code dictionary; do not add an i18n dependency.
 - Persist only the language preference in `localStorage`; never persist a run, score, record, equation, or inventory.

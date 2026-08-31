@@ -1,6 +1,6 @@
-# 1-0
+# ozterisk
 
-`1-0` is a browser-based, fully client-side endless multiplication game. A
+`ozterisk` is a browser-based, fully client-side endless multiplication game. A
 digit tile is simultaneously an answer input, a consumable spent on every
 submission, and an inventory-management choice: correct play returns one net
 tile before capacity resolution. The game validates whether that loop is
@@ -114,8 +114,9 @@ or other state library).
   as dependencies rather than called directly so they stay testable.
 - Styling uses CSS Modules per component plus one global stylesheet
   (`src/styles/global.css`); no Tailwind, component library, or animation
-  library. Only CSS transitions are used, and only for functional state
-  changes; `prefers-reduced-motion` removes nonessential transitions.
+  library. Motion is limited to CSS transitions for functional state changes
+  plus the named keyframe inventory in `docs/spec/ui-i18n.md` §1.12;
+  `prefers-reduced-motion` removes nonessential transitions.
 
 ## Test strategy
 

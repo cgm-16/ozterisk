@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<style>
+  body { margin: 0; background: #e4e4e7; }
+  .rec { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: #18181b; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  .rec *, .rec *::before, .rec *::after { box-sizing: border-box; }
+  .rec h1, .rec p, .rec ul, .rec li, .rec dl, .rec dt, .rec dd { margin: 0; }
+  .rec button { font: inherit; color: inherit; }
+</style>
+</helmet>
+
+<div style="display:flex;flex-wrap:wrap;gap:56px;padding:56px;align-items:flex-start;background:#e4e4e7;font-family:ui-monospace, SFMono-Regular, Menlo, monospace">
+
+  <figure data-screen-label="title" style="margin:0;display:flex;flex-direction:column;gap:12px">
+    <figcaption style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#52525b">phase: title</figcaption>
+    <div class="rec" style="width:900px;background:#ffffff;box-shadow:0 2px 8px rgb(0 0 0 / 12%)">
+      <div style="display:flex;flex-direction:column;min-height:640px">
+        <main style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:42rem;margin:0 auto;padding:32px 16px;text-align:center;width:100%">
+          <h1 style="font-size:2.5rem;font-weight:700">1-0</h1>
+          <p style="color:#52525b">Solve multiplication problems using limited digit tiles. Correct answers replace the tiles you spend and grant one extra tile. Incorrect answers consume your tiles without a reward. Keep your inventory balanced and survive as long as possible.</p>
+          <details style="width:100%;text-align:left;border:1px solid #d4d4d8;border-radius:8px;padding:12px 16px">
+            <summary style="cursor:pointer;font-weight:600;min-height:44px;padding-top:8px;padding-bottom:8px">How to Play</summary>
+            <ul style="margin-top:12px;padding-left:24px;display:flex;flex-direction:column;gap:8px">
+              <li>Click or tap an inventory tile to place it in the next empty answer slot. Click a filled slot to return that tile to your inventory.</li>
+              <li>Answer slots fill in the order you select tiles: the first tile you choose fills the leftmost slot, so selection order determines the number you submit.</li>
+              <li>A correct answer replaces the tiles you spent and grants one extra tile. An incorrect answer removes the tiles you spent and grants no reward.</li>
+              <li>Your inventory holds at most ten tiles.</li>
+              <li>If a reward would push your inventory past ten tiles, you must choose tiles to discard before play continues.</li>
+              <li>Score counts correct answers, streak counts consecutive correct answers, and round shows which equation is currently on screen. Rounds played counts every equation you have submitted, correct or incorrect. The run ends once you hold fewer tiles than the next answer requires.</li>
+              <li>Press a digit key to select a matching tile, Backspace to return the most recently selected tile, and Enter to submit, confirm a discard, or continue.</li>
+            </ul>
+          </details>
+          <div role="group" aria-label="Language" style="display:inline-flex;gap:8px">
+            <button type="button" aria-pressed="true" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #27272a;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-weight:600;font-size:16px">English</button>
+            <button type="button" aria-pressed="false" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #d4d4d8;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-size:16px">한국어</button>
+          </div>
+          <button type="button" style="min-width:44px;min-height:44px;padding:12px 24px;border:none;border-radius:8px;background:#27272a;color:#ffffff;font-weight:600;cursor:pointer;font-size:16px">Start Run</button>
+        </main>
+      </div>
+    </div>
+  </figure>
+
+  <figure data-screen-label="answering" style="margin:0;display:flex;flex-direction:column;gap:12px">
+    <figcaption style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#52525b">phase: answering</figcaption>
+    <div class="rec" style="width:900px;background:#ffffff;box-shadow:0 2px 8px rgb(0 0 0 / 12%)">
+      <div style="display:flex;flex-direction:column;min-height:640px">
+        <div style="display:flex;justify-content:flex-end;max-width:42rem;margin:0 auto;padding:16px 16px 0;width:100%">
+          <div role="group" aria-label="Language" style="display:inline-flex;gap:8px">
+            <button type="button" aria-pressed="true" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #27272a;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-weight:600;font-size:16px">English</button>
+            <button type="button" aria-pressed="false" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #d4d4d8;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-size:16px">한국어</button>
+          </div>
+        </div>
+        <main style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:42rem;margin:0 auto;padding:32px 16px;text-align:center;width:100%">
+          <dl style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Score</dt>
+              <dd style="font-size:1.25rem;font-weight:600">3</dd>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Streak</dt>
+              <dd style="font-size:1.25rem;font-weight:600">2</dd>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Round</dt>
+              <dd style="font-size:1.25rem;font-weight:600">4</dd>
+            </div>
+          </dl>
+          <p style="font-size:2rem;font-weight:600;text-align:center">7 × 6 =</p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+            <button type="button" aria-label="Answer slot 1: 4" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;border:2px dashed #52525b;border-radius:8px;background:#f4f4f5;box-shadow:inset 0 1px 2px rgb(0 0 0 / 8%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px">4</button>
+            <button type="button" aria-label="Answer slot 2: empty" disabled="true" style="min-width:44px;min-height:44px;display:flex;align-items:center;justify-content:center;border:2px dashed #52525b;border-radius:8px;background:#ffffff;box-shadow:inset 0 1px 2px rgb(0 0 0 / 8%);color:#18181b;font-size:1.25rem;cursor:default;padding:1px 6px"></button>
+          </div>
+          <button type="button" disabled="true" style="min-width:44px;min-height:44px;padding:12px 24px;border:none;border-radius:8px;background:#27272a;color:#ffffff;font-weight:600;cursor:default;opacity:0.6;font-size:16px">Submit</button>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+            <button type="button" aria-label="Digit 0" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">0</span></button>
+            <button type="button" aria-label="Digit 1" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">1</span></button>
+            <button type="button" aria-label="Digit 2" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">2</span></button>
+            <button type="button" aria-label="Digit 3" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">3</span></button>
+            <button type="button" aria-label="Digit 5" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">5</span></button>
+            <button type="button" aria-label="Digit 6" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">6</span></button>
+            <button type="button" aria-label="Digit 7" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">7</span></button>
+            <button type="button" aria-label="Digit 8" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">8</span></button>
+            <button type="button" aria-label="Digit 9" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">9</span></button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </figure>
+
+  <figure data-screen-label="feedback-correct" style="margin:0;display:flex;flex-direction:column;gap:12px">
+    <figcaption style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#52525b">phase: feedback — correct</figcaption>
+    <div class="rec" style="width:900px;background:#ffffff;box-shadow:0 2px 8px rgb(0 0 0 / 12%)">
+      <div style="display:flex;flex-direction:column;min-height:640px">
+        <div style="display:flex;justify-content:flex-end;max-width:42rem;margin:0 auto;padding:16px 16px 0;width:100%">
+          <div role="group" aria-label="Language" style="display:inline-flex;gap:8px">
+            <button type="button" aria-pressed="true" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #27272a;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-weight:600;font-size:16px">English</button>
+            <button type="button" aria-pressed="false" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #d4d4d8;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-size:16px">한국어</button>
+          </div>
+        </div>
+        <main style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:42rem;margin:0 auto;padding:32px 16px;text-align:center;width:100%">
+          <dl style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Score</dt>
+              <dd style="font-size:1.25rem;font-weight:600">4</dd>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Streak</dt>
+              <dd style="font-size:1.25rem;font-weight:600">3</dd>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Round</dt>
+              <dd style="font-size:1.25rem;font-weight:600">4</dd>
+            </div>
+          </dl>
+          <p style="font-size:2rem;font-weight:600;text-align:center">7 × 6 =</p>
+          <div role="status" aria-live="polite" style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+            <p style="font-size:1.5rem;font-weight:600;color:#15803d">Correct</p>
+            <ul style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;list-style:none;padding:0">
+              <li style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid #92400e;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%)"><span style="font-size:1.25rem;font-weight:600">1</span><span style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#92400e">New tile</span></li>
+              <li style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid #92400e;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%)"><span style="font-size:1.25rem;font-weight:600">5</span><span style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#92400e">New tile</span></li>
+              <li style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid #92400e;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%)"><span style="font-size:1.25rem;font-weight:600">8</span><span style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#92400e">New tile</span></li>
+            </ul>
+          </div>
+          <button type="button" style="min-width:44px;min-height:44px;padding:12px 24px;border:none;border-radius:8px;background:#27272a;color:#ffffff;font-weight:600;cursor:pointer;font-size:16px">Next Round</button>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+            <button type="button" aria-label="Digit 0" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">0</span></button>
+            <button type="button" aria-label="Digit 1" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">1</span></button>
+            <button type="button" aria-label="Digit 1, New tile" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">1</span><span aria-hidden="true" style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#92400e">New tile</span></button>
+            <button type="button" aria-label="Digit 2" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">2</span></button>
+            <button type="button" aria-label="Digit 3" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">3</span></button>
+            <button type="button" aria-label="Digit 5" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">5</span></button>
+            <button type="button" aria-label="Digit 5, New tile" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">5</span><span aria-hidden="true" style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#92400e">New tile</span></button>
+            <button type="button" aria-label="Digit 7" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">7</span></button>
+            <button type="button" aria-label="Digit 8" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">8</span></button>
+            <button type="button" aria-label="Digit 8, New tile" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">8</span><span aria-hidden="true" style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#92400e">New tile</span></button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </figure>
+
+  <figure data-screen-label="feedback-incorrect" style="margin:0;display:flex;flex-direction:column;gap:12px">
+    <figcaption style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#52525b">phase: feedback — incorrect</figcaption>
+    <div class="rec" style="width:900px;background:#ffffff;box-shadow:0 2px 8px rgb(0 0 0 / 12%)">
+      <div style="display:flex;flex-direction:column;min-height:640px">
+        <div style="display:flex;justify-content:flex-end;max-width:42rem;margin:0 auto;padding:16px 16px 0;width:100%">
+          <div role="group" aria-label="Language" style="display:inline-flex;gap:8px">
+            <button type="button" aria-pressed="true" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #27272a;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-weight:600;font-size:16px">English</button>
+            <button type="button" aria-pressed="false" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #d4d4d8;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-size:16px">한국어</button>
+          </div>
+        </div>
+        <main style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:42rem;margin:0 auto;padding:32px 16px;text-align:center;width:100%">
+          <dl style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Score</dt>
+              <dd style="font-size:1.25rem;font-weight:600">3</dd>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Streak</dt>
+              <dd style="font-size:1.25rem;font-weight:600">0</dd>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Round</dt>
+              <dd style="font-size:1.25rem;font-weight:600">4</dd>
+            </div>
+          </dl>
+          <p style="font-size:2rem;font-weight:600;text-align:center">7 × 6 =</p>
+          <div role="status" aria-live="polite" style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+            <p style="font-size:1.5rem;font-weight:600;color:#b91c1c">Incorrect</p>
+            <div style="display:flex;flex-direction:column;gap:4px;color:#52525b">
+              <p>Your answer: 48</p>
+              <p>Correct answer: 42</p>
+            </div>
+          </div>
+          <button type="button" style="min-width:44px;min-height:44px;padding:12px 24px;border:none;border-radius:8px;background:#27272a;color:#ffffff;font-weight:600;cursor:pointer;font-size:16px">Next Round</button>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+            <button type="button" aria-label="Digit 0" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">0</span></button>
+            <button type="button" aria-label="Digit 1" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">1</span></button>
+            <button type="button" aria-label="Digit 2" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">2</span></button>
+            <button type="button" aria-label="Digit 3" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">3</span></button>
+            <button type="button" aria-label="Digit 5" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">5</span></button>
+            <button type="button" aria-label="Digit 6" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">6</span></button>
+            <button type="button" aria-label="Digit 7" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">7</span></button>
+            <button type="button" aria-label="Digit 9" disabled="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:default;opacity:0.6;padding:1px 6px"><span aria-hidden="true">9</span></button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </figure>
+
+  <figure data-screen-label="overflow" style="margin:0;display:flex;flex-direction:column;gap:12px">
+    <figcaption style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#52525b">phase: overflow</figcaption>
+    <div class="rec" style="width:900px;background:#ffffff;box-shadow:0 2px 8px rgb(0 0 0 / 12%)">
+      <div style="display:flex;flex-direction:column;min-height:640px">
+        <div style="display:flex;justify-content:flex-end;max-width:42rem;margin:0 auto;padding:16px 16px 0;width:100%">
+          <div role="group" aria-label="Language" style="display:inline-flex;gap:8px">
+            <button type="button" aria-pressed="true" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #27272a;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-weight:600;font-size:16px">English</button>
+            <button type="button" aria-pressed="false" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #d4d4d8;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-size:16px">한국어</button>
+          </div>
+        </div>
+        <main style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:42rem;margin:0 auto;padding:32px 16px;text-align:center;width:100%">
+          <dl style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center">
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Score</dt>
+              <dd style="font-size:1.25rem;font-weight:600">5</dd>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Streak</dt>
+              <dd style="font-size:1.25rem;font-weight:600">4</dd>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center">
+              <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Round</dt>
+              <dd style="font-size:1.25rem;font-weight:600">5</dd>
+            </div>
+          </dl>
+          <p style="font-size:2rem;font-weight:600;text-align:center">4 × 2 =</p>
+          <div role="status" aria-live="polite" style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+            <p style="font-size:1.5rem;font-weight:600;color:#15803d">Correct</p>
+            <ul style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;list-style:none;padding:0">
+              <li style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid #92400e;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%)"><span style="font-size:1.25rem;font-weight:600">3</span><span style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#92400e">New tile</span></li>
+              <li style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid #92400e;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%)"><span style="font-size:1.25rem;font-weight:600">6</span><span style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#92400e">New tile</span></li>
+            </ul>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+            <p style="color:#52525b">Choose 1 tile(s) to discard.</p>
+            <button type="button" style="min-width:44px;min-height:44px;padding:12px 24px;border:none;border-radius:8px;background:#27272a;color:#ffffff;font-weight:600;cursor:pointer;font-size:16px">Confirm Discard</button>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
+            <button type="button" aria-label="Digit 0" aria-pressed="false" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">0</span></button>
+            <button type="button" aria-label="Digit 1" aria-pressed="false" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">1</span></button>
+            <button type="button" aria-label="Digit 2" aria-pressed="false" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">2</span></button>
+            <button type="button" aria-label="Digit 3" aria-pressed="false" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">3</span></button>
+            <button type="button" aria-label="Digit 3, New tile" aria-pressed="false" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">3</span><span aria-hidden="true" style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#92400e">New tile</span></button>
+            <button type="button" aria-label="Digit 5" aria-pressed="false" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">5</span></button>
+            <button type="button" aria-label="Digit 6" aria-pressed="false" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">6</span></button>
+            <button type="button" aria-label="Digit 6, New tile" aria-pressed="false" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">6</span><span aria-hidden="true" style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#92400e">New tile</span></button>
+            <button type="button" aria-label="Digit 7" aria-pressed="false" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">7</span></button>
+            <button type="button" aria-label="Digit 8" aria-pressed="false" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">8</span></button>
+            <button type="button" aria-label="Digit 9, Marked for discard" aria-pressed="true" style="position:relative;min-width:44px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #9a3412;border-radius:8px;background:#f4f4f5;box-shadow:0 1px 2px rgb(0 0 0 / 10%);color:#18181b;font-size:1.25rem;cursor:pointer;padding:1px 6px"><span aria-hidden="true">9</span><span aria-hidden="true" style="font-size:0.625rem;text-transform:uppercase;letter-spacing:0.02em;color:#9a3412">Marked for discard</span></button>
+          </div>
+        </main>
+      </div>
+    </div>
+  </figure>
+
+  <figure data-screen-label="gameOver" style="margin:0;display:flex;flex-direction:column;gap:12px">
+    <figcaption style="font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#52525b">phase: gameOver</figcaption>
+    <div class="rec" style="width:900px;background:#ffffff;box-shadow:0 2px 8px rgb(0 0 0 / 12%)">
+      <div style="display:flex;flex-direction:column;min-height:640px">
+        <div style="display:flex;justify-content:flex-end;max-width:42rem;margin:0 auto;padding:16px 16px 0;width:100%">
+          <div role="group" aria-label="Language" style="display:inline-flex;gap:8px">
+            <button type="button" aria-pressed="true" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #27272a;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-weight:600;font-size:16px">English</button>
+            <button type="button" aria-pressed="false" style="min-width:44px;min-height:44px;padding:8px 12px;border:1px solid #d4d4d8;border-radius:4px;background:#f4f4f5;color:#18181b;cursor:pointer;font-size:16px">한국어</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+          <p style="font-size:2rem;font-weight:600;text-align:center">9 × 8 =</p>
+          <main style="display:flex;flex-direction:column;align-items:center;gap:16px;max-width:42rem;margin:0 auto;padding:32px 16px;text-align:center;width:100%">
+            <h1 style="font-size:2.5rem;font-weight:700">Game Over</h1>
+            <dl style="display:flex;flex-wrap:wrap;gap:24px;justify-content:center">
+              <div style="display:flex;flex-direction:column;align-items:center">
+                <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Score</dt>
+                <dd style="font-size:1.25rem;font-weight:600">12</dd>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center">
+                <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Rounds played</dt>
+                <dd style="font-size:1.25rem;font-weight:600">15</dd>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center">
+                <dt style="font-size:0.75rem;color:#52525b;text-transform:uppercase;letter-spacing:0.02em">Longest streak</dt>
+                <dd style="font-size:1.25rem;font-weight:600">5</dd>
+              </div>
+            </dl>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
+              <button type="button" style="min-width:44px;min-height:44px;padding:12px 24px;border:none;border-radius:8px;background:#27272a;color:#ffffff;font-weight:600;cursor:pointer;font-size:16px">Play Again</button>
+              <button type="button" style="min-width:44px;min-height:44px;padding:12px 24px;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;color:#18181b;font-weight:600;cursor:pointer;font-size:16px">Share</button>
+              <button type="button" style="min-width:44px;min-height:44px;padding:12px 24px;border:1px solid #d4d4d8;border-radius:8px;background:#f4f4f5;color:#18181b;font-weight:600;cursor:pointer;font-size:16px">Copy Result</button>
+            </div>
+            <p role="status" aria-live="polite" style="color:#52525b;min-height:1.25em">Result copied.</p>
+          </main>
+        </div>
+      </div>
+    </div>
+  </figure>
+
+</div>
+
+</x-dc>
+</body>
+</html>

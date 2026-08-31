@@ -61,6 +61,19 @@
   100%    { opacity: 1; }
 }
 
+/* 2d — tier-3 (streak 8) six-chip burst: shards off the tile's own bottom edge.
+   The burst is made of the object, not added to it, so the chips carry ceramic
+   clay, never gold. Each chip supplies its own trajectory — --dx, --peak, --land,
+   --rot — and one keyframe set serves all six; --oz-chip-* below are the locked
+   six. Gravity is the point: launch, turn over at the peak, come down. */
+@keyframes oz-fan {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  45%  { transform: translate(calc(var(--dx) * .55), var(--peak)) rotate(calc(var(--rot) * .45)); opacity: 1; }
+  82%  { opacity: .9; }
+  100% { transform: translate(var(--dx), var(--land)) rotate(var(--rot)); opacity: 0; }
+}
+
 /* 11d — an action that becomes available rises to meet the hand. */
 @keyframes oz-rise-ready {
   0%   { transform: translateY(4px); }

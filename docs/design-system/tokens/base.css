@@ -19,9 +19,12 @@ button, input { font: inherit; color: inherit; }
 a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--accent-hover); }
 
+/* Fallback for anything without its own elevation. Objects that carry a shadow
+   (tiles, buttons) compose --ring-focus / --ring-focus-onDanger instead, so the
+   bezel follows their radius. */
 :focus-visible {
   outline: 2px solid var(--focus-ring);
-  outline-offset: 2px;
+  outline-offset: -2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

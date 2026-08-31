@@ -27,6 +27,7 @@ const SWATCH = {
 export function TitleScreen({ onStart, summary, language, onLanguageChange, labels = { start: "Start Run" }, rules = RULES }) {
   return (
     <div
+      lang={language}
       style={{
         position: "relative",
         display: "flex",

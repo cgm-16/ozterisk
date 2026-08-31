@@ -1,9 +1,5 @@
 # ozterisk — Design System
 
-> **Contract precedence.** `docs/spec/ui-i18n.md` §1.12 is the contract; this
-> directory is the normative source for token values, material rules, and the
-> motion inventory it refers to. Where the two disagree, §1.12 wins.
-
 **Start here, then read `decisions.md`.** This file states the rules;
 `decisions.md` states why they exist and what was rejected to reach them —
 including the refs (`9f`, `10b`, `2a`…) cited throughout this document.
@@ -95,10 +91,9 @@ order differs.
 **Every string ships in `en` and `ko` simultaneously.** The Korean tree must
 mirror the English tree's exact key structure (enforced by `MessageShape<T>` in
 `messages.ts`). Korean is not a translation layer bolted on — it is a first-class
-locale. **Correction:** an earlier draft of this file claimed Zen Kaku Gothic New
-sets both scripts. It does not — it is a Japanese family and serves no Hangul
-subset, so `--font-ui` must append a Hangul-capable face (Noto Sans KR) or every
-Korean string silently falls back to `system-ui`.
+locale. **Zen Kaku Gothic New does not set Hangul** — it is a Japanese family
+with no Hangul subset, so `--font-ui` appends Noto Sans KR; without it every
+Korean string falls silently to `system-ui`.
 Korean copy is likewise plain and instructional: `정답` / `오답`, `게임 시작`.
 
 ### Emoji
@@ -171,12 +166,22 @@ socket appears.
   tile faces at 34px, the wordmark at 52px. Choosing a serif for numerals is the
   single most identity-defining decision in the system: it makes a digit an
   object rather than a readout.
-- **Zen Kaku Gothic New** sets Latin interface text, instructions, and buttons. It
-  is a Japanese family and serves no Hangul subset, so the `ko` locale needs a
-  Hangul-capable companion face (Noto Sans KR) appended to `--font-ui`.
+- **Zen Kaku Gothic New** sets Latin interface text, instructions, and buttons.
+  It carries no Hangul, so **Noto Sans KR** sits behind it in `--font-ui` and
+  sets the entire Korean locale. Both load; neither is optional.
 - **IBM Plex Mono** sets labels, HUD captions, and share strings — always
   uppercase with `0.14–0.2em` tracking at 9–11px. This is the only tracked type
   in the system.
+- **Hangul is tuned, not merely substituted.** In the `ko` locale the tracked
+  label rule is switched off (`--track-label: normal`) and every interface size
+  goes up one pixel: Noto Sans KR runs optically smaller than Zen Kaku at the
+  same nominal size, and mono tracking pulls already-square syllable blocks
+  apart until 라운드 stops reading as one word. This is a token override on
+  `:lang(ko)`, so no component opts in — but it does require the locale to
+  reach the DOM: set `lang` on the app root (or on the screen, as `GameScreen`
+  and `TitleScreen` do from their `language` prop). Switching copy alone leaves
+  the override inert and Korean wearing the Latin rule. Uppercase transforms
+  stay — Hangul has no case, so they are harmless.
 - Body prose gets `text-wrap: pretty` and a `52–74ch` measure.
 - **Minimum sizes**: interface text never below 11px; interactive tiles never
   below 44px.
@@ -234,6 +239,7 @@ and quietest; what happens once a run can be theatrical.
 | Correct answer | `--dur-bloom` 420ms | answer tiles rise 14px and settle; jade ring |
 | Wrong answer | `--dur-crack` 520ms | tiles fracture where they stand, dust away |
 | Streak break | `--dur-break` 520ms | counter falls off its perch, 0 fades in |
+| Streak-8 burst | `--dur-burst` 720ms | six ceramic shards fan off the tile, turn over, fall |
 | Share confirm | `--dur-share` 900ms | chop stamps, holds, fades |
 
 Easings: `--ease-settle` for anything that lands and stays, `--ease-snap` for a
@@ -244,9 +250,10 @@ states is a *transition* and stays inline on the component. Anything with a
 shape — a rise that settles, a fall with gravity, a fracture — is a *keyframe* in
 `tokens/keyframes.css`, named for its storyboard ref: `oz-bloom` and `oz-ring`
 (2a/7a), `oz-crack` + `oz-dust` (9f), `oz-fire` (9i), `oz-round-rise` (10b),
-`oz-counter-fall` + `oz-counter-zero` (10e), `oz-rise-ready` (11d). The six
-round-frequency moments are wired; the once-a-run set (7b/7c tiers, 2d chip
-burst, 8a rim reject, 11a/8c discard, 10i table sweep, 11C title and share) is
+`oz-counter-fall` + `oz-counter-zero` (10e), `oz-fan` (2d), `oz-rise-ready`
+(11d). The six round-frequency moments and the whole streak ladder are wired;
+the remaining once-a-run set (8a rim reject, 11a/8c discard, 10i table sweep,
+11C title and share) is
 specified above but not yet implemented.
 
 Two implementation rules learned the hard way:
@@ -268,7 +275,12 @@ up; escalation is the tiles behaving harder, not the table.
 
 The streak ladder is three tiers that **accumulate, never swap** — 3: bloom +
 one jade ring; 5: + a second gold ring and a gold rim on the answer tiles; 8: +
-a third ring and a six-chip burst. Nothing above 8 escalates. **The bloom is the
+a third ring and a six-chip burst. Nothing above 8 escalates. **The burst is a
+ceramic fan** (`oz-fan`, `--dur-burst` 720ms on `--ease-fall`): six shards off
+the tile's own bottom edge, launched high, turning over at the peak and coming
+down. The chips carry clay, never gold — the ceiling of the ladder is the tile
+shedding material, not confetti added to the table. Gold in motion was drawn and
+rejected: it made the top rung read as a different game. **The bloom is the
 floor effect, not the ring**: correct answers at streak 1 and 2 rise and settle
 with no ring at all, so tier 1 has something to give. (The storyboard's 2a frame
 draws the ring on the first correct answer; the ladder wins — a rung that changes
@@ -295,11 +307,20 @@ offset.
   is still yours until you submit, so it stays in the rack's model and its own
   cell renders empty. Nothing else moves. The rack re-sorts once per round, at
   the resolve, where 10b covers it — never on a tap.
-- **A lifted socket is not an empty one.** `--rim-socket-lifted` (gold at 34%)
-  marks a socket whose tile is out on loan; `--rim-socket` (hairline) marks one
-  whose tile is gone. Same well, different debt.
-- **Focus** is a 2px `--gold-300` ring at 2px offset, distinct from every
-  semantic colour.
+- **A lifted socket is not an empty one.** A socket whose tile is out on loan
+  wears the ordinary `--rim-socket` plus `--outline-socket-lifted` — a dashed
+  gold rule inset 3px; one whose tile is gone wears the rim alone. Same well,
+  different debt. Dashed rather than brighter gold: dashed is already the
+  system's word for "something belongs here and does not yet" on the empty
+  answer slot, and the lifted socket is saying exactly that. It is also the one
+  place a second dashed border is permitted.
+- **Focus is an inset bezel, not a halo.** `--ring-focus`
+  (`inset 0 0 0 2px --gold-300`) composed after the object's own edge, so the
+  ring lives inside the object and follows its radius — a gold edge fired into
+  the tile rather than a rectangle floating around it. On vermilion actions use
+  `--ring-focus-onDanger`, which adds a felt-dark inner line so gold never sits
+  directly against red. Elements with no elevation of their own fall back to the
+  global `:focus-visible` outline at `-2px` offset.
 
 ---
 
@@ -314,8 +335,8 @@ The system's rules:
 
 - **Objects, not icons.** A tile, a socket, and a capacity pip carry the meaning
   an icon would carry elsewhere. Ten pips in a row are the capacity meter; gold
-  pips are held tiles, vermilion pips are the danger margin, a translucent pip
-  is a free socket.
+  pips are held tiles, a translucent pip is a free socket, and a vermilion pip
+  past the tenth is a tile over capacity — there is no near-capacity tint.
 - **The one glyph is ✳** (U+2733, EIGHT SPOKED ASTERISK), set in EB Garamond in
   `--gold-500`. It is the wordmark's centre (oz**✳**terisk), the title-screen
   tile face, and the share chop. It is type, not a logo file.

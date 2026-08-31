@@ -65,6 +65,16 @@ export function ActionButton({ children, variant = "primary", disabled = false, 
         e.currentTarget.style.transform = "translateY(var(--press-offset))";
         e.currentTarget.style.boxShadow = variant === "ghost" ? "none" : "0 2px 0 #7d2d1f";
       }}
+      onFocus={(e) => {
+        if (disabled) return;
+        // The bezel sits inside the object; on vermilion it needs the felt-dark
+        // inner line so gold never touches red directly.
+        const ring = variant === "primary" ? "var(--ring-focus-onDanger)" : "var(--ring-focus)";
+        e.currentTarget.style.boxShadow = v.edge === "none" ? ring : `${v.edge}, ${ring}`;
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.boxShadow = disabled ? "none" : v.edge;
+      }}
       onPointerUp={(e) => {
         if (disabled) return;
         e.currentTarget.style.transform = "translateY(0)";

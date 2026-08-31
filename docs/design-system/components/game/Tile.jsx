@@ -46,9 +46,16 @@ export function Tile({ digit, size = "lg", state = "resting", onClick, label, st
     disabled: { boxShadow: "none", opacity: 0.45, cursor: "default" },
   };
 
+  // Focus is an inset bezel, so it must compose with whatever edge this state
+  // already draws rather than replace it.
+  const stateStyle = byState[state] || {};
+  const focusEdge = stateStyle.boxShadow || base.boxShadow;
+
   return (
     <button
       type="button"
+      onFocus={(e) => { e.currentTarget.style.boxShadow = `${focusEdge}, var(--ring-focus)`; }}
+      onBlur={(e) => { e.currentTarget.style.boxShadow = focusEdge; }}
       aria-label={label != null ? label : `Digit ${digit}`}
       aria-pressed={state === "marked" ? true : undefined}
       disabled={!interactive}

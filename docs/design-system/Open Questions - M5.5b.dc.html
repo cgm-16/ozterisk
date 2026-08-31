@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta name="design_doc_mode" content="canvas">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { margin: 0; background: var(--felt-900); }
+    a { color: var(--accent); }
+    a:hover { color: var(--gold-300); }
+
+    /* 2d candidates. Six chips, each carrying its own --dx/--peak/--land/--rot,
+       so one keyframe set serves all six trajectories. Gravity is the thing that
+       separates a chip from a generic scatter: every candidate below launches,
+       turns over, and comes down. None of them fades in place. */
+    @keyframes ozc-fan {
+      0%   { transform: translate(0,0) rotate(0deg); opacity: 0; }
+      10%  { opacity: 1; }
+      45%  { transform: translate(calc(var(--dx) * .55), var(--peak)) rotate(calc(var(--rot) * .45)); opacity: 1; }
+      82%  { opacity: .9; }
+      100% { transform: translate(var(--dx), var(--land)) rotate(var(--rot)); opacity: 0; }
+    }
+    @keyframes ozc-leaf {
+      0%   { transform: translate(0,0) rotate(0deg) scale(.55); opacity: 0; }
+      18%  { transform: translate(calc(var(--dx) * .2), calc(var(--peak) * .85)) rotate(calc(var(--rot) * .25)) scale(1); opacity: 1; }
+      60%  { transform: translate(calc(var(--dx) * .7), calc(var(--peak) * .3)) rotate(calc(var(--rot) * .6)) scale(1); opacity: .95; }
+      100% { transform: translate(var(--dx), var(--land)) rotate(var(--rot)) scale(.95); opacity: 0; }
+    }
+    @keyframes ozc-skid {
+      0%   { transform: translate(0,0) rotate(0deg); opacity: 0; }
+      7%   { opacity: 1; }
+      100% { transform: translate(calc(var(--dx) * 1.5), calc(var(--land) * .3)) rotate(var(--rot)); opacity: 0; }
+    }
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:var(--felt-900);background-image:radial-gradient(ellipse 1000px 520px at 14% -8%, rgba(201,165,74,.09), transparent 70%);padding:44px 22px 72px;display:flex;flex-direction:column;gap:16px">
+
+  <header style="display:flex;flex-direction:column;gap:10px;max-width:76ch">
+    <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--accent)">M5.5b · open questions</span>
+    <h1 style="margin:0;font:var(--weight-medium) 32px/1.15 var(--font-display);color:var(--text-primary)">Four things prose can't settle</h1>
+    <p style="margin:0;font:var(--weight-regular) var(--size-body-sm)/1.6 var(--font-ui);color:var(--text-body);text-wrap:pretty">Every option carries an id. Name the ones you want in chat and I'll fold them into the tokens; anything you reject, say what it was missing and I'll draw again. The burst is the only group where nothing existed before, so it is three genuine directions rather than a baseline plus variants.</p>
+  </header>
+
+  <div style="display:flex;gap:var(--space-4);align-items:center;padding:14px 0 4px">
+    <button type="button" onClick="{{ replay }}" style="min-height:var(--target-min);padding:0 var(--space-8);border:none;border-radius:var(--radius-md);font:var(--weight-bold) var(--size-label)/var(--leading-tight) var(--font-ui);letter-spacing:var(--track-label);text-transform:uppercase;background:var(--surface-raised);color:var(--text-primary);box-shadow:0 4px 0 #0e2a21;cursor:pointer">Replay</button>
+    <label style="display:flex;align-items:center;gap:var(--space-2);font:var(--weight-medium) var(--size-label)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-meta);cursor:pointer">
+      <input type="checkbox" checked="{{ loop }}" onChange="{{ toggleLoop }}" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
+      Loop
+    </label>
+    <label style="display:flex;align-items:center;gap:var(--space-2);font:var(--weight-medium) var(--size-label)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-meta);cursor:pointer">
+      <input type="checkbox" checked="{{ slow }}" onChange="{{ toggleSlow }}" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
+      Quarter speed
+    </label>
+  </div>
+
+  <section style="display:flex;flex-direction:column;gap:var(--space-6);padding:28px 20px 34px;border-radius:var(--radius-lg);background:var(--felt-700);background-image:repeating-linear-gradient(48deg,rgba(255,255,255,.022) 0 2px,transparent 2px 4px);border:1px solid var(--border-hairline)">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:baseline;gap:var(--space-3)">
+        <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:4px 7px;border-radius:var(--radius-sm);background:var(--accent);color:var(--felt-900)">2d</span>
+        <h2 style="margin:0;font:var(--weight-medium) 22px/1.2 var(--font-display);color:var(--text-primary)">The six-chip burst</h2>
+      </div>
+      <p style="margin:0;font:var(--weight-regular) var(--size-body-sm)/1.55 var(--font-ui);color:var(--text-body);max-width:74ch">Streak 8, the ceiling of the ladder and the only purely celebratory moment in the game. Shown in its real context — bloom plus all three accumulated rings — because chips judged on their own are chips judged in the wrong place. All three obey the standing rules: the felt never lights up, and nothing glows.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:24px">
+      <sc-for list="{{ bursts }}" as="b" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:var(--space-4);min-width:0">
+          <div style="display:flex;align-items:baseline;gap:var(--space-2)">
+            <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:3px 6px;border-radius:var(--radius-sm);background:var(--gold-500);color:var(--felt-900)">{{ b.id }}</span>
+            <span style="font:var(--weight-medium) var(--size-body-sm)/1.2 var(--font-ui);color:var(--text-primary)">{{ b.name }}</span>
+          </div>
+          <div style="height:210px;border-radius:var(--radius-md);background:var(--felt-800);border:1px solid var(--border-hairline);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative">
+            {{ b.stage }}
+          </div>
+          <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.65 var(--font-mono);color:var(--text-meta)">{{ b.note }}</p>
+          <p style="margin:0;font:var(--weight-medium) var(--size-micro)/1.5 var(--font-mono);color:var(--accent)">{{ b.tokens }}</p>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.65 var(--font-mono);color:var(--text-meta);max-width:78ch">Chips carry the tile's own bottom-edge clay in <a href="#5a">5a</a> and <a href="#5c">5c</a>, so the burst is made of the tile rather than added to it. <a href="#5b">5b</a> spends gold instead, which is the more ceremonial read but puts the brand colour in motion for the first time anywhere in the system.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:var(--space-6);padding:28px 20px 34px;border-radius:var(--radius-lg);background:var(--felt-700);background-image:repeating-linear-gradient(48deg,rgba(255,255,255,.022) 0 2px,transparent 2px 4px);border:1px solid var(--border-hairline)">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:baseline;gap:var(--space-3)">
+        <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:4px 7px;border-radius:var(--radius-sm);background:var(--state-discard);color:var(--ink-000)">Lifted socket</span>
+        <h2 style="margin:0;font:var(--weight-medium) 22px/1.2 var(--font-display);color:var(--text-primary)">One pixel is carrying the whole mechanic</h2>
+      </div>
+      <p style="margin:0;font:var(--weight-regular) var(--size-body-sm)/1.55 var(--font-ui);color:var(--text-body);max-width:74ch">Each rack below holds seven tiles, two lifted into the answer, and one socket whose tile is simply gone. Two questions, then: can you find the lifted pair without hunting, and can you tell them from the gone one? <a href="#5d">5d</a> is what ships today at 1.94:1 against the well; the rest raise the signal without breaking the rule that nothing recessed casts an outer shadow.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2, minmax(384px, 1fr));gap:34px 26px">
+      <sc-for list="{{ sockets }}" as="s" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:var(--space-4);min-width:0">
+          <div style="display:flex;align-items:baseline;gap:var(--space-2)">
+            <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:3px 6px;border-radius:var(--radius-sm);background:var(--gold-500);color:var(--felt-900)">{{ s.id }}</span>
+            <span style="font:var(--weight-medium) var(--size-body-sm)/1.2 var(--font-ui);color:var(--text-primary)">{{ s.name }}</span>
+          </div>
+          <div style="padding:16px;border-radius:var(--radius-md);background:var(--felt-800);border:1px solid var(--border-hairline)">
+            {{ s.rack }}
+          </div>
+          <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.65 var(--font-mono);color:var(--text-meta)">{{ s.note }}</p>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.65 var(--font-mono);color:var(--text-meta);max-width:78ch"><a href="#5f">5f</a> is the one with an argument beyond contrast: dashed already means "something belongs here and does not yet" on the empty answer slot, which is exactly a lifted socket's meaning. Picking it makes the vocabulary consistent rather than merely louder.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:var(--space-6);padding:28px 20px 34px;border-radius:var(--radius-lg);background:var(--felt-700);background-image:repeating-linear-gradient(48deg,rgba(255,255,255,.022) 0 2px,transparent 2px 4px);border:1px solid var(--border-hairline)">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:baseline;gap:var(--space-3)">
+        <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:4px 7px;border-radius:var(--radius-sm);background:var(--accent);color:var(--felt-900)">Focus</span>
+        <h2 style="margin:0;font:var(--weight-medium) 22px/1.2 var(--font-display);color:var(--text-primary)">Does a focus ring belong to Tile House?</h2>
+      </div>
+      <p style="margin:0;font:var(--weight-regular) var(--size-body-sm)/1.55 var(--font-ui);color:var(--text-body);max-width:74ch">Ratios are yours to verify afterwards — this is only about whether it looks like part of the material world or like a browser default parked on a ceramic tile. Each is shown on the tile, on felt, and on the vermilion action, since those are the three grounds it has to survive.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:30px 26px">
+      <sc-for list="{{ focusOpts }}" as="f" hint-placeholder-count="4">
+        <div style="display:flex;flex-direction:column;gap:var(--space-4);min-width:0">
+          <div style="display:flex;align-items:baseline;gap:var(--space-2)">
+            <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:3px 6px;border-radius:var(--radius-sm);background:var(--gold-500);color:var(--felt-900)">{{ f.id }}</span>
+            <span style="font:var(--weight-medium) var(--size-body-sm)/1.2 var(--font-ui);color:var(--text-primary)">{{ f.name }}</span>
+          </div>
+          <div style="padding:22px 18px;border-radius:var(--radius-md);background:var(--felt-800);border:1px solid var(--border-hairline);display:flex;align-items:center;gap:20px;min-height:110px">
+            {{ f.demo }}
+          </div>
+          <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.65 var(--font-mono);color:var(--text-meta)">{{ f.note }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:var(--space-6);padding:28px 20px 34px;border-radius:var(--radius-lg);background:var(--felt-700);background-image:repeating-linear-gradient(48deg,rgba(255,255,255,.022) 0 2px,transparent 2px 4px);border:1px solid var(--border-hairline)">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:baseline;gap:var(--space-3)">
+        <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:4px 7px;border-radius:var(--radius-sm);background:var(--accent);color:var(--felt-900)">ko</span>
+        <h2 style="margin:0;font:var(--weight-medium) 22px/1.2 var(--font-display);color:var(--text-primary)">ozterisk in a real Hangul face, for the first time</h2>
+      </div>
+      <p style="margin:0;font:var(--weight-regular) var(--size-body-sm)/1.55 var(--font-ui);color:var(--text-body);max-width:74ch">Noto Sans KR against EB Garamond numerals. Two treatments, because the tracked-mono label rule was written for Latin and Hangul does not take letterspacing the same way — syllable blocks are already square, so tracking them reads as broken rather than as emphasis.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:26px">
+      <sc-for list="{{ koOpts }}" as="k" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:var(--space-4);min-width:0">
+          <div style="display:flex;align-items:baseline;gap:var(--space-2)">
+            <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:3px 6px;border-radius:var(--radius-sm);background:var(--gold-500);color:var(--felt-900)">{{ k.id }}</span>
+            <span style="font:var(--weight-medium) var(--size-body-sm)/1.2 var(--font-ui);color:var(--text-primary)">{{ k.name }}</span>
+          </div>
+          <div style="padding:22px;border-radius:var(--radius-md);background:var(--felt-800);border:1px solid var(--border-hairline);display:flex;flex-direction:column;gap:20px">
+            {{ k.demo }}
+          </div>
+          <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.65 var(--font-mono);color:var(--text-meta)">{{ k.note }}</p>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.65 var(--font-mono);color:var(--text-meta);max-width:78ch">Look hardest at the HUD row, where a Hangul label sits directly under an EB Garamond numeral. That pairing appears on every screen of the game and is the one that decides whether the two families can share a system.</p>
+  </section>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CHIPS = [
+  { dx: "-46px", peak: "-36px", land: "34px", rot: "-140deg" },
+  { dx: "-26px", peak: "-54px", land: "28px", rot: "96deg" },
+  { dx: "-8px", peak: "-62px", land: "36px", rot: "-62deg" },
+  { dx: "13px", peak: "-58px", land: "30px", rot: "124deg" },
+  { dx: "31px", peak: "-47px", land: "33px", rot: "-104deg" },
+  { dx: "51px", peak: "-31px", land: "26px", rot: "162deg" },
+];
+
+const TILE = {
+  width: "var(--tile-w)",
+  height: "var(--tile-h)",
+  borderRadius: "var(--radius-md)",
+  background: "var(--surface-tile)",
+  color: "var(--text-on-tile)",
+  font: "var(--weight-semibold) var(--size-tile)/1 var(--font-numeral)",
+  textShadow: "0 1px 0 rgba(255,255,255,.85)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  boxShadow: "var(--shadow-tile)",
+};
+
+const SOCKET = {
+  width: "var(--tile-w)",
+  height: "var(--tile-h)",
+  borderRadius: "var(--radius-md)",
+  background: "var(--surface-socket)",
+};
+
+const h = React.createElement;
+
+class Component extends DCLogic {
+  // `run` is the remount key for the burst stages. Keying them here restarts the
+  // keyframes without an sc-if gate — an element-valued hole nested inside sc-if
+  // resolves to nothing, which left all three stages empty.
+  state = { run: 0, loop: true, slow: false };
+
+  componentDidMount() {
+    this.replay();
+    this.startLoop();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.iv);
+  }
+
+  startLoop() {
+    clearInterval(this.iv);
+    if (this.state.loop) this.iv = setInterval(() => this.replay(), this.state.slow ? 5200 : 2600);
+  }
+
+  replay = () => this.setState((s) => ({ run: s.run + 1 }));
+
+  toggleLoop = () => this.setState((s) => ({ loop: !s.loop }), () => this.startLoop());
+  toggleSlow = () => this.setState((s) => ({ slow: !s.slow }), () => { this.startLoop(); this.replay(); });
+
+  get k() {
+    return this.state.slow ? 4 : 1;
+  }
+
+  // A burst stage: the tile mid-bloom, three accumulated rings, six chips.
+  stage(id, kind, chipStyle) {
+    const k = this.k;
+    const rings = [
+      { color: "var(--state-correct)", delay: 0 },
+      { color: "var(--gold-500)", delay: 70 * k },
+      { color: "var(--gold-300)", delay: 140 * k },
+    ].map((r, i) =>
+      h("span", {
+        key: `r${i}`,
+        "aria-hidden": true,
+        style: {
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          width: "calc(var(--tile-w) * 1.9)",
+          height: "calc(var(--tile-w) * 1.9)",
+          marginLeft: "calc(var(--tile-w) * -0.95)",
+          marginTop: "calc(var(--tile-w) * -0.95)",
+          borderRadius: "50%",
+          border: `2px solid ${r.color}`,
+          animation: `oz-ring ${420 * k}ms var(--ease-settle) ${r.delay}ms both`,
+          pointerEvents: "none",
+        },
+      })
+    );
+
+    const chips = CHIPS.map((c, i) =>
+      h("span", {
+        key: `c${i}`,
+        "aria-hidden": true,
+        style: {
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          "--dx": c.dx,
+          "--peak": c.peak,
+          "--land": c.land,
+          "--rot": c.rot,
+          ...chipStyle,
+          animation: `${kind.frames} ${kind.ms * k}ms ${kind.ease} ${(40 + i * 12) * k}ms both`,
+          pointerEvents: "none",
+        },
+      })
+    );
+
+    return h(
+      "div",
+      {
+        key: `burst-${id}-${this.state.run}`,
+        style: { position: "relative", display: "flex", alignItems: "center", justifyContent: "center" },
+      },
+      rings,
+      h(
+        "span",
+        { style: { ...TILE, animation: `oz-bloom ${420 * k}ms var(--ease-settle) both` } },
+        "8"
+      ),
+      chips
+    );
+  }
+
+  rack(liftedShadow, extra) {
+    // Seven held, two lifted (3, 6), one gone (8) — the gone socket has to be on
+    // screen or "out on loan" has nothing to be distinguished from.
+    const digits = [1, 2, 4, null, 5, 7, null, 9, null, 3];
+    const lifted = new Set([3, 6]);
+    return h(
+      "div",
+      // 5 x 64 + 4 x 8 = 352 exactly; without the explicit width the last column
+      // paints past the grid box and into the card's padding.
+      { style: { display: "grid", gridTemplateColumns: "repeat(5, var(--tile-w))", gap: "var(--space-2)", width: "352px" } },
+      digits.map((d, i) => {
+        if (lifted.has(i)) {
+          return h(
+            "div",
+            {
+              key: i,
+              "aria-hidden": true,
+              style: { ...SOCKET, boxShadow: `var(--shadow-socket), ${liftedShadow}`, ...(extra || {}) },
+            },
+            extra && extra.__mark ? extra.__mark : null
+          );
+        }
+        if (d == null) {
+          return h("div", { key: i, "aria-hidden": true, style: { ...SOCKET, boxShadow: "var(--shadow-socket), var(--rim-socket)" } });
+        }
+        return h("span", { key: i, style: TILE }, d);
+      })
+    );
+  }
+
+  focusDemo(ring) {
+    return [
+      h("span", { key: "t", style: { ...TILE, ...ring } }, "7"),
+      h(
+        "span",
+        {
+          key: "b",
+          style: {
+            minHeight: "var(--target-min)",
+            padding: "0 var(--space-6)",
+            borderRadius: "var(--radius-md)",
+            font: "var(--weight-bold) var(--size-label)/1 var(--font-ui)",
+            letterSpacing: "var(--track-label)",
+            textTransform: "uppercase",
+            background: "var(--state-incorrect)",
+            color: "var(--ink-000)",
+            boxShadow: "0 4px 0 #7d2d1f",
+            display: "inline-flex",
+            alignItems: "center",
+            ...ring,
+          },
+        },
+        "Submit"
+      ),
+    ];
+  }
+
+  koDemo(track, sizeAdj) {
+    const label = {
+      font: `var(--weight-medium) ${11 + sizeAdj}px/1 var(--font-ui)`,
+      letterSpacing: track,
+      color: "var(--text-meta)",
+      textTransform: "uppercase",
+    };
+    return [
+      h(
+        "div",
+        { key: "hud", style: { display: "flex", gap: "34px" } },
+        [
+          ["점수", "1,480"],
+          ["연속", "8"],
+          ["라운드", "14"],
+        ].map(([l, v]) =>
+          h(
+            "div",
+            { key: l, style: { display: "flex", flexDirection: "column", gap: "6px" } },
+            h("span", { style: label }, l),
+            h(
+              "span",
+              { style: { font: "var(--weight-semibold) var(--size-title)/1 var(--font-numeral)", color: "var(--text-primary)" } },
+              v
+            )
+          )
+        )
+      ),
+      h(
+        "div",
+        { key: "cap", style: { display: "flex", alignItems: "baseline", gap: "10px" } },
+        h("span", { style: label }, "용량"),
+        h("span", { style: { font: "var(--weight-medium) 15px/1 var(--font-numeral)", color: "var(--accent)" } }, "9 / 10")
+      ),
+      h(
+        "p",
+        {
+          key: "body",
+          style: {
+            margin: 0,
+            font: `var(--weight-regular) ${16 + sizeAdj}px/1.75 var(--font-ui)`,
+            color: "var(--text-body)",
+            textWrap: "pretty",
+          },
+        },
+        "인벤토리 타일을 클릭하거나 탭하면 다음 빈 정답 칸에 놓입니다. 남은 타일이 부족하면 라운드를 끝낼 수 없습니다."
+      ),
+      h(
+        "div",
+        { key: "verdict", style: { display: "flex", alignItems: "baseline", gap: "18px" } },
+        h("span", { style: { font: "var(--weight-medium) 26px/1 var(--font-ui)", color: "var(--state-correct)" } }, "정답"),
+        h("span", { style: { font: "var(--weight-medium) 26px/1 var(--font-ui)", color: "var(--state-discard)" } }, "오답"),
+        h("span", { style: { font: "var(--weight-medium) 20px/1 var(--font-ui)", color: "var(--text-primary)" } }, "게임 시작")
+      ),
+    ];
+  }
+
+  renderVals() {
+    return {
+      loop: this.state.loop,
+      slow: this.state.slow,
+      replay: this.replay,
+      toggleLoop: this.toggleLoop,
+      toggleSlow: this.toggleSlow,
+
+      bursts: [
+        {
+          id: "5a",
+          name: "Ceramic fan",
+          note: "Six shards off the tile's own bottom edge. High fan, turns over at the peak, comes down. Reads as the tile shedding material — closest to the mahjong metaphor, and the burst is made of the object rather than added to it.",
+          tokens: "--dur-burst 720ms · --ease-fall",
+          stage: this.stage(
+            "5a",
+            { frames: "ozc-fan", ms: 720, ease: "var(--ease-fall)" },
+            { width: "9px", height: "6px", borderRadius: "1.5px", background: "linear-gradient(160deg, var(--clay-050), var(--clay-400))" }
+          ),
+        },
+        {
+          id: "5b",
+          name: "Gold leaf",
+          note: "Six leaf slivers, slower, drifting rather than falling. The most ceremonial of the three and the only one that spends gold in motion — which either crowns the ladder properly or makes the ceiling feel like a different game.",
+          tokens: "--dur-burst 940ms · --ease-settle",
+          stage: this.stage(
+            "5b",
+            { frames: "ozc-leaf", ms: 940, ease: "var(--ease-settle)" },
+            { width: "4px", height: "13px", borderRadius: "0.5px", background: "linear-gradient(200deg, var(--gold-300), var(--gold-500))" }
+          ),
+        },
+        {
+          id: "5c",
+          name: "Low skid",
+          note: "Chips leave almost flat and skid outward across the felt. Fastest and least ceremonial: it reads as force rather than reward. Argues that streak 8 should feel earned and violent, not congratulatory.",
+          tokens: "--dur-burst 560ms · --ease-fall",
+          stage: this.stage(
+            "5c",
+            { frames: "ozc-skid", ms: 560, ease: "var(--ease-fall)" },
+            { width: "11px", height: "4px", borderRadius: "1px", background: "linear-gradient(90deg, var(--clay-200), var(--clay-400))" }
+          ),
+        },
+      ],
+
+      sockets: [
+        {
+          id: "5d",
+          name: "Gold 34% — former baseline, token now removed",
+          note: "1.94:1 against the well. Lifted are third and sixth; the ninth socket is a tile you lost. If you cannot tell those apart, that is the finding.",
+          rack: this.rack("inset 0 0 0 1px rgb(201 165 74 / 34%)"),
+        },
+        {
+          id: "5e",
+          name: "Gold 75%, doubled",
+          note: "Same idea, louder: a 1px rim at 75% plus a second inset pixel. Cheapest possible change — one token value, nothing structural — and roughly triples the contrast.",
+          rack: this.rack("inset 0 0 0 1px rgb(201 165 74 / 78%), inset 0 0 0 2px rgb(201 165 74 / 22%)"),
+        },
+        {
+          id: "5f",
+          name: "Dashed gold rim",
+          note: "Borrows the empty-answer-slot vocabulary, where dashed already means exactly this: something belongs here and does not yet. Consistent rather than merely brighter, and unmistakable at a glance.",
+          rack: this.rack("var(--rim-socket)", {
+            outline: "1px dashed rgb(201 165 74 / 72%)",
+            outlineOffset: "-3px",
+          }),
+        },
+        {
+          id: "5g",
+          name: "Rim plus resting mark",
+          note: "A faint gold bar on the socket floor — the tile's own footprint left behind. Strongest object story of the four, but adds an element to a shape that was deliberately empty.",
+          rack: this.rack("inset 0 0 0 1px rgb(201 165 74 / 44%)", {
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+            paddingBottom: "12px",
+            __mark: h("span", {
+              style: { width: "26px", height: "3px", borderRadius: "2px", background: "rgb(201 165 74 / 55%)" },
+            }),
+          }),
+        },
+      ],
+
+      focusOpts: [
+        {
+          id: "5h",
+          name: "Gold ring, 2px offset — shipped",
+          note: "One colour, one weight. Simplest, and on the vermilion action the gold sits directly against the red with nothing between them.",
+          demo: this.focusDemo({ outline: "2px solid var(--gold-300)", outlineOffset: "2px" }),
+        },
+        {
+          id: "5i",
+          name: "Two-tone, dark separator",
+          note: "Gold ring with a felt-dark inner pixel, so it holds on ceramic and on vermilion alike. Reads as engineering rather than material — the most browser-default of the four.",
+          demo: this.focusDemo({
+            outline: "2px solid var(--gold-300)",
+            outlineOffset: "3px",
+            boxShadow: "0 0 0 1px var(--felt-900)",
+          }),
+        },
+        {
+          id: "5j",
+          name: "Inset bezel",
+          note: "The ring moves inside the object and follows its radius — focus becomes a gold edge on the tile rather than a halo around it. Most Tile House of the four; weakest on the vermilion button, where inset gold has less room.",
+          demo: this.focusDemo({ boxShadow: "var(--shadow-tile), inset 0 0 0 2px var(--gold-300)" }),
+        },
+        {
+          id: "5k",
+          name: "Lacquer double rule",
+          note: "Two hairlines with felt between them, echoing the accent-panel border rather than any browser convention. Quietest, and the one most likely to be missed on a busy rack.",
+          demo: this.focusDemo({
+            outline: "1px solid var(--gold-500)",
+            outlineOffset: "4px",
+            boxShadow: "0 0 0 1px rgb(201 165 74 / 45%)",
+          }),
+        },
+      ],
+
+      koOpts: [
+        {
+          id: "5l",
+          name: "As specified — Latin rules applied to Hangul",
+          note: "The mono label rule as written: same size as Latin, same 0.14em tracking. Watch 라운드 and 용량 — the syllable blocks are already square, so the tracking pulls them apart into separate characters.",
+          demo: this.koDemo("var(--track-label)", 0),
+        },
+        {
+          id: "5m",
+          name: "Hangul-tuned — no tracking, +1px optical",
+          note: "Tracking dropped to normal and one pixel added, because Noto Sans KR runs optically smaller than Zen Kaku at the same nominal size. Labels stay uppercase-transformed harmlessly, since Hangul has no case.",
+          demo: this.koDemo("normal", 1),
+        },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>

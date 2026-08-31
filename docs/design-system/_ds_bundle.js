@@ -85,8 +85,15 @@ var OzteriskDesignSystem = (function(exports, react) {
 				cursor: "default"
 			}
 		};
+		const focusEdge = (byState[state] || {}).boxShadow || base.boxShadow;
 		return /* @__PURE__ */ react.default.createElement("button", {
 			type: "button",
+			onFocus: (e) => {
+				e.currentTarget.style.boxShadow = `${focusEdge}, var(--ring-focus)`;
+			},
+			onBlur: (e) => {
+				e.currentTarget.style.boxShadow = focusEdge;
+			},
 			"aria-label": label != null ? label : `Digit ${digit}`,
 			"aria-pressed": state === "marked" ? true : void 0,
 			disabled: !interactive,
@@ -222,6 +229,14 @@ var OzteriskDesignSystem = (function(exports, react) {
 				if (disabled) return;
 				e.currentTarget.style.transform = "translateY(var(--press-offset))";
 				e.currentTarget.style.boxShadow = variant === "ghost" ? "none" : "0 2px 0 #7d2d1f";
+			},
+			onFocus: (e) => {
+				if (disabled) return;
+				const ring = variant === "primary" ? "var(--ring-focus-onDanger)" : "var(--ring-focus)";
+				e.currentTarget.style.boxShadow = v.edge === "none" ? ring : `${v.edge}, ${ring}`;
+			},
+			onBlur: (e) => {
+				e.currentTarget.style.boxShadow = disabled ? "none" : v.edge;
 			},
 			onPointerUp: (e) => {
 				if (disabled) return;
@@ -495,6 +510,54 @@ var OzteriskDesignSystem = (function(exports, react) {
 	/**
 	* One or two ordered answer slots. Slot order is answer order.
 	*/
+	var CHIPS = [
+		{
+			dx: "-46px",
+			peak: "-36px",
+			land: "34px",
+			rot: "-140deg"
+		},
+		{
+			dx: "-26px",
+			peak: "-54px",
+			land: "28px",
+			rot: "96deg"
+		},
+		{
+			dx: "-8px",
+			peak: "-62px",
+			land: "36px",
+			rot: "-62deg"
+		},
+		{
+			dx: "13px",
+			peak: "-58px",
+			land: "30px",
+			rot: "124deg"
+		},
+		{
+			dx: "31px",
+			peak: "-47px",
+			land: "33px",
+			rot: "-104deg"
+		},
+		{
+			dx: "51px",
+			peak: "-31px",
+			land: "26px",
+			rot: "162deg"
+		}
+	];
+	var chipStyle = {
+		position: "absolute",
+		left: "50%",
+		top: "50%",
+		width: "9px",
+		height: "6px",
+		borderRadius: "1.5px",
+		background: "linear-gradient(160deg, var(--clay-050), var(--clay-400))",
+		pointerEvents: "none"
+	};
 	var ringStyle = {
 		position: "absolute",
 		left: "50%",
@@ -504,10 +567,25 @@ var OzteriskDesignSystem = (function(exports, react) {
 		marginLeft: "calc(var(--tile-w) * -0.95)",
 		marginTop: "calc(var(--tile-w) * -0.95)",
 		borderRadius: "50%",
-		border: "2px solid var(--state-correct)",
-		animation: "oz-ring var(--dur-bloom) var(--ease-settle) both",
 		pointerEvents: "none"
 	};
+	var RINGS = [
+		{
+			at: 3,
+			color: "var(--state-correct)",
+			delay: "0ms"
+		},
+		{
+			at: 5,
+			color: "var(--gold-500)",
+			delay: "70ms"
+		},
+		{
+			at: 8,
+			color: "var(--gold-300)",
+			delay: "140ms"
+		}
+	];
 	var dustStyle = {
 		position: "absolute",
 		inset: "-14%",
@@ -518,7 +596,10 @@ var OzteriskDesignSystem = (function(exports, react) {
 	};
 	function AnswerSlots({ slotCount, selectedTiles = [], onReturn, disabled = false, state = "answering", streak = 0 }) {
 		const slots = Array.from({ length: slotCount }, (_, i) => selectedTiles[i] || null);
-		const showRing = state === "correct" && streak >= 3;
+		const correctNow = state === "correct";
+		const rings = correctNow ? RINGS.filter((r) => streak >= r.at) : [];
+		const goldRim = correctNow && streak >= 5;
+		const burst = correctNow && streak >= 8;
 		return /* @__PURE__ */ react.default.createElement("div", {
 			role: "group",
 			"aria-label": "Answer",
@@ -541,19 +622,41 @@ var OzteriskDesignSystem = (function(exports, react) {
 					position: "relative",
 					display: "inline-flex"
 				}
-			}, showRing ? /* @__PURE__ */ react.default.createElement("span", {
-				style: ringStyle,
-				"aria-hidden": "true"
-			}) : null, /* @__PURE__ */ react.default.createElement(Tile, {
+			}, rings.map((r) => /* @__PURE__ */ react.default.createElement("span", {
+				key: r.at,
+				"aria-hidden": "true",
+				style: {
+					...ringStyle,
+					border: `2px solid ${r.color}`,
+					animation: `oz-ring var(--dur-bloom) var(--ease-settle) ${r.delay} both`
+				}
+			})), /* @__PURE__ */ react.default.createElement(Tile, {
 				digit: tile.digit,
 				state: correct ? "reward" : "resting",
 				label: `Answer slot ${i + 1}: ${tile.digit}`,
 				onClick: disabled ? void 0 : () => onReturn && onReturn(tile.id),
-				style: correct ? { animation: "oz-bloom var(--dur-bloom) var(--ease-settle) both" } : incorrect ? {
+				style: correct ? {
+					animation: "oz-bloom var(--dur-bloom) var(--ease-settle) both",
+					...goldRim ? {
+						outline: "1px solid var(--accent)",
+						outlineOffset: "-1px"
+					} : null
+				} : incorrect ? {
 					animation: "oz-crack var(--dur-crack) var(--ease-fall) both",
 					boxShadow: "var(--shadow-tile-pressed)"
 				} : void 0
-			}), incorrect ? /* @__PURE__ */ react.default.createElement("span", {
+			}), burst ? CHIPS.map((c, ci) => /* @__PURE__ */ react.default.createElement("span", {
+				key: `chip-${ci}`,
+				"aria-hidden": "true",
+				style: {
+					...chipStyle,
+					"--dx": c.dx,
+					"--peak": c.peak,
+					"--land": c.land,
+					"--rot": c.rot,
+					animation: `oz-fan var(--dur-burst) var(--ease-fall) ${40 + ci * 12}ms both`
+				}
+			})) : null, incorrect ? /* @__PURE__ */ react.default.createElement("span", {
 				style: dustStyle,
 				"aria-hidden": "true"
 			}) : null);
@@ -597,7 +700,8 @@ var OzteriskDesignSystem = (function(exports, react) {
 				key: tile.id,
 				style: {
 					...socketStyle,
-					boxShadow: "var(--shadow-socket), var(--rim-socket-lifted)"
+					outline: "var(--outline-socket-lifted)",
+					outlineOffset: "var(--outline-socket-lifted-offset)"
 				},
 				"aria-hidden": "true"
 			});
@@ -670,18 +774,21 @@ var OzteriskDesignSystem = (function(exports, react) {
 			next: "Next Round",
 			...labels
 		};
-		return /* @__PURE__ */ react.default.createElement("div", { style: {
-			width: "100%",
-			maxWidth: "var(--arena-max-width)",
-			margin: "0 auto",
-			display: "flex",
-			flexDirection: "column",
-			background: "var(--surface-table)",
-			backgroundImage: "repeating-linear-gradient(48deg, rgba(255,255,255,.022) 0 2px, transparent 2px 4px)",
-			border: "1px solid var(--border-hairline)",
-			borderRadius: "var(--radius-xl)",
-			overflow: "hidden"
-		} }, /* @__PURE__ */ react.default.createElement("div", { style: {
+		return /* @__PURE__ */ react.default.createElement("div", {
+			lang: language,
+			style: {
+				width: "100%",
+				maxWidth: "var(--arena-max-width)",
+				margin: "0 auto",
+				display: "flex",
+				flexDirection: "column",
+				background: "var(--surface-table)",
+				backgroundImage: "repeating-linear-gradient(48deg, rgba(255,255,255,.022) 0 2px, transparent 2px 4px)",
+				border: "1px solid var(--border-hairline)",
+				borderRadius: "var(--radius-xl)",
+				overflow: "hidden"
+			}
+		}, /* @__PURE__ */ react.default.createElement("div", { style: {
 			display: "flex",
 			alignItems: "center",
 			justifyContent: "space-between",
@@ -780,15 +887,18 @@ var OzteriskDesignSystem = (function(exports, react) {
 	* The only ceremony in the game.
 	*/
 	function TitleScreen({ onStart, summary, language, onLanguageChange, labels = { start: "Start Run" }, rules = RULES }) {
-		return /* @__PURE__ */ react.default.createElement("div", { style: {
-			position: "relative",
-			display: "flex",
-			flexDirection: "column",
-			alignItems: "center",
-			gap: "var(--space-8)",
-			padding: "var(--space-14) var(--space-8)",
-			textAlign: "center"
-		} }, /* @__PURE__ */ react.default.createElement("div", { style: {
+		return /* @__PURE__ */ react.default.createElement("div", {
+			lang: language,
+			style: {
+				position: "relative",
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+				gap: "var(--space-8)",
+				padding: "var(--space-14) var(--space-8)",
+				textAlign: "center"
+			}
+		}, /* @__PURE__ */ react.default.createElement("div", { style: {
 			position: "absolute",
 			top: "var(--space-6)",
 			right: "var(--space-6)"

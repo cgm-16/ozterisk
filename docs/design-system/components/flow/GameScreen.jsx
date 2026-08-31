@@ -38,6 +38,10 @@ export function GameScreen({
 
   return (
     <div
+      // Carries the locale for the :lang(ko) typography override — Hangul runs
+      // untracked and one pixel up. Without this the ko locale silently gets
+      // the Latin mono rule.
+      lang={language}
       style={{
         width: "100%",
         maxWidth: "var(--arena-max-width)",

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { margin: 0; background: var(--felt-900); }
+    a { color: var(--accent); }
+    a:hover { color: var(--gold-300); }
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:var(--felt-900);background-image:radial-gradient(ellipse 900px 500px at 16% -8%, rgba(201,165,74,.09), transparent 70%);padding:44px 48px 64px;display:flex;flex-direction:column;gap:30px">
+
+  <header style="display:flex;flex-direction:column;gap:10px;max-width:74ch">
+    <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--accent)">Motion proof · inferred only</span>
+    <h1 style="margin:0;font:var(--weight-medium) 32px/1.15 var(--font-display);color:var(--text-primary)">Four moments that were written, not drawn</h1>
+    <p style="margin:0;font:var(--weight-regular) var(--size-body-sm)/1.6 var(--font-ui);color:var(--text-body);text-wrap:pretty">Every other animation in the system comes from a reviewed storyboard frame. These four were constructed from a locked decision with no frame to check against, so they are the ones worth judging by eye. Each panel plays the choice beside the alternative it beat.</p>
+  </header>
+
+  <div style="display:flex;gap:var(--space-4);align-items:center">
+    <button type="button" onClick="{{ replay }}" style="min-height:var(--target-min);padding:0 var(--space-8);border:none;border-radius:var(--radius-md);font:var(--weight-bold) var(--size-label)/var(--leading-tight) var(--font-ui);letter-spacing:var(--track-label);text-transform:uppercase;background:var(--surface-raised);color:var(--text-primary);box-shadow:0 4px 0 #0e2a21;cursor:pointer">Replay all</button>
+    <label style="display:flex;align-items:center;gap:var(--space-2);font:var(--weight-medium) var(--size-label)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-meta);cursor:pointer">
+      <input type="checkbox" checked="{{ loop }}" onChange="{{ toggleLoop }}" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
+      Loop
+    </label>
+  </div>
+
+  <section style="display:flex;flex-direction:column;gap:var(--space-6);padding:26px 28px 30px;border-radius:var(--radius-lg);background:var(--felt-700);background-image:repeating-linear-gradient(48deg,rgba(255,255,255,.022) 0 2px,transparent 2px 4px);border:1px solid var(--border-hairline)">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:baseline;gap:var(--space-3)">
+        <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:4px 7px;border-radius:var(--radius-sm);background:var(--accent);color:var(--felt-900)">9f</span>
+        <h2 style="margin:0;font:var(--weight-medium) 21px/1.2 var(--font-display);color:var(--text-primary)">How long does a miss take?</h2>
+      </div>
+      <p style="margin:0;font:var(--weight-regular) var(--size-body-sm)/1.55 var(--font-ui);color:var(--text-body);max-width:70ch">The storyboard locked the shape — shake, fracture, dust — and no duration. Left matches the bloom, so a hit and a miss cost the same time. Right is slower, sharing a tempo with the streak break.</p>
+    </div>
+    <sc-if value="{{ mounted }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-wrap:wrap;gap:44px">
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font:var(--weight-medium) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-meta)">420ms — matched to the bloom · rejected</span>
+          <div style="display:flex;gap:var(--space-3)">
+            <span style="position:relative;display:inline-flex">
+              <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile-pressed);animation:oz-crack 420ms var(--ease-fall) both">9</span>
+              <span aria-hidden="true" style="position:absolute;inset:-14%;border-radius:var(--radius-md);background:radial-gradient(circle at 50% 55%, rgba(240,231,214,.5), transparent 68%);animation:oz-dust 420ms var(--ease-fall) both;pointer-events:none"></span>
+            </span>
+            <span style="position:relative;display:inline-flex">
+              <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile-pressed);animation:oz-crack 420ms var(--ease-fall) both">8</span>
+              <span aria-hidden="true" style="position:absolute;inset:-14%;border-radius:var(--radius-md);background:radial-gradient(circle at 50% 55%, rgba(240,231,214,.5), transparent 68%);animation:oz-dust 420ms var(--ease-fall) both;pointer-events:none"></span>
+            </span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font:var(--weight-medium) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--accent)">--dur-crack · chosen</span>
+          <div style="display:flex;gap:var(--space-3)">
+            <span style="position:relative;display:inline-flex">
+              <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile-pressed);animation:oz-crack var(--dur-crack) var(--ease-fall) both">9</span>
+              <span aria-hidden="true" style="position:absolute;inset:-14%;border-radius:var(--radius-md);background:radial-gradient(circle at 50% 55%, rgba(240,231,214,.5), transparent 68%);animation:oz-dust var(--dur-crack) var(--ease-fall) both;pointer-events:none"></span>
+            </span>
+            <span style="position:relative;display:inline-flex">
+              <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile-pressed);animation:oz-crack var(--dur-crack) var(--ease-fall) both">8</span>
+              <span aria-hidden="true" style="position:absolute;inset:-14%;border-radius:var(--radius-md);background:radial-gradient(circle at 50% 55%, rgba(240,231,214,.5), transparent 68%);animation:oz-dust var(--dur-crack) var(--ease-fall) both;pointer-events:none"></span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.6 var(--font-mono);color:var(--text-meta);max-width:72ch">Slower is physics, not sympathy — dust settles at its own rate. If the app already has a miss duration, the app wins: this was never drawn.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:var(--space-6);padding:26px 28px 30px;border-radius:var(--radius-lg);background:var(--felt-700);background-image:repeating-linear-gradient(48deg,rgba(255,255,255,.022) 0 2px,transparent 2px 4px);border:1px solid var(--border-hairline)">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:baseline;gap:var(--space-3)">
+        <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:4px 7px;border-radius:var(--radius-sm);background:var(--accent);color:var(--felt-900)">9i</span>
+        <h2 style="margin:0;font:var(--weight-medium) 21px/1.2 var(--font-display);color:var(--text-primary)">Does the halo expire with the fire, or on its own?</h2>
+      </div>
+      <p style="margin:0;font:var(--weight-regular) var(--size-body-sm)/1.55 var(--font-ui);color:var(--text-body);max-width:70ch">The spec had one clause: halo for the first two rounds. Splitting them makes the fire permanent — it says which sockets changed, which matters most late, when the rack is sparse — and leaves only the halo to expire.</p>
+    </div>
+    <sc-if value="{{ mounted }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-wrap:wrap;gap:44px">
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font:var(--weight-medium) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--accent)">Rounds 1–2 · fire + halo</span>
+          <div style="display:flex;gap:var(--space-3)">
+            <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile), var(--glow-reward);outline:1px solid var(--accent);outline-offset:-1px;animation:oz-fire var(--dur-reward) var(--ease-snap) both">3</span>
+            <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile), var(--glow-reward);outline:1px solid var(--accent);outline-offset:-1px;animation:oz-fire var(--dur-reward) var(--ease-snap) both">6</span>
+            <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile), var(--glow-reward);outline:1px solid var(--accent);outline-offset:-1px;animation:oz-fire var(--dur-reward) var(--ease-snap) both">7</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font:var(--weight-medium) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--accent)">Round 3+ · fire alone · shipped</span>
+          <div style="display:flex;gap:var(--space-3)">
+            <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile);animation:oz-fire var(--dur-reward) var(--ease-snap) both">3</span>
+            <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile);animation:oz-fire var(--dur-reward) var(--ease-snap) both">6</span>
+            <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile);animation:oz-fire var(--dur-reward) var(--ease-snap) both">7</span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.6 var(--font-mono);color:var(--text-meta);max-width:72ch">Watch the right-hand group specifically: with no gold, do three simultaneous arrivals still read as one event? If not, the fix is a single gold frame inside oz-fire — not the persistent halo back.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:var(--space-6);padding:26px 28px 30px;border-radius:var(--radius-lg);background:var(--felt-700);background-image:repeating-linear-gradient(48deg,rgba(255,255,255,.022) 0 2px,transparent 2px 4px);border:1px solid var(--border-hairline)">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:baseline;gap:var(--space-3)">
+        <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:4px 7px;border-radius:var(--radius-sm);background:var(--state-discard);color:var(--ink-000)">7a</span>
+        <h2 style="margin:0;font:var(--weight-medium) 21px/1.2 var(--font-display);color:var(--text-primary)">Is the ring the floor, or the first rung?</h2>
+      </div>
+      <p style="margin:0;font:var(--weight-regular) var(--size-body-sm)/1.55 var(--font-ui);color:var(--text-body);max-width:70ch">The only genuine contradiction in the locked set. The 2a frame draws the jade ring on the very first correct answer; the streak ladder says tier 1 begins at 3. Both were signed off, so this needs a ruling rather than a diff.</p>
+    </div>
+    <sc-if value="{{ mounted }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-wrap:wrap;gap:44px">
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font:var(--weight-medium) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--accent)">Streak 2 · bloom only · shipped</span>
+          <div style="display:flex;gap:var(--space-3)">
+            <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile);animation:oz-bloom var(--dur-bloom) var(--ease-settle) both">1</span>
+            <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile);animation:oz-bloom var(--dur-bloom) var(--ease-settle) both">8</span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font:var(--weight-medium) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--accent)">Streak 3 · bloom + ring</span>
+          <div style="display:flex;gap:var(--space-3)">
+            <span style="position:relative;display:inline-flex">
+              <span aria-hidden="true" style="position:absolute;left:50%;top:50%;width:calc(var(--tile-w) * 1.9);height:calc(var(--tile-w) * 1.9);margin-left:calc(var(--tile-w) * -0.95);margin-top:calc(var(--tile-w) * -0.95);border-radius:50%;border:2px solid var(--state-correct);animation:oz-ring var(--dur-bloom) var(--ease-settle) both;pointer-events:none"></span>
+              <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile);animation:oz-bloom var(--dur-bloom) var(--ease-settle) both">1</span>
+            </span>
+            <span style="position:relative;display:inline-flex">
+              <span aria-hidden="true" style="position:absolute;left:50%;top:50%;width:calc(var(--tile-w) * 1.9);height:calc(var(--tile-w) * 1.9);margin-left:calc(var(--tile-w) * -0.95);margin-top:calc(var(--tile-w) * -0.95);border-radius:50%;border:2px solid var(--state-correct);animation:oz-ring var(--dur-bloom) var(--ease-settle) both;pointer-events:none"></span>
+              <span style="width:var(--tile-w);height:var(--tile-h);border-radius:var(--radius-md);background:var(--surface-tile);color:var(--text-on-tile);font:var(--weight-semibold) var(--size-tile)/1 var(--font-numeral);text-shadow:0 1px 0 rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-tile);animation:oz-bloom var(--dur-bloom) var(--ease-settle) both">8</span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.6 var(--font-mono);color:var(--text-meta);max-width:72ch">Left is what the first two correct answers of every run look like today. If that reads as too little for a hit, the frame was right and the ladder needs renumbering to two rungs at 5 and 8.</p>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:var(--space-6);padding:26px 28px 30px;border-radius:var(--radius-lg);background:var(--felt-700);background-image:repeating-linear-gradient(48deg,rgba(255,255,255,.022) 0 2px,transparent 2px 4px);border:1px solid var(--border-hairline)">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="display:flex;align-items:baseline;gap:var(--space-3)">
+        <span style="font:var(--weight-bold) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);padding:4px 7px;border-radius:var(--radius-sm);background:var(--accent);color:var(--felt-900)">11d</span>
+        <h2 style="margin:0;font:var(--weight-medium) 21px/1.2 var(--font-display);color:var(--text-primary)">Should becoming available be a visible event?</h2>
+      </div>
+      <p style="margin:0;font:var(--weight-regular) var(--size-body-sm)/1.55 var(--font-ui);color:var(--text-body);max-width:70ch">No frame for this one at all. It follows from a rule rather than a drawing: if disabled means flat against the felt, then enabling has to restore the height — and a restoration you can see is a restoration you can act on.</p>
+    </div>
+    <sc-if value="{{ mounted }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-wrap:wrap;gap:44px;align-items:flex-end">
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font:var(--weight-medium) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-meta)">Appears · no rise · rejected</span>
+          <sc-if value="{{ btnReady }}" hint-placeholder-val="{{ true }}">
+            <span style="min-height:var(--target-min);padding:0 var(--space-8);border-radius:var(--radius-md);font:var(--weight-bold) var(--size-label)/var(--leading-tight) var(--font-ui);letter-spacing:var(--track-label);text-transform:uppercase;background:var(--state-incorrect);color:var(--ink-000);box-shadow:0 4px 0 #7d2d1f;display:inline-flex;align-items:center">Submit</span>
+          </sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font:var(--weight-medium) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--accent)">oz-rise-ready · chosen · shipped</span>
+          <sc-if value="{{ btnReady }}" hint-placeholder-val="{{ true }}">
+            <span style="min-height:var(--target-min);padding:0 var(--space-8);border-radius:var(--radius-md);font:var(--weight-bold) var(--size-label)/var(--leading-tight) var(--font-ui);letter-spacing:var(--track-label);text-transform:uppercase;background:var(--state-incorrect);color:var(--ink-000);box-shadow:0 4px 0 #7d2d1f;display:inline-flex;align-items:center;animation:oz-rise-ready var(--dur-round) var(--ease-snap) both">Submit</span>
+          </sc-if>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-3)">
+          <span style="font:var(--weight-medium) var(--size-micro)/1 var(--font-mono);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--text-meta)">Before · disabled, flat</span>
+          <span style="min-height:var(--target-min);padding:0 var(--space-8);border-radius:var(--radius-md);font:var(--weight-bold) var(--size-label)/var(--leading-tight) var(--font-ui);letter-spacing:var(--track-label);text-transform:uppercase;background:transparent;color:var(--text-disabled);box-shadow:none;outline:1px solid var(--border-hairline);display:inline-flex;align-items:center">Submit</span>
+        </div>
+      </div>
+    </sc-if>
+    <p style="margin:0;font:var(--weight-regular) var(--size-micro)/1.6 var(--font-mono);color:var(--text-meta);max-width:72ch">Both live buttons appear part-way through the cycle, as they would when the last slot fills. Cheapest of the four to drop if the app disagrees — nothing else depends on it.</p>
+  </section>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mounted: true, btnReady: false, loop: true };
+
+  componentDidMount() {
+    this.replay();
+    this.startLoop();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.iv);
+    clearTimeout(this.t1);
+    clearTimeout(this.t2);
+  }
+
+  startLoop() {
+    clearInterval(this.iv);
+    if (this.state.loop) this.iv = setInterval(() => this.replay(), 3000);
+  }
+
+  // Unmounting the panels for a frame is what restarts the keyframes — the same
+  // reason the real EquationBoard is keyed on its operands.
+  replay = () => {
+    clearTimeout(this.t1);
+    clearTimeout(this.t2);
+    this.setState({ mounted: false, btnReady: false });
+    this.t1 = setTimeout(() => this.setState({ mounted: true }), 60);
+    // 11d only reads if the button was absent first, so it lands late in the cycle.
+    this.t2 = setTimeout(() => this.setState({ btnReady: true }), 1000);
+  };
+
+  toggleLoop = () => {
+    this.setState(
+      (s) => ({ loop: !s.loop }),
+      () => this.startLoop()
+    );
+  };
+
+  renderVals() {
+    return {
+      mounted: this.state.mounted,
+      btnReady: this.state.btnReady,
+      loop: this.state.loop,
+      replay: this.replay,
+      toggleLoop: this.toggleLoop,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

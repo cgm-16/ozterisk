@@ -83,6 +83,11 @@ function canAttempt(inventory, equation) {
 
 export function App() {
   const [language, setLanguage] = React.useState("en");
+  // The Hangul tuning is a token override on :lang(ko), so the locale has to
+  // reach the DOM. Copy alone switching is not enough.
+  React.useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
   const t = messages[language];
   const [state, setState] = React.useState(initialState);
 

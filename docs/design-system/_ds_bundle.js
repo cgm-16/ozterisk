@@ -232,7 +232,7 @@ var OzteriskDesignSystem = (function(exports, react) {
 			},
 			onFocus: (e) => {
 				if (disabled) return;
-				const ring = variant === "primary" ? "var(--ring-focus-onDanger)" : "var(--ring-focus)";
+				const ring = "var(--ring-focus)";
 				e.currentTarget.style.boxShadow = v.edge === "none" ? ring : `${v.edge}, ${ring}`;
 			},
 			onBlur: (e) => {

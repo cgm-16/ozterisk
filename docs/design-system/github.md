@@ -9,7 +9,7 @@ date: 2026-08-31T00:00:00Z
 ### Updated in this project
 
 - Six round-frequency animations plus the whole streak ladder implemented in `tokens/keyframes.css` — including `oz-fan`, the streak-8 ceramic burst (`--dur-burst` 720ms).
-- Focus is an inset bezel (`--ring-focus`, `--ring-focus-onDanger`), not an offset halo; `:focus-visible` offset is now `-2px`.
+- Focus is a two-tone inset bezel (`--ring-focus`: `--gold-300` over a `--clay-900` inner line), not an offset halo; `:focus-visible` offset is now `-2px`.
 - Korean is tuned, not substituted: `:lang(ko)` drops mono tracking and raises interface sizes 1px. Requires `lang` on the app root.
 - Rack no longer reflows on tile select — a committed tile keeps its socket (`liftedIds`), marked with a dashed gold rim (`--outline-socket-lifted`).
 - Capacity meter lost its near-capacity tint: vermilion now means only "a tile is leaving"; excess pips render past the rail.

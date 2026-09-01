@@ -20,7 +20,7 @@ a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--accent-hover); }
 
 /* Fallback for anything without its own elevation. Objects that carry a shadow
-   (tiles, buttons) compose --ring-focus / --ring-focus-onDanger instead, so the
+   (tiles, buttons) compose --ring-focus after their own shadow instead, so the
    bezel follows their radius. */
 :focus-visible {
   outline: 2px solid var(--focus-ring);

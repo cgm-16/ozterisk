@@ -318,13 +318,17 @@ offset.
   system's word for "something belongs here and does not yet" on the empty
   answer slot, and the lifted socket is saying exactly that. It is also the one
   place a second dashed border is permitted.
-- **Focus is an inset bezel, not a halo.** `--ring-focus`
-  (`inset 0 0 0 2px --gold-300`) composed after the object's own edge, so the
-  ring lives inside the object and follows its radius — a gold edge fired into
-  the tile rather than a rectangle floating around it. On vermilion actions use
-  `--ring-focus-onDanger`, which adds a felt-dark inner line so gold never sits
-  directly against red. Elements with no elevation of their own fall back to the
-  global `:focus-visible` outline at `-2px` offset.
+- **Focus is an inset bezel, not a halo.** `--ring-focus` composed after the
+  object's own edge, so the ring lives inside the object and follows its radius —
+  a gold edge fired into the tile rather than a rectangle floating around it.
+  It carries two tones, `2px --gold-300` over a `1px --clay-900` inner line,
+  because the palette spans both ends: gold clears felt and socket but not the
+  ceramic face or the gold toggle segment, and `--clay-900` clears exactly the
+  surfaces gold cannot. Every surface is cleared by one line or the other, as
+  §1.12 requires. The inner line is the felt showing through the bezel, not a
+  separator — it is within `1.02:1` of `--felt-700`. Elements with no elevation
+  of their own fall back to the global `:focus-visible` outline at `-2px`
+  offset.
 
 ---
 

@@ -67,9 +67,9 @@ export function ActionButton({ children, variant = "primary", disabled = false, 
       }}
       onFocus={(e) => {
         if (disabled) return;
-        // The bezel sits inside the object; on vermilion it needs the felt-dark
-        // inner line so gold never touches red directly.
-        const ring = variant === "primary" ? "var(--ring-focus-onDanger)" : "var(--ring-focus)";
+        // The bezel sits inside the object and carries its own dark inner line,
+        // so vermilion needs no variant: gold never touches red directly.
+        const ring = "var(--ring-focus)";
         e.currentTarget.style.boxShadow = v.edge === "none" ? ring : `${v.edge}, ${ring}`;
       }}
       onBlur={(e) => {

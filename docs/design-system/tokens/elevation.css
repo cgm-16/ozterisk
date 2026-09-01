@@ -22,10 +22,21 @@
      follows its radius, so focus reads as a gold edge fired into the tile.
      Compose it after the object's own shadow —
      box-shadow: var(--shadow-tile), var(--ring-focus).
-     On vermilion surfaces use --ring-focus-onDanger: the extra felt-dark line
-     keeps gold off red with something between them. */
-  --ring-focus: inset 0 0 0 2px var(--focus-ring);
-  --ring-focus-onDanger: inset 0 0 0 2px var(--focus-ring), inset 0 0 0 3px rgb(11 33 27 / 55%);
+
+     Two tones, because the palette spans both ends and no single tone clears it.
+     Gold reaches 3:1 on felt (8.69), socket (11.56) and vermilion (3.55) but not
+     on the ceramic face (1.10 at --clay-200) or the gold toggle segment (1.51).
+     --clay-900 is the mirror image — 9.37 on ceramic, 5.68 on the segment, 1.02
+     on felt — so carrying both means every surface is cleared by whichever line
+     suits it, which is what ui-i18n.md §1.12 asks for. The two tones read
+     against each other at 8.56, so the bezel never blurs into a single band.
+
+     The inner line is not a separator laid onto the tile: --clay-900 and
+     --felt-700 differ by two values per channel, so it reads as the felt showing
+     through the bezel — the same dark the tile's own socket is cut from. That is
+     also why vermilion needs no variant of its own: the gold line clears red at
+     3.55, and the dark line is what sits between them. */
+  --ring-focus: inset 0 0 0 2px var(--focus-ring), inset 0 0 0 3px var(--clay-900);
 
   --shadow-panel: 0 24px 60px rgb(0 0 0 / 45%);
   --glow-reward: 0 0 12px rgba(201, 165, 74, 0.6);

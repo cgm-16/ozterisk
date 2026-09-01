@@ -260,9 +260,9 @@ redundancy, not indecision.
 **Hover raises; it never changes opacity.** Felt `--felt-700` → `--felt-600`, or
 a tile lifts `--lift-offset`.
 
-**Focus is a 2px `--gold-300` ring at 2px offset**, deliberately distinct from
-every semantic colour, so focus is never confused with correct, incorrect, or
-marked.
+**Focus is a two-tone inset bezel**, `--gold-300` over a `--clay-900` inner
+line, deliberately distinct from every semantic colour, so focus is never
+confused with correct, incorrect, or marked.
 
 ### Game logic the design must not misrepresent
 
@@ -375,14 +375,31 @@ loan. *Rejected:* **5g**, a gold footprint bar on the socket floor — the best
 object story of the four, but it adds an element to a shape that was
 deliberately empty. `--rim-socket-lifted` is removed from the system.
 
-**Focus — inset bezel (5j).** `--ring-focus` moves the ring inside the object,
-following its radius: focus is a gold edge fired into the tile, not a rectangle
-floating around it. Its known weakness — inset gold has less room on the
-vermilion action — is handled by `--ring-focus-onDanger`, which adds a
-felt-dark inner line so gold never touches red. *Rejected:* the shipped 2px
-offset ring (5h), gold directly against vermilion; **5i** two-tone with a dark
-separator, which read as engineering rather than material; **5k** lacquer double
-rule, too quiet to find on a busy rack.
+**Focus — inset bezel (5j), two-tone.** `--ring-focus` moves the ring inside
+the object, following its radius: focus is a gold edge fired into the tile, not
+a rectangle floating around it. It carries a `--clay-900` inner line under the
+gold. *Rejected:* the shipped 2px offset ring (5h), gold directly against
+vermilion; **5k** lacquer double rule, too quiet to find on a busy rack.
+
+*Amended after measurement.* The bezel first shipped single-tone, which changed
+the ring's geometry but not its tone: `--gold-300` reads `1.10:1` against
+`--clay-200` and `1.51:1` against the gold toggle segment, so an inset gold ring
+puts the same failing gold *on* the ceramic instead of beside it. Every digit
+tile is a `<button>`, so that is the app's most-focused surface. Darkening the
+ring instead fails the mirror image — `--clay-900` reads `1.02:1` on felt — so
+the palette admits no single tone. Two tones is not a compromise here; it is the
+only arrangement that satisfies §1.12.
+
+This overlaps the rejected **5i**, two-tone with a dark separator, judged to
+read as engineering rather than material. That judgement stands against a
+separator — a third element introduced to hold two others apart. This is not
+one: `--clay-900` sits within `1.02:1` of `--felt-700`, so the inner line reads
+as the felt showing through the bezel, the same dark the tile's socket is cut
+from. The system already shipped the shape on vermilion; this generalises it and
+makes the line opaque. `--ring-focus-onDanger` is therefore removed — with the
+base ring carrying a dark line, the danger variant was the same idea with a
+weaker `55%` inner line, measuring `2.05:1` against vermilion where the opaque
+line measures `2.41:1`.
 
 **Korean — Hangul-tuned (5m).** Tracking off and one pixel up, as a token
 override on `:lang(ko)`. Applying the Latin mono rule unchanged (5l) pulled

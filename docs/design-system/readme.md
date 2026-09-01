@@ -1,5 +1,9 @@
 # ozterisk — Design System
 
+> **Contract precedence.** `docs/spec/ui-i18n.md` §1.12 is the contract; this
+> directory is the normative source for token values, material rules, and the
+> motion inventory it refers to. Where the two disagree, §1.12 wins.
+
 **Start here, then read `decisions.md`.** This file states the rules;
 `decisions.md` states why they exist and what was rejected to reach them —
 including the refs (`9f`, `10b`, `2a`…) cited throughout this document.

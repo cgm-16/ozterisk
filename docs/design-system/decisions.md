@@ -25,10 +25,10 @@ where a collision with existing app behaviour is most likely.
 | Ref | Moment | Provenance | Status |
 |---|---|---|---|
 | `2a` | Correct answer: answer tiles rise 14px and settle | storyboard | **built** — `oz-bloom` |
-| `2d` | Streak tier 3: six-chip burst | storyboard | specified |
+| `2d` | Streak tier 3: six-chip burst | storyboard | **built** — `oz-fan` |
 | `7a` | Streak tier 1: one jade ring | storyboard (frame); **gating inferred** | **built** — `oz-ring`, gated at streak 3 |
-| `7b` | Streak tier 2: second gold ring + gold rim on answer tiles | storyboard | specified |
-| `7c` | Streak tier 3: third ring, brightest rim | storyboard | specified |
+| `7b` | Streak tier 2: second gold ring + gold rim on answer tiles | storyboard | **built** — `oz-ring` at 70ms |
+| `7c` | Streak tier 3: third ring, brightest rim | storyboard | **built** — `oz-ring` at 140ms |
 | `8a` | Overflow: the eleventh tile rim-rejects, perches on the rail | storyboard | specified |
 | `8c` | Discard confirm: the marked tile tips off the end | storyboard | specified |
 | `9b` | Tile to slot: flat slide, 130ms | storyboard | **built** — transition, not a keyframe |
@@ -334,9 +334,16 @@ in `--gold-500`. Rendered as text, never as an image.
   currently load from Google Fonts. Self-hosting needs licence review.
 - **Logo.** None exists. If the brand ever needs a mark that isn't type, it is a
   new design problem, not a derivation of this system.
-- **Seven motion refs specified but not built** — `7b`, `7c`, `2d`, `8a`,
-  `11a`/`8c`, `10i`, `11C`. All have durations and easings assigned in
-  `tokens/motion.css`; none have keyframes.
+- **Four motion refs specified but not built** — `8a`, `11a`/`8c`, `10i`,
+  `11C`. (`7b`, `7c` and `2d` are wired in `components/game/AnswerSlots.jsx`.)
+  None of the four has a duration or easing in `tokens/motion.css` either, so
+  the milestone that implements each one assigns both.
+  **Provenance:** none of the four is an original design. `ozterisk
+  Storyboard.dc.html` already carries their shapes as `sb-*` keyframes —
+  `sb-rim` (8a), `sb-drop` (11a), `sb-slide` (8c), `sb-sweep` (10i),
+  `sb-settle` and `sb-stamp` (11C). Port those rather than authoring new ones.
+  The canvas frames hold across a 2.6s infinite loop, so each must be
+  renormalised to 0–100% of its useful range when retimed to a one-shot.
 - **Verification against the shipped app.** The overflow panel is where the
   storyboard and the codebase disagree most; the redesign wins on visuals, but
   the *states* should be checked against `src/components/OverflowControls/`.

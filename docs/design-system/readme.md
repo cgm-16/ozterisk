@@ -336,8 +336,9 @@ offset.
 
 **ozterisk has no icon set, and that is deliberate.** The source codebase ships
 zero icon files — no icon font, no sprite, no SVG directory. Its only asset is
-`public/favicon.svg`, which draws the old product name `1-0` as text in a
-rounded square (copied to `assets/favicon.svg`, unchanged).
+`public/favicon.svg`, which draws the ✳ mark — eight gold spokes radiating
+from a point, in `--gold-500` on a `--felt-700` rounded square (copied to
+`assets/favicon.svg`, unchanged).
 
 The system's rules:
 

@@ -343,8 +343,17 @@ CSS custom properties.
 
 ## Open
 
-- **Licensed font files.** EB Garamond, IBM Plex Mono and Zen Kaku Gothic New
-  currently load from Google Fonts. Self-hosting needs licence review.
+- **Font redistribution notice.** M5.5b self-hosted EB Garamond, IBM Plex Mono,
+  Zen Kaku Gothic New and Noto Sans KR via their `@fontsource/*` packages.
+  Licence checked in `package-lock.json`: all four resolve to OFL-1.1
+  (`@fontsource/eb-garamond`, `@fontsource/ibm-plex-mono`,
+  `@fontsource/zen-kaku-gothic-new`, `@fontsource/noto-sans-kr`, each
+  `5.3.0`), which permits self-hosting, bundling, and redistribution. Not
+  verified: OFL §2 requires the copyright notice and licence text to
+  accompany redistributed copies of the fonts. Each `@fontsource` package
+  ships a `LICENSE` file, but the build copies only the font binaries
+  (`.woff2`/`.woff`) into `dist/assets/` — no licence text ships alongside
+  them. Whether that satisfies §2 is still open.
 - **Logo.** None exists. If the brand ever needs a mark that isn't type, it is a
   new design problem, not a derivation of this system.
 - **Four motion refs specified but not built** — `8a`, `11a`/`8c`, `10i`,

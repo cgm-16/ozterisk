@@ -7,22 +7,22 @@
 
 .tile {
   position: relative;
-  min-width: var(--tile-size);
-  min-height: var(--tile-size);
+  min-width: var(--target-min);
+  min-height: var(--target-min);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: var(--border-hairline) solid var(--color-border);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--surface-tile);
   box-shadow: var(--shadow-tile);
-  color: var(--color-text);
+  color: var(--text-on-tile);
   font-size: 1.25rem;
   cursor: pointer;
   transition:
-    border-color var(--duration-base) var(--ease-standard),
-    transform var(--duration-fast) var(--ease-standard);
+    border-color var(--dur-state) var(--ease-standard),
+    transform var(--dur-press) var(--ease-standard);
 }
 
 .tile:disabled {
@@ -35,7 +35,7 @@
 }
 
 .tile[aria-pressed="true"] {
-  border-color: var(--color-discard);
+  border-color: var(--state-discard);
 }
 
 .newBadge,
@@ -46,9 +46,9 @@
 }
 
 .newBadge {
-  color: var(--color-reward);
+  color: var(--state-reward);
 }
 
 .discardBadge {
-  color: var(--color-discard);
+  color: var(--state-discard);
 }

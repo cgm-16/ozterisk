@@ -6,27 +6,27 @@
 }
 
 .slot {
-  min-width: var(--tile-size);
-  min-height: var(--tile-size);
+  min-width: var(--target-min);
+  min-height: var(--target-min);
   display: flex;
   align-items: center;
   justify-content: center;
   /* A dashed, heavier border keeps slots visually distinct from the solid
-     1px inventory tiles at every fill state (§1.12). Uses --color-text-muted
-     rather than --color-border: an empty slot sits on --color-canvas (no
+     1px inventory tiles at every fill state (§1.12). Uses --text-meta
+     rather than --border-hairline: an empty slot sits on --surface-socket (no
      fill contrast of its own), so the border is the only cue defining its
      shape and needs the higher-contrast token to stay legible (>=3:1). */
-  border: 2px dashed var(--color-text-muted);
+  border: 2px dashed var(--text-meta);
   border-radius: var(--radius-md);
-  background: var(--color-canvas);
-  box-shadow: var(--shadow-inset);
-  color: var(--color-text);
+  background: var(--surface-socket);
+  box-shadow: var(--shadow-socket);
+  color: var(--text-primary);
   font-size: 1.25rem;
   cursor: pointer;
   transition:
-    background-color var(--duration-base) var(--ease-standard),
-    border-color var(--duration-base) var(--ease-standard),
-    transform var(--duration-fast) var(--ease-standard);
+    background-color var(--dur-state) var(--ease-standard),
+    border-color var(--dur-state) var(--ease-standard),
+    transform var(--dur-press) var(--ease-standard);
 }
 
 /* A slot is only ever disabled because it holds no tile (see
@@ -34,7 +34,7 @@
    `disabled` prop is always false while this component renders), so
    :disabled reliably targets the empty state without any markup change. */
 .slot:not(:disabled) {
-  background: var(--color-surface);
+  background: var(--surface-panel);
 }
 
 .slot:disabled {
@@ -48,13 +48,13 @@
    with a border/background shift rather than a "×" glyph, since ::before/
    ::after generated content can leak into the accessibility tree and this
    slot already carries a full aria-label (AnswerSlots.tsx:21-23). Background
-   shifts to --color-canvas, not --color-surface: the rest state above already
-   sets a filled slot's background to --color-surface, so --color-surface here
+   shifts to --surface-socket, not --surface-panel: the rest state above already
+   sets a filled slot's background to --surface-panel, so --surface-panel here
    would be a no-op and the shift would have no visible effect. */
 .slot:not(:disabled):hover,
 .slot:not(:disabled):focus-visible {
-  border-color: var(--color-accent);
-  background: var(--color-canvas);
+  border-color: var(--accent);
+  background: var(--surface-socket);
 }
 
 .slot:active:not(:disabled) {

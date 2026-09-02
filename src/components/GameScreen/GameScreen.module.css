@@ -18,15 +18,15 @@
 
 .action,
 .secondaryAction {
-  min-width: var(--tile-size);
-  min-height: var(--tile-size);
+  min-width: var(--target-min);
+  min-height: var(--target-min);
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition:
-    background-color var(--duration-base) var(--ease-standard),
-    transform var(--duration-fast) var(--ease-standard);
+    background-color var(--dur-state) var(--ease-standard),
+    transform var(--dur-press) var(--ease-standard);
 }
 
 .action:disabled,
@@ -42,17 +42,17 @@
 
 .action {
   border: none;
-  background: var(--color-accent);
-  color: var(--color-canvas);
+  background: var(--accent);
+  color: var(--text-on-tile);
 }
 
 /* Lower-emphasis sibling of .action: same footprint and press behavior, but
    an outlined, neutral-surface treatment so Clear reads as secondary to
    Submit's solid accent fill. */
 .secondaryAction {
-  border: var(--border-hairline) solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
+  border: 1px solid var(--border-hairline);
+  background: var(--surface-panel);
+  color: var(--text-primary);
 }
 
 @media (max-width: 40rem) {

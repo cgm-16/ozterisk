@@ -21,7 +21,7 @@
 .groupHeading {
   font-size: 0.875rem;
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--text-meta);
 }
 
 .list {
@@ -34,17 +34,17 @@
 
 .entryButton {
   width: 100%;
-  min-height: var(--tile-size);
+  min-height: var(--target-min);
   padding: var(--space-2) var(--space-3);
-  border: var(--border-hairline) solid var(--color-border);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  color: var(--color-text);
+  background: var(--surface-panel);
+  color: var(--text-primary);
   text-align: left;
   cursor: pointer;
   transition:
-    border-color var(--duration-base) var(--ease-standard),
-    transform var(--duration-fast) var(--ease-standard);
+    border-color var(--dur-state) var(--ease-standard),
+    transform var(--dur-press) var(--ease-standard);
 }
 
 .entryButton:active {
@@ -52,14 +52,14 @@
 }
 
 .entryButton[aria-pressed="true"] {
-  border-color: var(--color-accent);
+  border-color: var(--accent);
   font-weight: 600;
 }
 
 .stage {
   flex: 1;
   min-width: 0;
-  border-left: var(--border-hairline) solid var(--color-border);
+  border-left: 1px solid var(--border-hairline);
   padding-left: var(--space-6);
 }
 
@@ -78,7 +78,7 @@
 
   .stage {
     border-left: none;
-    border-top: var(--border-hairline) solid var(--color-border);
+    border-top: 1px solid var(--border-hairline);
     padding-left: 0;
     padding-top: var(--space-6);
   }

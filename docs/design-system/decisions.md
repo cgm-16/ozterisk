@@ -326,6 +326,19 @@ introduce an icon set and record it, not to smuggle one in.
 `ozterisk` in EB Garamond Medium, `--track-wordmark`, `--ink-000`, with the `✳`
 in `--gold-500`. Rendered as text, never as an image.
 
+**The favicon is the one surface where the ✳ is drawn rather than set.**
+`public/favicon.svg` builds the mark directly in SVG markup: eight gold spokes
+on a felt rounded square.
+*Why:* a favicon has to render at sizes as small as 16px before any web font
+is guaranteed to have loaded, on a machine that may not have the wordmark's
+font at all — a type treatment cannot survive that, so the glyph is drawn
+instead of set for this one surface. Geometry is locked: eight arms on a 45°
+rotation step, each spanning 24° (half-angle 12° at the centre vertex),
+leaving a 21° gap between arms so the spokes read as separate, not a fused
+star. `--gold-500` (`#c9a54a`) on `--felt-700` (`#14342a`), a rounded square;
+the hex values are inlined in the SVG because a file in `public/` cannot read
+CSS custom properties.
+
 ---
 
 ## Open

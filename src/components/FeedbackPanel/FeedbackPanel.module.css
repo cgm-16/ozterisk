@@ -44,6 +44,7 @@
   border: 1px solid var(--state-reward);
   border-radius: var(--radius-md);
   background: var(--surface-tile);
+  color: var(--text-on-tile);
   box-shadow: var(--shadow-tile);
 }
 

@@ -11,7 +11,7 @@ describe("formatShareText", () => {
     );
 
     expect(text).toBe(
-      "1-0 — Rounds: 12\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/",
+      "ozterisk — Rounds: 12\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/",
     );
 
     const lines = text.split("\n");
@@ -28,7 +28,7 @@ describe("formatShareText", () => {
     );
 
     expect(text).toBe(
-      "1-0 — 라운드: 12\n점수: 7\n최장 연속 정답: 4\n\n이 기록을 넘을 수 있나요?\nhttps://example.test/",
+      "ozterisk — 라운드: 12\n점수: 7\n최장 연속 정답: 4\n\n이 기록을 넘을 수 있나요?\nhttps://example.test/",
     );
 
     const lines = text.split("\n");
@@ -39,7 +39,7 @@ describe("formatShareText", () => {
 });
 
 describe("shareResult", () => {
-  const text = "1-0 — Rounds: 9\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
+  const text = "ozterisk — Rounds: 9\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
   const url = "https://example.test/";
 
   it("shares natively when available and never touches the clipboard", async () => {
@@ -88,7 +88,7 @@ describe("shareResult", () => {
 });
 
 describe("copyResult", () => {
-  const text = "1-0 — Rounds: 9\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
+  const text = "ozterisk — Rounds: 9\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
 
   it("resolves to copied when the clipboard write succeeds", async () => {
     const writeClipboard = vi.fn().mockResolvedValue(undefined);

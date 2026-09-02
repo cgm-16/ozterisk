@@ -42,5 +42,5 @@ date: 2026-08-31T00:00:00Z
 - The system's **structure** follows the repo; its **visual and motion language** follows the locked redesign. Where they disagree, the redesign wins.
 - `src/gallery/` (`states.tsx`) is the repo's own state gallery and is the closest analogue to `ui_kits/game/` — worth diffing when wiring the real components.
 - Not yet implemented, specified only: 8a rim reject, 11a/8c discard motion, 10i table sweep, 11C title entrance and share chop. (Streak tiers 7b/7c and the 2d burst are now wired in `components/game/AnswerSlots.jsx`.)
-- Every locked choice has a decision entry in `decisions.md`; the M5.5b section records the four most recent, with what was rejected. Read `readme.md` then `decisions.md` before touching tokens.
-- Open: licensed font files (currently Google Fonts), and no logo — the brand mark is a type treatment.
+- Every locked choice has a decision entry in `decisions.md`; the `## M5.5b` section records the judgement calls made this milestone, with what was rejected. Read `readme.md` then `decisions.md` before touching tokens.
+- Open: font redistribution notice (self-hosted families are OFL-1.1, but whether their licence text also needs to ship in `dist/assets/` per OFL §2 is unresolved), and no logo — the brand mark is a type treatment.

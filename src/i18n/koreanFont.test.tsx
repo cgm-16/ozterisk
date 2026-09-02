@@ -1,3 +1,4 @@
+import { StrictMode } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -125,9 +126,11 @@ describe("I18nProvider wired to the real Korean font loader", () => {
     );
 
     render(
-      <FreshI18nProvider initialLanguage="en">
-        <FreshLanguageToggle />
-      </FreshI18nProvider>,
+      <StrictMode>
+        <FreshI18nProvider initialLanguage="en">
+          <FreshLanguageToggle />
+        </FreshI18nProvider>
+      </StrictMode>,
     );
 
     const koreanButton = screen.getByRole("button", { name: "한국어" });
@@ -136,6 +139,29 @@ describe("I18nProvider wired to the real Korean font loader", () => {
     await userEvent.click(koreanButton);
     await userEvent.click(englishButton);
     await userEvent.click(koreanButton);
+
+    await waitFor(() => expect(cssImport).toHaveBeenCalledTimes(1));
+  });
+
+  // The test above mounts at initialLanguage="en", so StrictMode's doubled
+  // mount effect runs while language is still "en" and never calls the
+  // loader; every loadKoreanFont() call there comes from a later update
+  // effect, which StrictMode does not double-invoke. Mounting directly into
+  // Korean is what actually exercises the doubled mount effect this app
+  // hits in production, since I18nProvider is mounted inside StrictMode in
+  // both src/main.tsx and src/gallery/main.tsx.
+  it("fetches the Korean face exactly once when mounted directly into Korean under StrictMode", async () => {
+    const cssImport = vi.fn().mockResolvedValue({});
+    vi.doMock(KOREAN_FONT_SPECIFIER, cssImport);
+    const { I18nProvider: FreshI18nProvider } = await import("./I18nContext");
+
+    render(
+      <StrictMode>
+        <FreshI18nProvider initialLanguage="ko">
+          <div />
+        </FreshI18nProvider>
+      </StrictMode>,
+    );
 
     await waitFor(() => expect(cssImport).toHaveBeenCalledTimes(1));
   });

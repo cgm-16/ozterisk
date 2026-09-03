@@ -62,11 +62,23 @@ half.
 
 Measure what is drawn, not what is defined. A token can be correct and worn by
 nothing, and a step that reads the token definition cannot see that. Walk the
-tab order in a browser rather than listing the controls from memory; on each
-focused element read the focus style with `getComputedStyle`, identify the
-surface the indicator is actually drawn against — the control's own face for an
-inset ring, the ground behind it for an outset one — and compute the ratio
-against that surface. Report the control, the surface and the ratio for each.
+tab order in a browser rather than listing the controls from memory, and reach
+each control with `Tab`: a control focused by a click does not match
+`:focus-visible`, so a click-then-measure returns the same blank as a missing
+ring.
+
+**Read the ring from pixels, not from the DOM.** A computed background answers
+which element paints at a point, and the surface an indicator sits against is
+often painted by neither the control nor its ground — a `box-shadow` with no
+blur puts a hard band of colour outside the border box that `elementsFromPoint`
+reports as transparent, and the ratio then flatters the result by resolving to
+whatever lies further behind. Screenshot the control focused and unfocused, diff
+the two at the same coordinates to find the band the indicator actually occupies,
+and sample the unfocused image along the same band for what it is drawn against.
+Compute the ratio from those samples.
+
+Report the control, the band it occupies, what that band lands on per edge, and
+the ratio. Edges of one control can differ.
 
 - [ ] **Step 5: One animation resolves**
 

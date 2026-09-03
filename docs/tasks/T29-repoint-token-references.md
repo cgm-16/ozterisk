@@ -40,6 +40,13 @@ selectors, geometry, layout, or add rules. M5.5c–M5.5e own the appearance of
 these components; if a rule looks wrong after the substitution, that is their
 problem to solve and not yours to pre-empt.
 
+**Narrowed afterwards, for one site.** T33 added `color: var(--text-on-tile)`
+to `FeedbackPanel .reward` in `05edfbf`: this task had repointed that
+background to the ceramic gradient with no ink token beside it, leaving the
+digit at 1.07–1.25 against its own face. The pairing was granted there after
+the fact, not permitted here in advance, and the prohibition above stands for
+every other site.
+
 - [ ] **Step 1: Substitute the mechanical renames**
 
 Same value, new name — these are exact no-ops:

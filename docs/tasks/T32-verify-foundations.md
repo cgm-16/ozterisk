@@ -48,14 +48,25 @@ flattering one.
 
 - [ ] **Step 3: Korean renders in a Hangul-capable face**
 
-`document.fonts.check()` against a Hangul string, in a browser, after switching
-the locale to `ko`. jsdom cannot answer this.
+Not `document.fonts.check()`: it answers whether the text can be rendered at
+all, counting fallbacks, so it returns `true` with no Hangul face present.
+Measure rendered width instead. In a browser, render one Hangul string three
+ways — under the app's own `var(--font-ui)` stack, under an explicit
+`"Noto Sans KR"`, and under a family name that does not exist — and require the
+app's stack to match the explicit Noto width and to differ from the absent
+family's fallback width. Then require `Noto Sans KR 400` to enter
+`document.fonts` only after the locale switches to `ko`. jsdom answers neither
+half.
 
 - [ ] **Step 4: Focus indicator ≥ 3:1**
 
-The ratios are already computed from the committed token values and recorded in
-`docs/design-system/tokens/elevation.css`. Cite them; do not re-derive them.
-Confirm the shipped `--ring-focus` is the two-tone bezel.
+Measure what is drawn, not what is defined. A token can be correct and worn by
+nothing, and a step that reads the token definition cannot see that. Walk the
+tab order in a browser rather than listing the controls from memory; on each
+focused element read the focus style with `getComputedStyle`, identify the
+surface the indicator is actually drawn against — the control's own face for an
+inset ring, the ground behind it for an outset one — and compute the ratio
+against that surface. Report the control, the surface and the ratio for each.
 
 - [ ] **Step 5: One animation resolves**
 

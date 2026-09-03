@@ -47,7 +47,10 @@ export function I18nProvider({
   useEffect(() => {
     document.documentElement.lang = language;
     if (language === "ko") {
-      void loadKoreanFont();
+      // loadKoreanFont is injectable and its type promises nothing about
+      // rejection, so a rejecting loader is swallowed here rather than left
+      // to surface as an unhandled rejection.
+      void loadKoreanFont().catch(() => undefined);
     }
   }, [language, loadKoreanFont]);
 

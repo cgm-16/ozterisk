@@ -7,6 +7,14 @@ import { I18nProvider } from "./I18nContext";
 
 const KOREAN_FONT_SPECIFIER = "@fontsource/noto-sans-kr/korean-400.css";
 
+// Node reports unhandled rejections on `process`, and @types/node is not among
+// this project's tsconfig `types`, so the two methods used below are declared
+// here rather than by widening the app's global types.
+declare const process: {
+  on(event: "unhandledRejection", listener: () => void): void;
+  off(event: "unhandledRejection", listener: () => void): void;
+};
+
 describe("loadKoreanFont", () => {
   afterEach(() => {
     vi.doUnmock(KOREAN_FONT_SPECIFIER);
@@ -91,6 +99,35 @@ describe("I18nProvider Korean font loading", () => {
     await userEvent.click(screen.getByRole("button", { name: "한국어" }));
 
     expect(loadKoreanFont).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders without an unhandled rejection when the injected loader rejects", async () => {
+    const unhandledRejection = vi.fn();
+    process.on("unhandledRejection", unhandledRejection);
+    // A plain function, not vi.fn: the spy records settled results, which means
+    // it attaches its own handler to the promise it returns and no rejection
+    // passed through it can ever go unhandled. Counting calls by hand is what
+    // keeps this test able to fail.
+    let calls = 0;
+    const loadKoreanFont = () => {
+      calls += 1;
+      return Promise.reject(new Error("font fetch failed"));
+    };
+
+    render(
+      <I18nProvider initialLanguage="ko" loadKoreanFont={loadKoreanFont}>
+        <span>child</span>
+      </I18nProvider>,
+    );
+
+    // Node reports an unhandled rejection a macrotask after the microtask
+    // queue drains, so the listener has to outlive one turn to be conclusive.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    process.off("unhandledRejection", unhandledRejection);
+
+    expect(calls).toBe(1);
+    expect(unhandledRejection).not.toHaveBeenCalled();
+    expect(screen.getByText("child")).toBeInTheDocument();
   });
 
   it("does not call the injected loader again while the language stays Korean", async () => {

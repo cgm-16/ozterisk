@@ -67,18 +67,23 @@ each control with `Tab`: a control focused by a click does not match
 `:focus-visible`, so a click-then-measure returns the same blank as a missing
 ring.
 
-**Read the ring from pixels, not from the DOM.** A computed background answers
-which element paints at a point, and the surface an indicator sits against is
-often painted by neither the control nor its ground — a `box-shadow` with no
-blur puts a hard band of colour outside the border box that `elementsFromPoint`
-reports as transparent, and the ratio then flatters the result by resolving to
-whatever lies further behind. Screenshot the control focused and unfocused, diff
-the two at the same coordinates to find the band the indicator actually occupies,
-and sample the unfocused image along the same band for what it is drawn against.
-Compute the ratio from those samples.
+**Read both terms of the ratio from pixels.** Compute it from the indicator as
+rendered against the backdrop as rendered — neither term from a token value, and
+neither from a computed style. A computed background answers only which element
+paints at a point, and both terms escape it. The backdrop does because a
+`box-shadow` with no blur puts a hard band of colour outside the border box that
+`elementsFromPoint` reports as transparent, so the reading resolves past it to
+whatever lies further behind. The indicator does because an outline is painted
+with its own element, so anything drawn after it — a neighbour's shadow, a later
+sibling in the same stacking context — lands on top of the indicator and changes
+its colour too. Screenshot the control focused and unfocused, diff the two at the
+same coordinates to find the band the indicator occupies, then read the
+indicator's colour from the focused image and the backdrop from the unfocused
+image at those same coordinates.
 
-Report the control, the band it occupies, what that band lands on per edge, and
-the ratio. Edges of one control can differ.
+Report the control, the band it occupies, what that band lands on per edge, the
+indicator's rendered colour wherever it differs from the token, and the ratio.
+Edges of one control can differ, and so can instances of one control.
 
 - [ ] **Step 5: One animation resolves**
 

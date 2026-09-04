@@ -1,5 +1,7 @@
 /* ozterisk uses four Google-hosted families. No binaries ship with the system;
-   consumers load them from Google Fonts, which is how the app loads them too.
+   consumers load them from Google Fonts. The app takes a different path: it
+   self-hosts these same four families via @fontsource; see
+   src/styles/tokens/fonts.css.
    EB Garamond         — display, numerals, equations
    Zen Kaku Gothic New — Latin interface text, instructions, buttons
    Noto Sans KR        — Hangul. Zen Kaku Gothic New is a Japanese family and

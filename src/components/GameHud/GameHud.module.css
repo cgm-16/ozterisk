@@ -19,7 +19,7 @@
 
 .entry dt {
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--text-meta);
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }

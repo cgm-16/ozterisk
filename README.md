@@ -147,6 +147,21 @@ service. `vercel.json` pins the Vercel project to `framework: vite`,
 pull request and on push to `main`; only the exact commit that passed CI is
 promoted to production.
 
+## Fonts
+
+Four typefaces are self-hosted through `@fontsource` and served from the
+app's own origin: EB Garamond as the display and numeral face, Zen Kaku
+Gothic New for UI text, IBM Plex Mono for the monospace role, and Noto
+Sans KR for Hangul. Nothing is fetched from a font CDN, which is what
+keeps the zero-non-origin-request property true. Only Latin subsets ship
+eagerly; the Korean face loads on demand when the language is `ko`, so an
+English session never downloads it.
+
+All four are under the SIL Open Font License, Version 1.1. Its section 2
+requires each redistributed copy to carry the copyright notice and the
+licence, so both ship with the build at `/OFL.txt` (`public/OFL.txt` in
+the source tree) alongside the font files they cover.
+
 ## Supported languages
 
 English (`en`) and Korean (`ko`) through the typed dictionary in

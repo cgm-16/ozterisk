@@ -21,7 +21,7 @@
 
 .reason {
   padding: 0 var(--space-4);
-  color: var(--color-text-muted);
+  color: var(--text-meta);
   text-align: center;
 }
 
@@ -44,7 +44,7 @@
 
 .entry dt {
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--text-meta);
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }
@@ -70,16 +70,16 @@ dd.primary {
 
 .playAgain,
 .secondary {
-  min-width: var(--tile-size);
-  min-height: var(--tile-size);
+  min-width: var(--target-min);
+  min-height: var(--target-min);
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition:
-    background-color var(--duration-base) var(--ease-standard),
-    border-color var(--duration-base) var(--ease-standard),
-    transform var(--duration-fast) var(--ease-standard);
+    background-color var(--dur-state) var(--ease-standard),
+    border-color var(--dur-state) var(--ease-standard),
+    transform var(--dur-press) var(--ease-standard);
 }
 
 .playAgain:active,
@@ -89,18 +89,18 @@ dd.primary {
 
 .playAgain {
   border: none;
-  background: var(--color-accent);
-  color: var(--color-canvas);
+  background: var(--accent);
+  color: var(--text-on-tile);
 }
 
 .secondary {
-  border: var(--border-hairline) solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
+  border: 1px solid var(--border-hairline);
+  background: var(--surface-panel);
+  color: var(--text-primary);
 }
 
 .status {
-  color: var(--color-text-muted);
+  color: var(--text-meta);
   min-height: 1.25em;
 }
 

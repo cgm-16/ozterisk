@@ -12,7 +12,7 @@ describe("TitleScreen", () => {
         <TitleScreen onStart={onStart} />
       </I18nProvider>,
     );
-    expect(screen.getByRole("heading", { name: "1-0" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "ozterisk" })).toBeVisible();
     await userEvent.click(screen.getByRole("button", { name: "Start Run" }));
     expect(onStart).toHaveBeenCalledTimes(1);
   });
@@ -94,7 +94,7 @@ describe("TitleScreen", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "한국어" }));
 
-    expect(screen.getByRole("heading", { name: "1-0" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: "ozterisk" })).toBeVisible();
     expect(screen.getByRole("button", { name: "게임 시작" })).toBeInTheDocument();
     expect(screen.getByText("게임 방법")).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "언어" })).toBeInTheDocument();

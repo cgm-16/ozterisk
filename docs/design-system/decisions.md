@@ -326,12 +326,34 @@ introduce an icon set and record it, not to smuggle one in.
 `ozterisk` in EB Garamond Medium, `--track-wordmark`, `--ink-000`, with the `✳`
 in `--gold-500`. Rendered as text, never as an image.
 
+**The favicon is the one surface where the ✳ is drawn rather than set.**
+`public/favicon.svg` builds the mark directly in SVG markup: eight gold spokes
+on a felt rounded square.
+*Why:* a favicon has to render at sizes as small as 16px before any web font
+is guaranteed to have loaded, on a machine that may not have the wordmark's
+font at all — a type treatment cannot survive that, so the glyph is drawn
+instead of set for this one surface. Geometry is locked: eight arms on a 45°
+rotation step, each spanning 24° (half-angle 12° at the centre vertex),
+leaving a 21° gap between arms so the spokes read as separate, not a fused
+star. `--gold-500` (`#c9a54a`) on `--felt-700` (`#14342a`), a rounded square;
+the hex values are inlined in the SVG because a file in `public/` cannot read
+CSS custom properties.
+
 ---
 
 ## Open
 
-- **Licensed font files.** EB Garamond, IBM Plex Mono and Zen Kaku Gothic New
-  currently load from Google Fonts. Self-hosting needs licence review.
+- **Font redistribution notice.** M5.5b self-hosted EB Garamond, IBM Plex Mono,
+  Zen Kaku Gothic New and Noto Sans KR via their `@fontsource/*` packages.
+  Licence checked in `package-lock.json`: all four resolve to OFL-1.1
+  (`@fontsource/eb-garamond`, `@fontsource/ibm-plex-mono`,
+  `@fontsource/zen-kaku-gothic-new`, `@fontsource/noto-sans-kr`, each
+  `5.3.0`), which permits self-hosting, bundling, and redistribution. Not
+  verified: OFL §2 requires the copyright notice and licence text to
+  accompany redistributed copies of the fonts. Each `@fontsource` package
+  ships a `LICENSE` file, but the build copies only the font binaries
+  (`.woff2`/`.woff`) into `dist/assets/` — no licence text ships alongside
+  them. Whether that satisfies §2 is still open.
 - **Logo.** None exists. If the brand ever needs a mark that isn't type, it is a
   new design problem, not a derivation of this system.
 - **Four motion refs specified but not built** — `8a`, `11a`/`8c`, `10i`,

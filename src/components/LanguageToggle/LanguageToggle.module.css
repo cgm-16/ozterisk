@@ -4,17 +4,17 @@
 }
 
 .button {
-  min-width: var(--tile-size);
-  min-height: var(--tile-size);
+  min-width: var(--target-min);
+  min-height: var(--target-min);
   padding: var(--space-2) var(--space-3);
-  border: var(--border-hairline) solid var(--color-border);
+  border: 1px solid var(--border-hairline);
   border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  color: var(--color-text);
+  background: var(--surface-panel);
+  color: var(--text-primary);
   cursor: pointer;
   transition:
-    border-color var(--duration-base) var(--ease-standard),
-    transform var(--duration-fast) var(--ease-standard);
+    border-color var(--dur-state) var(--ease-standard),
+    transform var(--dur-press) var(--ease-standard);
 }
 
 .button:active {
@@ -22,6 +22,6 @@
 }
 
 .button[aria-pressed="true"] {
-  border-color: var(--color-accent);
+  border-color: var(--accent);
   font-weight: 600;
 }

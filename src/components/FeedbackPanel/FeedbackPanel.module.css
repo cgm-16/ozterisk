@@ -18,11 +18,11 @@
    so no markup change is needed. If FeedbackPanel.tsx ever stops rendering
    one of those elements, this coloring silently stops applying. */
 .panel:has(.rewards) .headline {
-  color: var(--color-correct);
+  color: var(--state-correct);
 }
 
 .panel:has(.comparison) .headline {
-  color: var(--color-incorrect);
+  color: var(--state-incorrect);
 }
 
 .rewards {
@@ -39,11 +39,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: var(--tile-size);
-  min-height: var(--tile-size);
-  border: var(--border-hairline) solid var(--color-reward);
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  border: 1px solid var(--state-reward);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
+  background: var(--surface-tile);
+  color: var(--text-on-tile);
   box-shadow: var(--shadow-tile);
 }
 
@@ -56,12 +57,12 @@
   font-size: 0.625rem;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  color: var(--color-reward);
+  color: var(--state-reward);
 }
 
 .comparison {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  color: var(--color-text-muted);
+  color: var(--text-meta);
 }

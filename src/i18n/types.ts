@@ -19,4 +19,5 @@ export interface I18nValue {
 export interface I18nProviderProps {
   children: ReactNode;
   initialLanguage?: Language; // deterministic tests; omit in production
+  loadKoreanFont?: () => Promise<void>; // injectable so tests never trigger the real font import; defaults to the real loader
 }

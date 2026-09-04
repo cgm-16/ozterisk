@@ -8,7 +8,7 @@ type MessageShape<T> = T extends string
 
 const en = {
   title: {
-    name: "1-0",
+    name: "ozterisk",
     summary:
       "Solve multiplication problems using limited digit tiles. Correct answers replace the tiles you spend and grant one extra tile. Incorrect answers consume your tiles without a reward. Keep your inventory balanced and survive as long as possible.",
     howToPlay: "How to Play",
@@ -78,7 +78,7 @@ const en = {
 
 const ko = {
   title: {
-    name: "1-0",
+    name: "ozterisk",
     summary:
       "제한된 숫자 타일로 곱셈 문제를 푸세요. 정답을 맞히면 사용한 타일을 보충하고 타일 한 개를 추가로 받습니다. 오답에 사용한 타일은 보상 없이 사라집니다. 타일 구성을 관리하며 최대한 오래 살아남으세요.",
     howToPlay: "게임 방법",

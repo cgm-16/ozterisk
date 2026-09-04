@@ -1,3 +1,17 @@
+/* The one global stylesheet. It is an entry: the token layer arrives as
+   partials in the design system's own order, and the reset and base below
+   are the app's. Partials are plain .css, never .module.css — CSS Modules
+   would scope the @keyframes names and every animation referencing them
+   would silently do nothing. */
+@import "./tokens/fonts.css";
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/spacing.css";
+@import "./tokens/radius.css";
+@import "./tokens/elevation.css";
+@import "./tokens/motion.css";
+@import "./tokens/keyframes.css";
+
 /* Reset */
 *,
 *::before,
@@ -15,7 +29,11 @@ html {
 
 body {
   min-height: 100svh;
+  font-family: var(--font-ui);
+  font-size: var(--size-body-sm);
   line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--surface-surround);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -32,75 +50,17 @@ input {
   color: inherit;
 }
 
-/* Tokens */
-:root {
-  color-scheme: light;
-
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-
-  /* Surfaces */
-  --color-canvas: #ffffff;
-  --color-surface: #f4f4f5;
-  --color-border: #d4d4d8;
-
-  /* Typography */
-  --color-text: #18181b;
-  --color-text-muted: #52525b;
-
-  /* Accent is the neutral, near-black primary-action/selection color. It is
-     deliberately distinct from --color-focus-ring so a focused primary
-     control still shows an unmistakable focus outline. */
-  --color-accent: #27272a;
-
-  /* State colors: each pairs with a text label or shape cue elsewhere, never
-     standing alone as the only signal (§1.12). */
-  --color-correct: #15803d;
-  --color-incorrect: #b91c1c;
-  --color-reward: #92400e;
-  --color-discard: #9a3412;
-
-  --color-focus-ring: #2563eb;
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  --space-8: 32px;
-
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-
-  /* Interactive/tile minimum footprint: doubles as the 44px accessible
-     minimum target (§1.12) and the physical-piece tile/slot size. */
-  --tile-size: 44px;
-
-  /* Motion. The reduced-motion block below neutralizes these wholesale; they
-     exist so press feel is retuned in one place rather than seven. */
-  --duration-fast: 100ms;    /* press / transform response */
-  --duration-base: 150ms;    /* color and border state changes */
-  --ease-standard: ease;
-  --press-offset: 1px;       /* :active translateY */
-
-  --border-hairline: 1px;    /* the repeated 1px solid border */
-
-  /* Restrained shadows for the "simple physical piece" tile look. */
-  --shadow-tile: 0 1px 2px rgb(0 0 0 / 10%);
-  --shadow-inset: inset 0 1px 2px rgb(0 0 0 / 8%);
-
-  /* Shared centered-arena width (§1.12 "one centered vertical arena"). */
-  --arena-max-width: 42rem;
-}
-
-body {
-  font-family: var(--font-sans);
-  color: var(--color-text);
-  background: var(--color-canvas);
-}
-
+/* No component declares an outline of its own, so this rule draws the ring on
+   every focused control. It sits outside the control, on the ground behind it,
+   and gold clears 3:1 against every step of the felt ramp — 7.01 against the
+   lightest (--felt-600) through 11.85 against the darkest (--felt-900). Drawn
+   inside, it would land on the control's own face instead, where gold reads
+   1.10 against a ceramic tile and 1.51 against the gold of a primary button.
+   The inset two-tone bezel --ring-focus is a box-shadow and has to compose
+   after an object's own shadow, so it belongs on the objects that carry one,
+   not in a global rule. */
 :focus-visible {
-  outline: 2px solid var(--color-focus-ring);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 

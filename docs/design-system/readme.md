@@ -336,8 +336,9 @@ offset.
 
 **ozterisk has no icon set, and that is deliberate.** The source codebase ships
 zero icon files — no icon font, no sprite, no SVG directory. Its only asset is
-`public/favicon.svg`, which draws the old product name `1-0` as text in a
-rounded square (copied to `assets/favicon.svg`, unchanged).
+`public/favicon.svg`, which draws the ✳ mark — eight gold spokes radiating
+from a point, in `--gold-500` on a `--felt-700` rounded square (copied to
+`assets/favicon.svg`, unchanged).
 
 The system's rules:
 
@@ -347,7 +348,9 @@ The system's rules:
   past the tenth is a tile over capacity — there is no near-capacity tint.
 - **The one glyph is ✳** (U+2733, EIGHT SPOKED ASTERISK), set in EB Garamond in
   `--gold-500`. It is the wordmark's centre (oz**✳**terisk), the title-screen
-  tile face, and the share chop. It is type, not a logo file.
+  tile face, and the share chop. It is type, not a logo file — except in the
+  favicon, which draws it directly in SVG because a favicon must render before
+  any web font is guaranteed to have loaded; see `decisions.md`.
 - **Unicode where a symbol is unavoidable**: `×` (U+00D7) for multiplication,
   `/` for capacity ratios.
 - **No emoji, ever.** No CDN icon library is linked, and none should be added

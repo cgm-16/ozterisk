@@ -35,10 +35,21 @@ export function TileInventory({ tiles = [], mode = "select", pendingDiscards = [
       {cells.map((tile, i) => {
         if (!tile) return <div key={`socket-${i}`} style={socketStyle} aria-hidden="true" />;
         // A lifted tile is in the answer slots but keeps its socket, so no
-        // neighbour ever moves mid-selection. The gold rim distinguishes it
-        // from a socket whose tile is gone.
+        // neighbour ever moves mid-selection. The dashed gold rule — the same
+        // vocabulary as an empty answer slot — distinguishes it from a socket
+        // whose tile is gone.
         if (liftedIds.includes(tile.id)) {
-          return <div key={tile.id} style={{ ...socketStyle, boxShadow: "var(--shadow-socket), var(--rim-socket-lifted)" }} aria-hidden="true" />;
+          return (
+            <div
+              key={tile.id}
+              style={{
+                ...socketStyle,
+                outline: "var(--outline-socket-lifted)",
+                outlineOffset: "var(--outline-socket-lifted-offset)",
+              }}
+              aria-hidden="true"
+            />
+          );
         }
         const marked = pendingDiscards.includes(tile.id);
         const state = marked ? "marked" : mode === "readOnly" ? "disabled" : tile.isNew && rewardHalo ? "reward" : "resting";

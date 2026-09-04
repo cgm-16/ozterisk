@@ -15,25 +15,58 @@ Per-component contracts (props, defaults, per-component prohibitions) live in th
 frames in **`ozterisk Storyboard.dc.html`** — six scenarios, read left to right.
 Every ref that survived into the locked spec:
 
-| Ref | Moment | Status |
-|---|---|---|
-| `2a` | Correct answer: answer tiles rise 14px and settle | **built** — `oz-bloom` |
-| `2d` | Streak tier 3: six-chip burst | specified |
-| `7a` | Streak tier 1: one jade ring | **built** — `oz-ring`, gated at streak 3 |
-| `7b` | Streak tier 2: second gold ring + gold rim on answer tiles | specified |
-| `7c` | Streak tier 3: third ring, brightest rim | specified |
-| `8a` | Overflow: the eleventh tile rim-rejects, perches on the rail | specified |
-| `8c` | Discard confirm: the marked tile tips off the end | specified |
-| `9b` | Tile to slot: flat slide, 130ms | **built** — transition, not a keyframe |
-| `9f` | Wrong answer: crack and dust | **built** — `oz-crack` + `oz-dust` |
-| `9i` | Reward tiles fire in place, in sorted position | **built** — `oz-fire` |
-| `10b` | Round change: old equation falls, next rises | **built** — `oz-round-rise` |
-| `10e` | Streak break: counter falls off its perch, 0 fades in | **built** — `oz-counter-fall` + `oz-counter-zero` |
-| `10i` | Game over: the last tiles are swept off the rack | specified |
-| `11a` | Overflow: tap a resident, it lifts out and tilts | specified |
-| `11d` | An action becomes available and rises to meet the hand | **built** — `oz-rise-ready` |
-| `11C` | Title entrance (240ms) and share chop (900ms) | specified |
-| `10d` | Persistent streak rings on the counter | **struck** — see below |
+**Provenance** matters as much as status. *Storyboard* = the frame was drawn and
+reviewed with the client; its shape is decided. *Inferred* = the moment was
+implied by a locked decision but never drawn, so the shape below is my
+construction and is the **first thing to challenge** if it disagrees with the
+app. Read the two columns together: an inferred moment that is already built is
+where a collision with existing app behaviour is most likely.
+
+| Ref | Moment | Provenance | Status |
+|---|---|---|---|
+| `2a` | Correct answer: answer tiles rise 14px and settle | storyboard | **built** — `oz-bloom` |
+| `2d` | Streak tier 3: six-chip burst | storyboard | **built** — `oz-fan` |
+| `7a` | Streak tier 1: one jade ring | storyboard (frame); **gating inferred** | **built** — `oz-ring`, gated at streak 3 |
+| `7b` | Streak tier 2: second gold ring + gold rim on answer tiles | storyboard | **built** — `oz-ring` at 70ms |
+| `7c` | Streak tier 3: third ring, brightest rim | storyboard | **built** — `oz-ring` at 140ms |
+| `8a` | Overflow: the eleventh tile rim-rejects, perches on the rail | storyboard | specified |
+| `8c` | Discard confirm: the marked tile tips off the end | storyboard | specified |
+| `9b` | Tile to slot: flat slide, 130ms | storyboard | **built** — transition, not a keyframe |
+| `9f` | Wrong answer: crack and dust | storyboard (shape); **duration inferred** | **built** — `oz-crack` + `oz-dust` |
+| `9i` | Reward tiles fire in place, in sorted position | storyboard (shape); **fire/halo split inferred** | **built** — `oz-fire` |
+| `10b` | Round change: old equation falls, next rises | storyboard | **built** — `oz-round-rise` |
+| `10e` | Streak break: counter falls off its perch, 0 fades in | storyboard | **built** — `oz-counter-fall` + `oz-counter-zero` |
+| `10i` | Game over: the last tiles are swept off the rack | storyboard | specified |
+| `11a` | Overflow: tap a resident, it lifts out and tilts | storyboard | specified |
+| `11d` | An action becomes available and rises to meet the hand | **inferred** — from "disabled is flat, not dim" | **built** — `oz-rise-ready` |
+| `11C` | Title entrance (240ms) and share chop (900ms) | storyboard | specified |
+| `10d` | Persistent streak rings on the counter | storyboard | **struck** — see below |
+
+### Inferred, and therefore open to challenge
+
+Four things in the built set were not drawn. Each has its reasoning under
+*Decisions* below; this is the index for a reviewer diffing against the app.
+
+1. **`--dur-crack` = 520ms** (`9f`). The storyboard locked the shake → fracture →
+   dust shape but no length. I chose 520ms to share a tempo with `--dur-break`.
+   *If the app already has a miss duration, the app wins — this was never
+   drawn.*
+2. **The `9i` fire/halo split.** The spec had one "first two rounds" clause; I
+   split it so the fire runs every round and only the halo expires. *Check
+   against the app's reward rendering — if it ties both to early rounds, that is
+   a deliberate existing behaviour, not a bug.*
+3. **`7a` gated at streak 3.** The frame drew the ring on the first correct
+   answer; the ladder says tier 1 starts at 3. I followed the ladder. *This is a
+   genuine contradiction in the locked set, so it needs a human ruling, not a
+   diff.*
+4. **`11d` exists at all.** No frame for it. It follows from "disabled is flat,
+   not dim" — if disabling removes elevation, re-enabling has to restore it
+   visibly. *Cheapest of the four to drop if the app disagrees.*
+
+Also inferred, outside the motion set: the 18px socket-swatch shadow literal,
+`--rim-socket-lifted`'s value (gold at 34%), the `RECEIVED n TILES` caption
+and its Korean string, and the overflow pip treatment on `CapacityMeter`. All
+are recorded with their rejected alternatives below.
 
 ---
 
@@ -165,9 +198,11 @@ rim, which reads as a flat chip rather than a well.
 *When to revisit:* if a third small socket appears, promote the literal to
 `--shadow-socket-xs`.
 
-**A lifted socket is not an empty one.** `--rim-socket-lifted` (gold, 34%) for a
-socket whose tile is out in the answer slots; plain `--rim-socket` for one whose
-tile is gone. Same well, different debt.
+**A lifted socket is not an empty one.** ~~`--rim-socket-lifted` (gold, 34%)~~
+**Superseded by M5.5b (5f)** — the token is removed; a lifted socket now wears
+`--outline-socket-lifted` (1px dashed gold at 72%, inset 3px) over the ordinary
+`--rim-socket`. The principle stands: plain `--rim-socket` alone for a socket
+whose tile is gone. Same well, different debt.
 *Rejected:* styling them identically, which was the first implementation — "on
 loan" and "lost" are the only two things the rack can say, and it has to say
 which.
@@ -225,9 +260,9 @@ redundancy, not indecision.
 **Hover raises; it never changes opacity.** Felt `--felt-700` → `--felt-600`, or
 a tile lifts `--lift-offset`.
 
-**Focus is a 2px `--gold-300` ring at 2px offset**, deliberately distinct from
-every semantic colour, so focus is never confused with correct, incorrect, or
-marked.
+**Focus is a two-tone inset bezel**, `--gold-300` over a `--clay-900` inner
+line, deliberately distinct from every semantic colour, so focus is never
+confused with correct, incorrect, or marked.
 
 ### Game logic the design must not misrepresent
 
@@ -255,6 +290,20 @@ change it for layout reasons — changing it requires retuning
 **A correct answer returns exactly one more tile than you spent**
 (`REWARD_BONUS = 1`). At 0 the overflow mechanic disappears entirely; above 1
 runs become unloseable.
+
+### Type
+
+**`--font-ui` is two families, not one: Zen Kaku Gothic New then Noto Sans KR.**
+Zen Kaku Gothic New is a Japanese family and ships no Hangul subset, so the
+Korean locale — half the product's copy — was resolving to `system-ui` on every
+platform. Latin resolves from Zen Kaku first and Hangul falls through per-glyph,
+so the order is load-bearing.
+*Rejected:* replacing Zen Kaku with a single pan-CJK face. It would set both
+scripts from one file, but Noto Sans KR's Latin is noticeably wider and flatter
+than Zen Kaku's, and the Latin interface text is what the type system was tuned
+against.
+*Note:* an earlier draft of `readme.md` claimed Zen Kaku "sets both scripts."
+It never did. If you see that sentence anywhere downstream, it is stale.
 
 ### Content
 
@@ -285,22 +334,76 @@ in `--gold-500`. Rendered as text, never as an image.
   currently load from Google Fonts. Self-hosting needs licence review.
 - **Logo.** None exists. If the brand ever needs a mark that isn't type, it is a
   new design problem, not a derivation of this system.
-- **Seven motion refs specified but not built** — `7b`, `7c`, `2d`, `8a`,
-  `11a`/`8c`, `10i`, `11C`. All have durations and easings assigned in
-  `tokens/motion.css`; none have keyframes in `tokens/keyframes.css`.
-  **Correction:** they are not seven original designs. `ozterisk Storyboard.dc.html`
-  already carries the shapes as `sb-*` keyframes — `sb-rim` (8a), `sb-drop` (11a),
-  `sb-slide` (8c), `sb-sweep` (10i), `sb-settle` and `sb-stamp` (11C) — and `7b`/`7c`
-  are `sb-ring` re-used at `.18s` and `.34s` delay with a different rim, not new
-  frames at all. Only `2d`, the six-chip burst, has to be authored from nothing.
-  The canvas frames hold across a 2.6s infinite loop, so each must be renormalised
-  to 0–100% of its useful range when retimed to a one-shot duration.
-  **Timing correction:** the durations claim above is wrong — `2d`, `7b`, `7c`,
-  `8a`, `8c`, `10i` and `11a` have no duration or easing in `tokens/motion.css`
-  either, and the milestone that implements each one assigns them.
+- **Four motion refs specified but not built** — `8a`, `11a`/`8c`, `10i`,
+  `11C`. (`7b`, `7c` and `2d` are wired in `components/game/AnswerSlots.jsx`.)
+  None of the four has a duration or easing in `tokens/motion.css` either, so
+  the milestone that implements each one assigns both.
+  **Provenance:** none of the four is an original design. `ozterisk
+  Storyboard.dc.html` already carries their shapes as `sb-*` keyframes —
+  `sb-rim` (8a), `sb-drop` (11a), `sb-slide` (8c), `sb-sweep` (10i),
+  `sb-settle` and `sb-stamp` (11C). Port those rather than authoring new ones.
+  The canvas frames hold across a 2.6s infinite loop, so each must be
+  renormalised to 0–100% of its useful range when retimed to a one-shot.
 - **Verification against the shipped app.** The overflow panel is where the
   storyboard and the codebase disagree most; the redesign wins on visuals, but
   the *states* should be checked against `src/components/OverflowControls/`.
 - **The UI kit is a state tour, not a balance test.** It ports
   `KIND_EQUATION_RATE` and the real loss condition, but not the reducer's exact
   action ordering. Do not tune game balance from it.
+
+## M5.5b — four judgement calls, resolved
+
+Four questions the prose could not settle were drawn as live candidates in
+*Open Questions — M5.5b* and decided by review.
+
+**2d burst — ceramic fan (5a).** Six shards off the tile's own bottom edge:
+launched high, turning over at the peak, falling. `oz-fan`, `--dur-burst` 720ms
+on `--ease-fall`. *Rejected:* **gold leaf (5b)**, slower and drifting — the only
+candidate that spent gold in motion, and it made the top rung read as a
+different game; **low skid (5c)**, flat and fast, which read as force rather than
+reward. The fan wins because the burst is then made *of* the object rather than
+added to it — consistent with "escalation is the tiles behaving harder, not the
+table".
+
+**Lifted socket — dashed gold rim (5f).** The shipped gold-at-34% inset rim
+(5d) measured 1.94:1 against the well and was unreadable at a glance. Rather
+than simply brighten it (5e, gold at 78% doubled), the lifted socket now borrows
+the empty-answer-slot vocabulary: `--outline-socket-lifted`, 1px dashed gold at
+72%, inset 3px, over the ordinary `--rim-socket`. Dashed already means
+"something belongs here and does not yet", which is precisely a tile out on
+loan. *Rejected:* **5g**, a gold footprint bar on the socket floor — the best
+object story of the four, but it adds an element to a shape that was
+deliberately empty. `--rim-socket-lifted` is removed from the system.
+
+**Focus — inset bezel (5j), two-tone.** `--ring-focus` moves the ring inside
+the object, following its radius: focus is a gold edge fired into the tile, not
+a rectangle floating around it. It carries a `--clay-900` inner line under the
+gold. *Rejected:* the shipped 2px offset ring (5h), gold directly against
+vermilion; **5k** lacquer double rule, too quiet to find on a busy rack.
+
+*Amended after measurement.* The bezel first shipped single-tone, which changed
+the ring's geometry but not its tone: `--gold-300` reads `1.10:1` against
+`--clay-200` and `1.51:1` against the gold toggle segment, so an inset gold ring
+puts the same failing gold *on* the ceramic instead of beside it. Every digit
+tile is a `<button>`, so that is the app's most-focused surface. Darkening the
+ring instead fails the mirror image — `--clay-900` reads `1.02:1` on felt — so
+the palette admits no single tone. Two tones is not a compromise here; it is the
+only arrangement that satisfies §1.12.
+
+This overlaps the rejected **5i**, two-tone with a dark separator, judged to
+read as engineering rather than material. That judgement stands against a
+separator — a third element introduced to hold two others apart. This is not
+one: `--clay-900` sits within `1.02:1` of `--felt-700`, so the inner line reads
+as the felt showing through the bezel, the same dark the tile's socket is cut
+from. The system already shipped the shape on vermilion; this generalises it and
+makes the line opaque. `--ring-focus-onDanger` is therefore removed — with the
+base ring carrying a dark line, the danger variant was the same idea with a
+weaker `55%` inner line, measuring `2.05:1` against vermilion where the opaque
+line measures `2.41:1`.
+
+**Korean — Hangul-tuned (5m).** Tracking off and one pixel up, as a token
+override on `:lang(ko)`. Applying the Latin mono rule unchanged (5l) pulled
+already-square syllable blocks apart until 라운드 read as three characters
+rather than one word, and Noto Sans KR runs optically smaller than Zen Kaku at
+the same nominal size. No component opts in; the override is invisible to
+callers.

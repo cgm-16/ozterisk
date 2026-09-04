@@ -4,12 +4,14 @@ path: src
 
 ## Last sync
 
-date: 2026-08-29T09:16:59Z
+date: 2026-08-31T00:00:00Z
 
 ### Updated in this project
 
-- Six round-frequency animations implemented from the locked storyboard, in a new `tokens/keyframes.css`.
-- Rack no longer reflows on tile select — a committed tile keeps its socket (`liftedIds`), marked with `--rim-socket-lifted`.
+- Six round-frequency animations plus the whole streak ladder implemented in `tokens/keyframes.css` — including `oz-fan`, the streak-8 ceramic burst (`--dur-burst` 720ms).
+- Focus is a two-tone inset bezel (`--ring-focus`: `--gold-300` over a `--clay-900` inner line), not an offset halo; `:focus-visible` offset is now `-2px`.
+- Korean is tuned, not substituted: `:lang(ko)` drops mono tracking and raises interface sizes 1px. Requires `lang` on the app root.
+- Rack no longer reflows on tile select — a committed tile keeps its socket (`liftedIds`), marked with a dashed gold rim (`--outline-socket-lifted`).
 - Capacity meter lost its near-capacity tint: vermilion now means only "a tile is leaving"; excess pips render past the rail.
 - Loss condition corrected to the codebase's `canAttemptEquation` (tile count), not `canConstruct` (exact digits).
 
@@ -39,5 +41,6 @@ date: 2026-08-29T09:16:59Z
 
 - The system's **structure** follows the repo; its **visual and motion language** follows the locked redesign. Where they disagree, the redesign wins.
 - `src/gallery/` (`states.tsx`) is the repo's own state gallery and is the closest analogue to `ui_kits/game/` — worth diffing when wiring the real components.
-- Not yet implemented, specified only: streak tiers 7b/7c, 2d chip burst, 8a rim reject, 11a/8c discard motion, 10i table sweep, 11C title entrance and share chop.
+- Not yet implemented, specified only: 8a rim reject, 11a/8c discard motion, 10i table sweep, 11C title entrance and share chop. (Streak tiers 7b/7c and the 2d burst are now wired in `components/game/AnswerSlots.jsx`.)
+- Every locked choice has a decision entry in `decisions.md`; the M5.5b section records the four most recent, with what was rejected. Read `readme.md` then `decisions.md` before touching tokens.
 - Open: licensed font files (currently Google Fonts), and no logo — the brand mark is a type treatment.

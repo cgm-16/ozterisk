@@ -17,12 +17,16 @@
   gap: var(--space-1);
 }
 
-/* Pip geometry is intrinsic to this component and has no reusable token;
-   radius alone borrows --radius-sm, the closest existing step. */
+/* Pip geometry is intrinsic to this component and has no reusable token: it is
+   one fixed shape in one place, and it does not move across the rack's tiers.
+   The radius stays a literal rather than borrowing --radius-sm (5px), because
+   at this height that token stops being a radius: CSS scales radii down when
+   two on a side exceed the side itself, so 5px on a 7px pip clamps to 3.5px —
+   exactly half the height — and the rectangle becomes a pill. */
 .pip {
   width: 15px;
   height: 7px;
-  border-radius: var(--radius-sm);
+  border-radius: 2px;
 }
 
 .filled {

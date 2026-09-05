@@ -24,7 +24,12 @@
   letter-spacing: 0.02em;
 }
 
+/* typography.css names HUD values as display-serif territory alongside
+   equations and tile faces — "ozterisk's numbers are objects, not data".
+   Family only: the sizes below stay as they are, so the specificity tie the
+   comment underneath depends on keeps resolving to the same computed values. */
 .entry dd {
+  font-family: var(--font-numeral);
   font-size: 1.25rem;
   font-weight: 600;
 }

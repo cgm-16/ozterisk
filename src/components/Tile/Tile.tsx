@@ -15,6 +15,12 @@ export interface TileProps {
   onClick?: () => void;
   /** Spoken label for the button form. Defaults to the localised digit name. */
   label?: string;
+  /**
+   * Toggle state, when the tile is one. Pass `false` as well as `true`: a
+   * toggle that reports only its on-state gives no cue that the off-state is
+   * pressable at all. Left undefined, the tile is a plain button.
+   */
+  pressed?: boolean;
   style?: CSSProperties;
 }
 
@@ -25,7 +31,7 @@ export interface TileProps {
  * The empty answer slot is not one — it is a socket cut into the felt, and its
  * rule stays in AnswerSlots.module.css.
  */
-export function Tile({ digit, size = "lg", state = "resting", onClick, label, style }: TileProps) {
+export function Tile({ digit, size = "lg", state = "resting", onClick, label, pressed, style }: TileProps) {
   const { t } = useI18n();
   const className = `${styles.tile} ${styles[size]} ${styles[state]}`;
 
@@ -48,7 +54,7 @@ export function Tile({ digit, size = "lg", state = "resting", onClick, label, st
       className={className}
       style={style}
       aria-label={label ?? t("tile.digitLabel", { digit })}
-      aria-pressed={state === "marked" ? true : undefined}
+      aria-pressed={pressed}
       disabled={state === "disabled"}
       onClick={onClick}
     >

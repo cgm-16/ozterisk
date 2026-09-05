@@ -27,6 +27,7 @@ export function TileInventory({ tiles, mode, pendingDiscards, onTile }: TileInve
               digit={tile.digit}
               state={isMarkedForDiscard ? "marked" : mode === "readOnly" ? "disabled" : "resting"}
               label={labelParts.join(", ")}
+              pressed={mode === "discard" ? isMarkedForDiscard : undefined}
               onClick={() => onTile(tile.id)}
             />
             {tile.isNew && (

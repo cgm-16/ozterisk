@@ -52,12 +52,20 @@ describe("Tile", () => {
       expect(screen.getByRole("button", { name: "Answer slot 1: 7" })).toBeInTheDocument();
     });
 
-    it("exposes the pressed state only while marked for discard", () => {
-      renderTile({ onClick: vi.fn(), state: "marked" });
+    it("reports a pressed toggle", () => {
+      renderTile({ onClick: vi.fn(), state: "marked", pressed: true });
       expect(screen.getByRole("button")).toHaveAttribute("aria-pressed", "true");
     });
 
-    it("does not expose a pressed state while resting", () => {
+    // The off-state is the half that matters: a toggle reporting only "true"
+    // leaves every unpressed tile announcing as a plain button, so nothing
+    // says it can be pressed at all.
+    it("reports an unpressed toggle rather than omitting the state", () => {
+      renderTile({ onClick: vi.fn(), pressed: false });
+      expect(screen.getByRole("button")).toHaveAttribute("aria-pressed", "false");
+    });
+
+    it("is a plain button when no toggle state is given", () => {
       renderTile({ onClick: vi.fn() });
       expect(screen.getByRole("button")).not.toHaveAttribute("aria-pressed");
     });

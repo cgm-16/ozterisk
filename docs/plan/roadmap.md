@@ -24,7 +24,7 @@ hoc at branch time.
 | `M5 — States Gallery` | Every component state viewable without playing to it | Dev-only `gallery.html` serves all five phases; absent from `dist/` after `npm run build` |
 | `M5.5a — Design Contract Amendments` | The specification permits the Tile House system | §1.12, §1.14, §1.15, `product.md` §1.10 and the AGENTS.md motion constraint amended; `docs/design-system/` adopted; `T25`–`T27` filed |
 | `M5.5b — Foundations and Identity` | Tile House tokens, self-hosted fonts, and the `ozterisk` wordmark | Token partials and global keyframes land; zero non-origin requests in a full run; Korean renders in a Hangul-capable face; focus indicator ≥ `3:1` on felt and ceramic |
-| `M5.5c — Tile and Action Primitives` | One `Tile` and one `ActionButton`, replacing three and seven copies | Both primitives wired at every call site; accessible names unchanged; suite green |
+| `M5.5c — Tile and Action Primitives` | One `Tile` and one `ActionButton`, replacing three and seven copies | Both primitives wired at every call site; accessible names unchanged; the focus indicator ≥ `3:1` on ceramic as well as felt; suite green |
 | `M5.5d — Board Surfaces` | The rack, slots, equation, HUD and capacity meter wear the system | Rack holds ten sockets at every tier; a selected tile keeps its socket; round retains primary emphasis |
 | `M5.5e — Flow Screens` | Title, feedback, overflow and game over wear the system | Answer slots stay mounted through feedback; `role="status"` regions intact |
 | `M5.5f — Motion` | The sixteen named moments | Every moment in the §1.12 inventory implemented; `prefers-reduced-motion` neutralises all of them |
@@ -43,11 +43,17 @@ indicator clears `3:1` on felt — `11.85` on all 176 sides of the eleven
 controls whose ring lands there — but not on ceramic. The inventory tile's
 ring lands on the tile's own `--shadow-tile` edge and reads `1.61`–`1.62` on
 every tile at every tier, because `--ring-focus` is defined correctly and worn
-by nothing. Its fix is a `box-shadow` rule in `TileInventory.module.css`, a
-component this milestone does not restyle, so `M5.5d` inherits it as a stated
-requirement rather than a surprise. The gate above is left as written: it is
-the standard, and `M5.5b` fell short of it. Measured across 111 readings in
-`docs/journal/journal-2026-09-02.md`.
+by nothing. The fix composes the ring onto the tile's own elevation rather than
+beside it, so it belongs wherever that elevation is declared — and `M5.5c` moves
+it, collapsing `.tile` into a `Tile` primitive that owns a `--shadow-tile` edge
+per size. So the gate `M5.5b` missed is `M5.5c`'s to close, not `M5.5d`'s:
+assigning it to `M5.5d` would have aimed it at a rule that left
+`TileInventory.module.css` a phase earlier. The design system's own `Tile.jsx`
+already composes `box-shadow: <edge>, var(--ring-focus)`, but through
+`onFocus`/`onBlur` handlers, which fire on click-focus as well; the port owes the
+composition through `:focus-visible`, not the handlers. The gate above is left
+as written: it is the standard, and `M5.5b` fell short of it. Measured across
+111 readings in `docs/journal/journal-2026-09-02.md`.
 
 **Why M5.5 is a fraction.** The design pass was not on the roadmap when M6
 and M7 were numbered, and it has to run once the gallery exists — the gallery

@@ -80,13 +80,28 @@ Click each control and confirm no ring appears. This is the `:focus-visible`
 guarantee, and it is the half that the reference implementations get wrong; a port
 that regressed to `onFocus` would pass every other step in this task.
 
-- [ ] **Step 5: Confirm the primitives actually replaced the old rules**
+- [ ] **Step 5: Read the ghost variant's boundary**
+
+Not the focus ring, and not this milestone's doing — `ActionButton.jsx` draws the
+`ghost` border with `--border-hairline`, and `T36` ported it faithfully. But the
+arithmetic says that hairline lands at **1.31:1** against the felt, so the button's
+own boundary is effectively invisible; only its label (6.47:1) identifies it. The
+disabled state wears the same hairline over the same transparent fill, and the two
+labels differ by only **2.12:1**.
+
+Confirm those three figures from pixels, and report whether an active `ghost` and a
+disabled button are distinguishable as rendered. Today no screen renders a disabled
+`ghost` — Copy Result is the only `ghost` call site and is never disabled — so this
+is a latent collision, not a live one. Report it as such; do not fix it here.
+Changing it means diverging from the design system, which is Ori's call.
+
+- [ ] **Step 6: Confirm the primitives actually replaced the old rules**
 
 Grep `src/` for the class rules `T35` and `T36` were meant to delete. A primitive
 wired beside a surviving duplicate is the failure mode that makes the next phase's
 diff lie, and it is invisible to the suite.
 
-- [ ] **Step 6: Record it**
+- [ ] **Step 7: Record it**
 
 A journal entry carrying the numbers and anything that surprised you.
 

@@ -1,0 +1,84 @@
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: var(--surface-tile);
+  color: var(--text-on-tile);
+  /* The engraved digit: a light top edge under dark ink reads as cut into the
+     ceramic rather than printed on it. */
+  text-shadow: 0 1px 0 rgb(255 255 255 / 85%);
+  box-shadow: var(--tile-edge);
+  transition:
+    transform var(--dur-select) var(--ease-settle),
+    box-shadow var(--dur-select) var(--ease-settle);
+}
+
+/* A tile without onClick renders as a roleless element, so the pointer cursor
+   is the button form's alone. */
+button.tile:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Only lg clears the 44x44 target minimum (§1.12): sm is 30x38, so it is for
+   non-interactive tiles only. */
+.lg {
+  --tile-edge-size: var(--shadow-tile);
+  width: var(--tile-w);
+  height: var(--tile-h);
+  border-radius: var(--radius-md);
+  font: var(--weight-semibold) var(--size-tile) / var(--leading-tight) var(--font-numeral);
+}
+
+.sm {
+  --tile-edge-size: var(--shadow-tile-sm);
+  width: var(--tile-w-sm);
+  height: var(--tile-h-sm);
+  border-radius: var(--radius-sm);
+  font: var(--weight-semibold) var(--size-tile-sm) / var(--leading-tight) var(--font-numeral);
+}
+
+/* Every state names its own edge in --tile-edge instead of setting box-shadow,
+   so the focus rule below can compose the bezel onto whatever edge the state
+   draws rather than replace it (src/styles/tokens/elevation.css:21-39). */
+.resting {
+  --tile-edge: var(--tile-edge-size);
+}
+
+.lifted {
+  --tile-edge: var(--shadow-tile-lifted);
+  transform: translateY(calc(-1 * var(--lift-offset)));
+}
+
+/* Selected as .tile.reward, not .reward: the global :focus-visible rule in
+   src/styles/global.css draws a 2px offset halo, and at equal specificity it
+   would win on source order and replace this inset rim on a focused tile. */
+.tile.reward {
+  --tile-edge: var(--tile-edge-size), var(--glow-reward);
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.marked {
+  --tile-edge: var(--shadow-tile-lifted), 0 0 0 2px var(--state-discard);
+  transform: translateY(calc(-1 * var(--lift-offset))) rotate(6deg);
+}
+
+.disabled {
+  --tile-edge: none;
+  opacity: 0.45;
+}
+
+/* :focus-visible, not focus handlers: a ring must not appear on click-focus.
+   The disabled state is excluded because "none" is not a valid entry in a
+   box-shadow list, and a disabled tile is not focusable anyway. */
+.tile:not(.disabled):focus-visible {
+  box-shadow: var(--tile-edge), var(--ring-focus);
+}
+
+/* The bezel is inset, so the UA's outer halo is suppressed — except on reward,
+   whose gold rim is drawn as an outline of its own. */
+.tile:not(.reward):focus-visible {
+  outline: none;
+}

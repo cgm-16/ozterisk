@@ -46,7 +46,7 @@ element wears it composed onto its own edge. A `box-shadow` focus ring **replace
 the shadow it is declared beside, so the fix has to live wherever the elevation is
 declared — which, after this task, is one place instead of three.
 
-- [ ] **Step 1: Rule on the element, before writing the component**
+- [x] **Step 1: Rule on the element, before writing the component**
 
 `Tile.jsx` always renders a `<button>` and sets `disabled={!interactive}`. Its
 `.d.ts` says *"Omit `onClick` to render a non-interactive tile"* — but a disabled
@@ -67,7 +67,7 @@ A decorative tile has no accessible name to give — its digit is its content. D
 put `aria-label` on a roleless element; either let the digit be the text, or give
 the element a role that can carry a name.
 
-- [ ] **Step 2: Leave the empty answer slot alone**
+- [x] **Step 2: Leave the empty answer slot alone**
 
 It is a socket, not a tile: `--surface-socket`, `--shadow-socket`, a dashed rim,
 and no ceramic anywhere. The design draws it as a `role="img"` div
@@ -81,7 +81,7 @@ empty state keeps its own rule in `AnswerSlots.module.css`. Say so in the CSS
 rather than leaving the next reader to rediscover why one of four cases stayed
 behind.
 
-- [ ] **Step 3: Build the primitive**
+- [x] **Step 3: Build the primitive**
 
 Props per `Tile.d.ts`: `digit`, `size` (`lg` 64×80 / `sm` 30×38), `state`
 (`resting | lifted | reward | marked | disabled`), `onClick`, `label`, `style`.
@@ -102,7 +102,7 @@ Write it as a CSS Module, not inline styles. A missing module key renders
 `class="undefined"` with no error — see `docs/journal/journal-2026-08-09.md` — so
 prove every state's class resolves.
 
-- [ ] **Step 4: Compose the focus ring onto the edge, through `:focus-visible`**
+- [x] **Step 4: Compose the focus ring onto the edge, through `:focus-visible`**
 
 `src/styles/tokens/elevation.css:21-39` already states the answer and the
 measurements behind it:
@@ -122,7 +122,7 @@ ring the spec deliberately withholds. That divergence would read as a passing
 measurement while shipping a defect. It is the single most important line in this
 task.
 
-- [ ] **Step 5: Wire all three call sites**
+- [x] **Step 5: Wire all three call sites**
 
 `TileInventory` (rack tile, `aria-pressed` in discard mode), `AnswerSlots` (filled
 slot only), `FeedbackPanel` (reward tile inside its `<li>`). An unwired primitive
@@ -132,14 +132,14 @@ the old rules are gone. Delete them; do not leave them beside the new one.
 Every accessible name is unchanged: `/^Digit \d$/`, `/New tile$/`,
 `/^Answer slot \d: \d$/`, `Answer slot N: empty`.
 
-- [ ] **Step 6: Test the states**
+- [x] **Step 6: Test the states**
 
 Focused tests for all five states plus both sizes, and for the element rule in
 step 1 — that omitting `onClick` yields no `button` role, and that a disabled tile
 with `onClick` still exposes one. The second half is what stops a later phase from
 "simplifying" the rule back into the reference's shape.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/components/ docs/tasks/T35-tile-primitive.md

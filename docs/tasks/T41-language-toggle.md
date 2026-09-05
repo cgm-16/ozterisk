@@ -35,7 +35,7 @@ button primitive would have been wrong.
 It is also the milestone's one **known live accessibility risk**, and the reason
 this task exists as its own unit rather than a line in `T40`.
 
-- [ ] **Step 1: Understand what T37 actually found before changing anything**
+- [x] **Step 1: Understand what T37 actually found before changing anything**
 
 `T37` measured the toggle's focus indicator at **11.85:1** — gold on the surround
 `#071711` — and it passes. But it passes *for a reason that this task is about to
@@ -53,7 +53,7 @@ segment per `elevation.css:29`, exactly as it carries the ceramic tile face.
 `--ring-focus` already contains both tones, so the fix is to compose it correctly,
 not to invent anything.
 
-- [ ] **Step 2: Compose, do not replace**
+- [x] **Step 2: Compose, do not replace**
 
 Follow `ActionButton.module.css`: each variant names its own edge in a custom
 property, and the `:focus-visible` rule composes `var(--ring-focus)` onto that
@@ -71,7 +71,7 @@ Two traps, both already paid for once in this milestone:
   Suppress the outer outline once the inset bezel is in place, and check rather
   than assume.
 
-- [ ] **Step 3: Keep the semantics exactly as they are**
+- [x] **Step 3: Keep the semantics exactly as they are**
 
 `role="group"` with `aria-label` from `language.groupLabel`, and `aria-pressed` on
 **both** segments — `true` on the active one and `false` on the other.
@@ -82,7 +82,7 @@ button. `M5.5c` had to restore exactly this on the rack after it was dropped.
 The press offset stays `translateY(var(--press-offset))`, which the reduced-motion
 block retires by zeroing the token.
 
-- [ ] **Step 4: Measure it, do not assert it**
+- [x] **Step 4: Measure it, do not assert it**
 
 This task's gate is a number, not a passing test. Follow `T37`'s method — it is
 recorded in `docs/journal/journal-2026-09-05.md` along with three ways the
@@ -97,7 +97,32 @@ measurement lied first:
 - Report **both tones separately** against **both segments**. An average is not a
   measurement, and the active segment is the one that matters.
 
-- [ ] **Step 5: Commit**
+Read from `/gallery.html` at `dpr: 1`: `Tab` to reach each segment (never a click),
+screenshot focused and unfocused, scan the pixel column at the vertical midline from
+8px outside the border box to 12px inside, and diff. No pixel changed outside the
+box, confirming `outline: none` actually beat the global `:focus-visible` halo
+rather than being assumed to.
+
+| Segment | backdrop | gold `#e8cd85` | dark `#16352b` | verdict |
+|---|---|---|---|---|
+| inactive, English (bare, over `#071711`) | `#071711` | **11.85:1** | 1.38:1 | passes on the gold line |
+| active, 한국어 (`--accent` = `--gold-500` `#c9a54a`) | `#c9a54a` | 1.51:1 | **5.68:1** | passes on the dark line |
+
+Both readings land exactly on the figures `elevation.css` and the 09-05 journal
+predicted (D1's `1.51`, the dark line's `5.68`, and the inactive segment's `11.85`
+matching T37's outer-ring reading now reproduced from the inset one). The default
+`--ring-focus` composition clears `3:1` on both segments without a segment-specific
+override, so the Step 2 fallback ring (`--clay-900` widened to the outside) was not
+needed — recorded as available, not built.
+
+The port also moved the inactive label from `--text-primary` to `--text-meta`
+(`--ink-200`, a translucent ink), per the design reference's "bare felt" inactive
+segment. That is a label colour, not the ring, but it is `--size-label` (11px)
+text and so owes its own `4.5:1` bar. Read from the same unfocused frame, the
+glyph's most-covered pixel is `rgb(135,137,125)` against the `#071711` backdrop —
+**5.18:1**. Clears it; not reverted.
+
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/ docs/tasks/T41-language-toggle.md

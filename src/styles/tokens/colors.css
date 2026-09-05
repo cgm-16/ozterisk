@@ -26,6 +26,7 @@
   --jade-500: #4f9d7c;
 
   /* ---- Vermilion (incorrect, discard, capacity danger) ------------------ */
+  --verm-800: #7d2d1f;   /* primary button edge — the fired 'thickness' colour */
   --verm-600: #b5432f;
   --verm-400: #e2795f;
 

@@ -68,37 +68,6 @@ dd.primary {
   justify-content: center;
 }
 
-.playAgain,
-.secondary {
-  min-width: var(--target-min);
-  min-height: var(--target-min);
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color var(--dur-state) var(--ease-standard),
-    border-color var(--dur-state) var(--ease-standard),
-    transform var(--dur-press) var(--ease-standard);
-}
-
-.playAgain:active,
-.secondary:active {
-  transform: translateY(var(--press-offset));
-}
-
-.playAgain {
-  border: none;
-  background: var(--accent);
-  color: var(--text-on-tile);
-}
-
-.secondary {
-  border: 1px solid var(--border-hairline);
-  background: var(--surface-panel);
-  color: var(--text-primary);
-}
-
 .status {
   color: var(--text-meta);
   min-height: 1.25em;

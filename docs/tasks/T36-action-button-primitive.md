@@ -42,7 +42,7 @@ Eight `<button>` sites each repeat the same block, across four components, with
 four different class names for three actual appearances. The plan's "seven copies"
 undercounts; the real inventory is below.
 
-- [ ] **Step 1: Take the variant mapping as given**
+- [x] **Step 1: Take the variant mapping as given**
 
 | Variant | Call sites |
 |---|---|
@@ -59,7 +59,7 @@ comment left out.
 `role="group"` segmented control with its own component, and they belong to
 `M5.5d`. Do not touch them.
 
-- [ ] **Step 2: Correct the contract's false claim**
+- [x] **Step 2: Correct the contract's false claim**
 
 `ActionButton.d.ts:8` names the `ghost` call sites as *"Copy Result, How to
 Play."* There is no How to Play button. `TitleScreen.jsx` has no disclosure at all
@@ -71,7 +71,7 @@ Correct the comment. `T27` already corrected two false claims in this handover o
 the same principle: a wrong doc line in a reference the next phase reads is a
 defect, not a cosmetic issue.
 
-- [ ] **Step 3: Do not inherit the reference's four defects**
+- [x] **Step 3: Do not inherit the reference's four defects**
 
 `ActionButton.jsx` is the visual authority and a mechanism trap. Each of these
 would read as a passing implementation:
@@ -88,7 +88,7 @@ would read as a passing implementation:
    is shared; the colour is not.
 4. **Raw hex edges** — `#7d2d1f` on `primary`, `#0e2a21` on `secondary`.
 
-- [ ] **Step 4: Tokenise the edges**
+- [x] **Step 4: Tokenise the edges**
 
 `elevation.css` has no button edge token, and `colors.css` has no `#7d2d1f`.
 
@@ -101,7 +101,7 @@ Then declare the edges and their pressed depths in `elevation.css`, beside the t
 shadows. Two colours and two depths is four values; if one variable per variant
 carries it in fewer, prefer that. Ghost has no edge at all.
 
-- [ ] **Step 5: Build and wire**
+- [x] **Step 5: Build and wire**
 
 Props per `ActionButton.d.ts`: `children` (Title Case, rendered uppercase),
 `variant`, `disabled`, `onClick`, `style`.
@@ -121,13 +121,13 @@ Every accessible name is unchanged and several are exact-pinned: `"Submit"`,
 `M5.5e`'s, and its three tests pin the element type. This task changes line 29 and
 nothing else on that screen.
 
-- [ ] **Step 6: Test the variants**
+- [x] **Step 6: Test the variants**
 
 Focused tests for the three variants and the disabled state — including that a
 disabled button carries no edge, and that press styling survives a pointer
 released off the element (the defect 2 guard).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/ docs/design-system/components/hud/ActionButton.d.ts docs/tasks/T36-action-button-primitive.md

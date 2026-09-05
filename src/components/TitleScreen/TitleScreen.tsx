@@ -1,3 +1,4 @@
+import { ActionButton } from "../ActionButton/ActionButton";
 import { LanguageToggle } from "../LanguageToggle/LanguageToggle";
 import { useI18n } from "../../i18n/I18nContext";
 import styles from "./TitleScreen.module.css";
@@ -26,9 +27,7 @@ export function TitleScreen({ onStart }: TitleScreenProps) {
         </ul>
       </details>
       <LanguageToggle />
-      <button type="button" className={styles.start} onClick={onStart}>
-        {t("action.start")}
-      </button>
+      <ActionButton onClick={onStart}>{t("action.start")}</ActionButton>
     </main>
   );
 }

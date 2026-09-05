@@ -7,6 +7,7 @@ import {
 } from "../../game/selectors";
 import { useGameKeyboard } from "../../hooks/useGameKeyboard";
 import { useI18n } from "../../i18n/I18nContext";
+import { ActionButton } from "../ActionButton/ActionButton";
 import { AnswerSlots } from "../AnswerSlots/AnswerSlots";
 import { EquationBoard } from "../EquationBoard/EquationBoard";
 import { FeedbackPanel } from "../FeedbackPanel/FeedbackPanel";
@@ -54,30 +55,22 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
 
       {state.phase === "answering" && (
         <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.action}
-            onClick={onSubmit}
-            disabled={!isSubmissionReady(state)}
-          >
+          <ActionButton onClick={onSubmit} disabled={!isSubmissionReady(state)}>
             {t("action.submit")}
-          </button>
+          </ActionButton>
 
-          <button
-            type="button"
-            className={styles.secondaryAction}
+          <ActionButton
+            variant="secondary"
             onClick={() => dispatch({ type: "CLEAR_SELECTION" })}
             disabled={state.selectedTiles.length === 0}
           >
             {t("action.clear")}
-          </button>
+          </ActionButton>
         </div>
       )}
 
       {state.phase === "feedback" && (
-        <button type="button" className={styles.action} onClick={onNextRound}>
-          {t("action.next")}
-        </button>
+        <ActionButton onClick={onNextRound}>{t("action.next")}</ActionButton>
       )}
 
       {state.phase === "overflow" && (

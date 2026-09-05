@@ -5,7 +5,7 @@ export type ActionButtonVariant =
   | "primary"
   /** Supporting action on the felt: Clear, Share. */
   | "secondary"
-  /** Lowest emphasis, hairline outline: Copy Result, How to Play. */
+  /** Lowest emphasis, hairline outline: Copy Result. */
   | "ghost";
 
 /**

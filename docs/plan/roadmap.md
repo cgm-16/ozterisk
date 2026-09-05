@@ -32,6 +32,23 @@ hoc at branch time.
 | `M6 — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(round)` merged; both modes' economy invariants green |
 | `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
 
+`M4`, `M5`, `M5.5a` and `M5.5b` are closed, merged as `16f2ff6`, `ecd76a1`,
+`f30929e` and `b933ca7`.
+
+**`M5.5b` met its exit gate in three parts of four.** A full English run plus a
+switch to Korean makes zero non-origin requests; Korean renders in Noto Sans KR,
+measured by rendered width rather than `document.fonts.check()`; the token
+partials and all ten global keyframes reach the document unscoped. The focus
+indicator clears `3:1` on felt — `11.85` on all 176 sides of the eleven
+controls whose ring lands there — but not on ceramic. The inventory tile's
+ring lands on the tile's own `--shadow-tile` edge and reads `1.61`–`1.62` on
+every tile at every tier, because `--ring-focus` is defined correctly and worn
+by nothing. Its fix is a `box-shadow` rule in `TileInventory.module.css`, a
+component this milestone does not restyle, so `M5.5d` inherits it as a stated
+requirement rather than a surprise. The gate above is left as written: it is
+the standard, and `M5.5b` fell short of it. Measured across 111 readings in
+`docs/journal/journal-2026-09-02.md`.
+
 **Why M5.5 is a fraction.** The design pass was not on the roadmap when M6
 and M7 were numbered, and it has to run once the gallery exists — the gallery
 is what makes every state viewable without playing to it, which is the

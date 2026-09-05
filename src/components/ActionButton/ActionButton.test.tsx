@@ -93,4 +93,49 @@ describe("ActionButton", () => {
     fireEvent.pointerUp(document.body);
     expect(button.getAttribute("style")).toBeNull();
   });
+
+  // The assertion above passes just as well if the :active rule is deleted
+  // outright — the button silently stops pressing. jsdom cannot enter :active,
+  // so the rule is read from the CSSOM instead, the way Tile.test.tsx reads
+  // its own composition guard.
+  describe("press rules", () => {
+    const ownClasses = Object.values(styles);
+
+    function ownRules() {
+      return Array.from(document.styleSheets)
+        .flatMap((sheet) => Array.from(sheet.cssRules))
+        .filter((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule)
+        .filter((rule) => ownClasses.some((name) => rule.selectorText.includes(name)));
+    }
+
+    it("presses through :active, and only while enabled", () => {
+      renderButton();
+      const press = ownRules().find(
+        (rule) => rule.selectorText.includes(":active") && !rule.selectorText.includes(":focus-visible"),
+      );
+      expect(press?.selectorText).toBe(`.${styles.button}:not(:disabled):active`);
+      expect(press?.style.transform).toBe("translateY(var(--press-offset))");
+      expect(press?.style.boxShadow).toBe("var(--btn-edge-depth-pressed) var(--btn-edge)");
+    });
+
+    // Defect 3 guard: the reference applied one hard-coded vermilion shadow to
+    // every variant, so a pressed secondary showed a vermilion edge against its
+    // own green one. The pressed depth is shared; the colour never is.
+    it("gives every variant its own edge colour", () => {
+      renderButton();
+      const edges = new Map(
+        (["primary", "secondary", "ghost"] as ActionButtonVariant[]).map((v) => [
+          v,
+          ownRules()
+            .find((rule) => rule.selectorText === `.${styles[v]}`)
+            ?.style.getPropertyValue("--btn-edge")
+            .trim(),
+        ]),
+      );
+      expect(edges.get("primary")).toBe("var(--verm-800)");
+      expect(edges.get("secondary")).toBe("var(--felt-800)");
+      expect(edges.get("ghost")).toBe("transparent");
+      expect(new Set(edges.values()).size).toBe(3);
+    });
+  });
 });

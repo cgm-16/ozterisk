@@ -1,0 +1,46 @@
+.meter {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.label {
+  font: var(--weight-medium) var(--size-label) / var(--leading-tight) var(--font-mono);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--text-meta);
+}
+
+.pips {
+  display: flex;
+  gap: var(--space-1);
+}
+
+/* Pip geometry is intrinsic to this component and has no reusable token;
+   radius alone borrows --radius-sm, the closest existing step. */
+.pip {
+  width: 15px;
+  height: 7px;
+  border-radius: var(--radius-sm);
+}
+
+.filled {
+  background: var(--accent);
+}
+
+/* Reference fill was raw rgba(240,231,214,.16); --hair-100
+   (rgba(240,231,214,.10)) is the closest existing token, so empty pips reuse
+   it rather than adding a new one. */
+.empty {
+  background: var(--hair-100);
+}
+
+/* The eleventh pip is not a near-capacity warning tint — vermilion already
+   means a tile is leaving, and mid-overflow this pip is exactly the tile
+   that must leave. Drawn past the rail with a gap so it reads as an addition,
+   not an eleventh socket. */
+.overflow {
+  background: var(--state-discard);
+  margin-left: var(--space-2);
+}

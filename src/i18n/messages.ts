@@ -45,6 +45,7 @@ const en = {
     score: "Score",
     streak: "Streak",
     round: "Round",
+    capacity: "Capacity",
   },
   result: {
     correct: "Correct",
@@ -114,6 +115,7 @@ const ko = {
     score: "점수",
     streak: "연속 정답",
     round: "라운드",
+    capacity: "용량",
   },
   result: {
     correct: "정답",

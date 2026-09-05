@@ -22,7 +22,7 @@ export function GameHud({ score, currentStreak, round }: GameHudProps) {
       </div>
       <div className={styles.entry}>
         <dt>{t("hud.streak")}</dt>
-        <dd>{currentStreak}</dd>
+        <dd className={currentStreak > 0 ? styles.streakActive : undefined}>{currentStreak}</dd>
       </div>
     </dl>
   );

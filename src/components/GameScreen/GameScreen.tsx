@@ -10,6 +10,7 @@ import { useGameKeyboard } from "../../hooks/useGameKeyboard";
 import { useI18n } from "../../i18n/I18nContext";
 import { ActionButton } from "../ActionButton/ActionButton";
 import { AnswerSlots } from "../AnswerSlots/AnswerSlots";
+import { CapacityMeter } from "../CapacityMeter/CapacityMeter";
 import { EquationBoard } from "../EquationBoard/EquationBoard";
 import { FeedbackPanel } from "../FeedbackPanel/FeedbackPanel";
 import { GameHud } from "../GameHud/GameHud";
@@ -41,6 +42,7 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
   return (
     <main className={styles.screen}>
       <GameHud score={state.score} currentStreak={state.currentStreak} round={state.round} />
+      <CapacityMeter held={state.inventory.length} />
       <EquationBoard equation={state.equation} />
 
       {state.phase === "answering" && (

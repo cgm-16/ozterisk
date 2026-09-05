@@ -35,7 +35,7 @@ paths:
 you are only if you can see the rack, and the meter is the persistent read. It is
 an intentional addition, not a port — `CapacityMeter.d.ts` says so.
 
-- [ ] **Step 1: The meter goes beside the `<dl>`, not inside it**
+- [x] **Step 1: The meter goes beside the `<dl>`, not inside it**
 
 **Ruling, so nobody has to guess.** `GameHud` stays a `<dl>` — the test policy
 pins that element type, and `GameHud.d.ts` carries only score, streak and round.
@@ -45,7 +45,7 @@ sibling in the HUD region.
 
 `§1.10`'s "the HUD gains the capacity meter" means the region, not the list.
 
-- [ ] **Step 2: Do not disturb what the tests hold**
+- [x] **Step 2: Do not disturb what the tests hold**
 
 Three separate pins, all load-bearing:
 
@@ -59,7 +59,7 @@ Three separate pins, all load-bearing:
 - **Round keeps primary emphasis.** Spec-locked in `§1.10` *and* test-pinned. The
   meter must not out-shout it — it is a read-out, not a stat.
 
-- [ ] **Step 3: Build the meter**
+- [x] **Step 3: Build the meter**
 
 `held: number` (0–11; 11 only mid-overflow) and `label?: string`, defaulting to the
 localised `hud.capacity`, which already exists in `§1.14`'s copy table in both
@@ -78,20 +78,20 @@ full, that is a new meaning for the hue and needs stating, not assuming.
 the label is the text cue; make sure a filled pip differs from an empty one by
 more than hue.
 
-- [ ] **Step 4: The HUD's own type**
+- [x] **Step 4: The HUD's own type**
 
 `GameHud.d.ts`: *"Renders gold above zero"* for streak. Labels are Title Case in
 source, uppercased by CSS — do not uppercase the strings, or `getByText("Round")`
 stops resolving.
 
-- [ ] **Step 5: Test**
+- [x] **Step 5: Test**
 
 - The meter reports held counts of 0, 10 and 11 distinctly.
 - Round, Score, Streak markup order unchanged.
 - `.primary` still wins its tie — assert the computed font-size the way
   `App.test.tsx:139` does, so a specificity regression fails here too.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/components/ docs/tasks/T40-hud-and-capacity.md

@@ -35,3 +35,9 @@
 dd.primary {
   font-size: 1.5rem;
 }
+
+/* Streak renders gold once it's above zero (GameHud.d.ts) — a plain color
+   rule, not competing with the .primary/.entry dd specificity tie above. */
+dd.streakActive {
+  color: var(--accent);
+}

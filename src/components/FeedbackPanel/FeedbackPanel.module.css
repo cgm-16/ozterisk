@@ -54,7 +54,7 @@
 }
 
 .rewardBadge {
-  font-size: 0.625rem;
+  font-size: var(--size-label);
   text-transform: uppercase;
   letter-spacing: 0.02em;
   color: var(--state-reward);

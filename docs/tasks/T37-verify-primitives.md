@@ -38,7 +38,7 @@ was defined correctly and worn by nothing — the token was right, no element
 composed it. That is the specific failure this task has to be able to detect, so
 reading the token back is not a measurement.
 
-- [ ] **Step 1: Walk the tab order, do not list controls from memory**
+- [x] **Step 1: Walk the tab order, do not list controls from memory**
 
 Reach every control with `Tab`. A control focused by a click does not match
 `:focus-visible`, so a click-then-measure returns the same blank a missing ring
@@ -49,7 +49,7 @@ Cover both primitives at every appearance: rack tile, filled answer slot, reward
 tile, and each of the three button variants plus disabled. `sm` and `lg` tiles draw
 different edges, so they are different readings.
 
-- [ ] **Step 2: Read both terms of the ratio from pixels**
+- [x] **Step 2: Read both terms of the ratio from pixels**
 
 Neither term from a token value, and neither from a computed style — the reasoning
 is in `T32` step 4 and has not changed. A `box-shadow` with no blur puts a hard band
@@ -67,20 +67,20 @@ only `1.10` on the ceramic face. The claim under test is that the `--clay-900` l
 clears `3:1` where the gold line cannot. Report both lines separately; an average
 is not a measurement.
 
-- [ ] **Step 3: Prove the ring composes rather than replaces**
+- [x] **Step 3: Prove the ring composes rather than replaces**
 
 The defect `M5.5b` shipped was structural, not chromatic: a focus `box-shadow`
 declared beside an elevation `box-shadow` replaces it. Confirm a focused tile still
 draws its own edge — that a focused `lifted` tile shows `--shadow-tile-lifted` and
 the ring, not the ring alone.
 
-- [ ] **Step 4: Prove the ring is withheld on click**
+- [x] **Step 4: Prove the ring is withheld on click**
 
 Click each control and confirm no ring appears. This is the `:focus-visible`
 guarantee, and it is the half that the reference implementations get wrong; a port
 that regressed to `onFocus` would pass every other step in this task.
 
-- [ ] **Step 5: Read the ghost variant's boundary**
+- [x] **Step 5: Read the ghost variant's boundary**
 
 Not the focus ring, and not this milestone's doing — `ActionButton.jsx` draws the
 `ghost` border with `--border-hairline`, and `T36` ported it faithfully. But the
@@ -95,13 +95,13 @@ disabled button are distinguishable as rendered. Today no screen renders a disab
 is a latent collision, not a live one. Report it as such; do not fix it here.
 Changing it means diverging from the design system, which is Ori's call.
 
-- [ ] **Step 6: Confirm the primitives actually replaced the old rules**
+- [x] **Step 6: Confirm the primitives actually replaced the old rules**
 
 Grep `src/` for the class rules `T35` and `T36` were meant to delete. A primitive
 wired beside a surviving duplicate is the failure mode that makes the next phase's
 diff lie, and it is invisible to the suite.
 
-- [ ] **Step 7: Record it**
+- [x] **Step 7: Record it**
 
 A journal entry carrying the numbers and anything that surprised you.
 

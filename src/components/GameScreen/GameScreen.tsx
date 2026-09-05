@@ -1,3 +1,4 @@
+import { sortTiles } from "../../game/factories";
 import type { GameAction, GameState } from "../../game/types";
 import {
   getAnswerLength,
@@ -82,7 +83,8 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
       )}
 
       <TileInventory
-        tiles={state.inventory}
+        tiles={sortTiles([...state.inventory, ...state.selectedTiles])}
+        liftedIds={state.selectedTiles.map((tile) => tile.id)}
         mode={state.phase === "answering" ? "select" : state.phase === "overflow" ? "discard" : "readOnly"}
         pendingDiscards={state.pendingDiscards}
         onTile={(tileId) => {

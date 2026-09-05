@@ -43,7 +43,7 @@ And selecting a tile removes it from the rack, so the remaining tiles slide left
 `decisions.md` calls this *"the one layout shift this screen cannot afford"* — you
 are asked to compare digits while they move.
 
-- [ ] **Step 1: Ten cells, always**
+- [x] **Step 1: Ten cells, always**
 
 The grid is `--rack-columns` (5) × `--rack-rows` (2), and it renders `--capacity`
 (10) cells whether ten tiles are held or one. An empty cell is a socket: it is the
@@ -61,7 +61,7 @@ which is what the gate asks. The design's own answer is the perched tile on
 `OverflowControls` (`perchedTile` in its `.d.ts`) — that belongs to `M5.5e`, and
 this task must not pre-empt it.
 
-- [ ] **Step 2: Add `liftedIds`, and derive it in `GameScreen`**
+- [x] **Step 2: Add `liftedIds`, and derive it in `GameScreen`**
 
 A tile sitting in an answer slot keeps its cell, drawn as an empty socket wearing
 `--outline-socket-lifted` (a dashed gold rule at `--outline-socket-lifted-offset`).
@@ -85,7 +85,7 @@ write a second one.
 `src/game/gameReducer.test.ts` is 892 lines and must not change. If you find
 yourself editing a reducer, stop — the derivation is the whole point.
 
-- [ ] **Step 3: Keep every pinned name and the ordering**
+- [x] **Step 3: Keep every pinned name and the ordering**
 
 `/^Digit \d$/` and `/New tile$/` are regex-pinned. `GameScreen.test.tsx:306` pins
 HUD → equation → Submit → inventory by `compareDocumentPosition`; reordering
@@ -96,7 +96,7 @@ it holds is in the answer slots and already carries its own name there. Two
 elements with the same accessible name for one tile is a defect, and
 `src/gallery/states.test.tsx:29` counts on the arithmetic.
 
-- [ ] **Step 4: Test the invariants that matter**
+- [x] **Step 4: Test the invariants that matter**
 
 - The rack renders ten cells at one tile held and at ten.
 - Selecting a tile does not change the number of cells, and does not move any
@@ -104,7 +104,7 @@ elements with the same accessible name for one tile is a defect, and
 - A lifted cell exposes no `Digit` name.
 - Eleven tiles render eleven cells.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/components/ docs/tasks/T38-rack-sockets.md

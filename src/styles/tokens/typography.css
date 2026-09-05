@@ -19,7 +19,6 @@
   --size-body: 16px;
   --size-body-sm: 13.5px;
   --size-label: 11px;      /* mono, uppercase, tracked */
-  --size-micro: 9px;
 
   --leading-tight: 1;
   --leading-snug: 1.4;
@@ -46,5 +45,4 @@
   --size-body: 17px;
   --size-body-sm: 14.5px;
   --size-label: 12px;
-  --size-micro: 10px;
 }

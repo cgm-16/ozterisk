@@ -32,13 +32,20 @@ socket; round retains primary emphasis."* CI proves none of the three. Two are
 geometry and one is a computed style, and the token layer never enters the test
 graph.
 
-- [ ] **Step 1: Ten sockets at three tiers**
+- [ ] **Step 1: Ten sockets at three tiers, and the boundary between them**
 
-Count rendered cells at `320`, `400` and `768` CSS pixels wide, at one tile held
+Count rendered cells at `320`, `408` and `768` CSS pixels wide, at one tile held
 and at ten. Ten every time. Report the rack's measured width at each tier against
-the viewport — `§1.12` fixes five tiles plus four gaps at `292px` inside `320px`
-and `378px` inside `400px`, and those figures leave room for the arena's padding
-by a margin small enough to lose.
+the viewport — the narrow tier needs `292px` of the `296px` a `320px` viewport
+leaves once the arena spends `24px` on its own padding, and the middle tier needs
+`378px` of the `384px` a `408px` viewport leaves.
+
+**The middle tier's lower bound moved from `400px` to `408px` during this
+milestone, and this step is what re-checks it.** `T38` made the rack a fixed
+five-column grid, and a fixed grid overflows where the old `flex-wrap` silently
+wrapped: at `400px` the tier needed `378px` against `376px` available. Measure at
+`407` and `408` specifically — `407` must still be on the narrow tier and `408`
+must fit — because an off-by-one here restores exactly the defect that was fixed.
 
 - [ ] **Step 2: A selected tile keeps its socket**
 
@@ -66,6 +73,14 @@ gold-on-gold.
 Report both tones against **both** segments, from pixels, scanning from outside
 the border box inward. If `T41`'s own number and this one disagree, the
 disagreement is the finding.
+
+`T41` reported `11.85:1` for gold on the inactive segment and `5.68:1` for the
+dark tone on the gold active segment. **Do not read those numbers before taking
+your own** — measure first, then compare. Note also what they mean: on the gold
+segment the gold band is invisible at `1.51:1`, so the whole indicator is the
+`1px` dark line the composition leaves at `3px` inset. It clears `SC 1.4.11`,
+which is the gate. Say how thick the visible band actually is, so the record
+carries what passed rather than only that it passed.
 
 - [ ] **Step 5: No horizontal scroll at 320px**
 

@@ -101,4 +101,45 @@ describe("Tile", () => {
       expect(screen.getByText("7")).toHaveClass(styles.tile, styles.sm, styles.reward);
     });
   });
+
+  // A press has to add its offset to whatever the state already does. If any
+  // state class declares `transform` itself, the press rule replaces it rather
+  // than composing with it, and a marked tile snaps flat and un-rotates the
+  // moment it is touched. Measured in the browser: marked sits at
+  // translateY(-5px) rotate(6deg), and marked-while-pressed at -3px / 6deg.
+  describe("press composition", () => {
+    // Every class this module owns, so a state rule cannot escape the check by
+    // having a selector that never mentions .tile — which is exactly how the
+    // first version of this test passed while the invariant was broken.
+    const ownClasses = Object.values(styles);
+
+    function ownRules() {
+      return Array.from(document.styleSheets)
+        .flatMap((sheet) => Array.from(sheet.cssRules))
+        .filter((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule)
+        .filter((rule) => ownClasses.some((name) => rule.selectorText.includes(name)));
+    }
+
+    it("declares transform in exactly one rule, the base one", () => {
+      renderTile({ onClick: vi.fn(), state: "marked" });
+      const declaring = ownRules().filter((rule) => rule.style.transform !== "");
+      expect(declaring.map((rule) => rule.selectorText)).toEqual([`.${styles.tile}`]);
+    });
+
+    it("drives the state offsets through custom properties", () => {
+      renderTile({ onClick: vi.fn(), state: "marked" });
+      const base = ownRules().find((rule) => rule.selectorText === `.${styles.tile}`);
+      expect(base?.style.transform).toContain("var(--tile-press)");
+      expect(base?.style.transform).toContain("var(--tile-lift)");
+      expect(base?.style.transform).toContain("var(--tile-tilt)");
+    });
+
+    it("presses only the button form, and only when enabled", () => {
+      renderTile({ onClick: vi.fn() });
+      const press = ownRules().find((rule) => rule.selectorText.includes(":active"));
+      expect(press?.selectorText).toBe(`button.${styles.tile}:not(:disabled):active`);
+      expect(press?.style.getPropertyValue("--tile-press")).toBe("var(--press-offset)");
+    });
+  });
+
 });

@@ -59,6 +59,19 @@ describe("TileInventory", () => {
     expect(button).toHaveAttribute("aria-pressed", "true");
   });
 
+  // The whole rack is a toggle set while discarding, so an unmarked tile has
+  // to say so. Reporting only the marked tile's "true" would leave the other
+  // nine announcing as plain buttons with nothing to suggest they can be
+  // marked at all.
+  it("reports the unmarked tiles as unpressed while discarding", () => {
+    renderInventory({
+      mode: "discard",
+      tiles: [tile(3, "a"), tile(4, "b")],
+      pendingDiscards: ["a"],
+    });
+    expect(screen.getByRole("button", { name: "Digit 4" })).toHaveAttribute("aria-pressed", "false");
+  });
+
   it("does not mark a tile as pending discard outside discard mode", () => {
     renderInventory({
       mode: "select",

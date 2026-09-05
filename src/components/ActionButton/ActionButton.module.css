@@ -1,0 +1,71 @@
+.button {
+  min-height: var(--target-min);
+  padding: 0 var(--space-8);
+  border: none;
+  border-radius: var(--radius-md);
+  font: var(--weight-bold) var(--size-label) / var(--leading-tight) var(--font-ui);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: var(--btn-edge-depth) var(--btn-edge);
+  transform: translateY(0);
+  transition:
+    transform var(--dur-press) var(--ease-settle),
+    box-shadow var(--dur-press) var(--ease-settle),
+    background var(--dur-state) var(--ease-standard);
+}
+
+.primary {
+  --btn-edge: var(--verm-800);
+  background: var(--state-incorrect);
+  color: var(--ink-000);
+}
+
+.secondary {
+  --btn-edge: var(--felt-800);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+}
+
+/* Ghost's edge colour is transparent rather than unset: box-shadow can
+   compose a transparent shadow into a list, but not the keyword `none`, and
+   the :focus-visible rule below composes --btn-edge onto the ring for every
+   variant alike. Declared after .button so its hairline border beats
+   .button's `border: none` at the equal (0,1,0) specificity the two share. */
+.ghost {
+  --btn-edge: transparent;
+  background: transparent;
+  color: var(--text-body);
+  border: 1px solid var(--border-hairline);
+}
+
+.button:not(:disabled):active {
+  transform: translateY(var(--press-offset));
+  box-shadow: var(--btn-edge-depth-pressed) var(--btn-edge);
+}
+
+/* Declared after :active: the two rules tie at (0,3,0), and a keyboard press
+   that also carries focus-visible should keep the ring, not the press depth. */
+.button:not(:disabled):focus-visible {
+  box-shadow: var(--btn-edge-depth) var(--btn-edge), var(--ring-focus);
+  outline: none;
+}
+
+/* A keyboard press carries focus-visible as well as :active, and each of
+   those rules alone would drop the other's half: the ring without the
+   pressed depth reads as the whole button sliding down rather than
+   compressing into the felt. */
+.button:not(:disabled):focus-visible:active {
+  box-shadow: var(--btn-edge-depth-pressed) var(--btn-edge), var(--ring-focus);
+}
+
+/* A disabled button is FLAT: no shadow, hairline outline instead of the
+   variant's own fill. "Not yet" reads as "not raised". (0,2,0) beats every
+   variant rule above regardless of source order. */
+.button:disabled {
+  cursor: default;
+  background: transparent;
+  color: var(--text-disabled);
+  box-shadow: none;
+  outline: 1px solid var(--border-hairline);
+}

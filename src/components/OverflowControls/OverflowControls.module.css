@@ -8,27 +8,3 @@
 .instruction {
   color: var(--text-meta);
 }
-
-.confirm {
-  min-width: var(--target-min);
-  min-height: var(--target-min);
-  padding: var(--space-3) var(--space-6);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  color: var(--text-on-tile);
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color var(--dur-state) var(--ease-standard),
-    transform var(--dur-press) var(--ease-standard);
-}
-
-.confirm:disabled {
-  cursor: default;
-  opacity: 0.6;
-}
-
-.confirm:active:not(:disabled) {
-  transform: translateY(var(--press-offset));
-}

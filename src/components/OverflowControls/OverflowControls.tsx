@@ -1,4 +1,5 @@
 import { useI18n } from "../../i18n/I18nContext";
+import { ActionButton } from "../ActionButton/ActionButton";
 import styles from "./OverflowControls.module.css";
 
 export interface OverflowControlsProps {
@@ -17,9 +18,9 @@ export function OverflowControls({ requiredCount, onConfirm, disabled }: Overflo
           GameScreen's onTile handler); Confirm only has a decision to make
           when more than one tile must go, which only Classic mode produces. */}
       {requiredCount > 1 && (
-        <button type="button" className={styles.confirm} onClick={onConfirm} disabled={disabled}>
+        <ActionButton onClick={onConfirm} disabled={disabled}>
           {t("action.confirmDiscard")}
-        </button>
+        </ActionButton>
       )}
     </div>
   );

@@ -5,37 +5,13 @@
   justify-content: center;
 }
 
-.tile {
-  position: relative;
-  min-width: var(--target-min);
-  min-height: var(--target-min);
+/* The badge sits below the tile rather than inside it: the ceramic face is the
+   Tile primitive's, and it renders a digit and nothing else. */
+.cell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-md);
-  background: var(--surface-tile);
-  box-shadow: var(--shadow-tile);
-  color: var(--text-on-tile);
-  font-size: 1.25rem;
-  cursor: pointer;
-  transition:
-    border-color var(--dur-state) var(--ease-standard),
-    transform var(--dur-press) var(--ease-standard);
-}
-
-.tile:disabled {
-  cursor: default;
-  opacity: 0.6;
-}
-
-.tile:active:not(:disabled) {
-  transform: translateY(var(--press-offset));
-}
-
-.tile[aria-pressed="true"] {
-  border-color: var(--state-discard);
+  gap: var(--space-1);
 }
 
 .newBadge,

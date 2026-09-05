@@ -9,6 +9,7 @@ import {
   type ShareOutcome,
   type ShareStats,
 } from "../../services/sharing";
+import { ActionButton } from "../ActionButton/ActionButton";
 import { EquationBoard } from "../EquationBoard/EquationBoard";
 import styles from "./GameOverScreen.module.css";
 
@@ -70,15 +71,13 @@ export function GameOverScreen({
         </div>
       </dl>
       <div className={styles.actions}>
-        <button type="button" className={styles.playAgain} onClick={onPlayAgain}>
-          {t("action.playAgain")}
-        </button>
-        <button type="button" className={styles.secondary} onClick={handleShare}>
+        <ActionButton onClick={onPlayAgain}>{t("action.playAgain")}</ActionButton>
+        <ActionButton variant="secondary" onClick={handleShare}>
           {t("action.share")}
-        </button>
-        <button type="button" className={styles.secondary} onClick={handleCopy}>
+        </ActionButton>
+        <ActionButton variant="ghost" onClick={handleCopy}>
           {t("action.copy")}
-        </button>
+        </ActionButton>
       </div>
       <p className={styles.status} role="status" aria-live="polite">
         {status === "copied" ? t("share.copied") : status === "failed" ? t("share.failed") : ""}

@@ -5,12 +5,14 @@
   justify-content: center;
 }
 
+/* The empty slot is the one ceramic-adjacent case the Tile primitive does not
+   collapse: it is a socket cut into the felt — --surface-socket, an inset
+   shadow and a dashed rim — with no tile face to draw. It stays a disabled
+   button because role and accessible name are load-bearing here
+   (AnswerSlots.test.tsx, GameScreen.test.tsx), not because it is a control. */
 .slot {
-  min-width: var(--target-min);
-  min-height: var(--target-min);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: var(--tile-w);
+  height: var(--tile-h);
   /* A dashed, heavier border keeps slots visually distinct from the solid
      1px inventory tiles at every fill state (§1.12). Uses --text-meta
      rather than --border-hairline: an empty slot sits on --surface-socket (no
@@ -20,43 +22,8 @@
   border-radius: var(--radius-md);
   background: var(--surface-socket);
   box-shadow: var(--shadow-socket);
-  color: var(--text-primary);
-  font-size: 1.25rem;
-  cursor: pointer;
-  transition:
-    background-color var(--dur-state) var(--ease-standard),
-    border-color var(--dur-state) var(--ease-standard),
-    transform var(--dur-press) var(--ease-standard);
-}
-
-/* A slot is only ever disabled because it holds no tile (see
-   AnswerSlots.tsx: `disabled={!tile || disabled}`, and the group-level
-   `disabled` prop is always false while this component renders), so
-   :disabled reliably targets the empty state without any markup change. */
-.slot:not(:disabled) {
-  background: var(--surface-panel);
-}
-
-.slot:disabled {
   /* No opacity dimming: the empty state is already signaled by the absence
      of a digit plus the dashed border, and dimming would push the border
      back below the contrast floor established above. */
   cursor: default;
-}
-
-/* A filled slot is clickable (it returns its tile to inventory); signal that
-   with a border/background shift rather than a "×" glyph, since ::before/
-   ::after generated content can leak into the accessibility tree and this
-   slot already carries a full aria-label (AnswerSlots.tsx:21-23). Background
-   shifts to --surface-socket, not --surface-panel: the rest state above already
-   sets a filled slot's background to --surface-panel, so --surface-panel here
-   would be a no-op and the shift would have no visible effect. */
-.slot:not(:disabled):hover,
-.slot:not(:disabled):focus-visible {
-  border-color: var(--accent);
-  background: var(--surface-socket);
-}
-
-.slot:active:not(:disabled) {
-  transform: translateY(var(--press-offset));
 }

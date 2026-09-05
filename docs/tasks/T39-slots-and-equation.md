@@ -32,7 +32,7 @@ The equation is the largest type in the app and currently renders at the same
 weight as body copy. The answer slots already carry a socket from `M5.5c` but
 still wear the placeholder dashed border rather than the system's own rim.
 
-- [ ] **Step 1: The empty slot wears the system's rim**
+- [x] **Step 1: The empty slot wears the system's rim**
 
 `M5.5c` left `.slot` as `--surface-socket` plus `--shadow-socket` and a `2px
 dashed var(--text-meta)` border. The system's empty-slot rim is
@@ -49,7 +49,7 @@ the contrast floor is not.
 Reuse `T38`'s socket rather than writing a second one. If the two sockets end up
 differing, one of them is wrong.
 
-- [ ] **Step 2: The equation gets the display type**
+- [x] **Step 2: The equation gets the display type**
 
 `--size-equation` is `68px` on `--font-numeral` (the display serif). This is the
 round's headline and the design's largest type.
@@ -64,14 +64,14 @@ At `320px` a `68px` equation with two operands and an `=` has to fit. Check it,
 and step the size down at the narrow tier if it does not — `§8.5` forbids
 horizontal scroll at `320px`, and that outranks the type scale.
 
-- [ ] **Step 3: Test**
+- [x] **Step 3: Test**
 
 - The empty slot keeps role `button`, stays disabled, and keeps the name
   `Answer slot N: empty`.
 - `getByText("3 × 4 =")` still resolves.
 - No horizontal scroll at `320px` with a two-digit equation.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add src/components/ docs/tasks/T39-slots-and-equation.md

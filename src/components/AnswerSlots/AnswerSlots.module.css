@@ -11,17 +11,22 @@
    button because role and accessible name are load-bearing here
    (AnswerSlots.test.tsx, GameScreen.test.tsx), not because it is a control. */
 .slot {
+  /* T38's socket treatment (TileInventory.module.css .socket), reused rather
+     than reinvented: same tokens, same composition order. This is a socket
+     of the rack's own kind — it just happens to be a disabled <button>. */
   width: var(--tile-w);
   height: var(--tile-h);
-  /* A dashed, heavier border keeps slots visually distinct from the solid
-     1px inventory tiles at every fill state (§1.12). Uses --text-meta
-     rather than --border-hairline: an empty slot sits on --surface-socket (no
-     fill contrast of its own), so the border is the only cue defining its
-     shape and needs the higher-contrast token to stay legible (>=3:1). */
-  border: 2px dashed var(--text-meta);
   border-radius: var(--radius-md);
   background: var(--surface-socket);
-  box-shadow: var(--shadow-socket);
+  box-shadow: var(--shadow-socket), var(--rim-socket);
+  /* A dashed, heavier border keeps slots visually distinct from the solid
+     1px inventory tiles at every fill state (§1.12). --border-slot-empty is
+     the system's own awaiting-input rim: rgba(201, 165, 74, 0.75) composited
+     over --surface-socket (--well-900, #081a14) resolves to #99823c, which
+     measures 4.80:1 against that socket -- clear of the >=3:1 floor. An
+     empty slot sits on --surface-socket with no fill contrast of its own, so
+     the border is the only cue defining its shape and has to clear that floor. */
+  border: 2px dashed var(--border-slot-empty);
   /* No opacity dimming: the empty state is already signaled by the absence
      of a digit plus the dashed border, and dimming would push the border
      back below the contrast floor established above. */

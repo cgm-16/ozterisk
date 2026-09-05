@@ -1,5 +1,6 @@
 .equation {
-  font-size: 2rem;
-  font-weight: 600;
+  /* The round's headline: the display serif at its largest size, matching
+     the weight Tile.module.css gives the same numerals on a tile face. */
+  font: var(--weight-semibold) var(--size-equation) / var(--leading-tight) var(--font-numeral);
   text-align: center;
 }

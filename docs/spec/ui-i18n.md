@@ -18,14 +18,17 @@ section wins.
 - Mobile changes spacing, wrapping, and control size, not information architecture.
 - The inventory rack is ten fixed sockets in a `5 × 2` grid at every breakpoint. The
   grid never resizes as tiles are lost, because the empty sockets are the score.
-- Rack sizing has three tiers: below `400px`, tiles are `52 × 64` with an `8px` gap;
-  from `400px`, `66 × 64` with a `12px` gap; from `48rem`, `64 × 80` with a `12px`
+- Rack sizing has three tiers: below `408px`, tiles are `52 × 64` with an `8px` gap;
+  from `408px`, `66 × 64` with a `12px` gap; from `48rem`, `64 × 80` with a `12px`
   gap. Every tier must satisfy the `44 × 44` target minimum and the `320px`
   no-horizontal-scroll rule below. A tier's rack width — five tiles plus four gaps
   — must also leave room for the arena's horizontal padding at that tier's lower
-  bound: `292px` inside `320px`, and `378px` inside `400px`. (The design document
-  draws this tier at `390px`; the spec raises the boundary to `400px` because
-  `378px` plus usable padding does not fit `390px`.)
+  bound. The arena spends `24px` of that width on its own padding below `40rem`, so
+  the narrow tier needs `292px` of `296px` and the middle tier needs `378px` of the
+  `384px` a `408px` viewport leaves. (The design document draws this tier at `390px`.
+  The boundary is `408px` rather than the `402px` the arithmetic bottoms out at, so a
+  desktop window narrow enough to show a vertical scrollbar still clears; it stays
+  below `412px` so that phone tier keeps the larger tile.)
 
 **Material and colour**
 

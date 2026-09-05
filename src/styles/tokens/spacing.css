@@ -15,10 +15,13 @@
      changes across tiers is the socket, and only the socket.
 
      The tokens below carry the narrowest tier; the media queries widen them.
-     Mobile-first, because 320px is the tier with no room to spare: five tiles
-     plus four gaps is 292px inside 320px, and 378px inside 400px. The design
-     document draws the middle tier at 390px; ui-i18n.md §1.12 raises the
-     boundary to 400px because 378px plus usable padding does not fit 390px. */
+     Mobile-first, because the rack width — five tiles plus four gaps — has to
+     clear the arena's own padding, which is 24px below 40rem. The narrow tier
+     needs 292px of the 296px a 320px viewport leaves. The middle tier needs
+     378px, so it cannot start at 400px: that leaves 376px and overflows by 2.
+     It starts at 408px, above the 402px the arithmetic bottoms out at so a
+     desktop window showing a vertical scrollbar still clears, and below 412px
+     so that phone tier keeps the larger tile. */
   --tile-w: 52px;
   --tile-h: 64px;
   --rack-gap: 8px;
@@ -34,7 +37,7 @@
   --arena-max-width: 42rem;
 }
 
-@media (min-width: 400px) {
+@media (min-width: 408px) {
   :root {
     --tile-w: 66px;
     --rack-gap: 12px;

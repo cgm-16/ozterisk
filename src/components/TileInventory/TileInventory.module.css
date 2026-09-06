@@ -17,6 +17,7 @@
   width: var(--tile-w);
   height: var(--tile-h);
   border-radius: var(--radius-md);
+  background: var(--surface-socket);
   box-shadow: var(--shadow-socket), var(--rim-socket);
 }
 
@@ -38,6 +39,11 @@
   height: var(--tile-h);
 }
 
+/* line-height is set rather than inherited: body's 1.5 gives each line 16.5px
+   here, and the badge grows upward from the tile's lower edge, so a string
+   that wraps climbs over the engraved digit. At 1 a wrapped line costs 11px
+   instead. This narrows the overlap but does not remove it — the label is
+   still longer than a 52px cell at the narrow tier. See issue #84. */
 .newBadge,
 .discardBadge {
   position: absolute;
@@ -45,6 +51,7 @@
   bottom: var(--space-1);
   text-align: center;
   font-size: var(--size-label);
+  line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }

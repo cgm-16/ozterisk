@@ -529,3 +529,36 @@ describe("useGameKeyboard under React.StrictMode", () => {
     expect(dispatch.mock.calls.map(([action]) => action.type)).toEqual(["CLEAR_SELECTION"]);
   });
 });
+
+// The capacity meter reads the same union the rack draws. Selecting a tile
+// moves it out of state.inventory and into state.selectedTiles, so a meter
+// reading inventory alone drops by one per selection and contradicts the rack
+// beside it, which keeps a socket for every tile in that union. It is wrong in
+// the direction that hides overflow: it shows headroom the player has not got.
+//
+// This is asserted at the GameScreen level on purpose. CapacityMeter's own
+// tests pass `held` by hand, so they constrain the component and can never
+// reach the wiring — which is how this shipped past 261 green tests once.
+const EIGHT_HELD_DIGITS = [0, 1, 2, 3, 4, 5, 6, 7] as const;
+
+describe("GameScreen capacity meter", () => {
+  it("counts tiles in the answer slots as still held", () => {
+    const equation = makeEquation(3, 4);
+    const inventory = EIGHT_HELD_DIGITS.map((digit) => makeTile(digit, `held-${digit}`));
+    const state = makeAnsweringState(equation, {
+      inventory,
+      selectedTiles: [makeTile(8, "lifted-a"), makeTile(9, "lifted-b")],
+    });
+    renderScreen(state);
+
+    expect(screen.getByRole("img", { name: "Capacity 10 of 10" })).toBeInTheDocument();
+  });
+
+  it("drops the count only when a tile actually leaves", () => {
+    const equation = makeEquation(3, 4);
+    const inventory = EIGHT_HELD_DIGITS.map((digit) => makeTile(digit, `held-${digit}`));
+    renderScreen(makeAnsweringState(equation, { inventory, selectedTiles: [] }));
+
+    expect(screen.getByRole("img", { name: "Capacity 8 of 10" })).toBeInTheDocument();
+  });
+});

@@ -11,7 +11,7 @@ const en = {
     name: "ozterisk",
     summary:
       "Solve multiplication problems using limited digit tiles. Correct answers replace the tiles you spend and grant one extra tile. Incorrect answers consume your tiles without a reward. Keep your inventory balanced and survive as long as possible.",
-    howToPlay: "How to Play",
+    more: "More",
   },
   language: {
     groupLabel: "Language",
@@ -21,8 +21,10 @@ const en = {
       "Click or tap an inventory tile to place it in the next empty answer slot. Click a filled slot to return that tile to your inventory.",
     slots:
       "Answer slots fill in the order you select tiles: the first tile you choose fills the leftmost slot, so selection order determines the number you submit.",
-    outcomes:
-      "A correct answer replaces the tiles you spent and grants one extra tile. An incorrect answer removes the tiles you spent and grants no reward.",
+    correct:
+      "A correct answer replaces the tiles you spent and grants one extra tile.",
+    incorrect:
+      "An incorrect answer removes the tiles you spent and grants no reward.",
     capacity: "Your inventory holds at most ten tiles.",
     overflow:
       "If a reward would push your inventory past ten tiles, you must choose tiles to discard before play continues.",
@@ -86,7 +88,7 @@ const ko = {
     name: "ozterisk",
     summary:
       "제한된 숫자 타일로 곱셈 문제를 푸세요. 정답을 맞히면 사용한 타일을 보충하고 타일 한 개를 추가로 받습니다. 오답에 사용한 타일은 보상 없이 사라집니다. 타일 구성을 관리하며 최대한 오래 살아남으세요.",
-    howToPlay: "게임 방법",
+    more: "더 보기",
   },
   language: {
     groupLabel: "언어",
@@ -96,8 +98,8 @@ const ko = {
       "인벤토리 타일을 클릭하거나 탭하면 다음 빈 정답 칸에 놓입니다. 채워진 칸을 클릭하면 타일이 인벤토리로 돌아갑니다.",
     slots:
       "정답 칸은 선택한 순서대로 채워집니다. 먼저 선택한 타일이 맨 왼쪽 칸에 들어가므로 선택 순서가 제출할 숫자를 결정합니다.",
-    outcomes:
-      "정답이면 사용한 타일을 보충하고 타일 한 개를 추가로 받습니다. 오답이면 사용한 타일이 보상 없이 사라집니다.",
+    correct: "정답이면 사용한 타일을 보충하고 타일 한 개를 추가로 받습니다.",
+    incorrect: "오답이면 사용한 타일이 보상 없이 사라집니다.",
     capacity: "인벤토리는 최대 열 개의 타일까지 보관할 수 있습니다.",
     overflow: "보상으로 인벤토리가 열 개를 초과하면, 계속하기 전에 버릴 타일을 선택해야 합니다.",
     progress:

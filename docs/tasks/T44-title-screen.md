@@ -47,7 +47,7 @@ The ruling was reached by Ori after seeing both rendered, and it is fixed:
 
 Do not relitigate this. Build it.
 
-- [ ] **Step 1: Split `howToPlay.outcomes` at its existing sentence boundary**
+- [x] **Step 1: Split `howToPlay.outcomes` at its existing sentence boundary**
 
 The design draws four rules, but they cover only three of the seven topics: the
 `tile` and `verm` rules are the two halves of `outcomes`. The catalogue bundles
@@ -66,7 +66,7 @@ This keeps `TitleScreen.test.tsx`'s `/A correct answer replaces the tiles you
 spent/` matching, unweakened — which is the check that the split preserved
 meaning rather than rewrote it.
 
-- [ ] **Step 2: The four rules, with material swatches**
+- [x] **Step 2: The four rules, with material swatches**
 
 Map: `socket` → `howToPlay.capacity`; `tile` → `howToPlay.correct`; `gold` →
 `howToPlay.overflow`; `verm` → `howToPlay.incorrect`.
@@ -90,7 +90,7 @@ The design lays the four out in a two-column grid, `max-width: 620px`, left
 aligned inside a centered column. Check it at `320px` — two columns of that copy
 will not fit, so it needs to fall to one.
 
-- [ ] **Step 3: The wordmark**
+- [x] **Step 3: The wordmark**
 
 The design sets `oz✳terisk` in `--font-display` at `--size-wordmark` with
 `--track-wordmark`, the `✳` in `--accent`, under a `✳` tile.
@@ -107,7 +107,7 @@ Two constraints:
 2. The `✳` tile above the wordmark is **not a `Tile`**. `M5.5c` ruled `digit` stays
    `number`; the mark gets the same tokens without claiming to be the primitive.
 
-- [ ] **Step 4: The `More` disclosure**
+- [x] **Step 4: The `More` disclosure**
 
 Relabel the `<details>` summary from `title.howToPlay` to `title.more` (`T43`
 amended §1.14 for this). It now holds four topics in this order: `keyboard`,
@@ -119,7 +119,7 @@ locales. A key the spec no longer requires and nothing renders is dead weight.
 Keep the element a native `<details>/<summary>`. `TitleScreen.test.tsx:38` asserts
 `closest("details")` and the `open` toggle; both stay true.
 
-- [ ] **Step 5: Update only the queries that moved, and only their labels**
+- [x] **Step 5: Update only the queries that moved, and only their labels**
 
 Three tests query `getByText("How to Play")` / `getByText("게임 방법")`. Those are
 presentation — the label changed, so the query changes with it, to `More` /
@@ -134,7 +134,7 @@ not the test.
 Add one test: the four rules are present on the felt without opening the
 disclosure.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/components/TitleScreen/ src/i18n/messages.ts docs/tasks/T44-title-screen.md

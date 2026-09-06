@@ -42,7 +42,7 @@ quotes it.** Everything else in the issue stands.
 
 Four defects, all measured, all in `GameOverScreen.module.css`:
 
-- [ ] **Step 1: Three focal points become one**
+- [x] **Step 1: Three focal points become one**
 
 A `2.5rem` `Game Over` title, an `EquationBoard` styled exactly as it is
 mid-round, and a stat row — stacked, centered, all shouting.
@@ -60,7 +60,7 @@ carries text, never a container whose own text content becomes
 `"7 × 8 = Not enough tiles left to answer."`. The current markup already satisfies
 this; a redesign that wraps them in a labelled block breaks it.
 
-- [ ] **Step 2: The stat row ranks its own stats**
+- [x] **Step 2: The stat row ranks its own stats**
 
 Rounds played is Endless's win condition. Today it gets `1.5rem` against `1.25rem`
 for score and streak, over three identical `0.75rem` uppercase labels. **A
@@ -83,7 +83,7 @@ Two constraints on how you fix it:
 Rounds must still compute larger than score when you are done. That is the test,
 and it is the point.
 
-- [ ] **Step 3: The primary action dominates**
+- [x] **Step 3: The primary action dominates**
 
 `Play Again`, `Share` and `Copy Result` all carry `min-width: var(--tile-size)` in
 one wrapping flex row, so `Play Again` never leads. `M5.5c` already gave them
@@ -92,7 +92,7 @@ work instead of a uniform min-width, and lay them out so the primary reads first
 
 `44 × 44` still binds on all three.
 
-- [ ] **Step 4: The share confirmation becomes visible — the chop**
+- [x] **Step 4: The share confirmation becomes visible — the chop**
 
 `.status` is a bare muted `<p>` with `min-height: 1.25em`. Copying is the one
 action with no other feedback, and this invisible line is what confirms it.
@@ -116,7 +116,7 @@ chop is reinforcement — §1.12: colour plus text or shape, never colour alone.
 Keep the `"shared"` outcome rendering no inline message; the comment in
 `GameOverScreen.tsx` explains why and it is still true.
 
-- [ ] **Step 5: Leave the restart hint a place to sit**
+- [x] **Step 5: Leave the restart hint a place to sit**
 
 `T48` binds restart to `R` and adds `gameOver.restartHint` (the copy row `T43`
 added to §1.14). #51 is explicit that where that hint sits **without adding a
@@ -127,7 +127,7 @@ in. If you conclude it belongs beside the `Play Again` button rather than as its
 own line, say that — a decision recorded is what `T48` needs; a gap left silently
 is not.
 
-- [ ] **Step 6: Test**
+- [x] **Step 6: Test**
 
 - Every existing test in `GameOverScreen.test.tsx` and the game-over tests in
   `App.test.tsx` pass **unchanged**, except where a class name or colour is
@@ -142,7 +142,7 @@ there. The computed-font-size tests are the exception and they work only because
 stylesheet rather than asserting a pixel. Measure the rest against real pixels and
 put the figures in the commit message.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add src/components/GameOverScreen/ src/i18n/messages.ts docs/tasks/T47-game-over-screen.md

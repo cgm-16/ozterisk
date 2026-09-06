@@ -32,7 +32,7 @@ socket; round retains primary emphasis."* CI proves none of the three. Two are
 geometry and one is a computed style, and the token layer never enters the test
 graph.
 
-- [ ] **Step 1: Ten sockets at three tiers, and the boundary between them**
+- [x] **Step 1: Ten sockets at three tiers, and the boundary between them**
 
 Count rendered cells at `320`, `408` and `768` CSS pixels wide, at one tile held
 and at ten. Ten every time. Report the rack's measured width at each tier against
@@ -47,7 +47,7 @@ wrapped: at `400px` the tier needed `378px` against `376px` available. Measure a
 `407` and `408` specifically — `407` must still be on the narrow tier and `408`
 must fit — because an off-by-one here restores exactly the defect that was fixed.
 
-- [ ] **Step 2: A selected tile keeps its socket**
+- [x] **Step 2: A selected tile keeps its socket**
 
 The gate's real claim is *no reflow*. Record every tile's bounding box before and
 after a select, and require the untouched tiles to be **identical**, not merely
@@ -56,7 +56,7 @@ and "it looks fine" has never detected it.
 
 Do the same across a return and a clear.
 
-- [ ] **Step 3: Round retains primary emphasis**
+- [x] **Step 3: Round retains primary emphasis**
 
 Computed font-size of round's `<dd>` against score's and streak's. It rests on a
 specificity tie decided by source order (`dd.primary` vs `.entry dd`, both
@@ -82,7 +82,7 @@ segment the gold band is invisible at `1.51:1`, so the whole indicator is the
 which is the gate. Say how thick the visible band actually is, so the record
 carries what passed rather than only that it passed.
 
-- [ ] **Step 5: No horizontal scroll at 320px**
+- [x] **Step 5: No horizontal scroll at 320px**
 
 `documentElement.scrollWidth` against `clientWidth`, plus a sweep for any element
 whose right edge exceeds the viewport. The equation is the new risk —
@@ -91,13 +91,13 @@ Check `answering`, `feedback` and `overflow`, and check the Korean locale: Hangu
 sets wider at the same nominal size, and `§1.12` already gives `ko` its own
 `--size-label` for that reason.
 
-- [ ] **Step 6: Eleven held**
+- [x] **Step 6: Eleven held**
 
 The transient state every reward overflow passes through. The rack renders eleven
 cells and the capacity meter distinguishes eleven from ten. Both are easy to lose
 because neither is a resting state anyone looks at.
 
-- [ ] **Step 7: Record it**
+- [x] **Step 7: Record it** — see `docs/journal/journal-2026-09-06.md`, "T42, part A".
 
 A journal entry carrying the numbers and anything that surprised you.
 

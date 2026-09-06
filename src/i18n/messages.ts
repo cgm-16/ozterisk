@@ -31,7 +31,7 @@ const en = {
     progress:
       "Round shows which equation is currently on screen, score counts correct answers, and streak counts consecutive correct answers. Rounds played counts every equation you have submitted, correct or incorrect. The run ends once you hold fewer tiles than the next answer requires.",
     keyboard:
-      "Press a digit key to select a matching tile or, during a discard, to mark it and complete the discard, Backspace to return the most recently selected tile, Escape to clear your selection, and Enter to submit or continue.",
+      "Press a digit key to select a matching tile or, during a discard, to mark it and complete the discard, Backspace to return the most recently selected tile, Escape to clear your selection, Enter to submit or continue, and R to play again once the run ends.",
   },
   action: {
     start: "Start Run",
@@ -67,6 +67,7 @@ const en = {
     reason: "Not enough tiles left to answer.",
     rounds: "Rounds played",
     longestStreak: "Longest streak",
+    restartHint: "Press R to play again",
   },
   share: {
     copied: "Result copied.",
@@ -105,7 +106,7 @@ const ko = {
     progress:
       "라운드는 현재 화면에 표시된 문제의 번호이며, 점수는 정답 횟수를, 연속 정답은 이어지는 정답 횟수를 나타냅니다. 진행한 라운드는 정답과 오답을 포함해 지금까지 제출한 문제 수를 나타냅니다. 다음 정답에 필요한 타일보다 보유한 타일이 적어지면 게임이 종료됩니다.",
     keyboard:
-      "숫자 키를 누르면 일치하는 타일을 선택하거나, 버리기 중에는 타일을 표시해 바로 버리기를 완료하며, Backspace 키로 가장 최근에 선택한 타일을 되돌리고, Escape 키로 선택을 지우며, Enter 키로 제출하거나 다음으로 진행합니다.",
+      "숫자 키를 누르면 일치하는 타일을 선택하거나, 버리기 중에는 타일을 표시해 바로 버리기를 완료하며, Backspace 키로 가장 최근에 선택한 타일을 되돌리고, Escape 키로 선택을 지우며, Enter 키로 제출하거나 다음으로 진행하고, 게임이 끝나면 R 키로 다시 시작합니다.",
   },
   action: {
     start: "게임 시작",
@@ -138,6 +139,7 @@ const ko = {
     reason: "답을 만들 타일이 부족합니다.",
     rounds: "진행한 라운드",
     longestStreak: "최장 연속 정답",
+    restartHint: "R 키를 눌러 다시 하기",
   },
   share: {
     copied: "결과를 복사했습니다.",

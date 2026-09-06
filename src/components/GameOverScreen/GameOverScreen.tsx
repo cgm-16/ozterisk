@@ -76,6 +76,7 @@ export function GameOverScreen({
             the row of alternatives: it names the key that presses the button
             directly above it, and as meta text under a button it explains, it
             adds no focal point of its own. */}
+        <p className={styles.restartHint}>{t("gameOver.restartHint")}</p>
         <div className={styles.secondaryActions}>
           <ActionButton variant="secondary" onClick={handleShare}>
             {t("action.share")}

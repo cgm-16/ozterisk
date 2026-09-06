@@ -52,7 +52,7 @@ language changes never reset game state.
 `R` collides with nothing: buttons do not activate on it. So the focus guard
 becomes unnecessary rather than merely correct.
 
-- [ ] **Step 1: The binding**
+- [x] **Step 1: The binding**
 
 `src/app/App.tsx:64-81` holds the effect. Replace the key test; keep the effect
 where it is.
@@ -72,7 +72,7 @@ task's file. The `gameOver` shortcut has always lived in `App.tsx` because
 Accept either, and put the reason in a comment. Keep the unmodified-key check:
 `Ctrl`/`Meta`/`Alt` combinations are the browser's, not ours.
 
-- [ ] **Step 2: Two tests, and one of them does not exist yet**
+- [x] **Step 2: Two tests, and one of them does not exist yet**
 
 `App.test.tsx:267` — "restarts via Enter … even when a non-Play-Again button has
 focus" — **inverts**. `Enter` no longer restarts; the test becomes the assertion
@@ -89,7 +89,7 @@ fix, and nothing currently guards it.
 Add: `R` restarts. Add: `R` restarts with a non-`Play Again` button focused, since
 that was the old test's point and it still matters.
 
-- [ ] **Step 3: The affordance**
+- [x] **Step 3: The affordance**
 
 `R` has no visible affordance anywhere. The only keyboard documentation in the
 product is `howToPlay.keyboard`, inside a collapsed disclosure on a screen the
@@ -99,7 +99,7 @@ Write `gameOver.restartHint` into `src/i18n/messages.ts`, en and ko, matching th
 row `T43` put in §1.14. Place it where `T47` decided. Do not add a fourth focal
 point to a screen `T47` just spent its whole budget giving one.
 
-- [ ] **Step 4: `howToPlay.keyboard` stops being wrong**
+- [x] **Step 4: `howToPlay.keyboard` stops being wrong**
 
 That string currently ends "...and Enter to submit or continue." After this task
 `Enter` no longer continues from `gameOver`, and `R` is undocumented. Update both
@@ -115,7 +115,7 @@ a matching tile/`, which is its opening. Keep that opening intact and the test
 stays green. If you must change the opening, the test's query changes with it —
 but nothing else in that file weakens.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add src/app/ src/components/GameOverScreen/ src/i18n/messages.ts docs/tasks/T48-restart-on-r.md

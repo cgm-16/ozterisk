@@ -83,6 +83,35 @@ describe("GameOverScreen", () => {
     expect(roundsFontSize).toBeGreaterThan(scoreFontSize);
   });
 
+  // The R shortcut has no other affordance in the product, so its hint has to
+  // sit with the button it presses: after Play Again, before the alternatives.
+  it("names the R shortcut between Play Again and the secondary actions, in either language", async () => {
+    render(
+      <I18nProvider initialLanguage="en">
+        <LanguageToggle />
+        <GameOverScreen
+          equation={EQUATION}
+          stats={STATS}
+          url={URL}
+          dependencies={{ writeClipboard: vi.fn().mockResolvedValue(undefined) }}
+          onPlayAgain={vi.fn()}
+        />
+      </I18nProvider>,
+    );
+
+    const hint = screen.getByText("Press R to play again");
+    const playAgain = screen.getByRole("button", { name: "Play Again" });
+    const share = screen.getByRole("button", { name: "Share" });
+
+    // DOCUMENT_POSITION_FOLLOWING (4) means the argument node comes after `this` node.
+    expect(playAgain.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(hint.compareDocumentPosition(share) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    await userEvent.click(screen.getByRole("button", { name: "한국어" }));
+
+    expect(screen.getByText("R 키를 눌러 다시 하기")).toBeInTheDocument();
+  });
+
   it("invokes the Play Again callback", async () => {
     const { onPlayAgain } = renderScreen();
     await userEvent.click(screen.getByRole("button", { name: "Play Again" }));

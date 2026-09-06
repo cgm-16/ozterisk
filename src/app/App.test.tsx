@@ -1,5 +1,5 @@
 import { StrictMode } from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "../i18n/I18nContext";
@@ -264,7 +264,7 @@ describe("App", () => {
     expect(screen.getAllByRole("button", { name: /^Digit \d$/ })).toHaveLength(10);
   });
 
-  it("restarts via Enter on the game over screen, even when a non-Play-Again button has focus", async () => {
+  it("restarts via R on the game over screen, even when a non-Play-Again button has focus", async () => {
     const user = userEvent.setup();
     // Exactly 18 (driveToGameOver) + 3 (the restart draw) = 21 values, rendered
     // under Strict Mode: a doubled handleRestart would consume 3 extra samples
@@ -279,11 +279,68 @@ describe("App", () => {
     await driveToGameOver(user);
     screen.getByRole("button", { name: "Share" }).focus();
 
-    await user.keyboard("{Enter}");
+    await user.keyboard("r");
 
     expect(screen.getByText("2 × 3 =")).toBeInTheDocument();
     expect(hudField("Round")).toBe("1");
     expect(shareDependencies.writeClipboard).not.toHaveBeenCalled();
+  });
+
+  it("restarts on the key at R's physical position when the key value is not r", async () => {
+    const user = userEvent.setup();
+    renderApp([...lossRandomValues(), ...equationSamples(2, 3)], { initialLanguage: "en" });
+
+    await driveToGameOver(user);
+
+    // A Korean IME hands the keydown a jamo rather than "r"; only event.code
+    // still carries the physical key, so the binding accepts either property.
+    fireEvent.keyDown(window, { key: "ㄱ", code: "KeyR" });
+
+    expect(screen.getByText("2 × 3 =")).toBeInTheDocument();
+    expect(hudField("Round")).toBe("1");
+  });
+
+  it("does not restart on Enter on the game over screen; a focused button keeps its own behavior", async () => {
+    const user = userEvent.setup();
+    // §1.11 gives gameOver no global Enter shortcut, so no restart draw is
+    // budgeted: a restart here exhausts the sequence as well as failing below.
+    const { shareDependencies } = renderApp(lossRandomValues(), { initialLanguage: "en" });
+
+    await driveToGameOver(user);
+    screen.getByRole("button", { name: "Share" }).focus();
+
+    await user.keyboard("{Enter}");
+
+    // Enter reaches the focused button and stops there: Share runs, the score
+    // screen survives to be read.
+    await waitFor(() => expect(shareDependencies.writeClipboard).toHaveBeenCalledTimes(1));
+    expect(screen.getByRole("heading", { name: "Game Over" })).toBeInTheDocument();
+    expect(hudField("Rounds played")).toBe("5");
+  });
+
+  it("survives the stray Enter of a Submit/Enter rhythm arriving after the phase flips", async () => {
+    const user = userEvent.setup();
+    // One equation past the loss path, so a restart draws a run and this fails
+    // on the assertion below rather than on "Random sequence exhausted".
+    renderApp([...lossRandomValues(), ...equationSamples(2, 3)], { initialLanguage: "en" });
+
+    // The rhythm that produces the defect, entirely by keyboard: digits, Enter
+    // to submit, Enter to advance. The last of those Enters flips the phase to
+    // gameOver, and the player's next tap is already in flight.
+    await user.click(screen.getByRole("button", { name: "Start Run" }));
+    for (const { digits } of LOSS_ROUNDS) {
+      for (const digit of digits) await user.keyboard(String(digit));
+      await user.keyboard("{Enter}"); // submit
+      await user.keyboard("{Enter}"); // next round
+    }
+
+    expect(screen.getByRole("heading", { name: "Game Over" })).toBeInTheDocument();
+    expect(document.activeElement?.tagName).toBe("BODY");
+
+    await user.keyboard("{Enter}");
+
+    expect(screen.getByRole("heading", { name: "Game Over" })).toBeInTheDocument();
+    expect(hudField("Rounds played")).toBe("5");
   });
 
   it("changes language mid-answering immediately, without resetting the run", async () => {

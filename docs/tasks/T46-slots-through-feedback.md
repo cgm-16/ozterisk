@@ -36,7 +36,7 @@ structure has to exist before the motion can.
 Today `GameScreen.tsx` gates `<AnswerSlots>` on `state.phase === "answering"`, so
 the slots vanish exactly when the result arrives.
 
-- [ ] **Step 1: Understand the constraint before you write anything**
+- [x] **Step 1: Understand the constraint before you write anything**
 
 This is the single likeliest place in `M5.5e` for a passing implementation to be
 wrong, because two assertions look contradictory and are not:
@@ -55,7 +55,7 @@ present → `<button>` (disabled when the caller says so); `onClick` omitted →
 genuinely non-button element carrying no `button` role.** Use it. Do not invent a
 second mechanism.
 
-- [ ] **Step 2: `onReturn` becomes optional, and that is the read-only mode**
+- [x] **Step 2: `onReturn` becomes optional, and that is the read-only mode**
 
 Make `AnswerSlots`' `onReturn` optional. Omitted means the whole group renders
 non-interactively: the filled slots pass no `onClick` to `Tile`, and the empty
@@ -76,7 +76,7 @@ The empty slot keeps its accessible name in every mode. `answerSlot.empty` and
 `answerSlot.filled` are unchanged — `AnswerSlots.test.tsx:51`, `:81` and
 `GameScreen.test.tsx:328` all pin those names in the `answering` phase.
 
-- [ ] **Step 3: Mount them through feedback in `GameScreen`**
+- [x] **Step 3: Mount them through feedback in `GameScreen`**
 
 `answering` keeps today's interactive slots. `feedback` renders them read-only,
 still showing the tiles that were submitted.
@@ -94,7 +94,7 @@ the feedback and overflow ordering tests. The slots already sit between the
 equation and the feedback panel; keep them there and every chain stays intact.
 Reordering *visually* with CSS is fine; reordering markup is not.
 
-- [ ] **Step 4: Give the read-only slot its own treatment**
+- [x] **Step 4: Give the read-only slot its own treatment**
 
 A slot that cannot be pressed should not invite a press. It is the same tile face
 without the affordance — no hover, no press offset, no focus ring, and no
@@ -102,7 +102,7 @@ without the affordance — no hover, no press offset, no focus ring, and no
 
 Do not add the crack or the bloom. They are `M5.5f`'s.
 
-- [ ] **Step 5: Test**
+- [x] **Step 5: Test**
 
 Add, do not replace:
 
@@ -118,7 +118,7 @@ Sabotage-check the new mount: break the phase condition and confirm the new test
 actually fails. A test that passes against a broken implementation is worse than
 none.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add src/components/AnswerSlots/ src/components/GameScreen/ docs/tasks/T46-slots-through-feedback.md

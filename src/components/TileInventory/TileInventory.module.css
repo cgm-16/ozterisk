@@ -1,22 +1,72 @@
+/* Five columns, rows that grow: ten sockets fit exactly the --rack-rows two
+   rows, and the one state that exceeds ten (an eleventh tile mid-overflow,
+   R5) lands alone on a third row (grid-auto-rows) rather than forcing a
+   sixth column. */
 .inventory {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  display: grid;
+  grid-template-columns: repeat(var(--rack-columns), var(--tile-w));
+  grid-template-rows: repeat(var(--rack-rows), var(--tile-h));
+  grid-auto-rows: var(--tile-h);
+  gap: var(--rack-gap);
   justify-content: center;
 }
 
-/* The badge sits below the tile rather than inside it: the ceramic face is the
-   Tile primitive's, and it renders a digit and nothing else. */
-.cell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
+/* An empty or lifted socket is its own grid item, sized like a tile, with no
+   wrapper of its own. */
+.socket {
+  width: var(--tile-w);
+  height: var(--tile-h);
+  border-radius: var(--radius-md);
+  background: var(--surface-socket);
+  box-shadow: var(--shadow-socket), var(--rim-socket);
 }
 
+/* A socket whose tile is out in the answer slots — owed back, not lost. */
+.socketLifted {
+  outline: var(--outline-socket-lifted);
+  outline-offset: var(--outline-socket-lifted-offset);
+}
+
+/* The tile is the Tile primitive's own ceramic face; the cell is only sized
+   to it. The badge is positioned out of flow, overlaid on the tile's own
+   lower edge rather than stacked below it, so a badged cell and an unbadged
+   cell occupy the same fixed --tile-w x --tile-h grid track: stacking below
+   would either grow the row (R6's forbidden outcome) or, at the tile's own
+   width, run the label past both neighbouring cells. */
+.cell {
+  position: relative;
+  width: var(--tile-w);
+  height: var(--tile-h);
+}
+
+/* The badge overlays the tile's lower edge and grows upward, so its height is
+   what decides whether it reaches the engraved digit. Two declarations pin it
+   to exactly one line, and one line always clears:
+
+   - line-height, set rather than inherited. body's 1.5 gives each line 16.5px;
+     at 1 it is 11px, so a single line occupies the bottom 11px of the cell and
+     the digit's glyph box ends right above it.
+   - white-space and overflow. Without them the label wraps inside a cell
+     narrower than the text — 52px at the narrow tier — and every wrapped line
+     climbs a further 11px over the digit. "Marked for discard" reached three
+     lines and covered the whole face. Clipping is not the nice answer, but a
+     covered digit is not an answer at all.
+
+   The nice answer is that this system draws no text badge: the design carries
+   both cues through the Tile's own `marked` and `reward` states, which the
+   primitive already implements. That is issue #84, and it is a product
+   decision rather than a layout fix. */
 .newBadge,
 .discardBadge {
+  position: absolute;
+  inset-inline: 0;
+  bottom: var(--space-1);
+  text-align: center;
   font-size: var(--size-label);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }

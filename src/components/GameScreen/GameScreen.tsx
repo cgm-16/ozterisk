@@ -1,3 +1,4 @@
+import { sortTiles } from "../../game/factories";
 import type { GameAction, GameState } from "../../game/types";
 import {
   getAnswerLength,
@@ -9,6 +10,7 @@ import { useGameKeyboard } from "../../hooks/useGameKeyboard";
 import { useI18n } from "../../i18n/I18nContext";
 import { ActionButton } from "../ActionButton/ActionButton";
 import { AnswerSlots } from "../AnswerSlots/AnswerSlots";
+import { CapacityMeter } from "../CapacityMeter/CapacityMeter";
 import { EquationBoard } from "../EquationBoard/EquationBoard";
 import { FeedbackPanel } from "../FeedbackPanel/FeedbackPanel";
 import { GameHud } from "../GameHud/GameHud";
@@ -40,6 +42,11 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
   return (
     <main className={styles.screen}>
       <GameHud score={state.score} currentStreak={state.currentStreak} round={state.round} />
+      {/* Capacity is what you hold, and a tile in an answer slot is still
+          yours — you can return it. Reading state.inventory alone would drop
+          by one per selection and disagree with the rack beside it, which
+          keeps a socket for every tile in the same union. */}
+      <CapacityMeter held={state.inventory.length + state.selectedTiles.length} />
       <EquationBoard equation={state.equation} />
 
       {state.phase === "answering" && (
@@ -82,7 +89,8 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
       )}
 
       <TileInventory
-        tiles={state.inventory}
+        tiles={sortTiles([...state.inventory, ...state.selectedTiles])}
+        liftedIds={state.selectedTiles.map((tile) => tile.id)}
         mode={state.phase === "answering" ? "select" : state.phase === "overflow" ? "discard" : "readOnly"}
         pendingDiscards={state.pendingDiscards}
         onTile={(tileId) => {

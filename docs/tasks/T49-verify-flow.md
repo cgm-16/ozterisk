@@ -46,8 +46,22 @@ instead of a measurement has not been verified.
 
 Every new or changed surface, against what is actually behind it:
 
-- The four title swatches on `--felt-900`, the socket one especially — it is the
-  one the design flags as invisible at `18px` if built naively.
+- The four title swatches on `--felt-900`. **The socket one needs more than a
+  ratio.** It is a well, and a well is defined by its inset band and its bottom
+  rim rather than by fill contrast — `--surface-socket` measures `1.025:1` there,
+  which is why the design's own exception exists. `T44` shipped
+  `inset 0 2px 2px rgb(0 0 0 / 55%)` where the handover writes `1px 3px 45%`,
+  because a `3px` blur over an `18px` square dilutes `45%` black to roughly `11%`
+  where it lands and sampled to a `1.161:1` band. Re-measure the shipped value's
+  band and rim against the swatch floor and say whether it reads as cut or laid
+  on. That judgement is currently one person's eye on a `2px` band.
+
+  **Ruling, so this is not reopened as a WCAG question:** SC 1.4.11 does not bind
+  these swatches. Each rule's adjacent text states the rule completely; remove the
+  swatch and no information is lost. They are material association, not content.
+  §1.12's "colour plus text or shape, never colour alone" is satisfied by the text.
+  What binds is the design's own requirement that the socket "read as a well, not
+  a plain chip" — which is a quality bar, and this step is where it is checked.
 - The feedback panel's border in both branches.
 - The reward caption (`4.5:1`, not `3:1` — it is `11px` body text).
 - The chop.

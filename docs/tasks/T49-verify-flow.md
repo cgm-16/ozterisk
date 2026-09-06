@@ -84,7 +84,28 @@ From `T37` and `T42`:
   measurements taken in the gallery can be measuring a layout artifact. Check
   against the real screen before believing a gallery figure.
 
-- [ ] **Step 5: Reduced motion**
+- [ ] **Step 5: What the read-only answer slots announce**
+
+`T46` mounted the slots through feedback and reported an asymmetry it could not
+resolve inside its own paths: the empty socket announces its full name
+(`Answer slot 1: empty`, carried by `role="img"`), while a filled read-only slot
+announces only its bare digit, because `Tile`'s roleless form drops `label` by
+design and a comment in the primitive says so.
+
+Walk the feedback phase with the accessibility tree and report **what a screen
+reader actually receives**, in both locales. The submitted value is already
+announced by `FeedbackPanel`'s `role="status"` region, so the question is whether
+the slots add orientation or only noise — three plausible answers, and the
+measurement should say which:
+
+- the reading order carries position well enough and this is fine as built;
+- the filled slot should carry its name too, which means changing `Tile`;
+- the read-only group is redundant with the status region and should be
+  `aria-hidden`.
+
+Report the finding; do not pick for the product. If it needs a change, file it.
+
+- [ ] **Step 6: Reduced motion**
 
 Per `docs/journal/journal-2026-08-09.md`: flip `rule.media.mediaText` between
 `'all'` and `'(prefers-reduced-motion: reduce)'` and read
@@ -94,7 +115,7 @@ accept "look at it and confirm nothing happens" as a criterion.
 `M5.5e` adds no keyframes, so the check here is that nothing it *did* add animates
 unconditionally.
 
-- [ ] **Step 6: Journal it and commit**
+- [ ] **Step 7: Journal it and commit**
 
 Record the figures, the traps hit, anything carried forward, and any defect found
 but deliberately not fixed — with the issue number it was filed under.

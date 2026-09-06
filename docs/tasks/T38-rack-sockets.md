@@ -50,7 +50,7 @@ The grid is `--rack-columns` (5) × `--rack-rows` (2), and it renders `--capacit
 score, not an absence.
 
 All three tiers already exist in `src/styles/tokens/spacing.css` and need no new
-values — `52 × 64` at `8px` gap, `66 × 64` at `12px` from `400px`, `64 × 80` from
+values — `52 × 64` at `8px` gap, `66 × 64` at `12px` from `408px`, `64 × 80` from
 `48rem`. Consume them; do not redefine them.
 
 **Mid-overflow the rack holds eleven.** `INVENTORY_CAPACITY` is 10 and

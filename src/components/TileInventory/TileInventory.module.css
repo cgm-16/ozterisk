@@ -39,11 +39,23 @@
   height: var(--tile-h);
 }
 
-/* line-height is set rather than inherited: body's 1.5 gives each line 16.5px
-   here, and the badge grows upward from the tile's lower edge, so a string
-   that wraps climbs over the engraved digit. At 1 a wrapped line costs 11px
-   instead. This narrows the overlap but does not remove it — the label is
-   still longer than a 52px cell at the narrow tier. See issue #84. */
+/* The badge overlays the tile's lower edge and grows upward, so its height is
+   what decides whether it reaches the engraved digit. Two declarations pin it
+   to exactly one line, and one line always clears:
+
+   - line-height, set rather than inherited. body's 1.5 gives each line 16.5px;
+     at 1 it is 11px, so a single line occupies the bottom 11px of the cell and
+     the digit's glyph box ends right above it.
+   - white-space and overflow. Without them the label wraps inside a cell
+     narrower than the text — 52px at the narrow tier — and every wrapped line
+     climbs a further 11px over the digit. "Marked for discard" reached three
+     lines and covered the whole face. Clipping is not the nice answer, but a
+     covered digit is not an answer at all.
+
+   The nice answer is that this system draws no text badge: the design carries
+   both cues through the Tile's own `marked` and `reward` states, which the
+   primitive already implements. That is issue #84, and it is a product
+   decision rather than a layout fix. */
 .newBadge,
 .discardBadge {
   position: absolute;
@@ -52,6 +64,9 @@
   text-align: center;
   font-size: var(--size-label);
   line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }

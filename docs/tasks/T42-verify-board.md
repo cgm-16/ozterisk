@@ -63,7 +63,7 @@ specificity tie decided by source order (`dd.primary` vs `.entry dd`, both
 `(0,1,1)`), so a rule added anywhere in the cascade can flip it with nothing
 failing. Read it, do not infer it.
 
-- [ ] **Step 4: The language toggle's ring, on gold**
+- [x] **Step 4: The language toggle's ring, on gold**
 
 `T41` owns the fix; this step is the independent read. `T37` measured this control
 at `11.85:1` only because its ring was **outset** and landed on the felt. Once it

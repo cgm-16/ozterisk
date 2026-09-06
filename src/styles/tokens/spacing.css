@@ -19,9 +19,17 @@
      clear the arena's own padding, which is 24px below 40rem. The narrow tier
      needs 292px of the 296px a 320px viewport leaves. The middle tier needs
      378px, so it cannot start at 400px: that leaves 376px and overflows by 2.
-     It starts at 408px, above the 402px the arithmetic bottoms out at so a
-     desktop window showing a vertical scrollbar still clears, and below 412px
-     so that phone tier keeps the larger tile. */
+     It starts at 408px, and below 412px so that phone tier keeps the larger
+     tile.
+
+     A media query cannot see a scrollbar, and neither boundary here accounts
+     for one. `min-width` matches the scrollbar-INCLUSIVE viewport while the
+     content box excludes it, so on a classic-scrollbar platform both tiers
+     fire about 15px early: measured, viewport 408 gives clientWidth 393, and
+     a 378px rack is asked to fit 369px. No boundary fixes that — the same
+     query answers both cases identically — so it is not a number to tune but
+     a structure to change. Issue #85; the rack has to be told to fit its
+     container rather than the viewport. */
   --tile-w: 52px;
   --tile-h: 64px;
   --rack-gap: 8px;

@@ -56,3 +56,26 @@ describe("CapacityMeter", () => {
     expect(screen.getByRole("img", { name: "Held 3 of 10" })).toBeInTheDocument();
   });
 });
+
+// The accessible name is a localised template, not an interpolated "of". Built
+// by hand it read "용량 10 of 10" in Korean — an English preposition inside a
+// Korean string, in the one place a screen reader user has no visual fallback
+// for. Korean also orders it the other way round: total, then held.
+describe("CapacityMeter accessible name across locales", () => {
+  it("localises the whole name, preposition and word order included", () => {
+    render(
+      <I18nProvider initialLanguage="ko">
+        <CapacityMeter held={7} />
+      </I18nProvider>,
+    );
+
+    expect(screen.getByRole("img", { name: "용량 10 중 7" })).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: /\bof\b/ })).not.toBeInTheDocument();
+  });
+
+  it("keeps an explicit label override in the accessible name too", () => {
+    renderMeter({ held: 3, label: "Held" });
+
+    expect(screen.getByRole("img", { name: "Held 3 of 10" })).toBeInTheDocument();
+  });
+});

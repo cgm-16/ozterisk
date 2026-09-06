@@ -29,7 +29,7 @@ export function CapacityMeter({ held, label }: CapacityMeterProps) {
       <div
         className={styles.pips}
         role="img"
-        aria-label={`${resolvedLabel} ${held} of ${INVENTORY_CAPACITY}`}
+        aria-label={t("hud.capacityStatus", { label: resolvedLabel, held, total: INVENTORY_CAPACITY })}
       >
         {Array.from({ length: pipCount }, (_, index) => {
           const isOverflow = index >= INVENTORY_CAPACITY;

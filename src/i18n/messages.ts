@@ -46,6 +46,10 @@ const en = {
     streak: "Streak",
     round: "Round",
     capacity: "Capacity",
+    // The pip row is a role="img"; this is its accessible name. It has to be a
+    // localised template rather than an interpolated "of", which rendered the
+    // Korean name as "용량 10 of 10".
+    capacityStatus: "{label} {held} of {total}",
   },
   result: {
     correct: "Correct",
@@ -116,6 +120,7 @@ const ko = {
     streak: "연속 정답",
     round: "라운드",
     capacity: "용량",
+    capacityStatus: "{label} {total} 중 {held}",
   },
   result: {
     correct: "정답",

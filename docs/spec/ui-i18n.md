@@ -26,9 +26,14 @@ section wins.
   bound. The arena spends `24px` of that width on its own padding below `40rem`, so
   the narrow tier needs `292px` of `296px` and the middle tier needs `378px` of the
   `384px` a `408px` viewport leaves. (The design document draws this tier at `390px`.
-  The boundary is `408px` rather than the `402px` the arithmetic bottoms out at, so a
-  desktop window narrow enough to show a vertical scrollbar still clears; it stays
-  below `412px` so that phone tier keeps the larger tile.)
+  The boundary is `408px` rather than the `402px` the arithmetic bottoms out at, for a
+  little slack; it stays below `412px` so that phone tier keeps the larger tile.)
+- **These boundaries assume no vertical scrollbar.** A `min-width` query matches the
+  scrollbar-*inclusive* viewport while the content box excludes it, so wherever
+  scrollbars take layout width every tier fires about `15px` early and the rack asks
+  for more room than it has. No choice of boundary corrects this — the same query
+  answers both cases identically — so the rule above is necessary and not sufficient.
+  Making the rack fit its container rather than the viewport is tracked separately.
 
 **Material and colour**
 

@@ -36,12 +36,16 @@
 }
 
 /* The verdict is a mono label, not a headline: the run's numbers below carry
-   the screen's one focal point. Vermilion is the hue for a tile leaving. */
+   the screen's one focal point. Vermilion is the hue for a tile leaving.
+   --state-incorrect is the wrong step of it here: at 11px this is body text
+   and owes 4.5:1, and verm-600 measures 3.34:1 on --surface-surround. verm-400
+   measures 6.26:1 and keeps the hue. The larger vermilion surfaces elsewhere
+   on this screen stay on --state-incorrect, which clears the 3:1 they owe. */
 .title {
   font: var(--weight-medium) var(--size-label) / var(--leading-tight) var(--font-mono);
   letter-spacing: var(--track-label);
   text-transform: uppercase;
-  color: var(--state-incorrect);
+  color: var(--verm-400);
 }
 
 .stats {

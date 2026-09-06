@@ -101,7 +101,7 @@ The implementation may improve punctuation but may not change rule meaning.
 |---|---|---|
 | `title.name` | `ozterisk` | `ozterisk` |
 | `title.summary` | `Solve multiplication problems using limited digit tiles. Correct answers replace the tiles you spend and grant one extra tile. Incorrect answers consume your tiles without a reward. Keep your inventory balanced and survive as long as possible.` | `제한된 숫자 타일로 곱셈 문제를 푸세요. 정답을 맞히면 사용한 타일을 보충하고 타일 한 개를 추가로 받습니다. 오답에 사용한 타일은 보상 없이 사라집니다. 타일 구성을 관리하며 최대한 오래 살아남으세요.` |
-| `title.howToPlay` | `How to Play` | `게임 방법` |
+| `title.more` | `More` | `더 보기` |
 | `action.start` | `Start Run` | `게임 시작` |
 | `action.submit` | `Submit` | `제출` |
 | `action.clear` | `Clear` | `지우기` |
@@ -124,8 +124,13 @@ The implementation may improve punctuation but may not change rule meaning.
 | `gameOver.reason` | `Not enough tiles left to answer.` | `답을 만들 타일이 부족합니다.` |
 | `gameOver.rounds` | `Rounds played` | `진행한 라운드` |
 | `gameOver.longestStreak` | `Longest streak` | `최장 연속 정답` |
+| `gameOver.restartHint` | `Press R to play again` | `R 키를 눌러 다시 하기` |
 | `share.copied` | `Result copied.` | `결과를 복사했습니다.` |
 | `share.failed` | `Could not share or copy the result.` | `결과를 공유하거나 복사하지 못했습니다.` |
+
+The title screen shows four of these topics on the felt as always-visible
+material rules; `title.more` labels the disclosure holding the rest. All seven are
+still explained, which is what this section requires.
 
 The expanded rules must explain:
 

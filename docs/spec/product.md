@@ -195,10 +195,22 @@ as a submitted round.
 | `overflow` | `0`–`9` | Mark the first matching tile not already marked; at a required count of one this also completes the discard |
 | `overflow` | `Enter` | Confirm only if exactly the excess number is selected. Unreachable in Endless, which always overflows by one and so completes on marking |
 | `feedback` | `Enter` | Draw and advance to the next equation |
-| `gameOver` | `Enter` | Start a fresh run, equivalent to **Play Again** |
+| `gameOver` | `R` | Start a fresh run, equivalent to **Play Again**. Accepts the key by either its value or its physical position, so neither a Korean IME nor a Dvorak layout can make it unreachable |
+| `gameOver` | `Enter` | No global shortcut; a focused button retains normal browser behavior |
 | `title` | `Enter` | No global shortcut; the focused **Start Run** button retains normal browser behavior |
 
 Disabled keyboard actions are no-ops. Language changes are available in every phase and never reset game state.
+
+`gameOver` restarts on `R` rather than `Enter` because `Enter` cannot be made
+safe there. A player advancing a run by keyboard — Submit, `Enter`, Submit,
+`Enter` — destroys the score screen with the tap already in flight, before it can
+be read or shared; measured as `{ reachedGameOver: true, survivedSecondEnter:
+false, activeTag: "BODY" }`. `event.repeat` does not help, because it catches a
+held key rather than two discrete presses, and scoping the shortcut to an unfocused
+document fixes a different failure. `Enter` on the language toggle, which renders
+buttons and is present in this phase, also restarted the run and discarded the
+language change — contradicting the line above. `R` activates no button, so it
+needs no focus guard.
 
 ### 1.17 Explicitly out of scope
 

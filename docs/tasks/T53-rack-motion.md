@@ -133,7 +133,7 @@ Write the message to a file and pass it with `-F`.
 
 **What this task does not do**
 
-- Does not implement `10i`. The game-over sweep is deferred — see the milestone
+- Does not implement `10i`. The game-over sweep is deferred (#104) — see the milestone
   ruling and its issue.
 - Does not touch `keyframes.css`, `src/game/` or `src/hooks/`.
 - Does not touch #84 (badges over the engraved digit). Parked with Ori.

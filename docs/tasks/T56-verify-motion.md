@@ -48,7 +48,7 @@ transition it resolves to, and evidence it **ran** — not that it was declared.
 
 Three rows will not be a plain "plays":
 
-- `10i` — deferred. Record the issue number and the reason.
+- `10i` — deferred, #104. Record the reason beside it.
 - `11a` — `T53` measured whether the existing transition already is the moment.
   Carry its reading, not its conclusion.
 - `11d` — `T54` may have landed it as a transition rather than `oz-rise-ready`.

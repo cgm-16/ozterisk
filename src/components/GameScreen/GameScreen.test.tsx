@@ -12,6 +12,7 @@ import {
   makeOverflowState,
   makeTile,
 } from "../../test/fixtures";
+import slotStyles from "../AnswerSlots/AnswerSlots.module.css";
 import { GameScreen, type GameScreenProps } from "./GameScreen";
 
 // A 12-tile inventory (excess 2) for exercising the multi-tile Confirm path.
@@ -349,6 +350,29 @@ describe("GameScreen phase composition", () => {
     expect(screen.getByText("5")).toBeInTheDocument();
     expect(screen.getByText("6")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Answer slot/ })).not.toBeInTheDocument();
+  });
+
+  /* The ladder is gated on the streak the answer just earned, and only this
+     screen knows it. `SUBMIT_CORRECT` increments `currentStreak` in the same
+     transition that enters feedback, so the reducer's count already includes
+     the round on screen — one ring at 3 rather than three is what says the
+     count travelled rather than a constant. */
+  it("gates the streak ladder on the streak the judged answer earned", () => {
+    const equation = makeEquation(3, 4); // product 12, two slots
+    const state = makeFeedbackState(equation, {
+      currentStreak: 3,
+      lastResult: {
+        kind: "correct",
+        submittedValue: equation.product,
+        correctValue: equation.product,
+        submittedTiles: [makeTile(1, "a"), makeTile(2, "b")],
+        rewardTileIds: [],
+      },
+    });
+    renderScreen(state);
+
+    // One ring per filled slot, and the answer fills two.
+    expect(document.querySelectorAll(`.${slotStyles.ring}`)).toHaveLength(2);
   });
 
   it("renders a read-only inventory, feedback, and Next Round in feedback, with no answer-slot button", () => {

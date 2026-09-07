@@ -108,3 +108,82 @@
   animation-fill-mode: both;
   pointer-events: none;
 }
+
+/* 7a/7b/7c — the streak ladder's rings. One shape, three tiers: the tier
+   classes below change only the colour and the delay, which is what makes the
+   ladder accumulate rather than swap. They are siblings of the tile's moment
+   span, not children of it, so the bloom's transform does not carry them.
+   Centred by a half-size negative margin rather than a translate, because
+   oz-ring spends the transform on its own scale. */
+.ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--tile-w) * 1.9);
+  height: calc(var(--tile-w) * 1.9);
+  margin-left: calc(var(--tile-w) * -0.95);
+  margin-top: calc(var(--tile-w) * -0.95);
+  border-radius: 50%;
+  border: 2px solid;
+  animation-name: global(oz-ring);
+  animation-duration: var(--dur-bloom);
+  animation-timing-function: var(--ease-settle);
+  animation-fill-mode: both;
+  pointer-events: none;
+}
+
+/* The ladder's two golds are the palette's two golds, named directly: the
+   semantic aliases over them (--accent, --accent-hover) name interaction
+   states, and a rung of a reward ladder is not one. */
+.ringJade {
+  border-color: var(--state-correct);
+}
+
+.ringGold {
+  border-color: var(--gold-500);
+  animation-delay: 70ms;
+}
+
+.ringBright {
+  border-color: var(--gold-300);
+  animation-delay: 140ms;
+}
+
+/* Tier 2 and tier 3's rim: state, not motion. It sits on the moment span so it
+   travels with the bloom, and carries the tile's own radius so it traces the
+   ceramic rather than boxing it. One outline per element, so the two tiers
+   replace each other where the rings accumulate. */
+.rim,
+.rimBright {
+  border-radius: var(--radius-md);
+  outline-offset: -1px;
+}
+
+.rim {
+  outline: 1px solid var(--gold-500);
+}
+
+.rimBright {
+  outline: 1px solid var(--gold-300);
+}
+
+/* 2d — the tier-3 burst. Ceramic clay, never gold: the chips are the tile
+   shedding its own material, and a gold chip would read as a reward pip
+   breaking off. Each chip supplies oz-fan the trajectory it interpolates
+   (--dx, --peak, --land, --rot) and its own delay, inline in the component,
+   because six siblings inside .filled cannot be told apart positionally — the
+   rings above them come and go with the tier. */
+.chip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 6px;
+  border-radius: 1.5px;
+  background: linear-gradient(160deg, var(--clay-050), var(--clay-400));
+  animation-name: global(oz-fan);
+  animation-duration: var(--dur-burst);
+  animation-timing-function: var(--ease-fall);
+  animation-fill-mode: both;
+  pointer-events: none;
+}

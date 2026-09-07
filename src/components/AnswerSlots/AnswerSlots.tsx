@@ -1,7 +1,33 @@
+import type { CSSProperties } from "react";
 import type { RoundResult, Tile as TileModel } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
 import styles from "./AnswerSlots.module.css";
+
+/* The streak ladder accumulates, never swaps: streak 3 adds the jade ring, 5 a
+   second ring in gold plus a gold rim on the answer tiles, 8 a third ring, the
+   brightest rim and the six-chip burst. Nothing above 8 escalates, and streaks
+   1–2 bloom with nothing added — the bloom is the floor, not the ring. A rung
+   that fires from the first correct answer changes nothing when it is reached. */
+const RING_TIERS = [
+  { at: 3, ring: styles.ringJade, rim: "" },
+  { at: 5, ring: styles.ringGold, rim: styles.rim },
+  { at: 8, ring: styles.ringBright, rim: styles.rimBright },
+];
+
+const BURST_AT = 8;
+
+/* 2d — the locked six. Ceramic shards off the tile's own bottom edge, each
+   carrying the trajectory oz-fan interpolates. The design staggers them
+   40 + index × 12 ms. */
+const CHIPS = [
+  { dx: "-46px", peak: "-36px", land: "34px", rot: "-140deg" },
+  { dx: "-26px", peak: "-54px", land: "28px", rot: "96deg" },
+  { dx: "-8px", peak: "-62px", land: "36px", rot: "-62deg" },
+  { dx: "13px", peak: "-58px", land: "30px", rot: "124deg" },
+  { dx: "31px", peak: "-47px", land: "33px", rot: "-104deg" },
+  { dx: "51px", peak: "-31px", land: "26px", rot: "162deg" },
+];
 
 export interface AnswerSlotsProps {
   slotCount: 1 | 2;
@@ -20,6 +46,13 @@ export interface AnswerSlotsProps {
    * not a default of either verdict, and the tiles are neither yet.
    */
   verdict?: RoundResult["kind"];
+  /**
+   * The streak the answer on screen just earned, which is what the ladder is
+   * gated on. `SUBMIT_CORRECT` increments `currentStreak` in the same
+   * transition that enters `feedback`, so during feedback the reducer's count
+   * already includes the round being judged.
+   */
+  streak?: number;
 }
 
 export function AnswerSlots({
@@ -28,9 +61,20 @@ export function AnswerSlots({
   onReturn,
   disabled,
   verdict,
+  streak = 0,
 }: AnswerSlotsProps) {
   const { t } = useI18n();
   const positions = Array.from({ length: slotCount }, (_, index) => index);
+
+  // Nothing on the ladder plays on an incorrect answer, and nothing plays
+  // while the round is still unjudged.
+  const rewarded = verdict === "correct";
+  const rings = rewarded ? RING_TIERS.filter((tier) => streak >= tier.at) : [];
+  const burst = rewarded && streak >= BURST_AT;
+  // The rings accumulate; the rim escalates. One element carries one outline,
+  // so the highest tier reached supplies it and the tier below is replaced,
+  // not stacked with.
+  const rim = rings[rings.length - 1]?.rim ?? "";
 
   return (
     <div className={styles.slots}>
@@ -85,7 +129,16 @@ export function AnswerSlots({
           // play again after the first selection.
           <span key={tile.id} className={styles.filled}>
             {verdict === "incorrect" && <span className={styles.dust} aria-hidden="true" />}
-            <span className={moment}>
+            {/* The ladder is decoration on a moment the tile already carries:
+                nothing here is reachable, and nothing here is named. */}
+            {rings.map((tier) => (
+              <span
+                key={tier.at}
+                className={`${styles.ring} ${tier.ring}`}
+                aria-hidden="true"
+              />
+            ))}
+            <span className={rim === "" ? moment : `${moment} ${rim}`}>
               <Tile
                 digit={tile.digit}
                 state={disabled ? "disabled" : "resting"}
@@ -93,6 +146,23 @@ export function AnswerSlots({
                 onClick={onReturn && (() => onReturn(tile.id))}
               />
             </span>
+            {burst &&
+              CHIPS.map((chip, chipIndex) => (
+                <span
+                  key={chip.rot}
+                  className={styles.chip}
+                  aria-hidden="true"
+                  style={
+                    {
+                      "--dx": chip.dx,
+                      "--peak": chip.peak,
+                      "--land": chip.land,
+                      "--rot": chip.rot,
+                      animationDelay: `${40 + chipIndex * 12}ms`,
+                    } as CSSProperties
+                  }
+                />
+              ))}
           </span>
         );
       })}

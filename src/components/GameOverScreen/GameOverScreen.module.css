@@ -122,10 +122,23 @@
   min-height: var(--chop-size);
 }
 
-/* Ref 11C, the vermilion chop bearing ✳. Static: the stamp, hold and fade
-   over --dur-share are keyframes.css's, and an `animation:` naming a keyframe
-   that stylesheet does not define fails silently. */
+/* Ref 11C, the vermilion chop bearing ✳: it lands oversized and turned, comes
+   down square, holds while it is read, then lifts. The element mounts only
+   when a copy succeeds, so mounting is the trigger and no state flag is needed.
+   `forwards` because oz-chop ends at zero opacity — that fade is the moment's
+   ending, and without the fill mode the chop would snap back to full and stay.
+   Longhands rather than the `animation` shorthand: jsdom expands no shorthand,
+   so the shorthand form reads back as animationName `none` and no test can
+   tell a placed animation from a misplaced one. `global()` because
+   keyframes.css is not a CSS Module and this file is: without the escape the
+   name is rewritten to a locally scoped one that matches no @keyframes
+   anywhere, and an animation naming a keyframe nothing defines fails
+   silently. */
 .chop {
+  animation-name: global(oz-chop);
+  animation-duration: var(--dur-share);
+  animation-timing-function: var(--ease-snap);
+  animation-fill-mode: forwards;
   display: flex;
   align-items: center;
   justify-content: center;

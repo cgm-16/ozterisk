@@ -3,4 +3,16 @@
      the weight Tile.module.css gives the same numerals on a tile face. */
   font: var(--weight-semibold) var(--size-equation) / var(--leading-tight) var(--font-numeral);
   text-align: center;
+  /* 10b — the arriving equation rises into place. Only the rise: the design
+     records 10b as "old equation falls, next rises" and keyframes.css carries
+     the second half alone, which is recorded rather than forgotten.
+     Longhands, because jsdom expands no shorthand and the `animation` form
+     reads back as animationName `none`, which no cascade assertion can tell
+     from a misplaced animation. global() because keyframes.css is not a CSS
+     Module and this file is: a locally scoped name matches no @keyframes and
+     fails silently — no error, no warning, no motion. */
+  animation-name: global(oz-round-rise);
+  animation-duration: var(--dur-round);
+  animation-timing-function: var(--ease-settle);
+  animation-fill-mode: both;
 }

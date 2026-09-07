@@ -7,7 +7,13 @@ export interface EquationBoardProps {
 
 export function EquationBoard({ equation }: EquationBoardProps) {
   return (
-    <p className={styles.equation}>
+    // Keyed by the equation itself, which is what makes 10b fire once per
+    // round: EquationBoard stays mounted across a round change, and only a
+    // fresh element restarts a CSS animation. React reconciles a single child
+    // by key as well as by type, so a changed key remounts the <p> and an
+    // unchanged one keeps it — a re-render that brought the same equation must
+    // not replay the rise.
+    <p key={`${equation.left}x${equation.right}`} className={styles.equation}>
       {equation.left} × {equation.right} =
     </p>
   );

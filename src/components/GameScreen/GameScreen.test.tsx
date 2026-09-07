@@ -330,7 +330,28 @@ describe("GameScreen phase composition", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("renders a read-only inventory, feedback, and Next Round in feedback, without answer slots", () => {
+  it("keeps the submitted tiles on screen in feedback with no answer-slot button", () => {
+    const equation = makeEquation(3, 4); // product 12, two slots
+    // Digits 5 and 6 appear in neither the equation, the submitted value, the
+    // correct value, nor the inventory, so getByText finds only the slots.
+    const state = makeFeedbackState(equation, {
+      inventory: [],
+      lastResult: {
+        kind: "incorrect",
+        submittedValue: 0,
+        correctValue: equation.product,
+        submittedTiles: [makeTile(5, "a"), makeTile(6, "b")],
+        rewardTileIds: [],
+      },
+    });
+    renderScreen(state);
+
+    expect(screen.getByText("5")).toBeInTheDocument();
+    expect(screen.getByText("6")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Answer slot/ })).not.toBeInTheDocument();
+  });
+
+  it("renders a read-only inventory, feedback, and Next Round in feedback, with no answer-slot button", () => {
     const equation = makeEquation(3, 3);
     const state = makeFeedbackState(equation, { inventory: [makeTile(1, "a")] });
     renderScreen(state);

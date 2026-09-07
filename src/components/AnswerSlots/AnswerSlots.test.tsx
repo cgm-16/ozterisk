@@ -73,6 +73,18 @@ describe("AnswerSlots", () => {
     expect(onReturn).not.toHaveBeenCalled();
   });
 
+  it("renders no button at all when onReturn is omitted", () => {
+    renderSlots({
+      slotCount: 2,
+      selectedTiles: [tile(5, "a")],
+      onReturn: undefined,
+    });
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    // The filled slot keeps its digit; the socket keeps its name without a control.
+    expect(screen.getByText("5")).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Answer slot 2: empty" })).toBeInTheDocument();
+  });
+
   it("never allows clicking an empty slot to trigger a return", async () => {
     const { onReturn } = renderSlots({
       slotCount: 1,

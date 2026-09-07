@@ -58,6 +58,19 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         />
       )}
 
+      {/* Feedback keeps the slots mounted so the verdict lands on the tiles the
+          player submitted. The reducer clears selectedTiles on submit and hands
+          the same array to lastResult.submittedTiles, so that is where they are.
+          No onReturn: read-only slots carry no button role, and the phase offers
+          no control to take a tile back. */}
+      {state.phase === "feedback" && lastResult !== null && (
+        <AnswerSlots
+          slotCount={getAnswerLength(state.equation)}
+          selectedTiles={lastResult.submittedTiles}
+          disabled={false}
+        />
+      )}
+
       {lastResult !== null && <FeedbackPanel result={lastResult} rewardTiles={rewardTiles} />}
 
       {state.phase === "answering" && (

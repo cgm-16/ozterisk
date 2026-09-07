@@ -9,20 +9,108 @@
   text-align: center;
 }
 
-.title {
-  font-size: 2.5rem;
+/* The ✳ mark above the wordmark. It carries the resting tile's tokens without
+   being a Tile: the primitive takes a numeric `digit` (M5.5c) and ✳ is not a
+   digit, so the mark borrows the material rather than claiming the component. */
+.markTile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tile-w);
+  height: var(--tile-h);
+  border-radius: var(--radius-md);
+  background: var(--surface-tile);
+  color: var(--text-on-tile);
+  box-shadow: var(--shadow-tile);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 85%);
+  font: var(--weight-semibold) var(--size-tile) / var(--leading-tight) var(--font-numeral);
+}
+
+.wordmark {
+  font: var(--weight-medium) var(--size-wordmark) / var(--leading-tight) var(--font-display);
+  letter-spacing: var(--track-wordmark);
+  color: var(--text-primary);
+}
+
+.mark {
+  color: var(--accent);
 }
 
 .summary {
   color: var(--text-meta);
 }
 
+/* Two columns of rules, falling to one below 40rem where that copy cannot fit
+   them. The count is a breakpoint rather than auto-fit with a track floor:
+   .screen is a flex item of App's column flex container, so the grid's
+   min-content width sets the flex line's cross size, and a track floor wide
+   enough to be worth having pushes the whole screen wider than the viewport
+   instead of collapsing — measured at 320px, a 240px floor stretched main to
+   528px against a 305px client width. */
+.materialRules {
+  width: 100%;
+  max-width: 620px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3) var(--space-6);
+  list-style: none;
+  padding: 0;
+  text-align: left;
+}
+
+.materialRule {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  color: var(--text-body);
+}
+
+.swatch {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* The one place the socket fill is not --surface-socket. At 18px on
+   --surface-surround that fill measures 1.025:1 — the same dead-pixel failure
+   as the capacity pip that read 1.27:1 and turned out not to be painting at
+   all. The raised felt step reads 1.691:1 there, so the well is drawn from the
+   raised face inward instead: a hand-softened inset plus --rim-socket. That
+   inset is the whole of what makes this read as cut rather than laid on, so it
+   is softened to the size it sits at. A 3px blur over 18px dilutes 45% black to
+   about 11% by the time it paints: sampled, it gave a top band only 1.161:1
+   against the floor, which is at the threshold of being seen at all. 2px of
+   blur concentrates it into a band 1.399:1 against the floor, under a bottom
+   rim 1.686:1 lighter again than the band. Still nowhere near
+   --shadow-socket-sm, which is tuned for a ~34px chip and whose 3px/7px
+   falloff swallows the whole top half of an 18px square. */
+.socket {
+  background: var(--surface-raised);
+  box-shadow:
+    inset 0 2px 2px rgb(0 0 0 / 55%),
+    var(--rim-socket);
+}
+
+.tile {
+  background: var(--surface-tile);
+  box-shadow: var(--shadow-tile-sm);
+}
+
+.gold {
+  background: var(--accent);
+}
+
+.verm {
+  background: var(--state-incorrect);
+}
+
+/* The disclosure stays native and untreated. A hairline border and a padded
+   box would make it read as a button; the marker is already the affordance. */
 .details {
   width: 100%;
   text-align: left;
-  border: 1px solid var(--border-hairline);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
 }
 
 .summaryLabel {
@@ -45,7 +133,11 @@
     padding: var(--space-6) var(--space-3);
   }
 
-  .title {
-    font-size: 2rem;
+  .wordmark {
+    font-size: var(--size-display);
+  }
+
+  .materialRules {
+    grid-template-columns: 1fr;
   }
 }

@@ -72,16 +72,34 @@ export function GameOverScreen({
       </dl>
       <div className={styles.actions}>
         <ActionButton onClick={onPlayAgain}>{t("action.playAgain")}</ActionButton>
-        <ActionButton variant="secondary" onClick={handleShare}>
-          {t("action.share")}
-        </ActionButton>
-        <ActionButton variant="ghost" onClick={handleCopy}>
-          {t("action.copy")}
-        </ActionButton>
+        {/* `gameOver.restartHint` belongs here, between the primary action and
+            the row of alternatives: it names the key that presses the button
+            directly above it, and as meta text under a button it explains, it
+            adds no focal point of its own. */}
+        <p className={styles.restartHint}>{t("gameOver.restartHint")}</p>
+        <div className={styles.secondaryActions}>
+          <ActionButton variant="secondary" onClick={handleShare}>
+            {t("action.share")}
+          </ActionButton>
+          <ActionButton variant="ghost" onClick={handleCopy}>
+            {t("action.copy")}
+          </ActionButton>
+        </div>
       </div>
-      <p className={styles.status} role="status" aria-live="polite">
-        {status === "copied" ? t("share.copied") : status === "failed" ? t("share.failed") : ""}
-      </p>
+      {/* The chop is reinforcement, never the confirmation itself: §1.12 asks
+          for colour plus shape or text, and a mark carries no announcement.
+          The status region beside it stays the accessible confirmation, so the
+          chop is hidden from it. */}
+      <div className={styles.confirmation}>
+        {status === "copied" ? (
+          <span className={styles.chop} aria-hidden="true">
+            ✳
+          </span>
+        ) : null}
+        <p className={styles.status} role="status" aria-live="polite">
+          {status === "copied" ? t("share.copied") : status === "failed" ? t("share.failed") : ""}
+        </p>
+      </div>
     </main>
   );
 }

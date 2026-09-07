@@ -13,7 +13,11 @@ export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
   const isCorrect = result.kind === "correct";
 
   return (
-    <div className={styles.panel} role="status" aria-live="polite">
+    <div
+      className={`${styles.panel} ${isCorrect ? styles.correct : styles.incorrect}`}
+      role="status"
+      aria-live="polite"
+    >
       <p className={styles.headline}>{isCorrect ? t("result.correct") : t("result.incorrect")}</p>
       {isCorrect ? (
         <ul className={styles.rewards}>

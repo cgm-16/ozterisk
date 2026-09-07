@@ -6,6 +6,7 @@ import type { ShareDependencies } from "../../services/sharing";
 import { makeEquation } from "../../test/fixtures";
 import { LanguageToggle } from "../LanguageToggle/LanguageToggle";
 import { GameOverScreen, type GameOverScreenProps } from "./GameOverScreen";
+import styles from "./GameOverScreen.module.css";
 
 const STATS = { score: 7, totalRounds: 9, longestStreak: 4 };
 const EQUATION = makeEquation(2, 3);
@@ -20,7 +21,7 @@ function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
   const dependencies: ShareDependencies = {
     writeClipboard: vi.fn().mockResolvedValue(undefined),
   };
-  render(
+  const { container } = render(
     <I18nProvider initialLanguage="en">
       <GameOverScreen
         equation={EQUATION}
@@ -32,7 +33,7 @@ function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
       />
     </I18nProvider>,
   );
-  return { onPlayAgain, dependencies };
+  return { onPlayAgain, dependencies, container };
 }
 
 describe("GameOverScreen", () => {
@@ -80,6 +81,35 @@ describe("GameOverScreen", () => {
     const scoreFontSize = parseFloat(getComputedStyle(scoreValue).fontSize);
 
     expect(roundsFontSize).toBeGreaterThan(scoreFontSize);
+  });
+
+  // The R shortcut has no other affordance in the product, so its hint has to
+  // sit with the button it presses: after Play Again, before the alternatives.
+  it("names the R shortcut between Play Again and the secondary actions, in either language", async () => {
+    render(
+      <I18nProvider initialLanguage="en">
+        <LanguageToggle />
+        <GameOverScreen
+          equation={EQUATION}
+          stats={STATS}
+          url={URL}
+          dependencies={{ writeClipboard: vi.fn().mockResolvedValue(undefined) }}
+          onPlayAgain={vi.fn()}
+        />
+      </I18nProvider>,
+    );
+
+    const hint = screen.getByText("Press R to play again");
+    const playAgain = screen.getByRole("button", { name: "Play Again" });
+    const share = screen.getByRole("button", { name: "Share" });
+
+    // DOCUMENT_POSITION_FOLLOWING (4) means the argument node comes after `this` node.
+    expect(playAgain.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(hint.compareDocumentPosition(share) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    await userEvent.click(screen.getByRole("button", { name: "한국어" }));
+
+    expect(screen.getByText("R 키를 눌러 다시 하기")).toBeInTheDocument();
   });
 
   it("invokes the Play Again callback", async () => {
@@ -139,6 +169,21 @@ describe("GameOverScreen", () => {
     await waitFor(() => expect(writeClipboard).toHaveBeenCalledTimes(1));
     expect(writeClipboard).toHaveBeenCalledWith(EN_TEXT);
     expect(screen.getByRole("status")).toHaveTextContent("Result copied.");
+  });
+
+  // Queried by the CSS Modules key rather than by role: the chop is
+  // aria-hidden, and a key that does not exist would render class="undefined"
+  // with no error, so the selector is the guard.
+  it("stamps the chop when a copy succeeds, with the status region still announcing", async () => {
+    const writeClipboard = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderScreen({ dependencies: { writeClipboard } });
+
+    expect(container.querySelector(`.${styles.chop}`)).toBeNull();
+
+    await userEvent.click(screen.getByRole("button", { name: "Copy Result" }));
+
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Result copied."));
+    expect(container.querySelector(`.${styles.chop}`)).toBeInTheDocument();
   });
 
   it("shows an inline failure status when the clipboard write rejects", async () => {

@@ -35,7 +35,7 @@ describe("TitleScreen", () => {
       </I18nProvider>,
     );
 
-    const summary = screen.getByText("How to Play");
+    const summary = screen.getByText("More");
     const disclosure = summary.closest("details");
     expect(disclosure).not.toBeNull();
     expect(disclosure).not.toHaveAttribute("open");
@@ -52,7 +52,7 @@ describe("TitleScreen", () => {
       </I18nProvider>,
     );
 
-    await userEvent.click(screen.getByText("How to Play"));
+    await userEvent.click(screen.getByText("More"));
 
     // selecting and returning tiles
     expect(
@@ -82,6 +82,28 @@ describe("TitleScreen", () => {
     ).toBeInTheDocument();
   });
 
+  it("states the four material rules on the felt, outside the disclosure", () => {
+    render(
+      <I18nProvider initialLanguage="en">
+        <TitleScreen onStart={vi.fn()} />
+      </I18nProvider>,
+    );
+
+    // getByText reaches inside a closed <details>, so presence alone would pass
+    // even if every rule were still in the panel. The closest("details") check
+    // is what makes this a test of where the rules are.
+    for (const rule of [
+      /holds at most ten tiles/,
+      /A correct answer replaces the tiles you spent/,
+      /choose tiles to discard before play continues/,
+      /An incorrect answer removes the tiles you spent/,
+    ]) {
+      expect(screen.getByText(rule).closest("details")).toBeNull();
+    }
+
+    expect(screen.getByText("More").closest("details")).not.toHaveAttribute("open");
+  });
+
   it("switches all visible copy live when the language toggle changes languages", async () => {
     render(
       <I18nProvider initialLanguage="en">
@@ -90,13 +112,13 @@ describe("TitleScreen", () => {
     );
 
     expect(screen.getByRole("button", { name: "Start Run" })).toBeInTheDocument();
-    expect(screen.getByText("How to Play")).toBeInTheDocument();
+    expect(screen.getByText("More")).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "한국어" }));
 
     expect(screen.getByRole("heading", { name: "ozterisk" })).toBeVisible();
     expect(screen.getByRole("button", { name: "게임 시작" })).toBeInTheDocument();
-    expect(screen.getByText("게임 방법")).toBeInTheDocument();
+    expect(screen.getByText("더 보기")).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "언어" })).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "English" }));

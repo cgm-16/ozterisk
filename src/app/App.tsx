@@ -61,8 +61,10 @@ export function App({ dependencies, shareDependencies }: AppProps) {
     dispatch({ type: "NEXT_ROUND", equation });
   }, [dependencies, state.inventory]);
 
-  // §1.11: gameOver's Enter shortcut restarts the run, equivalent to Play
-  // Again, regardless of which button currently has focus. useGameKeyboard
+  // §1.11: gameOver restarts the run on R, equivalent to Play Again. Enter has
+  // no global shortcut in this phase — it destroyed the score screen with the
+  // tap already in flight from the Submit/Enter rhythm that reached it — and R
+  // activates no button, so this needs no focus guard. useGameKeyboard
   // (mounted inside GameScreen) only covers answering/feedback/overflow, and
   // title intentionally has no global Enter shortcut (the focused Start Run
   // button keeps ordinary browser behavior), so gameOver needs its own
@@ -72,7 +74,12 @@ export function App({ dependencies, shareDependencies }: AppProps) {
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
-      if (event.key !== "Enter" || event.repeat) return;
+      // Neither key property is correct alone: event.key carries a jamo under a
+      // Korean IME, a shipped locale, and event.code is physical-position-based,
+      // so a Dvorak player pressing the key labelled R sends KeyP. Either one
+      // matching is enough.
+      const isRestartKey = event.key === "r" || event.key === "R" || event.code === "KeyR";
+      if (!isRestartKey || event.repeat) return;
       event.preventDefault();
       handleRestart();
     }

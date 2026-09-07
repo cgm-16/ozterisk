@@ -11,7 +11,7 @@ const en = {
     name: "ozterisk",
     summary:
       "Solve multiplication problems using limited digit tiles. Correct answers replace the tiles you spend and grant one extra tile. Incorrect answers consume your tiles without a reward. Keep your inventory balanced and survive as long as possible.",
-    howToPlay: "How to Play",
+    more: "More",
   },
   language: {
     groupLabel: "Language",
@@ -21,15 +21,17 @@ const en = {
       "Click or tap an inventory tile to place it in the next empty answer slot. Click a filled slot to return that tile to your inventory.",
     slots:
       "Answer slots fill in the order you select tiles: the first tile you choose fills the leftmost slot, so selection order determines the number you submit.",
-    outcomes:
-      "A correct answer replaces the tiles you spent and grants one extra tile. An incorrect answer removes the tiles you spent and grants no reward.",
+    correct:
+      "A correct answer replaces the tiles you spent and grants one extra tile.",
+    incorrect:
+      "An incorrect answer removes the tiles you spent and grants no reward.",
     capacity: "Your inventory holds at most ten tiles.",
     overflow:
       "If a reward would push your inventory past ten tiles, you must choose tiles to discard before play continues.",
     progress:
       "Round shows which equation is currently on screen, score counts correct answers, and streak counts consecutive correct answers. Rounds played counts every equation you have submitted, correct or incorrect. The run ends once you hold fewer tiles than the next answer requires.",
     keyboard:
-      "Press a digit key to select a matching tile or, during a discard, to mark it and complete the discard, Backspace to return the most recently selected tile, Escape to clear your selection, and Enter to submit or continue.",
+      "Press a digit key to select a matching tile or, during a discard, to mark it and complete the discard, Backspace to return the most recently selected tile, Escape to clear your selection, Enter to submit or continue, and R to play again once the run ends.",
   },
   action: {
     start: "Start Run",
@@ -65,6 +67,7 @@ const en = {
     reason: "Not enough tiles left to answer.",
     rounds: "Rounds played",
     longestStreak: "Longest streak",
+    restartHint: "Press R to play again",
   },
   share: {
     copied: "Result copied.",
@@ -86,7 +89,7 @@ const ko = {
     name: "ozterisk",
     summary:
       "제한된 숫자 타일로 곱셈 문제를 푸세요. 정답을 맞히면 사용한 타일을 보충하고 타일 한 개를 추가로 받습니다. 오답에 사용한 타일은 보상 없이 사라집니다. 타일 구성을 관리하며 최대한 오래 살아남으세요.",
-    howToPlay: "게임 방법",
+    more: "더 보기",
   },
   language: {
     groupLabel: "언어",
@@ -96,14 +99,14 @@ const ko = {
       "인벤토리 타일을 클릭하거나 탭하면 다음 빈 정답 칸에 놓입니다. 채워진 칸을 클릭하면 타일이 인벤토리로 돌아갑니다.",
     slots:
       "정답 칸은 선택한 순서대로 채워집니다. 먼저 선택한 타일이 맨 왼쪽 칸에 들어가므로 선택 순서가 제출할 숫자를 결정합니다.",
-    outcomes:
-      "정답이면 사용한 타일을 보충하고 타일 한 개를 추가로 받습니다. 오답이면 사용한 타일이 보상 없이 사라집니다.",
+    correct: "정답이면 사용한 타일을 보충하고 타일 한 개를 추가로 받습니다.",
+    incorrect: "오답이면 사용한 타일이 보상 없이 사라집니다.",
     capacity: "인벤토리는 최대 열 개의 타일까지 보관할 수 있습니다.",
     overflow: "보상으로 인벤토리가 열 개를 초과하면, 계속하기 전에 버릴 타일을 선택해야 합니다.",
     progress:
       "라운드는 현재 화면에 표시된 문제의 번호이며, 점수는 정답 횟수를, 연속 정답은 이어지는 정답 횟수를 나타냅니다. 진행한 라운드는 정답과 오답을 포함해 지금까지 제출한 문제 수를 나타냅니다. 다음 정답에 필요한 타일보다 보유한 타일이 적어지면 게임이 종료됩니다.",
     keyboard:
-      "숫자 키를 누르면 일치하는 타일을 선택하거나, 버리기 중에는 타일을 표시해 바로 버리기를 완료하며, Backspace 키로 가장 최근에 선택한 타일을 되돌리고, Escape 키로 선택을 지우며, Enter 키로 제출하거나 다음으로 진행합니다.",
+      "숫자 키를 누르면 일치하는 타일을 선택하거나, 버리기 중에는 타일을 표시해 바로 버리기를 완료하며, Backspace 키로 가장 최근에 선택한 타일을 되돌리고, Escape 키로 선택을 지우며, Enter 키로 제출하거나 다음으로 진행하고, 게임이 끝나면 R 키로 다시 시작합니다.",
   },
   action: {
     start: "게임 시작",
@@ -136,6 +139,7 @@ const ko = {
     reason: "답을 만들 타일이 부족합니다.",
     rounds: "진행한 라운드",
     longestStreak: "최장 연속 정답",
+    restartHint: "R 키를 눌러 다시 하기",
   },
   share: {
     copied: "결과를 복사했습니다.",

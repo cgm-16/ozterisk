@@ -1,27 +1,41 @@
+/* The verdict's only color is its edge. §1.12 permits semantic color on the
+   object concerned and forbids a full-screen wash, so the panel takes a border
+   and no fill. Measured on --surface-surround: jade 5.66:1, vermilion 3.34:1. */
 .panel {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border: 1px solid;
+  border-radius: var(--radius-lg);
   text-align: center;
 }
 
+/* The headline text ("Correct"/"Incorrect") already carries the state without
+   color; the branch class adds color as reinforcement only (§1.12). The class
+   comes from the same `kind` the headline is rendered from, so the two cannot
+   disagree — a selector keyed off a sibling element's presence can, and does so
+   silently. At --size-title/600 the headline is large text, so vermilion's
+   3.34:1 clears its 3:1 floor; it does not clear 4.5:1 and must not be reused
+   at body size. */
 .headline {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font: var(--weight-semibold) var(--size-title) / var(--leading-tight) var(--font-display);
 }
 
-/* The headline text ("Correct"/"Incorrect") already carries the state
-   without color; these rules add color as reinforcement only (§1.12).
-   :has() keys off the branch-specific list already in the DOM
-   (.rewards on the correct branch, .comparison on the incorrect branch),
-   so no markup change is needed. If FeedbackPanel.tsx ever stops rendering
-   one of those elements, this coloring silently stops applying. */
-.panel:has(.rewards) .headline {
+.correct {
+  border-color: var(--state-correct);
+}
+
+.correct .headline {
   color: var(--state-correct);
 }
 
-.panel:has(.comparison) .headline {
+.incorrect {
+  border-color: var(--state-incorrect);
+}
+
+.incorrect .headline {
   color: var(--state-incorrect);
 }
 
@@ -44,6 +58,10 @@
   gap: var(--space-1);
 }
 
+/* Gold on --surface-surround measures 7.87:1. This caption is 11px body text,
+   so it owes 4.5:1 rather than 3:1 — it clears with room. It sits below the
+   tile, not over the ceramic; the rack's badges are the ones that overlap a
+   digit face, and that is issue #84. */
 .rewardBadge {
   font-size: var(--size-label);
   text-transform: uppercase;

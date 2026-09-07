@@ -1,4 +1,4 @@
-import type { Tile as TileModel } from "../../game/types";
+import type { RoundResult, Tile as TileModel } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
 import styles from "./AnswerSlots.module.css";
@@ -14,9 +14,21 @@ export interface AnswerSlotsProps {
    */
   onReturn?(tileId: string): void;
   disabled: boolean;
+  /**
+   * How the round judged the tiles in these slots, once it has judged them.
+   * Omitted while the player is still answering: unjudged is a third state,
+   * not a default of either verdict, and the tiles are neither yet.
+   */
+  verdict?: RoundResult["kind"];
 }
 
-export function AnswerSlots({ slotCount, selectedTiles, onReturn, disabled }: AnswerSlotsProps) {
+export function AnswerSlots({
+  slotCount,
+  selectedTiles,
+  onReturn,
+  disabled,
+  verdict,
+}: AnswerSlotsProps) {
   const { t } = useI18n();
   const positions = Array.from({ length: slotCount }, (_, index) => index);
 
@@ -35,7 +47,7 @@ export function AnswerSlots({ slotCount, selectedTiles, onReturn, disabled }: An
           if (onReturn === undefined) {
             return (
               <span
-                key={index}
+                key={`empty-${index}`}
                 className={styles.slot}
                 role="img"
                 aria-label={t("answerSlot.empty", { position })}
@@ -45,7 +57,7 @@ export function AnswerSlots({ slotCount, selectedTiles, onReturn, disabled }: An
 
           return (
             <button
-              key={index}
+              key={`empty-${index}`}
               type="button"
               className={styles.slot}
               aria-label={t("answerSlot.empty", { position })}
@@ -54,14 +66,34 @@ export function AnswerSlots({ slotCount, selectedTiles, onReturn, disabled }: An
           );
         }
 
+        // A filled slot plays exactly one moment: a tile is either arriving or
+        // being judged, and two animations on one element would leave only the
+        // last of them anyway.
+        const moment =
+          verdict === "correct"
+            ? styles.bloom
+            : verdict === "incorrect"
+              ? styles.crack
+              : styles.arriving;
+
         return (
-          <Tile
-            key={index}
-            digit={tile.digit}
-            state={disabled ? "disabled" : "resting"}
-            label={t("answerSlot.filled", { position, digit: tile.digit })}
-            onClick={onReturn && (() => onReturn(tile.id))}
-          />
+          // Keyed by the tile rather than the slot, which is what makes the
+          // arrival fire once: React remounts the slot when its tile changes
+          // and keeps it when nothing did, and only a fresh element restarts a
+          // CSS animation. Under a positional key the same node would be
+          // reused and 9b, the most frequent motion in the app, would never
+          // play again after the first selection.
+          <span key={tile.id} className={styles.filled}>
+            {verdict === "incorrect" && <span className={styles.dust} aria-hidden="true" />}
+            <span className={moment}>
+              <Tile
+                digit={tile.digit}
+                state={disabled ? "disabled" : "resting"}
+                label={t("answerSlot.filled", { position, digit: tile.digit })}
+                onClick={onReturn && (() => onReturn(tile.id))}
+              />
+            </span>
+          </span>
         );
       })}
     </div>

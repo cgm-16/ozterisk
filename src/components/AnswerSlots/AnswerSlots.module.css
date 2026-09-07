@@ -36,3 +36,76 @@
      back below the contrast floor established above. */
   cursor: default;
 }
+
+/* One wrapper per filled slot, and the tile's moment plays on the span inside
+   it rather than on this one, so the dust behind the tile — and the streak
+   ring that will join it — is not dragged along by the transform that carries
+   the tile away. */
+.filled {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The moments a filled slot can play, one at a time.
+   They sit on a wrapper and not on the Tile because .tile already spends its
+   transform on the state lift and tilt, with a transition on it; an animation
+   on the same element would replace both.
+   Longhands rather than the `animation` shorthand: jsdom expands no shorthand,
+   so the shorthand form reads back as animationName `none` and the cascade
+   assertions in AnswerSlots.test.tsx could not tell a placed animation from a
+   misplaced one.
+   `global()` because keyframes.css is not a CSS Module and these rules are:
+   without the escape the name is rewritten to a locally scoped one that
+   matches no @keyframes anywhere, and an animation naming a keyframe nothing
+   defines fails silently — no error, no warning, no motion.
+   A bare <span> is an inline box and transform does nothing to one, so each
+   moment blockifies its own element. */
+.arriving,
+.bloom,
+.crack {
+  display: inline-flex;
+  animation-fill-mode: both;
+}
+
+/* 9b — the arrival, flat: no overshoot and no scale. It is the one motion that
+   happens on every selection, and §1.12 budgets what happens every round as
+   the fastest and quietest thing in the app. */
+.arriving {
+  animation-name: global(oz-slot-arrive);
+  animation-duration: var(--dur-select);
+  animation-timing-function: var(--ease-settle);
+}
+
+/* 2a — correct: the tile rises and settles, once. */
+.bloom {
+  animation-name: global(oz-bloom);
+  animation-duration: var(--dur-bloom);
+  animation-timing-function: var(--ease-settle);
+}
+
+/* 9f — wrong: the tile fractures where it sits and drops out of its slot. */
+.crack {
+  animation-name: global(oz-crack);
+  animation-duration: var(--dur-crack);
+  animation-timing-function: var(--ease-fall);
+}
+
+/* The dust is a second element and not a second animation on the tile, because
+   it scales and fades on its own while the tile fractures and falls: one
+   element can only run one of those shapes.
+   It is drawn before the tile, and the cracking span's transform makes that
+   span paint with the positioned boxes, so the two paint in document order and
+   the cloud stays behind the ceramic — uncovered as the tile drops out of it.
+   No z-index does this job: .filled has z-index auto and is no stacking
+   context, so a negative one would sink past it and out of the slot. */
+.dust {
+  position: absolute;
+  inset: -14%;
+  border-radius: var(--radius-md);
+  background: radial-gradient(circle at 50% 55%, rgb(240 231 214 / 50%), transparent 68%);
+  animation-name: global(oz-dust);
+  animation-duration: var(--dur-crack);
+  animation-timing-function: var(--ease-fall);
+  animation-fill-mode: both;
+  pointer-events: none;
+}

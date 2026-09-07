@@ -36,13 +36,13 @@ rationale that was empirically false. Both were caught by measuring, and one was
 caught only by an adversarial pass sweeping *between* the tiers rather than at
 them.
 
-- [ ] **Step 1: The gate, clause by clause**
+- [x] **Step 1: The gate, clause by clause**
 
 Take `docs/plan/roadmap.md`'s `M5.5e` row as `T43` amended it, and produce a
 figure or a reproducible check for every clause. A clause with prose next to it
 instead of a measurement has not been verified.
 
-- [ ] **Step 2: Contrast**
+- [x] **Step 2: Contrast**
 
 Every new or changed surface, against what is actually behind it:
 
@@ -70,7 +70,7 @@ Every new or changed surface, against what is actually behind it:
 Report what you measured against, not just the ratio. A figure without its
 background is not a measurement.
 
-- [ ] **Step 3: `320px`, both locales, every phase**
+- [x] **Step 3: `320px`, both locales, every phase**
 
 §8.5 forbids horizontal scroll at `320px` and that outranks the type scale.
 `documentElement.scrollWidth` against `clientWidth`, plus a sweep for any element
@@ -85,7 +85,7 @@ make it worse, say so.
 The title screen's two-column rule grid and the game-over stat row are the two new
 things most likely to overflow.
 
-- [ ] **Step 4: Measurement traps, recorded so you do not rediscover them**
+- [x] **Step 4: Measurement traps, recorded so you do not rediscover them**
 
 From `T37` and `T42`:
 
@@ -98,7 +98,7 @@ From `T37` and `T42`:
   measurements taken in the gallery can be measuring a layout artifact. Check
   against the real screen before believing a gallery figure.
 
-- [ ] **Step 5: What the read-only answer slots announce**
+- [x] **Step 5: What the read-only answer slots announce**
 
 `T46` mounted the slots through feedback and reported an asymmetry it could not
 resolve inside its own paths: the empty socket announces its full name
@@ -119,7 +119,7 @@ measurement should say which:
 
 Report the finding; do not pick for the product. If it needs a change, file it.
 
-- [ ] **Step 6: Reduced motion**
+- [x] **Step 6: Reduced motion**
 
 Per `docs/journal/journal-2026-08-09.md`: flip `rule.media.mediaText` between
 `'all'` and `'(prefers-reduced-motion: reduce)'` and read
@@ -129,7 +129,7 @@ accept "look at it and confirm nothing happens" as a criterion.
 `M5.5e` adds no keyframes, so the check here is that nothing it *did* add animates
 unconditionally.
 
-- [ ] **Step 7: Journal it and commit**
+- [x] **Step 7: Journal it and commit**
 
 Record the figures, the traps hit, anything carried forward, and any defect found
 but deliberately not fixed — with the issue number it was filed under.

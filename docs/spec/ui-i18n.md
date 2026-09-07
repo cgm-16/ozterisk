@@ -128,9 +128,11 @@ The implementation may improve punctuation but may not change rule meaning.
 | `share.copied` | `Result copied.` | `결과를 복사했습니다.` |
 | `share.failed` | `Could not share or copy the result.` | `결과를 공유하거나 복사하지 못했습니다.` |
 
-The title screen shows four of these topics on the felt as always-visible
-material rules; `title.more` labels the disclosure holding the rest. All seven are
-still explained, which is what this section requires.
+The title screen shows **four material rules** on the felt, always visible. They
+cover **three** of these topics — capacity, outcomes, overflow — because outcomes
+takes two rules, one per material: a tile for the correct half, a vermilion pip
+for the incorrect one. `title.more` labels the disclosure holding the remaining
+four. All seven are still explained, which is what this section requires.
 
 The expanded rules must explain:
 

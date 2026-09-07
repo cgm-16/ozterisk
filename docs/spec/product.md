@@ -140,8 +140,13 @@ as a submitted round.
 #### `title`
 
 - Wordmark `ozterisk`.
-- Three-line rules summary.
-- Expandable **How to Play**.
+- One-paragraph pitch.
+- Four always-visible rules, each preceded by the material swatch it concerns —
+  socket, tile, gold, vermilion. Between them they cover capacity, both outcomes,
+  and overflow.
+- Expandable **More**, holding the required topics the four rules do not: keyboard
+  controls first, then selecting and returning tiles, ordered answer slots, and
+  the score/streak/round/loss rules.
 - Visible `English / 한국어` language selector.
 - One primary **Start Run** button.
 

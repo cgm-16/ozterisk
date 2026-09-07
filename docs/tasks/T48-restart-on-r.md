@@ -128,8 +128,11 @@ git commit -m "feat(game-over): restart on R, and say so on screen" -m "Task: T4
   and a comment saying why both are needed.
 - The stray-`Enter` regression test exists, and was sabotage-verified: revert the
   key test and confirm it fails.
-- `App.test.tsx:267` is inverted, not deleted, and the commit message names §1.11
-  as the authority for changing a behavioural test.
+- The old `Enter` test's scenario survives as an assertion rather than being
+  deleted, and the commit message names §1.11 as the authority for changing a
+  behavioural test. It may become two tests — `R` restarts with a non-`Play Again`
+  button focused, and `Enter` does not while that button keeps its own behaviour —
+  which covers more than the single inverted test would.
 - The hint is on screen in both locales and does not become a fourth focal point.
 - `howToPlay.keyboard` describes the bindings that actually exist, in both locales.
 - Lint, typecheck, test and build all pass.

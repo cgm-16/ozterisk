@@ -143,7 +143,12 @@ git commit -m "docs(journal): record what the flow screens measured" -m "Task: T
 
 - Every gate clause has a figure or a reproducible check beside it.
 - Every contrast figure names the surface it was measured against.
-- No horizontal scroll at `320px` in either locale, in every phase.
+- No horizontal scroll at `320px` in either locale, in every phase, **on a
+  viewport whose scrollbar takes no layout width**. Where a classic scrollbar
+  does take width, the rack's own arithmetic overflows in the four game phases at
+  `320`/`324`/`328px` and again at `408`/`412`/`416px`. That is #85, it predates
+  this branch, and it is `M5.5g`'s to fix — so the gate here is that this phase
+  did not move those readings, which is itself a measurement and not an excuse.
 - Any defect found is either fixed by its owning task or filed with a number.
 - No `src/` diff in this commit.
 

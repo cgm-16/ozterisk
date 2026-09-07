@@ -33,7 +33,7 @@ quietest; what happens once a run may be theatrical."* These two are the
 theatrical end, and `M5.5e` already built both their surfaces and left them
 still.
 
-- [ ] **Step 1: The title entrance**
+- [x] **Step 1: The title entrance**
 
 `TitleScreen.tsx` renders `.markTile` — the `✳` wearing the resting tile's
 tokens without being a `Tile`. The storyboard applies `sb-settle` to exactly
@@ -49,7 +49,7 @@ The four material rules are the first thing a new player reads. Nothing on this
 screen may arrive late enough to be missed, and nothing may start below its
 resting position and leave the layout shifting under a reader.
 
-- [ ] **Step 2: The share chop**
+- [x] **Step 2: The share chop**
 
 `GameOverScreen.module.css` already carries `.chop` — Ref 11C, the vermilion
 chop bearing `✳`, at 34px — and `.confirmation` already reserves its height so
@@ -71,7 +71,7 @@ than trimming it.
 The chop is decorative — the copy confirmation a screen reader hears comes from
 the `role="status"` region, which is not this element and must not change.
 
-- [ ] **Step 3: Test**
+- [x] **Step 3: Test**
 
 `getComputedStyle(el).animationName` resolves under `css: true`. Assert the
 mark carries the entrance and the chop carries the stamp; assert the chop is
@@ -81,7 +81,7 @@ absent before a copy and present after.
 order, the `role="status"` region and the `.primary` computed font size. None of
 those may move.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 Write the message to a file and pass it with `-F`.
 

@@ -271,4 +271,27 @@ describe("AnswerSlots streak ladder", () => {
     renderLadder({ streak: 8 });
     expect(getComputedStyle(screen.getByText("5").parentElement!).animationName).toBe("oz-bloom");
   });
+
+  /* The rim is the one rung that cannot accumulate: an element carries one
+     outline, so the tiers replace each other. Asserted by class rather than by
+     the colour it resolves to — the gate is what is testable here. */
+  const rimOn = () => screen.getByText("5").parentElement!.classList;
+
+  it("leaves the tiles unrimmed at the first rung", () => {
+    renderLadder({ streak: 3 });
+    expect(rimOn().contains(styles.rim)).toBe(false);
+    expect(rimOn().contains(styles.rimBright)).toBe(false);
+  });
+
+  it("rims the tiles in gold at streak 5", () => {
+    renderLadder({ streak: 5 });
+    expect(rimOn().contains(styles.rim)).toBe(true);
+    expect(rimOn().contains(styles.rimBright)).toBe(false);
+  });
+
+  it("replaces the gold rim with the brightest at streak 8", () => {
+    renderLadder({ streak: 8 });
+    expect(rimOn().contains(styles.rimBright)).toBe(true);
+    expect(rimOn().contains(styles.rim)).toBe(false);
+  });
 });

@@ -40,7 +40,9 @@
 /* One wrapper per filled slot, and the tile's moment plays on the span inside
    it rather than on this one, so the dust behind the tile — and the streak
    ring that will join it — is not dragged along by the transform that carries
-   the tile away. */
+   the tile away.
+   inline-flex is what makes the moment span animatable at all: transform does
+   nothing to an inline box, and a flex container blockifies its children. */
 .filled {
   position: relative;
   display: inline-flex;
@@ -57,13 +59,10 @@
    `global()` because keyframes.css is not a CSS Module and these rules are:
    without the escape the name is rewritten to a locally scoped one that
    matches no @keyframes anywhere, and an animation naming a keyframe nothing
-   defines fails silently — no error, no warning, no motion.
-   A bare <span> is an inline box and transform does nothing to one, so each
-   moment blockifies its own element. */
+   defines fails silently — no error, no warning, no motion. */
 .arriving,
 .bloom,
 .crack {
-  display: inline-flex;
   animation-fill-mode: both;
 }
 

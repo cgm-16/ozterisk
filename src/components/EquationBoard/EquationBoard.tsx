@@ -13,6 +13,10 @@ export function EquationBoard({ equation }: EquationBoardProps) {
     // by key as well as by type, so a changed key remounts the <p> and an
     // unchanged one keeps it — a re-render that brought the same equation must
     // not replay the rise.
+    // Ceiling: generateEquation draws uniformly and never rejects a repeat, so
+    // a round that happens to redraw the previous pair keeps this key and does
+    // not rise. The honest key is the round number, which this component is not
+    // given; issue that prop from GameScreen if the miss is worth closing.
     <p key={`${equation.left}x${equation.right}`} className={styles.equation}>
       {equation.left} × {equation.right} =
     </p>

@@ -33,10 +33,25 @@ describe("EquationBoard motion", () => {
     expect(screen.getByText("4 × 5 =")).not.toBe(first);
   });
 
-  it("keeps its node when the same equation re-renders, so the rise does not replay", () => {
+  // The reducer holds one equation object per round and hands the same one back
+  // on every render within it, so this is what a re-render inside a round looks
+  // like — not a fresh object carrying equal digits, which is the next case.
+  it("keeps its node while the round's own equation re-renders, so the rise does not replay", () => {
+    const round = equation(2, 3);
+    const { rerender } = render(<EquationBoard equation={round} />);
+    const first = screen.getByText("2 × 3 =");
+    rerender(<EquationBoard equation={round} />);
+    expect(screen.getByText("2 × 3 =")).toBe(first);
+  });
+
+  // generateEquation draws uniformly from 45 pairs and never rejects a repeat,
+  // so roughly one round in forty-five arrives with the digits already on the
+  // board. Keying on those digits skips the rise on exactly those rounds — and
+  // it fails by staying still, which is indistinguishable from correct rest.
+  it("replaces its node when a new round redraws the pair already on the board", () => {
     const { rerender } = render(<EquationBoard equation={equation(2, 3)} />);
     const first = screen.getByText("2 × 3 =");
     rerender(<EquationBoard equation={equation(2, 3)} />);
-    expect(screen.getByText("2 × 3 =")).toBe(first);
+    expect(screen.getByText("2 × 3 =")).not.toBe(first);
   });
 });

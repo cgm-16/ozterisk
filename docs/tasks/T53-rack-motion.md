@@ -35,7 +35,7 @@ Four of the sixteen moments belong to the rack, and the rack is the one surface
 mounted in every game phase — which makes it the only place two of them can
 play at all.
 
-- [ ] **Step 1: `9i` — the reward tiles fire in place**
+- [x] **Step 1: `9i` — the reward tiles fire in place**
 
 `oz-fire` over `--dur-reward` on `--ease-snap`, on the tiles carrying
 `isNew`. It never travels: the tile is already in its sorted position and fires
@@ -51,7 +51,7 @@ Verify it plays **once**, on arrival, and does not replay when the player
 toggles a discard or the phase changes. React reuses the DOM node across
 re-renders, so a stable key is what buys that; confirm rather than assume.
 
-- [ ] **Step 2: `8a` — the eleventh tile rim-rejects**
+- [x] **Step 2: `8a` — the eleventh tile rim-rejects**
 
 `TileInventory` renders `Math.max(INVENTORY_CAPACITY, tiles.length)` cells, so
 **cell index 10 exists only while the rack overflows.** That cell is the
@@ -69,7 +69,7 @@ Whether the eleventh cell should also *look* like a perch on the rail rather
 than the first cell of a third grid row is a CSS question this task may answer
 — but only if it can be done without moving the ten sockets.
 
-- [ ] **Step 3: `8c` — the marked tile tips off the end**
+- [x] **Step 3: `8c` — the marked tile tips off the end**
 
 A tile that leaves state unmounts, and CSS cannot animate an unmounted node. So
 this one needs the departing tile held on screen for the length of its own exit.
@@ -83,7 +83,7 @@ Keep the mechanism inside this component. It is presentational: the reducer has
 already dropped the tile, and nothing outside the rack needs to know one is
 still being drawn.
 
-- [ ] **Step 4: `11a` — verify, then write down what you found**
+- [x] **Step 4: `11a` — verify, then write down what you found**
 
 `11a` is *"tap a resident, it lifts out and tilts."* `Tile`'s `marked` state
 already lifts and tilts, and `Tile.module.css:21` already transitions
@@ -99,7 +99,35 @@ half is missing.
 **Do not add an animation on top of a working transition.** The lazy answer and
 the correct answer are the same answer here.
 
-- [ ] **Step 5: Test**
+### The reading: `11a` holds, and no code was written
+
+Measured with `getComputedStyle` on the rack's own marked tile
+(`mode="discard"`, the tile in `pendingDiscards`), under `css: true`.
+
+Decidable in jsdom, and it holds:
+
+| read | value |
+| --- | --- |
+| `transition` | `transform var(--dur-select) var(--ease-settle), box-shadow var(--dur-select) var(--ease-settle)` |
+| `--tile-tilt` | `6deg` |
+
+Both halves of the moment are therefore present: `.marked` raises and turns the
+tile, and `.tile` transitions the `transform` that carries both, over the
+duration and easing `11a` asks for. The moment is built.
+
+Not decidable in jsdom, and handed to `T56`:
+
+| read | value | why it is not a reading |
+| --- | --- | --- |
+| `transform` | `translateY(calc(var(--tile-press) - var(--tile-lift))) rotate(var(--tile-tilt))` | jsdom does not substitute custom properties, so this is the declaration echoed back, not the composed transform |
+| `--tile-lift` | `var(--lift-offset)` | same: unsubstituted. `motion.css` puts `--lift-offset` at `5px` |
+| `transitionProperty` / `transitionDuration` / `transitionTimingFunction` | `all` / `0s` / `ease` | jsdom does not expand the `transition` shorthand into longhands, so these are initial values rather than reads. The shorthand string above is the real read |
+
+So `T56` measures in a browser that the marked tile lands 5px up and 6deg over,
+and that it takes `--dur-select` to get there. That it is asked to at all is
+settled here.
+
+- [x] **Step 5: Test**
 
 `getComputedStyle(el).animationName` resolves under `css: true` and is a real
 assertion; durations, distances and appearance are `T56`'s to measure in a
@@ -116,7 +144,7 @@ for lifted cells. **A held departing tile must not add a button a test can
 find, and must not be announced** — it has already left the game. Give it no
 role and hide it.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Write the message to a file and pass it with `-F`.
 

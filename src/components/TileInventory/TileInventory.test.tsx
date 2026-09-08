@@ -237,6 +237,41 @@ describe("TileInventory", () => {
     expect(cells(container)[1].textContent).toBe("3");
   });
 
+  // The only discard the product can actually reach. INVENTORY_CAPACITY plus
+  // REWARD_BONUS caps overflow at one tile, so GameScreen dispatches
+  // TOGGLE_DISCARD and CONFIRM_DISCARD from the same click handler; React
+  // batches them, and the rack is never once rendered with the tile's id in
+  // pendingDiscards. Measured in a browser against the real game: keying the
+  // exit off pendingDiscards meant 8c never played at all.
+  it("tips off a discard that was never rendered as pending", () => {
+    const tiles = [tile(1, "a"), tile(2, "b"), tile(3, "c")];
+    const { container, rerender } = renderInventory({
+      tiles,
+      mode: "discard",
+      pendingDiscards: [],
+    });
+    rerender({ tiles: [tiles[0], tiles[2]], mode: "readOnly", pendingDiscards: [] });
+
+    const departing = cells(container)[1];
+    expect(departing.textContent).toBe("2");
+    expect(animationOn(departing)).toBe("oz-tip-off");
+  });
+
+  // A tile leaving the rack from the answering phase was submitted, not
+  // discarded, and the slots already carry it — tipping it off the end would
+  // draw it in two places going two ways.
+  it("does not tip off a tile that leaves while the rack is selectable", () => {
+    const tiles = [tile(1, "a"), tile(2, "b"), tile(3, "c")];
+    const { container, rerender } = renderInventory({
+      tiles,
+      mode: "select",
+      pendingDiscards: [],
+    });
+    rerender({ tiles: [tiles[0], tiles[2]], mode: "readOnly", pendingDiscards: [] });
+
+    expect(cells(container)[1].textContent).toBe("3");
+  });
+
   // A reward tile is the usual thing to discard, so this is the ordinary case
   // rather than the odd one: if 9i kept the cell, its animation-name would not
   // change, no animation would start, animationend would never fire and the

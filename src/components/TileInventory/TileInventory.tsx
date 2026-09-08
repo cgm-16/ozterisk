@@ -28,18 +28,30 @@ export function TileInventory({ tiles, mode, pendingDiscards, liftedIds, onTile 
   // A tile that leaves state unmounts, and CSS cannot animate an unmounted
   // node, so 8c has to be drawn from a copy the rack keeps. Both halves of
   // "which tile just left, and did it leave by discard" are only legible
-  // against the previous render: CONFIRM_DISCARD drops the tile and clears
-  // pendingDiscards in the same action, and a submitted tile leaves the rack
-  // by a route that must not tip off. Adjusting state during render rather
-  // than in an effect keeps the held tile on screen from the first frame
-  // after the drop, with no gap for it to disappear in.
-  const [previous, setPrevious] = useState({ tiles, pendingDiscards });
+  // against the previous render, because CONFIRM_DISCARD drops the tile in the
+  // same action that leaves the discard phase. Adjusting state during render
+  // rather than in an effect keeps the held tile on screen from the first
+  // frame after the drop, with no gap for it to disappear in.
+  //
+  // The discard test is the phase the rack was in, not pendingDiscards. A
+  // forced single-tile discard dispatches TOGGLE_DISCARD and CONFIRM_DISCARD
+  // from one click handler (GameScreen), React batches them into one update,
+  // and the rack goes straight from "not marked" to "gone" — so a tile that
+  // left by discard was never once rendered with its id in pendingDiscards.
+  // Since INVENTORY_CAPACITY + REWARD_BONUS caps overflow at one tile, that
+  // batched path is the only discard the product can reach. `mode` is
+  // "discard" for exactly the overflow phase, which is the one phase a tile
+  // can leave the rack this way, and a submitted tile leaves from "select".
+  const [previous, setPrevious] = useState({ tiles, mode });
   if (previous.tiles !== tiles) {
     const present = new Set(tiles.map((tile) => tile.id));
-    const discarded = previous.tiles
-      .map((tile, index) => ({ tile, index }))
-      .filter(({ tile }) => !present.has(tile.id) && previous.pendingDiscards.includes(tile.id));
-    setPrevious({ tiles, pendingDiscards });
+    const discarded =
+      previous.mode === "discard"
+        ? previous.tiles
+            .map((tile, index) => ({ tile, index }))
+            .filter(({ tile }) => !present.has(tile.id))
+        : [];
+    setPrevious({ tiles, mode });
     if (discarded.length > 0) setDeparting((held) => [...held, ...discarded]);
   }
 

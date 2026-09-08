@@ -87,6 +87,24 @@ method `journal-2026-08-12.md` established.
 `T58`'s new states are the point: hover, focus-visible, disabled,
 reduced-motion, `pendingDiscards`, a short rack, streak 5 and streak 8.
 
+**Two readings inherited from other tasks, because this one owns the browser:**
+
+- **The rack, after `T59`.** `T59` deletes the text badges, which makes #84's
+  overlap criterion vacuous — nothing is left to overlap. What still needs
+  measuring is what replaced them: that a reward tile is visibly distinct from
+  a resting one, and that a reward cell and a plain cell occupy the same
+  footprint, at `320`, `408` and `768`, in both locales. Read it **with the
+  webfont blocked as well as loaded** — `@fontsource` ships `font-display:
+  swap`, so the fallback face paints on every cold load, and that was the
+  common case #84 turned on.
+- **Hover reads as nothing, and that is the finding.** No component in `src/`
+  declares a `:hover` rule, and the design system declares none either — the
+  only `:hover` in the whole handover is on `<a>` elements in the documents'
+  own chrome. So a hover reading identical to the resting reading is the system
+  as designed, not a failed probe. Record it as a figure, not as a gap, and do
+  not file it as a defect without saying that the design specifies no hover
+  treatment.
+
 - [ ] **Step 4: Reduced motion, per moment, both directions**
 
 `T56` could not do this per moment and recorded why: it read four
@@ -123,6 +141,13 @@ Each of these has cost a phase time already:
 - The gallery stretches some controls to their container; check a figure
   against the real screen before believing it.
 - jsdom substitutes no custom properties and expands no shorthand.
+- **The two game-over copy states press Copy Result on mount.** `T58` drove
+  them that way because `GameOverScreen` holds the share outcome in local
+  state, and the alternative was drawing a stand-in. Under `StrictMode` the
+  effect runs twice, so the press fires twice — idempotent, but a clipboard
+  probe that counts writes will see two. The chop is a 900ms one-shot that has
+  already played by the time the card is read at rest: seek it, do not wait for
+  it.
 
 - [ ] **Step 6: Journal it, and score the gate honestly**
 
@@ -141,6 +166,9 @@ the same. That precedent is the house style and it outranks a clean scorecard.
 - `7b`, `7c` and `2d` measured at `320px` while in flight, with peak extents
   labelled as such.
 - Every gallery state walked, in both locales, with a figure per state.
+- The rack read at `320`, `408` and `768` in both locales, with the webfont
+  blocked as well as loaded: a reward tile visibly distinct from a resting one,
+  and a reward cell and a plain cell occupying the same footprint.
 - Reduced motion read **per moment**, in **both** directions; `11d`'s resting
   offset survives both.
 - An explicit gate verdict, and every failure carrying an issue number.

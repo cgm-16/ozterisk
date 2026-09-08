@@ -27,7 +27,7 @@
 }
 
 /* The active segment fills gold with --clay-900 text; the inactive one
-   stays bare felt (docs/design-system/components/hud/LanguageToggle.prompt.md). */
+   stays bare felt. */
 .button[aria-pressed="true"] {
   background: var(--accent);
   color: var(--clay-900);

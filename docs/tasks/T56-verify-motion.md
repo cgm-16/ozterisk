@@ -41,7 +41,7 @@ that resolves and still never plays: wrong element, zero-size node, a
 `transform` on an inline element, an animation that fired before its element
 was on screen.
 
-- [ ] **Step 1: The inventory, moment by moment**
+- [x] **Step 1: The inventory, moment by moment**
 
 Sixteen rows. For each: the element that carries it, the animation or
 transition it resolves to, and evidence it **ran** — not that it was declared.
@@ -56,7 +56,7 @@ Three rows will not be a plain "plays":
 
 A row with prose beside it instead of a reading has not been verified.
 
-- [ ] **Step 2: Prove each one ran**
+- [x] **Step 2: Prove each one ran**
 
 `getComputedStyle` gives you the declaration. Running is a different claim.
 `getAnimations()` on the element (or on `document`) returns the live
@@ -66,7 +66,7 @@ the reading this step wants, taken while the moment is in flight.
 **`getComputedStyle` is stale within a single `evaluate`** — re-read it. That
 trap is recorded from `T37` and cost `T42` time again.
 
-- [ ] **Step 3: Reduced motion, in both directions**
+- [x] **Step 3: Reduced motion, in both directions**
 
 Per `docs/journal/journal-2026-08-09.md`: flip `rule.media.mediaText` between
 `'all'` and `'(prefers-reduced-motion: reduce)'` and read the computed
@@ -85,7 +85,7 @@ under `reduce` and its comment claims that retires every press in the app.
 resting offset to the disabled button state (`11d`), which is not a press and
 must survive, and the two must not be confused.
 
-- [ ] **Step 4: `320px`, both locales, every phase**
+- [x] **Step 4: `320px`, both locales, every phase**
 
 §8.5 forbids horizontal scroll at `320px` and it outranks anything this phase
 added. `documentElement.scrollWidth` against `clientWidth`, plus a sweep for
@@ -102,7 +102,7 @@ width the rack's own arithmetic overflows at `320`/`324`/`328px` and again at
 is that this phase did not move those readings, which is a measurement and not
 an excuse.
 
-- [ ] **Step 5: Traps, recorded so you do not rediscover them**
+- [x] **Step 5: Traps, recorded so you do not rediscover them**
 
 From `T37`, `T42` and `T49`:
 
@@ -114,7 +114,7 @@ From `T37`, `T42` and `T49`:
 - The gallery stretches some controls to their container; check a figure
   against the real screen before believing it.
 
-- [ ] **Step 6: Journal it and commit**
+- [x] **Step 6: Journal it and commit**
 
 Record the sixteen readings, the reduce figures in both directions, the `320px`
 sweep, the traps hit, and every defect found but deliberately not fixed — with

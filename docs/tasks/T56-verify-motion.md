@@ -131,6 +131,22 @@ the issue number it was filed under.
   and #85's readings unmoved where it does.
 - No `src/` diff in this commit.
 
+**Three of those criteria were written stricter than this task's own scope**
+
+Not a shortfall in the walk — a contradiction inside the task, worth naming so
+the next verification phase does not inherit it. Each of the three needs a
+fixture this task is explicitly forbidden from adding, four lines below.
+
+| Criterion | What blocks it |
+|---|---|
+| every deferral carries an issue number | `2d`, `7b` and `7c` are recorded as not reached, under #105 rather than one issue each — #105 *is* the reason they are unreachable |
+| reduced motion in both directions, **per moment** | read on four representative properties, not sixteen. `global.css` neutralises with one `!important` sweep, so the reading does not vary per moment — but that is an argument, not the per-moment measurement the criterion asks for |
+| `320px` **while the moments are in flight** | swept in every reachable state; the three ring tiers and the burst are not among them, so their peak extents are unmeasured at `320px` |
+
+A criterion that cannot be met without work the same task forbids is a defect
+in the criterion. `M5.5g` owns the fixtures (#105) and the real-viewport walk
+(#85); it is the phase that can satisfy these as written, and it should.
+
 **What this task does not do**
 
 - Does not fix #85, #94 or #95. All three are `M5.5g`'s.

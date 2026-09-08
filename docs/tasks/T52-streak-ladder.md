@@ -107,3 +107,14 @@ Write the message to a file and pass it with `-F`.
   rack past ten, the run goes straight to `overflow` and these slots never
   mount, so none of this plays. That is ruled on in the milestone record (#93)
   and is not a defect to fix here.
+
+> **Corrected 2026-09-09 by `T56`, which measured it.** The premise above is
+> false. `CONFIRM_DISCARD` (`gameReducer.ts:128-137`) sets `phase: "feedback"`,
+> so overflow **defers** the slot-bound moments by one step rather than
+> cancelling them: `answering → overflow → (discard) → feedback`. They are
+> absent only while the phase is `overflow`, and play on the submitted tiles
+> after the discard — measured live, bloom ×2 and the jade ring at streak 3.
+> The step this task was told to skip is therefore a real surface, and a phase
+> verifying the ladder must walk `overflow` and the post-discard `feedback`
+> rather than stopping at the submit. Nothing built here needs changing; #93
+> is closed as not-a-defect. Full reading in `journal-2026-09-09.md`.

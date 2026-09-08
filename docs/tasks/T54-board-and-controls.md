@@ -56,8 +56,10 @@ beneath it. `GameHud` renders the current streak and nothing else, so it has
 to remember the value it is replacing — the fall needs a number that is no
 longer in state.
 
-Fire it only on a break: a streak going `7 → 0`. A streak going `4 → 5` is not
-this moment, and neither is the first render of a run.
+Fire it only on a break: any `n → 0` where `n` was greater than zero, `7 → 0`
+being the representative case. A streak going `4 → 5` is not this moment, and
+neither is the first render of a run — a run that opens at `0` had nothing to
+lose.
 
 **`GameHud` is a `<dl>` and three tests pin its order.** `App.test.tsx:119`
 asserts Round → Score → Streak by `compareDocumentPosition`, and

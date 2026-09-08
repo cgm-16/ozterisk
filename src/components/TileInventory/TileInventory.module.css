@@ -66,11 +66,19 @@
 /* 8a — the eleventh cell, which exists only while the rack overflows: the
    tile is refused entry, drops onto the rail and stays perched there. The
    frame's last keyframe is that perch, not a rest, so without a fill mode the
-   tile snaps back into the grid the instant it lands. */
+   tile snaps back into the grid the instant it lands.
+
+   transform-origin carries the shape's pivot, which lives on the element in
+   the storyboard rather than in the frame: the rotation reads as a tile
+   catching on its lower-left edge, and around the default centre it reads as
+   a swivel instead. The rack is five columns at every tier, so the eleventh
+   cell sits alone in the leftmost column of a third row and the wider
+   rightward reach the pivot gives it lands in empty track. */
 .cellRimReject {
   animation-name: global(oz-rim-reject);
   animation-duration: var(--dur-select);
   animation-fill-mode: forwards;
+  transform-origin: 0 100%;
 }
 
 /* 8c — a confirmed discard tips off the end of the rack. forwards for the

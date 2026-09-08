@@ -68,4 +68,13 @@
   color: var(--text-disabled);
   box-shadow: none;
   outline: 1px solid var(--border-hairline);
+  /* 11d — an action that becomes available rises to meet the hand. Rest low
+     while disabled and the enable is the rise, carried by .button's existing
+     transform transition, which is not gated on :not(:disabled) and so is in
+     force through the flip. No JavaScript and no edge detection: the button
+     persists across the enable, so this is a value change on a live element.
+     4px is oz-rise-ready's own travel; that keyframe is the same shape said
+     the other way and stays part of the vocabulary, unused. Literal rather
+     than a token because motion.css names no resting offset for it. */
+  transform: translateY(4px);
 }

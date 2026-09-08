@@ -22,25 +22,32 @@ construction and is the **first thing to challenge** if it disagrees with the
 app. Read the two columns together: an inferred moment that is already built is
 where a collision with existing app behaviour is most likely.
 
-| Ref | Moment | Provenance | Status |
-|---|---|---|---|
-| `2a` | Correct answer: answer tiles rise 14px and settle | storyboard | **built** — `oz-bloom` |
-| `2d` | Streak tier 3: six-chip burst | storyboard | **built** — `oz-fan` |
-| `7a` | Streak tier 1: one jade ring | storyboard (frame); **gating inferred** | **built** — `oz-ring`, gated at streak 3 |
-| `7b` | Streak tier 2: second gold ring + gold rim on answer tiles | storyboard | **built** — `oz-ring` at 70ms |
-| `7c` | Streak tier 3: third ring, brightest rim | storyboard | **built** — `oz-ring` at 140ms |
-| `8a` | Overflow: the eleventh tile rim-rejects, perches on the rail | storyboard | specified |
-| `8c` | Discard confirm: the marked tile tips off the end | storyboard | specified |
-| `9b` | Tile to slot: flat slide, 130ms | storyboard | **built** — transition, not a keyframe |
-| `9f` | Wrong answer: crack and dust | storyboard (shape); **duration inferred** | **built** — `oz-crack` + `oz-dust` |
-| `9i` | Reward tiles fire in place, in sorted position | storyboard (shape); **fire/halo split inferred** | **built** — `oz-fire` |
-| `10b` | Round change: old equation falls, next rises | storyboard | **built** — `oz-round-rise` |
-| `10e` | Streak break: counter falls off its perch, 0 fades in | storyboard | **built** — `oz-counter-fall` + `oz-counter-zero` |
-| `10i` | Game over: the last tiles are swept off the rack | storyboard | specified |
-| `11a` | Overflow: tap a resident, it lifts out and tilts | storyboard | specified |
-| `11d` | An action becomes available and rises to meet the hand | **inferred** — from "disabled is flat, not dim" | **built** — `oz-rise-ready` |
-| `11C` | Title entrance (240ms) and share chop (900ms) | storyboard | specified |
-| `10d` | Persistent streak rings on the counter | storyboard | **struck** — see below |
+**Status** is this design system's own record and is left as it was written:
+it says whether the handover shipped a keyframe for the moment, not whether the
+product plays it. **Wired in `ozterisk`** is the fourth column, filled in by
+`M5.5f`, and the two disagree in both directions — the handover specified four
+moments it never built, and built one (`9b`) whose mechanism does not survive
+this codebase's non-reflowing rack.
+
+| Ref | Moment | Provenance | Status | Wired in `ozterisk` |
+|---|---|---|---|---|
+| `2a` | Correct answer: answer tiles rise 14px and settle | storyboard | **built** — `oz-bloom` | `AnswerSlots` `.bloom` |
+| `2d` | Streak tier 3: six-chip burst | storyboard | **built** — `oz-fan` | `AnswerSlots`, six chips, streak ≥ 8 |
+| `7a` | Streak tier 1: one jade ring | storyboard (frame); **gating inferred** | **built** — `oz-ring`, gated at streak 3 | `AnswerSlots`, streak ≥ 3 |
+| `7b` | Streak tier 2: second gold ring + gold rim on answer tiles | storyboard | **built** — `oz-ring` at 70ms | `AnswerSlots`, streak ≥ 5 |
+| `7c` | Streak tier 3: third ring, brightest rim | storyboard | **built** — `oz-ring` at 140ms | `AnswerSlots`, streak ≥ 8 |
+| `8a` | Overflow: the eleventh tile rim-rejects, perches on the rail | storyboard | specified | `TileInventory`, cell 10 — `oz-rim-reject`. **Positional**: no per-tile identity for the refused tile exists |
+| `8c` | Discard confirm: the marked tile tips off the end | storyboard | specified | `TileInventory`, held past the drop — `oz-tip-off` |
+| `9b` | Tile to slot: flat slide, 130ms | storyboard | **built** — transition, not a keyframe | `AnswerSlots` `.arriving` — `oz-slot-arrive`. **A keyframe here**: our slot tile mounts rather than travels |
+| `9f` | Wrong answer: crack and dust | storyboard (shape); **duration inferred** | **built** — `oz-crack` + `oz-dust` | `AnswerSlots` `.crack` + `.dust` |
+| `9i` | Reward tiles fire in place, in sorted position | storyboard (shape); **fire/halo split inferred** | **built** — `oz-fire` | `TileInventory`, `isNew` cells. Measured firing in both `overflow` and `feedback` |
+| `10b` | Round change: old equation falls, next rises | storyboard | **built** — `oz-round-rise` | `EquationBoard`. Only the rise; the fall was never built |
+| `10e` | Streak break: counter falls off its perch, 0 fades in | storyboard | **built** — `oz-counter-fall` + `oz-counter-zero` | `GameHud`, as siblings in one cell |
+| `10i` | Game over: the last tiles are swept off the rack | storyboard | specified | **not built** — #104. Needs a rack the game-over screen does not have |
+| `11a` | Overflow: tap a resident, it lifts out and tilts | storyboard | specified | `Tile` `.marked` — already a transition, measured in `T53`. No code |
+| `11d` | An action becomes available and rises to meet the hand | **inferred** — from "disabled is flat, not dim" | **built** — `oz-rise-ready` | `ActionButton`, a resting offset on `:disabled`. A transition, so `oz-rise-ready` stays unused |
+| `11C` | Title entrance (240ms) and share chop (900ms) | storyboard | specified | `TitleScreen` `.markTile` — `oz-title-settle`; `GameOverScreen` `.chop` — `oz-chop` |
+| `10d` | Persistent streak rings on the counter | storyboard | **struck** — see below | — |
 
 ### Inferred, and therefore open to challenge
 

@@ -67,6 +67,8 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         <AnswerSlots
           slotCount={getAnswerLength(state.equation)}
           selectedTiles={lastResult.submittedTiles}
+          verdict={lastResult.kind}
+          streak={state.currentStreak}
           disabled={false}
         />
       )}

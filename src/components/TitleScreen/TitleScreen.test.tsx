@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "../../i18n/I18nContext";
 import { TitleScreen } from "./TitleScreen";
+import styles from "./TitleScreen.module.css";
 
 describe("TitleScreen", () => {
   it("starts only from the explicit action", async () => {
@@ -124,5 +125,28 @@ describe("TitleScreen", () => {
     await userEvent.click(screen.getByRole("button", { name: "English" }));
 
     expect(screen.getByRole("button", { name: "Start Run" })).toBeInTheDocument();
+  });
+
+  // 11C. Cascade resolution, which jsdom does decide; that the mark actually
+  // settles, and over how long, is T56's to measure in a browser.
+  it("settles the mark on entrance and animates nothing else on the screen", () => {
+    const { container } = render(
+      <I18nProvider initialLanguage="en">
+        <TitleScreen onStart={vi.fn()} />
+      </I18nProvider>,
+    );
+
+    const mark = container.querySelector(`.${styles.markTile}`);
+    expect(mark).not.toBeNull();
+    expect(getComputedStyle(mark as Element).animationName).toBe("oz-title-settle");
+
+    // The mark settles; the screen does not. A staggered sequence across the
+    // wordmark, the rules and the button would be decorative motion outside
+    // §1.12's named inventory, and the rules are the first thing a new player
+    // reads.
+    for (const element of container.querySelectorAll("*")) {
+      if (element === mark) continue;
+      expect(getComputedStyle(element).animationName).toBe("none");
+    }
   });
 });

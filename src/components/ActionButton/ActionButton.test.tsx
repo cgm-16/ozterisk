@@ -70,6 +70,34 @@ describe("ActionButton", () => {
     expect(disabledShadow).toBe("none");
   });
 
+  /* 11d — an action that becomes available rises to meet the hand. It is a
+     transition and not a keyframe: the button element persists across the
+     enable (GameScreen keeps Submit and Clear mounted for the whole answering
+     phase and only flips `disabled`), so the resting offset below is a value
+     change on a live element, which is exactly what a transition interpolates.
+     jsdom runs no transition, so what is asserted is what jsdom decides: that
+     the two states resolve to different transforms, and that the transition
+     covering transform is in force in both of them. */
+  describe("rise to ready", () => {
+    it("rests low while disabled and level once enabled", () => {
+      const { button: enabled } = renderButton({ children: "Enabled" });
+      const { button: disabled } = renderButton({ children: "Disabled", disabled: true });
+
+      expect(getComputedStyle(disabled).transform).toBe("translateY(4px)");
+      expect(getComputedStyle(enabled).transform).toBe("translateY(0)");
+    });
+
+    // Gate the transition on :not(:disabled) and the rise would be a jump: the
+    // rule stops applying at the same moment the transform changes.
+    it("keeps the transform transition in force in both states", () => {
+      const { button: enabled } = renderButton({ children: "Enabled" });
+      const { button: disabled } = renderButton({ children: "Disabled", disabled: true });
+
+      expect(getComputedStyle(enabled).transition).toContain("transform");
+      expect(getComputedStyle(disabled).transition).toContain("transform");
+    });
+  });
+
   // Defect 1 guard: the reference implementation used onFocus/onBlur to swap
   // in the focus ring via inline style, which fires on click-focus as well as
   // keyboard focus. This component has no such handlers, so focusing and

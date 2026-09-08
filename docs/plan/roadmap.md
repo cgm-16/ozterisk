@@ -32,8 +32,8 @@ hoc at branch time.
 | `M6 — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(round)` merged; both modes' economy invariants green |
 | `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
 
-`M4`, `M5`, `M5.5a` and `M5.5b` are closed, merged as `16f2ff6`, `ecd76a1`,
-`f30929e` and `b933ca7`.
+`M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d` and `M5.5e` are closed, merged as
+`16f2ff6`, `ecd76a1`, `f30929e`, `b933ca7`, `29708b8`, `e4734e4` and `b6e801b`.
 
 **`M5.5b` met its exit gate in three parts of four.** A full English run plus a
 switch to Korean makes zero non-origin requests; Korean renders in Noto Sans KR,
@@ -54,6 +54,16 @@ already composes `box-shadow: <edge>, var(--ring-focus)`, but through
 composition through `:focus-visible`, not the handlers. The gate above is left
 as written: it is the standard, and `M5.5b` fell short of it. Measured across
 111 readings in `docs/journal/journal-2026-09-02.md`.
+
+**`M5.5f` will miss part of its exit gate, and the gate stays as written.** One
+of the sixteen named moments — `10i`, the game-over table sweep — cannot be
+built without either `GameScreen` outliving its own phase or `GameOverScreen`
+growing a rack it does not have. The second is new product surface and would
+need `product.md` §1.10 amended, and `M5.5f` is not a docs phase. Deferred as
+#104, with the question it turns on stated there: should the game-over screen
+show the final rack at all? Same precedent as `M5.5b` above — the gate is the
+standard, and the phase falling short of it is recorded rather than the gate
+being moved. Reasoning in `docs/journal/journal-2026-09-08.md`.
 
 **Why M5.5 is a fraction.** The design pass was not on the roadmap when M6
 and M7 were numbered, and it has to run once the gallery exists — the gallery

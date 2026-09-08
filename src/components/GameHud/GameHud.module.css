@@ -46,3 +46,43 @@ dd.primary {
 dd.streakActive {
   color: var(--accent);
 }
+
+/* 10e is two elements in one cell: a grid stacks the falling count over the
+   zero it uncovers without taking either out of flow, so the value keeps its
+   own width and the row never shifts while the break plays. Declares position
+   only in the grid sense — no font-size, so the .primary/.entry dd tie above
+   is untouched. */
+dd.streak {
+  display: grid;
+  justify-items: center;
+}
+
+/* The count that is being replaced. It is not text: content: attr() keeps the
+   glyph out of dd.textContent, which is how the streak value is read, so a
+   break still reads as the current streak alone. */
+.counterFall::before {
+  content: attr(data-fallen);
+}
+
+/* Both moments occupy the same cell, so the fall passes over the zero rather
+   than beside it. Longhands rather than the `animation` shorthand: jsdom
+   expands no shorthand, so the shorthand form reads back as animationName
+   `none` and no cascade assertion could tell a placed animation from a
+   misplaced one. global() because keyframes.css is not a CSS Module and this
+   file is — a locally scoped name matches no @keyframes and fails silently. */
+.counterFall,
+.counterZero {
+  grid-area: 1 / 1;
+  animation-duration: var(--dur-break);
+  animation-fill-mode: both;
+}
+
+.counterFall {
+  animation-name: global(oz-counter-fall);
+  animation-timing-function: var(--ease-fall);
+}
+
+.counterZero {
+  animation-name: global(oz-counter-zero);
+  animation-timing-function: var(--ease-standard);
+}

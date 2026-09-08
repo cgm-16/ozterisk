@@ -223,4 +223,42 @@ describe("GameOverScreen", () => {
     await waitFor(() => expect(nativeShare).toHaveBeenCalledTimes(2));
     expect(nativeShare).toHaveBeenNthCalledWith(2, { text: KO_TEXT, url: URL });
   });
+
+  // 11C. Cascade resolution, which jsdom does decide; that the stamp actually
+  // plays, how long it holds and what it looks like are T56's to measure in a
+  // browser. The animation names are longhands rather than the `animation`
+  // shorthand precisely so this read is possible at all.
+  it("stamps the chop only once a copy has succeeded", async () => {
+    const { container } = renderScreen({
+      dependencies: { writeClipboard: vi.fn().mockResolvedValue(undefined) },
+    });
+
+    expect(container.querySelector(`.${styles.chop}`)).toBeNull();
+
+    await userEvent.click(screen.getByRole("button", { name: "Share" }));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Result copied."));
+
+    const chop = container.querySelector(`.${styles.chop}`);
+    expect(chop).not.toBeNull();
+    expect(getComputedStyle(chop as Element).animationName).toBe("oz-chop");
+    // The chop is reinforcement; the status region is the confirmation. A
+    // screen reader must hear the copy from the region and never from here.
+    expect(chop).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("leaves the chop unstamped when the share fails", async () => {
+    const { container } = renderScreen({
+      dependencies: {
+        nativeShare: vi.fn().mockRejectedValue(new Error("cancelled")),
+        writeClipboard: vi.fn().mockResolvedValue(undefined),
+      },
+    });
+
+    await userEvent.click(screen.getByRole("button", { name: "Share" }));
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Could not share or copy the result."),
+    );
+
+    expect(container.querySelector(`.${styles.chop}`)).toBeNull();
+  });
 });

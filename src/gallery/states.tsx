@@ -243,16 +243,27 @@ const OVERFLOW_REQUIRED_2_STATE = makeOverflowState(makeEquation(3, 3), {
   },
 });
 
-// The decision the overflow phase actually asks for: one tile marked. Only
-// TOGGLE_DISCARD fills pendingDiscards, so no state that skips the reducer
-// has ever carried one, and the marked tile — its lift, its rim and the
-// confirm button it enables — had only ever been rendered by jsdom, which
-// performs no layout. tile-0 is the first of the hand's two 0s and carries no
-// reward badge of its own, which is the duplicate a player would let go.
-const OVERFLOW_MARKED_STATE: GameState = {
-  ...OVERFLOW_REQUIRED_1_STATE,
-  pendingDiscards: ["tile-0"],
-};
+// The decision the overflow phase actually asks for: one tile marked, and the
+// discard not yet complete. Only TOGGLE_DISCARD fills pendingDiscards, so no
+// state that skips the reducer has ever carried one, and the marked tile —
+// its lift and its rim — had only ever been rendered by jsdom, which performs
+// no layout.
+//
+// Built on required 2, not required 1: at excess 1 GameScreen's onTile
+// handler dispatches TOGGLE_DISCARD and CONFIRM_DISCARD from the same click,
+// so a tile marked and unconfirmed is a state the reducer permits and the
+// product never shows. It carries required 2's caveat with it — Classic is
+// not in the shipped game, so this hand is unreachable by playing.
+//
+// tile-0 is the first of the hand's two 0s and carries no reward badge of its
+// own, which is the duplicate a player would let go. Marked through the
+// reducer, which is also what proves the mark is legal: TOGGLE_DISCARD
+// returns the state unchanged if the tile is absent or the pending count has
+// already reached the overflow count.
+const OVERFLOW_MARKED_STATE = gameReducer(OVERFLOW_REQUIRED_2_STATE, {
+  type: "TOGGLE_DISCARD",
+  tileId: "tile-0",
+});
 
 const GAME_OVER_STATE = makeGameOverState(makeEquation(7, 8));
 

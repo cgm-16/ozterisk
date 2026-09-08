@@ -5,6 +5,7 @@ import { INVENTORY_CAPACITY } from "../../game/balance";
 import type { Tile } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
 import { TileInventory, type TileInventoryProps } from "./TileInventory";
+import tileStyles from "../Tile/Tile.module.css";
 
 const tile = (digit: Tile["digit"], id: string, isNew = false): Tile => ({ id, digit, isNew });
 
@@ -91,7 +92,9 @@ describe("TileInventory", () => {
       tiles: [tile(7, "a", true)],
     });
     expect(screen.getByRole("button", { name: "Digit 7, New tile" })).toBeInTheDocument();
-    expect(screen.getByText("New tile")).toBeInTheDocument();
+    // The badge span is gone (#84); the reward state is what now makes a new
+    // tile visibly distinct, so that is what the test has to hold on to.
+    expect(screen.getByRole("button", { name: "Digit 7, New tile" })).toHaveClass(tileStyles.reward);
   });
 
   it("marks a pending discard with a textual label and pressed state", () => {

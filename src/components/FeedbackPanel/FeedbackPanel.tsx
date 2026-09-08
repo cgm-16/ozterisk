@@ -20,14 +20,17 @@ export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
     >
       <p className={styles.headline}>{isCorrect ? t("result.correct") : t("result.incorrect")}</p>
       {isCorrect ? (
-        <ul className={styles.rewards}>
-          {rewardTiles.map((tile) => (
-            <li key={tile.id} className={styles.reward}>
-              <Tile digit={tile.digit} size="sm" state="reward" />
-              <span className={styles.rewardBadge}>{t("tile.newLabel")}</span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <p className={styles.comparison}>{t("result.submitted", { value: result.submittedValue })}</p>
+          <ul className={styles.rewards}>
+            {rewardTiles.map((tile) => (
+              <li key={tile.id} className={styles.reward}>
+                <Tile digit={tile.digit} size="sm" state="reward" />
+                <span className={styles.rewardBadge}>{t("tile.newLabel")}</span>
+              </li>
+            ))}
+          </ul>
+        </>
       ) : (
         <div className={styles.comparison}>
           <p>{t("result.submitted", { value: result.submittedValue })}</p>

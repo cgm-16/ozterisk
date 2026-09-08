@@ -60,7 +60,9 @@ describe("FeedbackPanel", () => {
   // place the submitted value is stated.
   it("states the submitted value on a correct answer, in both locales", () => {
     renderPanel(correct, [tile(4, "r1"), tile(7, "r2")]);
-    expect(screen.getByText("Your answer: 12")).toBeInTheDocument();
+    // A CSS Modules key that does not exist renders class="undefined" and
+    // reports no error, so the line's own class is asserted alongside its text.
+    expect(screen.getByText("Your answer: 12")).toHaveClass(styles.submitted);
 
     renderPanel(correct, [tile(4, "r1"), tile(7, "r2")], "ko");
     expect(screen.getByText("제출한 답: 12")).toBeInTheDocument();

@@ -160,6 +160,19 @@ describe("gallery catalogue", () => {
     expect(failed.container.querySelector(`.${gameOverStyles.chop}`)).toBeNull();
   });
 
+  // Four rules in the system draw a focus ring, and LanguageToggle's is the
+  // one no other board carries. Mounting it on the focus-visible board is
+  // also what makes that board differ from the hover board in what it
+  // renders rather than in what its note says about it.
+  it("mounts the language toggle on the focus-visible board and on no other", async () => {
+    await renderEntry(entryById("interaction-focus-visible"));
+    expect(screen.getByRole("group", { name: "Language" })).toBeInTheDocument();
+    cleanup();
+
+    await renderEntry(entryById("interaction-hover"));
+    expect(screen.queryByRole("group", { name: "Language" })).toBeNull();
+  });
+
   it("disables every control in the disabled interaction state", async () => {
     const { container } = await renderEntry(entryById("interaction-disabled"));
     const controls = [...container.querySelectorAll("button")];

@@ -46,7 +46,16 @@ export function CopyPressedOnMount({ children }: { children: ReactNode }) {
 // the stage's — a control that sizes to its container reads wider here than
 // on the screen — and the note that says how the state has to be driven,
 // since each of these has been read wrong before.
-export function ControlBoard({ note, disabled }: { note: string; disabled: boolean }) {
+export function ControlBoard({
+  note,
+  disabled,
+  children,
+}: {
+  note: string;
+  disabled: boolean;
+  /** A control only one of these states needs, mounted inside the arena. */
+  children?: ReactNode;
+}) {
   const { t } = useI18n();
 
   return (
@@ -67,6 +76,7 @@ export function ControlBoard({ note, disabled }: { note: string; disabled: boole
         <Tile digit={4} state={disabled ? "disabled" : "resting"} onClick={noop} />
         <Tile digit={7} state={disabled ? "disabled" : "marked"} onClick={noop} />
       </div>
+      {children}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { GameOverScreen } from "../components/GameOverScreen/GameOverScreen";
 import { GameScreen } from "../components/GameScreen/GameScreen";
+import { LanguageToggle } from "../components/LanguageToggle/LanguageToggle";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { sortTiles } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
@@ -272,7 +273,7 @@ const HOVER_NOTE =
   "Move a real pointer over each control: matches(':hover') is as unreadable in an automated probe as matches(':active') is. No component declares a :hover rule, so a hover reading equal to the resting reading is the system as built, not a failed probe.";
 
 const FOCUS_VISIBLE_NOTE =
-  "Tab to each control; never click it. :focus-visible survives a click on an already-focused element, so a click-driven reading shows a ring the spec withholds.";
+  "Tab to each control; never click it. :focus-visible survives a click on an already-focused element, so a click-driven reading shows a ring the spec withholds. Four rules draw a ring — the button's, the tile's two, and the language toggle's own — so the toggle is on this board and on no other.";
 
 const DISABLED_NOTE =
   "Every control here is disabled: flat, hairline outline, and resting 4px low so that becoming available reads as a rise (11d). It is a comparison against the enabled board, not a reading on its own.";
@@ -384,7 +385,15 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
     {
       id: "interaction-focus-visible",
       label: "Interaction — focus-visible",
-      render: () => <ControlBoard note={FOCUS_VISIBLE_NOTE} disabled={false} />,
+      // LanguageToggle carries a :focus-visible rule of its own, and the
+      // picker's copy of it sits outside the arena container, where a figure
+      // read off it need not be the figure it has on a screen. So the ring
+      // that only this component draws is read on a copy that is inside.
+      render: () => (
+        <ControlBoard note={FOCUS_VISIBLE_NOTE} disabled={false}>
+          <LanguageToggle />
+        </ControlBoard>
+      ),
     },
     {
       id: "interaction-disabled",

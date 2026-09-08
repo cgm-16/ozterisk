@@ -30,7 +30,13 @@
 /* The tile is the Tile primitive's own ceramic face; the cell is only sized
    to it, matching the fixed --tile-w x --tile-h grid track: every cell
    occupies the same footprint whether or not the tile inside it is a
-   reward. */
+   reward.
+
+   position: relative has no positioned child left to hold, but it still makes
+   the cell paint above its unpositioned siblings — which is what a cell
+   animating out of its own track needs. Whether the rack still reads right
+   without it is a browser question, not one a test can settle, so it stays
+   until something measures it. */
 .cell {
   position: relative;
   width: var(--tile-w);

@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 import { INVENTORY_CAPACITY } from "../../game/balance";
 import type { Tile } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
-import { TileInventory, type TileInventoryProps } from "./TileInventory";
 import tileStyles from "../Tile/Tile.module.css";
+import { TileInventory, type TileInventoryProps } from "./TileInventory";
 
 const tile = (digit: Tile["digit"], id: string, isNew = false): Tile => ({ id, digit, isNew });
 

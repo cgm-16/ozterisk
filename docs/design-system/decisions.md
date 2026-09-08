@@ -43,7 +43,7 @@ this codebase's non-reflowing rack.
 | `9i` | Reward tiles fire in place, in sorted position | storyboard (shape); **fire/halo split inferred** | **built** — `oz-fire` | `TileInventory`, `isNew` cells. Measured firing in both `overflow` and `feedback` |
 | `10b` | Round change: old equation falls, next rises | storyboard | **built** — `oz-round-rise` | `EquationBoard`. Only the rise; the fall was never built |
 | `10e` | Streak break: counter falls off its perch, 0 fades in | storyboard | **built** — `oz-counter-fall` + `oz-counter-zero` | `GameHud`, as siblings in one cell |
-| `10i` | Game over: the last tiles are swept off the rack | storyboard | specified | **not built** — #104. Needs a rack the game-over screen does not have |
+| `10i` | Game over: the last tiles are swept off the rack | storyboard | **struck** — #104, see below | — |
 | `11a` | Overflow: tap a resident, it lifts out and tilts | storyboard | specified | `Tile` `.marked` — already a transition, measured in `T53`. No code |
 | `11d` | An action becomes available and rises to meet the hand | **inferred** — from "disabled is flat, not dim" | **built** — `oz-rise-ready` | `ActionButton`, a resting offset on `:disabled`. A transition, so `oz-rise-ready` stays unused |
 | `11C` | Title entrance (240ms) and share chop (900ms) | storyboard | specified | `TitleScreen` `.markTile` — `oz-title-settle`; `GameOverScreen` `.chop` — `oz-chop` |
@@ -155,6 +155,16 @@ puzzle game.
 spec.** Not deferred; impossible as described. Rings were specified as an
 animated burst on the answer tiles; a persistent version on a different element
 would have to mean something else, and nothing was defined for it to mean.
+
+**`10i` — the game-over table sweep — was struck from the spec (#104).** Not
+impossible as described, unlike `10d`: impossible without new product surface.
+The sweep needs tiles on the rack at game over, and the game-over screen has no
+rack. Giving it one is a `product.md` §1.10 change, and the question that change
+turns on — *should the game-over screen show the final rack at all?* — is a
+product question, not a motion one. Ori's ruling is that it should not, so the
+moment has nothing to play on and the inventory drops to fifteen. The sweep
+shape stays in `ozterisk Storyboard.dc.html` as `sb-sweep`; nothing in
+`keyframes.css` was ever authored from it, so the strike removes no code.
 
 **A composited fade must not nest inside another fade.** In `10e` the falling
 counter is a **sibling** of the fading-in zero.
@@ -373,6 +383,13 @@ CSS custom properties.
   `sb-settle` and `sb-stamp` (11C). Port those rather than authoring new ones.
   The canvas frames hold across a 2.6s infinite loop, so each must be
   renormalised to 0–100% of its useful range when retimed to a one-shot.
+
+  > **Resolved by `M5.5f` and `M5.5g`.** `8a`, `8c` and `11C` were ported from
+  > those `sb-*` shapes and are wired; `11a` is a transition on `Tile.marked`
+  > rather than a keyframe. `10i` is struck — see the strike note under
+  > *Motion*. The renormalisation warning held: `sb-rim` also carried its pivot
+  > inline on the element rather than in the frame, and porting the frames alone
+  > dropped it.
 - **Verification against the shipped app.** The overflow panel is where the
   storyboard and the codebase disagree most; the redesign wins on visuals, but
   the *states* should be checked against `src/components/OverflowControls/`.

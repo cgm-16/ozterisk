@@ -72,7 +72,7 @@ section wins.
 - Motion is budgeted by frequency: what happens every round is fastest and quietest;
   what happens once a run may be theatrical.
 - Permitted motion is the **named inventory** in `docs/design-system/decisions.md`
-  — the sixteen named storyboard moments. A moment whose duration and easing are
+  — the fifteen named storyboard moments. A moment whose duration and easing are
   not yet assigned in `docs/design-system/tokens/motion.css` gets them assigned by
   the milestone that implements it, and that assignment is not an amendment. Motion
   outside that inventory is not permitted; extending the inventory amends this

@@ -40,7 +40,7 @@ this codebase's non-reflowing rack.
 | `8c` | Discard confirm: the marked tile tips off the end | storyboard | specified | `TileInventory`, held past the drop — `oz-tip-off` |
 | `9b` | Tile to slot: flat slide, 130ms | storyboard | **built** — transition, not a keyframe | `AnswerSlots` `.arriving` — `oz-slot-arrive`. **A keyframe here**: our slot tile mounts rather than travels |
 | `9f` | Wrong answer: crack and dust | storyboard (shape); **duration inferred** | **built** — `oz-crack` + `oz-dust` | `AnswerSlots` `.crack` + `.dust` |
-| `9i` | Reward tiles fire in place, in sorted position | storyboard (shape); **fire/halo split inferred** | **built** — `oz-fire` | `TileInventory`, `isNew` cells — so it plays on the `overflow` path too |
+| `9i` | Reward tiles fire in place, in sorted position | storyboard (shape); **fire/halo split inferred** | **built** — `oz-fire` | `TileInventory`, `isNew` cells. Measured firing in both `overflow` and `feedback` |
 | `10b` | Round change: old equation falls, next rises | storyboard | **built** — `oz-round-rise` | `EquationBoard`. Only the rise; the fall was never built |
 | `10e` | Streak break: counter falls off its perch, 0 fades in | storyboard | **built** — `oz-counter-fall` + `oz-counter-zero` | `GameHud`, as siblings in one cell |
 | `10i` | Game over: the last tiles are swept off the rack | storyboard | specified | **not built** — #104. Needs a rack the game-over screen does not have |

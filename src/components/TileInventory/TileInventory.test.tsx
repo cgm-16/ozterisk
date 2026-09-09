@@ -9,6 +9,7 @@ import { TileInventory, type TileInventoryProps } from "./TileInventory";
 
 const tile = (digit: Tile["digit"], id: string, isNew = false): Tile => ({ id, digit, isNew });
 
+/** Renders the rack with stable callbacks and exposes a same-tree rerender helper. */
 function renderInventory(overrides: Partial<TileInventoryProps> = {}) {
   const onTile = vi.fn();
   const inventory = (props: Partial<TileInventoryProps>) => (

@@ -26,6 +26,7 @@ const incorrect: RoundResult = {
   rewardTileIds: [],
 };
 
+/** Renders a feedback result in the requested locale for focused assertions. */
 function renderPanel(
   result: RoundResult,
   rewardTiles: readonly TileModel[] = [],

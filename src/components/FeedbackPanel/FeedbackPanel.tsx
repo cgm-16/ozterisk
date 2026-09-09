@@ -8,6 +8,7 @@ export interface FeedbackPanelProps {
   rewardTiles: readonly TileModel[];
 }
 
+/** Renders the announced outcome, submitted answer, and any earned tiles. */
 export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
   const { t } = useI18n();
   const isCorrect = result.kind === "correct";

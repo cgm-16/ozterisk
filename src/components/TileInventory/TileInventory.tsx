@@ -22,6 +22,7 @@ export interface TileInventoryProps {
   onTile(tileId: string): void;
 }
 
+/** Renders the fixed-socket rack, including lifted and departing tile states. */
 export function TileInventory({ tiles, mode, pendingDiscards, liftedIds, onTile }: TileInventoryProps) {
   const { t } = useI18n();
   const [departing, setDeparting] = useState<readonly DepartingTile[]>([]);

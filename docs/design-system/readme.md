@@ -30,7 +30,8 @@ in **English and Korean**.
 ### Sources this system was built from
 
 - **Codebase** (attached local folder `ozterisk/`, upstream `cgm-16/ozterisk@main`
-  — see `github.md` for the screen map) — React + TypeScript + Vite.
+  — the screen map was in `github.md`, pruned; read `src/app/App.tsx`) — React +
+  TypeScript + Vite.
   Reducer-driven game core in `src/game/`, ten component families in
   `src/components/`, original plain-neutral tokens in `src/styles/global.css`,
   bilingual copy in `src/i18n/messages.ts`.
@@ -38,7 +39,8 @@ in **English and Korean**.
   `ozterisk/docs/spec/ui-i18n.md` (visual, language, copy, sharing contracts).
 - **Design exploration** (this project) — `1-0 Redesign - Tile House.dc.html`
   (the full options-and-locks document: colour, wordmark, streak ladder, every
-  animation) and `ozterisk Storyboard.dc.html` (six scenarios, 21 frames).
+  animation), pruned once its locks were ported and recorded in `decisions.md`;
+  and `ozterisk Storyboard.dc.html` (six scenarios, 21 frames), which stays.
 
 The system's **structure and component inventory come from the codebase**. Its
 **visual and motion language comes from the locked redesign** — the shipped app

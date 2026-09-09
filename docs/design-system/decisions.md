@@ -4,8 +4,10 @@
 get there. Read it when you want to change something: most of these constraints
 have a reason that isn't visible from the rule alone.
 
-Per-component contracts (props, defaults, per-component prohibitions) live in the
-11 `components/**/*.prompt.md` and `.d.ts` files, not here.
+Per-component contracts (props, defaults, per-component prohibitions) were in the
+11 `components/**/*.prompt.md` and `.d.ts` files, pruned once every one of them
+shipped. The contracts that bind are the implementations in `src/components/`
+and their tests, not here.
 
 ---
 
@@ -373,8 +375,10 @@ CSS custom properties.
   them. Whether that satisfies §2 is still open.
 - **Logo.** None exists. If the brand ever needs a mark that isn't type, it is a
   new design problem, not a derivation of this system.
-- **Four motion refs specified but not built** — `8a`, `11a`/`8c`, `10i`,
-  `11C`. (`7b`, `7c` and `2d` are wired in `components/game/AnswerSlots.jsx`.)
+- **Four motion refs specified but not built** — **resolved, see the note
+  below** — `8a`, `11a`/`8c`, `10i`,
+  `11C`. (`7b`, `7c` and `2d` were wired in the pruned
+  `components/game/AnswerSlots.jsx`.)
   None of the four has a duration or easing in `tokens/motion.css` either, so
   the milestone that implements each one assigns both.
   **Provenance:** none of the four is an original design. `ozterisk

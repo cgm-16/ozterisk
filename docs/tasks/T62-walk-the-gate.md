@@ -79,10 +79,18 @@ must be labelled as a peak extent rather than a resting one.
 
 - [ ] **Step 3: The gallery walk**
 
-Every state, against the bar. `main.innerText`,
-`documentElement.scrollWidth` against `clientWidth`, a sweep for any element
-whose right edge exceeds the viewport, and the tray's accessible names — the
-method `journal-2026-08-12.md` established.
+Every state, against the bar. `documentElement.scrollWidth` against
+`clientWidth`, a sweep for any element whose right edge exceeds the viewport,
+and the tray's accessible names — the method `journal-2026-08-12.md`
+established.
+
+**Amended during execution.** The root is the gallery's own `.stage`, not
+`main`: `Gallery.tsx` renders every state into `.stage`, and the `interaction`
+boards render no `<main>` at all — a sweep rooted at `main` measures **zero
+elements** on those four and reports them clean. **Record the swept element
+count per state and reject a count of zero**; a sweep over nothing is
+indistinguishable from a sweep that found nothing. See
+`journal-2026-09-12.md`, harness bug 1.
 
 `T58`'s new states are the point: hover, focus-visible, disabled,
 reduced-motion, `pendingDiscards`, a short rack, streak 5 and streak 8.

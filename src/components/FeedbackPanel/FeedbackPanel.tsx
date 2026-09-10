@@ -8,6 +8,7 @@ export interface FeedbackPanelProps {
   rewardTiles: readonly TileModel[];
 }
 
+/** Renders the announced outcome, submitted answer, and any earned tiles. */
 export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
   const { t } = useI18n();
   const isCorrect = result.kind === "correct";
@@ -20,14 +21,17 @@ export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
     >
       <p className={styles.headline}>{isCorrect ? t("result.correct") : t("result.incorrect")}</p>
       {isCorrect ? (
-        <ul className={styles.rewards}>
-          {rewardTiles.map((tile) => (
-            <li key={tile.id} className={styles.reward}>
-              <Tile digit={tile.digit} size="sm" state="reward" />
-              <span className={styles.rewardBadge}>{t("tile.newLabel")}</span>
-            </li>
-          ))}
-        </ul>
+        <>
+          <p className={styles.submitted}>{t("result.submitted", { value: result.submittedValue })}</p>
+          <ul className={styles.rewards}>
+            {rewardTiles.map((tile) => (
+              <li key={tile.id} className={styles.reward}>
+                <Tile digit={tile.digit} size="sm" state="reward" />
+                <span className={styles.rewardBadge}>{t("tile.newLabel")}</span>
+              </li>
+            ))}
+          </ul>
+        </>
       ) : (
         <div className={styles.comparison}>
           <p>{t("result.submitted", { value: result.submittedValue })}</p>

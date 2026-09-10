@@ -60,8 +60,10 @@
 
 /* Gold on --surface-surround measures 7.87:1. This caption is 11px body text,
    so it owes 4.5:1 rather than 3:1 — it clears with room. It sits below the
-   tile, not over the ceramic; the rack's badges are the ones that overlap a
-   digit face, and that is issue #84. */
+   tile, not over the ceramic. The rack draws no badge at all — its text
+   labels overlapped the engraved digit and were deleted (#84), leaving the
+   tile's own reward state to carry the cue. This panel keeps its badge
+   because a panel has room for the words a 52px cell does not. */
 .rewardBadge {
   font-size: var(--size-label);
   text-transform: uppercase;
@@ -73,5 +75,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+  color: var(--text-meta);
+}
+
+/* The correct branch states the submitted value on its own, with nothing to
+   compare it against, so it takes the caption colour without the stacking the
+   incorrect branch's pair needs. */
+.submitted {
   color: var(--text-meta);
 }

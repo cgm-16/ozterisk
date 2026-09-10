@@ -30,7 +30,8 @@ in **English and Korean**.
 ### Sources this system was built from
 
 - **Codebase** (attached local folder `ozterisk/`, upstream `cgm-16/ozterisk@main`
-  — see `github.md` for the screen map) — React + TypeScript + Vite.
+  — the screen map was in `github.md`, pruned; read `src/app/App.tsx`) — React +
+  TypeScript + Vite.
   Reducer-driven game core in `src/game/`, ten component families in
   `src/components/`, original plain-neutral tokens in `src/styles/global.css`,
   bilingual copy in `src/i18n/messages.ts`.
@@ -38,7 +39,8 @@ in **English and Korean**.
   `ozterisk/docs/spec/ui-i18n.md` (visual, language, copy, sharing contracts).
 - **Design exploration** (this project) — `1-0 Redesign - Tile House.dc.html`
   (the full options-and-locks document: colour, wordmark, streak ladder, every
-  animation) and `ozterisk Storyboard.dc.html` (six scenarios, 21 frames).
+  animation), pruned once its locks were ported and recorded in `decisions.md`;
+  and `ozterisk Storyboard.dc.html` (six scenarios, 21 frames), which stays.
 
 The system's **structure and component inventory come from the codebase**. Its
 **visual and motion language comes from the locked redesign** — the shipped app
@@ -373,14 +375,38 @@ wherever a mark would go. See `guidelines/wordmark.html`.
 | `styles.css` | Global CSS entry — `@import`s every token file. Link this one file. |
 | `tokens/` | `colors`, `typography`, `spacing`, `radius`, `elevation`, `motion`, `keyframes`, `fonts`, `base` |
 | `guidelines/` | Foundation specimen cards (colour, type, tiles, motion, wordmark) |
-| `components/game/` | `Tile`, `TileInventory`, `AnswerSlots`, `EquationBoard` |
-| `components/hud/` | `GameHud`, `CapacityMeter`, `LanguageToggle`, `ActionButton` |
-| `components/flow/` | `FeedbackPanel`, `OverflowControls`, `TitleScreen`, `GameOverScreen`, `GameScreen` |
-| `ui_kits/game/` | Click-through recreation: title → answering → feedback → overflow → game over |
+| `Tile House Design System.dc.html` | The system presented whole: colour, type, tile anatomy, the rack, slots and buttons, motion, motifs |
+| `ozterisk Storyboard.dc.html` | The `sb-*` motion shapes every keyframe in `src/` was ported from |
+| `support.js` | The runtime the two canvases above need in order to render |
 | `assets/` | `favicon.svg` (from the codebase, unchanged) |
 | `decisions.md` | Decision record: why each rule exists, what was rejected, storyboard ref legend |
-| `github.md` | Source repo association and screen map |
-| `SKILL.md` | Agent Skills manifest, for use in Claude Code |
+
+### What this folder no longer holds
+
+The handover shipped reference components (`components/`), a click-through
+recreation (`ui_kits/`), four further canvases, and the design tool's own
+scaffolding. `M5.5a`–`M5.5f` ported all of it into `src/`, and `M5.5g` pruned
+what the port had absorbed (#58).
+
+The rule applied: **keep what the spec calls normative and what a future phase
+would have to re-derive; drop what `src/` now implements better and what only
+the design tool reads.** §1.12 names this directory the normative source for
+token values, material rules and the motion inventory, so `tokens/`,
+`guidelines/` and `decisions.md` are spec-bound and stay. The two surviving
+canvases stay because nothing in `src/` re-derives them: one presents the
+system whole, the other is the provenance for every motion shape.
+
+The reference components are the one deletion worth a reason of its own. They
+were superseded by `src/components/`, and four of their mechanisms were
+recorded as defects during the port — `onFocus`/`onBlur` in place of
+`:focus-visible`, pointer handlers in place of `:active`, one press shadow
+across every variant, and raw hex edges. Their `.prompt.md` prose had also
+drifted from what shipped. A reference that contradicts the implementation is
+worse than no reference.
+
+The task files and journals of `M5.5a`–`M5.5f` cite the deleted paths
+throughout. Those citations are the historical record and are deliberately left
+as they are.
 
 ### Component inventory — and why it is exactly this
 

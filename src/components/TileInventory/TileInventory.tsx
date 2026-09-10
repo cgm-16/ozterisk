@@ -22,6 +22,7 @@ export interface TileInventoryProps {
   onTile(tileId: string): void;
 }
 
+/** Renders the fixed-socket rack, including lifted and departing tile states. */
 export function TileInventory({ tiles, mode, pendingDiscards, liftedIds, onTile }: TileInventoryProps) {
   const { t } = useI18n();
   const [departing, setDeparting] = useState<readonly DepartingTile[]>([]);
@@ -127,21 +128,19 @@ export function TileInventory({ tiles, mode, pendingDiscards, liftedIds, onTile 
           <div key={tile.id} className={`${styles.cell}${moment}`}>
             <Tile
               digit={tile.digit}
-              state={isMarkedForDiscard ? "marked" : mode === "readOnly" ? "disabled" : "resting"}
+              state={
+                isMarkedForDiscard
+                  ? "marked"
+                  : mode === "readOnly"
+                    ? "disabled"
+                    : tile.isNew
+                      ? "reward"
+                      : "resting"
+              }
               label={labelParts.join(", ")}
               pressed={mode === "discard" ? isMarkedForDiscard : undefined}
               onClick={() => onTile(tile.id)}
             />
-            {tile.isNew && (
-              <span className={styles.newBadge} aria-hidden="true">
-                {t("tile.newLabel")}
-              </span>
-            )}
-            {isMarkedForDiscard && (
-              <span className={styles.discardBadge} aria-hidden="true">
-                {t("tile.discardLabel")}
-              </span>
-            )}
           </div>
         );
       })}

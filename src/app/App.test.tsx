@@ -189,7 +189,6 @@ describe("App", () => {
     expect(screen.getByText("4 × 5 =")).toBeInTheDocument();
     expect(hudField("Round")).toBe("2");
     expect(screen.getAllByRole("button", { name: /^Digit \d$/ })).toHaveLength(10);
-    expect(screen.queryByText("New tile")).not.toBeInTheDocument();
 
     // §1.16 / AGENTS.md: no game field ever enters storage, even after a full round.
     expect(localStorage.length).toBe(0);

@@ -28,7 +28,7 @@ hoc at branch time.
 | `M5.5d — Board Surfaces` | The rack, slots, equation, HUD and capacity meter wear the system | Rack holds ten sockets at every tier; a selected tile keeps its socket; round retains primary emphasis |
 | `M5.5e — Flow Screens` | Title, feedback, overflow and game over wear the system | Answer slots stay mounted through feedback and carry no `button` role there; `role="status"` regions intact; the game-over screen has one focal point and ranks its own numbers; restart is bound to `R` and has a visible affordance; the title's four material rules are visible without interaction |
 | `M5.5f — Motion` | The sixteen named moments | Every moment in the §1.12 inventory implemented; `prefers-reduced-motion` neutralises all of them |
-| `M5.5g — Visual Verification` | The gallery proves it | Gallery covers hover, focus-visible, disabled and reduced-motion; §8.5 walked with measured evidence at 320px |
+| `M5.5g — Visual Verification` | The gallery proves it | Gallery covers hover, focus-visible, disabled and reduced-motion, and every state renders what its name claims; §8.5 walked with measured evidence at 320px in a real top-level viewport; reduced motion read per moment in both directions; no rack badge overlaps the engraved digit in either locale or either font face; `docs/design-system/` holds only what the product still reads |
 | `M6 — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(round)` merged; both modes' economy invariants green |
 | `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
 
@@ -64,6 +64,34 @@ need `product.md` §1.10 amended, and `M5.5f` is not a docs phase. Deferred as
 show the final rack at all? Same precedent as `M5.5b` above — the gate is the
 standard, and the phase falling short of it is recorded rather than the gate
 being moved. Reasoning in `docs/journal/journal-2026-09-08.md`.
+
+**`10i` is struck, and `M5.5f` is not re-scored for it.** `M5.5g` opened with
+Ori's ruling on the question #104 stated: the game-over screen does not grow a
+rack, so the sweep has nothing to play on and §1.12's inventory drops to
+fifteen. That makes `M5.5f`'s gate — *every moment in the §1.12 inventory
+implemented* — read true against the amended inventory, and it is **not** being
+claimed retroactively. `M5.5f` shipped short of the gate as the gate stood on
+the day it shipped, and the paragraph above stays as written. A gate is scored
+against the standard in force when the phase closes, not against a later
+amendment that happens to flatter it.
+
+**`M5.5g` carries a docket, and three issues are deliberately not on it.**
+The gate above gained the docket the phase inherited: #105 (three gallery
+states that render something other than their name), #84 (rack badges over the
+engraved digit — Ori's ruling is to delete the text badges and let the tile's
+`reward` state carry the meaning), #94, #95 and #58. Left out, each for a
+reason rather than by omission:
+
+- **#64** — `dist/` carries ~1.0 MB of duplicate `.woff` files. A build-output
+  defect; nothing in this gate touches the bundle.
+- **#77** — lint CSS with Stylelint. Its own title says *once M5.5 settles*, and
+  introducing a linter mid-verification would churn every stylesheet the phase
+  exists to hold still.
+- **#31** — the post-release tidy batch. Predates `M5.5` and is labelled
+  post-release.
+
+**#58 is the exception and stays in**: it was blocked only on `M5.5f` still
+reading the storyboard canvases, and that block is gone.
 
 **Why M5.5 is a fraction.** The design pass was not on the roadmap when M6
 and M7 were numbered, and it has to run once the gallery exists — the gallery

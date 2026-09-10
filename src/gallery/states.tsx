@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { GameOverScreen } from "../components/GameOverScreen/GameOverScreen";
 import { GameScreen } from "../components/GameScreen/GameScreen";
+import { LanguageToggle } from "../components/LanguageToggle/LanguageToggle";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { sortTiles } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
@@ -15,6 +16,7 @@ import {
   makeOverflowState,
   makeTile,
 } from "../test/fixtures";
+import { ControlBoard, CopyPressedOnMount, ReducedMotionBoard } from "./harness";
 
 export interface GalleryEntry {
   /** Stable across renders; used as the picker's React key. */
@@ -67,6 +69,26 @@ const ANSWERING_FULL_STATE = gameReducer(ANSWERING_PARTIAL_STATE, {
   tileId: "tile-2",
 });
 
+// A rack late in a run, where §1.12's empty sockets are the score. Every
+// other state holds a nearly full hand, so the sockets have only ever been a
+// minority of the rack. Four tiles that can still spell 6, because a hand
+// that cannot answer its equation is gameOver rather than answering
+// (canAttemptEquation, NEXT_ROUND); round is one past totalRounds, as §2.5
+// requires of this phase.
+const ANSWERING_DEPLETED_STATE = makeAnsweringState(makeEquation(2, 3), {
+  inventory: [
+    makeTile(0, "tile-0"),
+    makeTile(3, "tile-3"),
+    makeTile(6, "tile-6"),
+    makeTile(9, "tile-9"),
+  ],
+  score: 5,
+  round: 9,
+  totalRounds: 8,
+  currentStreak: 2,
+  longestStreak: 3,
+});
+
 // score and currentStreak/longestStreak reflect the round this correct
 // answer just won, matching what SUBMIT_CORRECT actually produces instead of
 // showing a reward next to a HUD that still reads zero.
@@ -91,9 +113,73 @@ const FEEDBACK_CORRECT_STATE = makeFeedbackState(makeEquation(3, 3), {
   },
 });
 
-// The default lastResult (src/test/fixtures.ts) is already incorrect, so no
-// override is needed here.
-const FEEDBACK_INCORRECT_STATE = makeFeedbackState(makeEquation(6, 7));
+// 7b and 7c, the ladder above streak 3. The rings accumulate, so the streak 8
+// state draws jade, gold and bright together — but one element carries one
+// outline, so the rim escalates instead: at 8 the rim is the bright one, and
+// the gold rim of the 5 tier is on screen at 5 and nowhere else
+// (AnswerSlots). That exclusivity is why the ladder needs two states and not
+// one at the top.
+//
+// A two-digit product rather than the single slot 3 x 3 gives: a ring's peak
+// extent is 213x213 around a 64x80 tile, and two adjacent rings overlapping
+// is the case §8.5 has never been read against.
+const STREAK_EQUATION = makeEquation(3, 4); // product 12: two answer slots
+const STREAK_REWARD_TILE_IDS = ["reward-0", "reward-1", "reward-2"];
+
+// Hand-assembled rather than run through the reducer, because SUBMIT_CORRECT
+// cannot land a two-digit answer in feedback from a full rack: two tiles
+// spent earn getRewardCount(2) = 3, and 10 - 2 + 3 overflows. Eight held at
+// submit is the largest hand that reaches feedback, and 8 - 2 + 3 = 9 is what
+// it leaves. An unbroken streak is also the run's whole history, so score,
+// round and totalRounds are the streak itself.
+function makeStreakState(streak: number): GameState {
+  return makeFeedbackState(STREAK_EQUATION, {
+    inventory: sortTiles([
+      makeTile(0, "tile-0"),
+      makeTile(3, "tile-3"),
+      makeTile(4, "tile-4"),
+      makeTile(5, "tile-5"),
+      makeTile(7, "tile-7"),
+      makeTile(8, "tile-8"),
+      makeTile(1, "reward-0", true),
+      makeTile(2, "reward-1", true),
+      makeTile(6, "reward-2", true),
+    ]),
+    score: streak,
+    round: streak,
+    totalRounds: streak,
+    currentStreak: streak,
+    longestStreak: streak,
+    lastResult: {
+      kind: "correct",
+      submittedValue: STREAK_EQUATION.product,
+      correctValue: STREAK_EQUATION.product,
+      submittedTiles: [makeTile(1, "spent-0"), makeTile(2, "spent-1")],
+      rewardTileIds: STREAK_REWARD_TILE_IDS,
+    },
+  });
+}
+
+const FEEDBACK_STREAK_5_STATE = makeStreakState(5);
+const FEEDBACK_STREAK_8_STATE = makeStreakState(8);
+
+// Built by running the real reducer for the same reason the answering states
+// are: SUBMIT_INCORRECT is what puts the selected tiles into
+// lastResult.submittedTiles and keeps them out of the rack. Taking
+// makeFeedbackState's default result instead left submittedTiles empty, so
+// the slots rendered as two empty sockets and 9f — the crack and its dust —
+// had nothing to play on. 6 x 7 is 42, and 21 is the wrong answer a player
+// who spelled the digits in the wrong order would submit.
+const INCORRECT_EQUATION = makeEquation(6, 7); // product 42: two answer slots
+const INCORRECT_PARTIAL_STATE = gameReducer(makeAnsweringState(INCORRECT_EQUATION), {
+  type: "SELECT_TILE",
+  tileId: "tile-2",
+});
+const INCORRECT_FULL_STATE = gameReducer(INCORRECT_PARTIAL_STATE, {
+  type: "SELECT_TILE",
+  tileId: "tile-1",
+});
+const FEEDBACK_INCORRECT_STATE = gameReducer(INCORRECT_FULL_STATE, { type: "SUBMIT_INCORRECT" });
 
 // Overflow always follows SUBMIT_CORRECT, which stamps every newly granted
 // tile isNew: true and files the result through sortTiles (gameReducer.ts).
@@ -157,6 +243,28 @@ const OVERFLOW_REQUIRED_2_STATE = makeOverflowState(makeEquation(3, 3), {
   },
 });
 
+// The decision the overflow phase actually asks for: one tile marked, and the
+// discard not yet complete. Only TOGGLE_DISCARD fills pendingDiscards, so no
+// state that skips the reducer has ever carried one, and the marked tile —
+// its lift and its rim — had only ever been rendered by jsdom, which performs
+// no layout.
+//
+// Built on required 2, not required 1: at excess 1 GameScreen's onTile
+// handler dispatches TOGGLE_DISCARD and CONFIRM_DISCARD from the same click,
+// so a tile marked and unconfirmed is a state the reducer permits and the
+// product never shows. It carries required 2's caveat with it — Classic is
+// not in the shipped game, so this hand is unreachable by playing.
+//
+// tile-0 is the first of the hand's two 0s and carries no reward badge of its
+// own, which is the duplicate a player would let go. Marked through the
+// reducer, which is also what proves the mark is legal: TOGGLE_DISCARD
+// returns the state unchanged if the tile is absent or the pending count has
+// already reached the overflow count.
+const OVERFLOW_MARKED_STATE = gameReducer(OVERFLOW_REQUIRED_2_STATE, {
+  type: "TOGGLE_DISCARD",
+  tileId: "tile-0",
+});
+
 const GAME_OVER_STATE = makeGameOverState(makeEquation(7, 8));
 
 const RESOLVING_SHARE_DEPENDENCIES: ShareDependencies = {
@@ -172,10 +280,26 @@ const REJECTING_SHARE_DEPENDENCIES: ShareDependencies = {
   },
 };
 
+const HOVER_NOTE =
+  "Move a real pointer over each control: matches(':hover') is as unreadable in an automated probe as matches(':active') is. No component declares a :hover rule, so a hover reading equal to the resting reading is the system as built, not a failed probe.";
+
+const FOCUS_VISIBLE_NOTE =
+  "Tab to each control; never click it. :focus-visible survives a click on an already-focused element, so a click-driven reading shows a ring the spec withholds. Four rules draw a ring — the button's, the tile's two, and the language toggle's own — so the toggle is on this board and on no other.";
+
+const DISABLED_NOTE =
+  "Every control here is disabled: flat, hairline outline, and resting 4px low so that becoming available reads as a rise (11d). It is a comparison against the enabled board, not a reading on its own.";
+
+const REDUCED_MOTION_NOTE =
+  "Read every element below under prefers-reduced-motion: reduce AND under normal. global.css neutralises animation and transition durations with !important, so the reduce reading alone cannot tell a wired animation from an unwired one — only the pair can. Animations: the ladder's top tier and the crack that takes its dust with it. Transitions: the button and the tile beneath them.";
+
 // Keyed by phase so that adding a GamePhase member fails typecheck until the
 // gallery covers it. A flat array with a hand-written phase list would rot
 // silently, which is the failure this structure exists to prevent.
-export const GALLERY_STATES: Record<GamePhase, GalleryEntry[]> = {
+//
+// `interaction` is the one key that is not a phase: hover, focus-visible,
+// disabled and reduced motion are conditions any screen can be in rather than
+// moments the reducer can reach, and M5.5g's gate names all four.
+export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> = {
   title: [{ id: "title", label: "Title", render: () => <TitleScreen onStart={noop} /> }],
   answering: [
     {
@@ -193,6 +317,11 @@ export const GALLERY_STATES: Record<GamePhase, GalleryEntry[]> = {
       label: "Answering — all slots filled",
       render: () => renderGameScreen(ANSWERING_FULL_STATE),
     },
+    {
+      id: "answering-depleted",
+      label: "Answering — a depleted rack",
+      render: () => renderGameScreen(ANSWERING_DEPLETED_STATE),
+    },
   ],
   feedback: [
     {
@@ -204,6 +333,16 @@ export const GALLERY_STATES: Record<GamePhase, GalleryEntry[]> = {
       id: "feedback-incorrect",
       label: "Feedback — incorrect, with the answer comparison",
       render: () => renderGameScreen(FEEDBACK_INCORRECT_STATE),
+    },
+    {
+      id: "feedback-streak-5",
+      label: "Feedback — correct at streak 5 (second ring, gold rim)",
+      render: () => renderGameScreen(FEEDBACK_STREAK_5_STATE),
+    },
+    {
+      id: "feedback-streak-8",
+      label: "Feedback — correct at streak 8 (third ring, the burst)",
+      render: () => renderGameScreen(FEEDBACK_STREAK_8_STATE),
     },
   ],
   overflow: [
@@ -217,6 +356,11 @@ export const GALLERY_STATES: Record<GamePhase, GalleryEntry[]> = {
       label: "Overflow — required 2 (Classic)",
       render: () => renderGameScreen(OVERFLOW_REQUIRED_2_STATE),
     },
+    {
+      id: "overflow-marked",
+      label: "Overflow — a tile marked for discard",
+      render: () => renderGameScreen(OVERFLOW_MARKED_STATE),
+    },
   ],
   gameOver: [
     {
@@ -227,12 +371,50 @@ export const GALLERY_STATES: Record<GamePhase, GalleryEntry[]> = {
     {
       id: "game-over-copy-succeeded",
       label: "Game over — copy succeeded",
-      render: () => renderGameOverScreen(GAME_OVER_STATE, RESOLVING_SHARE_DEPENDENCIES),
+      render: () => (
+        <CopyPressedOnMount>
+          {renderGameOverScreen(GAME_OVER_STATE, RESOLVING_SHARE_DEPENDENCIES)}
+        </CopyPressedOnMount>
+      ),
     },
     {
       id: "game-over-copy-failed",
       label: "Game over — copy failed",
-      render: () => renderGameOverScreen(GAME_OVER_STATE, REJECTING_SHARE_DEPENDENCIES),
+      render: () => (
+        <CopyPressedOnMount>
+          {renderGameOverScreen(GAME_OVER_STATE, REJECTING_SHARE_DEPENDENCIES)}
+        </CopyPressedOnMount>
+      ),
+    },
+  ],
+  interaction: [
+    {
+      id: "interaction-hover",
+      label: "Interaction — hover",
+      render: () => <ControlBoard note={HOVER_NOTE} disabled={false} />,
+    },
+    {
+      id: "interaction-focus-visible",
+      label: "Interaction — focus-visible",
+      // LanguageToggle carries a :focus-visible rule of its own, and the
+      // picker's copy of it sits outside the arena container, where a figure
+      // read off it need not be the figure it has on a screen. So the ring
+      // that only this component draws is read on a copy that is inside.
+      render: () => (
+        <ControlBoard note={FOCUS_VISIBLE_NOTE} disabled={false}>
+          <LanguageToggle />
+        </ControlBoard>
+      ),
+    },
+    {
+      id: "interaction-disabled",
+      label: "Interaction — disabled",
+      render: () => <ControlBoard note={DISABLED_NOTE} disabled />,
+    },
+    {
+      id: "interaction-reduced-motion",
+      label: "Interaction — reduced motion",
+      render: () => <ReducedMotionBoard note={REDUCED_MOTION_NOTE} />,
     },
   ],
 };

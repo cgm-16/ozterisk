@@ -32,8 +32,10 @@ hoc at branch time.
 | `M6 — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(round)` merged; both modes' economy invariants green |
 | `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
 
-`M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d` and `M5.5e` are closed, merged as
-`16f2ff6`, `ecd76a1`, `f30929e`, `b933ca7`, `29708b8`, `e4734e4` and `b6e801b`.
+`M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d`, `M5.5e`, `M5.5f` and `M5.5g` are
+closed, merged as `16f2ff6`, `ecd76a1`, `f30929e`, `b933ca7`, `29708b8`,
+`e4734e4`, `b6e801b`, `b95dcaa` and `9e40611`. **`M5.5` itself is not closed** —
+see the `M5.5g` verdict below.
 
 **`M5.5b` met its exit gate in three parts of four.** A full English run plus a
 switch to Korean makes zero non-origin requests; Korean renders in Noto Sans KR,
@@ -92,6 +94,39 @@ reason rather than by omission:
 
 **#58 is the exception and stays in**: it was blocked only on `M5.5f` still
 reading the storyboard canvases, and that block is gone.
+
+**`M5.5g` met its exit gate in four parts of five, and the gate stays as
+written.** The gallery covers hover, focus-visible, disabled and reduced motion
+and every state renders what its name claims; reduced motion is read per moment
+in both directions for all fifteen; no rack badge overlaps the engraved digit,
+because `M5.5g` deleted the text badges outright; `docs/design-system/` holds
+only what the product still reads. **The one miss is §8.5 at 320px, which is an
+iframe reading rather than a top-level one** — this harness cannot foreground
+a window to resize it, so `resize_window` reports success and `innerWidth`
+never moves, and `window.open` at that width is popup-blocked. The sweep is
+clean: nineteen states, both locales, zero elements past the right edge and no
+horizontal scroll, at all seven widths #85 names. #85 stays open anyway, per
+`T62`'s own rule that closing it on an iframe is not acceptable. Figures and
+method in `docs/journal/journal-2026-09-12.md`.
+
+**#85 is the sole open gate clause, and `M5.5` closes when it and #52 do.**
+#85's bar is a reading in a real top-level viewport, which a person at a narrow
+browser window satisfies and this harness cannot — so it is the one piece of
+this milestone that is waiting on hardware rather than on work. #52, the
+whole-UI tracking issue, closes with the milestone and only once the gate reads
+met.
+
+**The premise behind #114 was wrong, and the correction is worth keeping.** It
+held that `8c`, `9b` and `10e` could not be read because no gallery entry holds
+them at rest, and therefore needed gallery drivers built for them. Neither half
+survives. A transition does not need a resting surface to be read: drive the
+real control and catch the carrier, which for `8c` means an `animationstart`
+listener, because under `reduce` the `1e-05s` animation retires the departing
+tile before resolved style can be sampled. And `9b` had a resting surface the
+whole time — `AnswerSlots.module.css` gives `.arriving` `animation-fill-mode:
+both`, so a filled slot with no verdict holds `oz-slot-arrive` in resolved style
+indefinitely, which is exactly what `answering-partial` and `answering-full`
+render.
 
 **Why M5.5 is a fraction.** The design pass was not on the roadmap when M6
 and M7 were numbered, and it has to run once the gallery exists — the gallery

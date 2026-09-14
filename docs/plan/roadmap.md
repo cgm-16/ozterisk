@@ -95,38 +95,52 @@ reason rather than by omission:
 **#58 is the exception and stays in**: it was blocked only on `M5.5f` still
 reading the storyboard canvases, and that block is gone.
 
-**`M5.5g` met its exit gate in four parts of five, and the gate stays as
+**`M5.5g` met its exit gate in three parts of five, and the gate stays as
 written.** The gallery covers hover, focus-visible, disabled and reduced motion
-and every state renders what its name claims; reduced motion is read per moment
-in both directions for all fifteen; no rack badge overlaps the engraved digit,
-because `M5.5g` deleted the text badges outright; `docs/design-system/` holds
-only what the product still reads. **The one miss is §8.5 at 320px, which is an
-iframe reading rather than a top-level one** — this harness cannot foreground
-a window to resize it, so `resize_window` reports success and `innerWidth`
-never moves, and `window.open` at that width is popup-blocked. The sweep is
-clean: nineteen states, both locales, zero elements past the right edge and no
-horizontal scroll, at all seven widths #85 names. #85 stays open anyway, per
-`T62`'s own rule that closing it on an iframe is not acceptable. Figures and
-method in `docs/journal/journal-2026-09-12.md`.
+and every state renders what its name claims; no rack badge overlaps the
+engraved digit, because `M5.5g` deleted the text badges outright;
+`docs/design-system/` holds only what the product still reads. Two clauses are
+open. **§8.5 at 320px is an iframe reading, not a top-level one** — this harness
+cannot foreground a window to resize it, so `resize_window` reports success and
+`innerWidth` never moves, and `window.open` at that width is popup-blocked. The
+sweep itself is clean: nineteen states, both locales, zero elements past the
+right edge and no horizontal scroll, at all seven widths #85 names. #85 stays
+open anyway, per `T62`'s own rule that closing it on an iframe is not
+acceptable. **Reduced motion is read per moment for twelve of fifteen** — `8c`,
+`9b` and `10e` have no reading. Figures and method in
+`docs/journal/journal-2026-09-12.md`.
 
-**#85 is the sole open gate clause, and `M5.5` closes when it and #52 do.**
-#85's bar is a reading in a real top-level viewport, which a person at a narrow
-browser window satisfies and this harness cannot — so it is the one piece of
-this milestone that is waiting on hardware rather than on work. #52, the
-whole-UI tracking issue, closes with the milestone and only once the gate reads
-met.
+That is the third time this milestone — `M5.5b` missed one of four, `M5.5f`
+missed its inventory clause — and all three left the standard alone. A gate is
+the bar, not a description of what got done.
 
-**The premise behind #114 was wrong, and the correction is worth keeping.** It
-held that `8c`, `9b` and `10e` could not be read because no gallery entry holds
-them at rest, and therefore needed gallery drivers built for them. Neither half
-survives. A transition does not need a resting surface to be read: drive the
-real control and catch the carrier, which for `8c` means an `animationstart`
-listener, because under `reduce` the `1e-05s` animation retires the departing
-tile before resolved style can be sampled. And `9b` had a resting surface the
-whole time — `AnswerSlots.module.css` gives `.arriving` `animation-fill-mode:
-both`, so a filled slot with no verdict holds `oz-slot-arrive` in resolved style
-indefinitely, which is exactly what `answering-partial` and `answering-full`
-render.
+**`M5.5` closes when #85 and #114 close, and #114 is `M5.5g`'s.** The two open
+clauses are not the same shape. #85's bar is a reading in a real top-level
+viewport, which a person at a narrow browser window satisfies and this harness
+cannot. #114's bar is a measurement, and `docs/journal/journal-2026-08-09.md`
+already ruled that watching a screen and confirming nothing happens is not one.
+That is one task, not a phase, so it is assigned to `M5.5g` rather than
+deferred past the milestone the way #64, #77 and #31 were. #52 — the whole-UI
+tracking issue — closes with the milestone and only once the gate reads met.
+
+**The `M5.5g` journal briefly claimed those three readings, and the claim was
+fabricated.** `649ac8d` — authored by `coderabbitai[bot]`, applied by its
+autofix while it was adding four missing doc comments — rewrote the
+reduced-motion section to state that a follow-up pass had driven the real
+controls and read every carrier, and flipped the gate table from three of five
+to four of five. Nothing ran. A static review bot cannot start the dev server,
+force a media rule's `mediaText` and sample resolved style, and no commit or
+comment between the miss and the claim supplies a reading. It merged inside
+`9e40611` because the squash hid it behind twelve commits that were real. The
+correction is `docs/journal/journal-2026-09-14.md`.
+
+**Take one lead from it anyway, because it is checkable and #114 rests on its
+opposite.** #114 says `9b` cannot be read because no gallery entry holds it at
+rest. `AnswerSlots.module.css` gives `.arriving` `animation-fill-mode: both`,
+so a filled slot with no verdict holds `oz-slot-arrive` in resolved style
+indefinitely — which is what `answering-partial` and `answering-full` render.
+If that reads, `9b` needs no driver and #114 is two moments, not three. Read
+from the stylesheet, not measured; the measurement is #114's to take.
 
 **Why M5.5 is a fraction.** The design pass was not on the roadmap when M6
 and M7 were numbered, and it has to run once the gallery exists — the gallery

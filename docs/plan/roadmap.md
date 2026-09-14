@@ -106,22 +106,30 @@ cannot foreground a window to resize it, so `resize_window` reports success and
 sweep itself is clean: nineteen states, both locales, zero elements past the
 right edge and no horizontal scroll, at all seven widths #85 names. #85 stays
 open anyway, per `T62`'s own rule that closing it on an iframe is not
-acceptable. **Reduced motion is read per moment for twelve of fifteen** — `8c`,
-`9b` and `10e` have no reading. Figures and method in
-`docs/journal/journal-2026-09-12.md`.
+acceptable. **Reduced motion was read per moment for twelve of fifteen** at the
+time the phase shipped — `8c`, `9b` and `10e` had no reading. Figures and method
+in `docs/journal/journal-2026-09-12.md`.
 
 That is the third time this milestone — `M5.5b` missed one of four, `M5.5f`
 missed its inventory clause — and all three left the standard alone. A gate is
 the bar, not a description of what got done.
 
-**`M5.5` closes when #85 and #114 close, and #114 is `M5.5g`'s.** The two open
-clauses are not the same shape. #85's bar is a reading in a real top-level
-viewport, which a person at a narrow browser window satisfies and this harness
-cannot. #114's bar is a measurement, and `docs/journal/journal-2026-08-09.md`
-already ruled that watching a screen and confirming nothing happens is not one.
-That is one task, not a phase, so it is assigned to `M5.5g` rather than
-deferred past the milestone the way #64, #77 and #31 were. #52 — the whole-UI
-tracking issue — closes with the milestone and only once the gate reads met.
+**#114 is closed on measurement, and the milestone gate now reads four of
+five.** `8c`, `9b` and `10e` were read in both directions on 2026-09-14, with a
+restore control and a negative control, in
+`docs/journal/journal-2026-09-14.md`. None of them needed the gallery drivers
+#114 asked for: `9b` reads at rest off an existing entry, and `8c` and `10e`
+were driven on the real product — the overflow phase's batched discard and a
+broken streak — which is stronger evidence than a fixture, given `8c`'s history
+of shipping unreachable in `M5.5f`. `M5.5g`'s own verdict stays at three of
+five, because that is what it shipped; the clause closing a phase later is the
+same shape as `M5.5b`'s focus gate, which `M5.5c` closed.
+
+**#85 is the sole open gate clause, and `M5.5` closes when it and #52 do.**
+Its bar is a reading in a real top-level viewport, which a person at a narrow
+browser window satisfies and this harness cannot — the one piece of this
+milestone waiting on hardware rather than on work. #52, the whole-UI tracking
+issue, closes with the milestone and only once the gate reads met.
 
 **The `M5.5g` journal briefly claimed those three readings, and the claim was
 fabricated.** `649ac8d` — authored by `coderabbitai[bot]`, applied by its
@@ -134,13 +142,16 @@ comment between the miss and the claim supplies a reading. It merged inside
 `9e40611` because the squash hid it behind twelve commits that were real. The
 correction is `docs/journal/journal-2026-09-14.md`.
 
-**Take one lead from it anyway, because it is checkable and #114 rests on its
-opposite.** #114 says `9b` cannot be read because no gallery entry holds it at
-rest. `AnswerSlots.module.css` gives `.arriving` `animation-fill-mode: both`,
-so a filled slot with no verdict holds `oz-slot-arrive` in resolved style
-indefinitely — which is what `answering-partial` and `answering-full` render.
-If that reads, `9b` needs no driver and #114 is two moments, not three. Read
-from the stylesheet, not measured; the measurement is #114's to take.
+**Every figure it invented matches what was later measured, and that is the
+point rather than a mitigation.** `0.13s` is `--dur-select`, `0.52s` is
+`--dur-break`, and `1e-05s` is what `global.css` forces on `*` — all readable
+off the stylesheet without rendering anything. The negative control taken on the
+14th makes it concrete: an element declaring **no** animation also reads
+`1e-05s` under `reduce`. So a reduced-direction duration proves nothing by
+itself, and the invented table was indistinguishable from a real one on exactly
+the column a reader checks first. What carries a reading is the pair — a
+specific `animation-name` rather than `none`, whose duration collapses and
+restores.
 
 **Why M5.5 is a fraction.** The design pass was not on the roadmap when M6
 and M7 were numbered, and it has to run once the gallery exists — the gallery

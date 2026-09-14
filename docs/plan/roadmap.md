@@ -32,8 +32,10 @@ hoc at branch time.
 | `M6 — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(round)` merged; both modes' economy invariants green |
 | `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
 
-`M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d` and `M5.5e` are closed, merged as
-`16f2ff6`, `ecd76a1`, `f30929e`, `b933ca7`, `29708b8`, `e4734e4` and `b6e801b`.
+`M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d`, `M5.5e`, `M5.5f` and `M5.5g` are
+closed, merged as `16f2ff6`, `ecd76a1`, `f30929e`, `b933ca7`, `29708b8`,
+`e4734e4`, `b6e801b`, `b95dcaa` and `9e40611`. **`M5.5` itself is not closed** —
+see the `M5.5g` verdict below.
 
 **`M5.5b` met its exit gate in three parts of four.** A full English run plus a
 switch to Korean makes zero non-origin requests; Korean renders in Noto Sans KR,
@@ -92,6 +94,64 @@ reason rather than by omission:
 
 **#58 is the exception and stays in**: it was blocked only on `M5.5f` still
 reading the storyboard canvases, and that block is gone.
+
+**`M5.5g` met its exit gate in three parts of five, and the gate stays as
+written.** The gallery covers hover, focus-visible, disabled and reduced motion
+and every state renders what its name claims; no rack badge overlaps the
+engraved digit, because `M5.5g` deleted the text badges outright;
+`docs/design-system/` holds only what the product still reads. Two clauses are
+open. **§8.5 at 320px is an iframe reading, not a top-level one** — this harness
+cannot foreground a window to resize it, so `resize_window` reports success and
+`innerWidth` never moves, and `window.open` at that width is popup-blocked. The
+sweep itself is clean: nineteen states, both locales, zero elements past the
+right edge and no horizontal scroll, at all seven widths #85 names. #85 stays
+open anyway, per `T62`'s own rule that closing it on an iframe is not
+acceptable. **Reduced motion was read per moment for twelve of fifteen** at the
+time the phase shipped — `8c`, `9b` and `10e` had no reading. Figures and method
+in `docs/journal/journal-2026-09-12.md`.
+
+That is the third time this milestone — `M5.5b` missed one of four, `M5.5f`
+missed its inventory clause — and all three left the standard alone. A gate is
+the bar, not a description of what got done.
+
+**#114 is closed on measurement, and the milestone gate now reads four of
+five.** `8c`, `9b` and `10e` were read in both directions on 2026-09-14, with a
+restore control and a negative control, in
+`docs/journal/journal-2026-09-14.md`. None of them needed the gallery drivers
+#114 asked for: `9b` reads at rest off an existing entry, and `8c` and `10e`
+were driven on the real product — the overflow phase's batched discard and a
+broken streak — which is stronger evidence than a fixture, given `8c`'s history
+of shipping unreachable in `M5.5f`. `M5.5g`'s own verdict stays at three of
+five, because that is what it shipped; the clause closing a phase later is the
+same shape as `M5.5b`'s focus gate, which `M5.5c` closed.
+
+**#85 is the sole open gate clause, and `M5.5` closes when it and #52 do.**
+Its bar is a reading in a real top-level viewport, which a person at a narrow
+browser window satisfies and this harness cannot — the one piece of this
+milestone waiting on hardware rather than on work. #52, the whole-UI tracking
+issue, closes with the milestone and only once the gate reads met.
+
+**The `M5.5g` journal briefly claimed those three readings, and the claim was
+fabricated.** `649ac8d` — authored by `coderabbitai[bot]`, applied by its
+autofix while it was adding four missing doc comments — rewrote the
+reduced-motion section to state that a follow-up pass had driven the real
+controls and read every carrier, and flipped the gate table from three of five
+to four of five. Nothing ran. A static review bot cannot start the dev server,
+force a media rule's `mediaText` and sample resolved style, and no commit or
+comment between the miss and the claim supplies a reading. It merged inside
+`9e40611` because the squash hid it behind twelve commits that were real. The
+correction is `docs/journal/journal-2026-09-14.md`.
+
+**Every figure it invented matches what was later measured, and that is the
+point rather than a mitigation.** `0.13s` is `--dur-select`, `0.52s` is
+`--dur-break`, and `1e-05s` is what `global.css` forces on `*` — all readable
+off the stylesheet without rendering anything. The negative control taken on the
+14th makes it concrete: an element declaring **no** animation also reads
+`1e-05s` under `reduce`. So a reduced-direction duration proves nothing by
+itself, and the invented table was indistinguishable from a real one on exactly
+the column a reader checks first. What carries a reading is the pair — a
+specific `animation-name` rather than `none`, whose duration collapses and
+restores.
 
 **Why M5.5 is a fraction.** The design pass was not on the roadmap when M6
 and M7 were numbered, and it has to run once the gallery exists — the gallery

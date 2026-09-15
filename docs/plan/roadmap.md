@@ -34,8 +34,9 @@ hoc at branch time.
 
 `M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d`, `M5.5e`, `M5.5f` and `M5.5g` are
 closed, merged as `16f2ff6`, `ecd76a1`, `f30929e`, `b933ca7`, `29708b8`,
-`e4734e4`, `b6e801b`, `b95dcaa` and `9e40611`. **`M5.5` itself is not closed** —
-see the `M5.5g` verdict below.
+`e4734e4`, `b6e801b`, `b95dcaa` and `9e40611`. **`M5.5` itself closed on
+2026-09-15**, when #85's reading was finally taken in a real top-level window —
+two phases after `M5.5g` shipped. The verdict below records why.
 
 **`M5.5b` met its exit gate in three parts of four.** A full English run plus a
 switch to Korean makes zero non-origin requests; Korean renders in Noto Sans KR,
@@ -99,16 +100,16 @@ reading the storyboard canvases, and that block is gone.
 written.** The gallery covers hover, focus-visible, disabled and reduced motion
 and every state renders what its name claims; no rack badge overlaps the
 engraved digit, because `M5.5g` deleted the text badges outright;
-`docs/design-system/` holds only what the product still reads. Two clauses are
-open. **§8.5 at 320px is an iframe reading, not a top-level one** — this harness
-cannot foreground a window to resize it, so `resize_window` reports success and
-`innerWidth` never moves, and `window.open` at that width is popup-blocked. The
-sweep itself is clean: nineteen states, both locales, zero elements past the
-right edge and no horizontal scroll, at all seven widths #85 names. #85 stays
-open anyway, per `T62`'s own rule that closing it on an iframe is not
-acceptable. **Reduced motion was read per moment for twelve of fifteen** at the
-time the phase shipped — `8c`, `9b` and `10e` had no reading. Figures and method
-in `docs/journal/journal-2026-09-12.md`.
+`docs/design-system/` holds only what the product still reads. Two clauses were
+open when it shipped. **§8.5 at 320px was an iframe reading, not a top-level
+one** — that harness cannot foreground a window to resize it, so `resize_window`
+reports success and `innerWidth` never moves, and `window.open` at that width is
+popup-blocked. The sweep itself was clean: nineteen states, both locales, zero
+elements past the right edge and no horizontal scroll, at all seven widths #85
+names. #85 stayed open anyway, per `T62`'s own rule that closing it on an iframe
+is not acceptable. **Reduced motion was read per moment for twelve of fifteen**
+— `8c`, `9b` and `10e` had no reading. Figures and method in
+`docs/journal/journal-2026-09-12.md`.
 
 That is the third time this milestone — `M5.5b` missed one of four, `M5.5f`
 missed its inventory clause — and all three left the standard alone. A gate is
@@ -125,11 +126,19 @@ of shipping unreachable in `M5.5f`. `M5.5g`'s own verdict stays at three of
 five, because that is what it shipped; the clause closing a phase later is the
 same shape as `M5.5b`'s focus gate, which `M5.5c` closed.
 
-**#85 is the sole open gate clause, and `M5.5` closes when it and #52 do.**
-Its bar is a reading in a real top-level viewport, which a person at a narrow
-browser window satisfies and this harness cannot — the one piece of this
-milestone waiting on hardware rather than on work. #52, the whole-UI tracking
-issue, closes with the milestone and only once the gate reads met.
+**#85 is closed on a real top-level reading, and `M5.5` is complete.** Ori took
+it on 2026-09-15 in a genuine Chrome window at 150% zoom — `clientWidth 323`
+with a **10px classic scrollbar taking layout width**, in the narrow tier below
+`408`. Nineteen states, both locales: zero elements past the right edge, no
+horizontal scroll, every per-state element count non-zero. §8.5 asks for `320`
+and this is `323`; the widest right edge anywhere is `309.0`, which is below
+`320` outright, so the clause holds without relying on the layout reflowing.
+Three earlier attempts each returned `clean` and none of them counted — device
+emulation, then a real window Chrome clamped to `500` and therefore the wrong
+rack tier. `docs/journal/journal-2026-09-15.md` records all four, because the
+three that failed are the part worth keeping: **each was indistinguishable from
+the right answer on the `clean` field alone.** With #85 closed, #52 closes with
+it and the milestone gate reads met in five parts of five.
 
 **The `M5.5g` journal briefly claimed those three readings, and the claim was
 fabricated.** `649ac8d` — authored by `coderabbitai[bot]`, applied by its

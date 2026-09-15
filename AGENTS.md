@@ -132,11 +132,14 @@ use `tune(balance):`; feature commits never carry value changes.
   squashed, which is exactly why this matters: a squashed release writes a
   commit `prod` shares with no ancestor on `main`, the two diverge
   permanently, and every later release replays the whole history as
-  conflicts. Kept clean, `prod` stays a strict ancestor of `main` and the
-  release is always fast-forwardable.
-- `prod` therefore also answers "what is actually deployed" — it is a
-  pointer to the live commit, which is a question this project could not
-  answer before.
+  conflicts. A merge commit instead keeps the previous `prod` tip as a
+  parent, so each release builds on the last and the trees stay identical.
+- `prod` is an ancestor of `main` only until the first release. The merge
+  commit is a *descendant* of `main`, so from then on each branch is ahead
+  of the other by those merges. Nothing breaks, but ask "is this commit
+  deployed?" by testing against `prod` — never by assuming `prod` is behind.
+- `prod` therefore answers "what is actually deployed", which is a question
+  this project could not answer before.
 
 ## Loop-Agent Operating Protocol
 

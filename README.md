@@ -150,7 +150,9 @@ builds as a preview; a release is a merge commit from `main` to **`prod`**,
 which Vercel builds as production. `prod` is a pointer to the live commit.
 GitHub Actions (`.github/workflows/ci.yml`) runs lint, typecheck, test, the
 viewport sweep, and build on every pull request and on every push to either
-branch, so a commit reaches `prod` only after passing the same gate twice.
+branch. That reports, it does not block: `prod` carries no required status
+checks, so a green run before a release is the convention rather than an
+enforced gate.
 
 ## Fonts
 

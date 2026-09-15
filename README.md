@@ -143,10 +143,14 @@ and tile IDs instead of mocking `Math.random()` globally.
 
 The app is a static Vite build with no serverless function or backend
 service. `vercel.json` pins the Vercel project to `framework: vite`,
-`buildCommand: npm run build`, and `outputDirectory: dist`. GitHub Actions
-(`.github/workflows/ci.yml`) runs lint, typecheck, test, and build on every
-pull request and on push to `main`; only the exact commit that passed CI is
-promoted to production.
+`buildCommand: npm run build`, and `outputDirectory: dist`.
+
+Two long-lived branches carry it. Work merges to **`main`**, which Vercel
+builds as a preview; a release is a merge commit from `main` to **`prod`**,
+which Vercel builds as production. `prod` is a pointer to the live commit.
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, typecheck, test, the
+viewport sweep, and build on every pull request and on every push to either
+branch, so a commit reaches `prod` only after passing the same gate twice.
 
 ## Fonts
 

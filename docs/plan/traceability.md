@@ -16,7 +16,7 @@
 | R-10 score/streak/round semantics | T05, T06 | reducer tests |
 | R-11 five phases | T04–T06, T12 | exhaustive reducer/integration tests |
 | R-12 mouse/touch/keyboard | T09, T10 | RTL user-event tests |
-| R-13 responsive centered arena | T13 | viewport/manual checklist |
+| R-13 responsive centered arena | T13 | viewport/manual checklist; `e2e/viewport.spec.ts` sweeps §8.5 at 305/320/407px in both locales |
 | R-14 English/Korean live switching | T07, T08, T12 | storage and app tests |
 | R-15 only language persists | T07, T12 | reload/storage tests |
 | R-16 localized share/copy | T11 | service/component tests |

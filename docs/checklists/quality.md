@@ -52,7 +52,8 @@ Done (§9) live in `docs/checklists/release.md`.
 - [ ] Representative invalid transitions return identical state.
 - [ ] Generator boundary values are tested.
 - [ ] Component tests cover all requested interaction slices.
-- [ ] No Playwright dependency or test exists.
+- [ ] No browser test asserts a game rule, reducer transition, or interaction
+      flow.
 - [ ] Lint passes with zero warnings.
 - [ ] Typecheck passes.
 - [ ] Production build passes.

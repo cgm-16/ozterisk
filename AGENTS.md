@@ -54,7 +54,11 @@ plan, so cross-references resolve across files.
 - Support responsive desktop and mobile layouts with mouse, touch, and keyboard input.
 - Support English and Korean through a typed in-code dictionary; do not add an i18n dependency.
 - Persist only the language preference in `localStorage`; never persist a run, score, record, equation, or inventory.
-- Use Vitest and React Testing Library; do not add Playwright or another E2E suite.
+- Use Vitest and React Testing Library for behavior: game rules, reducer
+  transitions, component interaction, and accessibility semantics are tested
+  there and never in a browser. A browser suite is permitted only for
+  properties jsdom cannot observe — layout geometry, overflow, and computed
+  font metrics — and must assert no behavior. See `docs/spec/product.md` §1.17.
 - Use ordinary browser randomness in production; do not generate, display, encode, or share run seeds.
 - Do not add sound, music, mute, or volume controls.
 - Deploy the static Vite build to Vercel.

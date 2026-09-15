@@ -120,8 +120,9 @@ or other state library).
 
 ## Test strategy
 
-Vitest + React Testing Library + `@testing-library/user-event`; no
-Playwright or other end-to-end suite. Tests are deterministic: `game/`
+Vitest + React Testing Library + `@testing-library/user-event` for all
+behavior; a browser suite covers only layout properties jsdom cannot
+observe, and asserts no behavior. Tests are deterministic: `game/`
 fixtures (`sequenceRandom`, `sequentialIds`) inject fixed random sequences
 and tile IDs instead of mocking `Math.random()` globally.
 
@@ -196,5 +197,5 @@ equation; skip buttons or a separate manual-discard action during
 answering; exact-answer-constructibility loss detection; saved best score
 or history; seeded or replayable runs; result pages or result parameters;
 leaderboards, authentication, backend APIs, databases, or server authority;
-audio and haptics; Playwright or other end-to-end tests; analytics and
+audio and haptics; end-to-end tests of game behavior; analytics and
 telemetry; and offline/PWA behavior.

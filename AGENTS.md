@@ -22,6 +22,7 @@ is read on demand through the routing map below.
 | Running quality gates (spec, architecture, interaction, a11y) | `docs/checklists/quality.md` |
 | Preparing or verifying the release | `docs/checklists/release.md` |
 | Recording insights that must outlive this session | `docs/journal/journal-*.md` |
+| Invoking a `mattpocock-skills` engineering skill | `docs/agents/*.md` |
 | Anything still unclear after all of the above | `docs/archive/complete-plan.md` (frozen snapshot) |
 
 ## Document precedence
@@ -200,3 +201,26 @@ Release completion additionally requires:
 
 Wave monitoring (§7.5) lives in `docs/plan/roadmap.md` because it gates waves,
 not single-task iterations.
+
+## Agent skills
+
+Configuration the `mattpocock-skills` engineering skills read. Each file is an
+adapter onto conventions this repo already had; none of them is canonical over
+`docs/spec/**`.
+
+### Issue tracker
+
+Issues live in this repo's GitHub Issues, via `gh`. See
+`docs/agents/issue-tracker.md`; label, schema, and object conventions stay in
+`docs/plan/github.md`.
+
+### Triage labels
+
+Five `triage:`-prefixed labels, matching the prefixed vocabulary in
+`docs/plan/github.md` §4.2. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context. `CONTEXT.md` and `docs/adr/` do not exist yet and are created
+lazily; `docs/spec/**` holds the vocabulary meanwhile. See
+`docs/agents/domain.md`.

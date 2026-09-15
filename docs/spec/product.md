@@ -232,6 +232,9 @@ needs no focus guard.
 - Result pages or result parameters.
 - Leaderboards, authentication, backend APIs, databases, and server authority.
 - Audio and haptics.
-- Playwright/E2E tests.
+- End-to-end tests of game behavior. A browser suite is in scope only for
+  layout properties jsdom cannot observe, and must assert no game rule,
+  reducer transition, or interaction flow. §8.5's `320px` and Korean-clipping
+  gates are unverifiable without one, because jsdom performs no layout.
 - Analytics and telemetry.
 - Offline/PWA behavior.

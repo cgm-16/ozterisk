@@ -20,7 +20,7 @@
 | R-14 English/Korean live switching | T07, T08, T12 | storage and app tests |
 | R-15 only language persists | T07, T12 | reload/storage tests |
 | R-16 localized share/copy | T11 | service/component tests |
-| R-17 no backend/audio/E2E | T01, T14 | dependency and repository audit |
+| R-17 no backend/audio/behavioral E2E | T01, T14 | dependency and repository audit; any browser test asserts layout only |
 | R-18 Vercel static deployment | T14 | production build and deployment smoke test |
 
 M4 — Endless Polish and Tuning Surface:

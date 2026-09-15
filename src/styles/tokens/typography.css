@@ -1,5 +1,6 @@
 :root {
   --font-display: "EB Garamond", "Times New Roman", serif;
+
   /* Noto Sans KR carries Hangul; Zen Kaku Gothic New has no Hangul subset and
      would drop the ko locale to system-ui. Order matters — Latin resolves from
      Zen Kaku first, Hangul falls to Noto per-glyph. */

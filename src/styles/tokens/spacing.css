@@ -6,6 +6,7 @@
   --space-4: 16px;
   --space-6: 24px;
   --space-8: 32px;
+
   /* Added for the redesign's larger felt layouts. */
   --space-10: 40px;
   --space-14: 56px;
@@ -45,14 +46,14 @@
   --arena-max-width: 42rem;
 }
 
-@media (min-width: 408px) {
+@media (width >= 408px) {
   :root {
     --tile-w: 66px;
     --rack-gap: 12px;
   }
 }
 
-@media (min-width: 48rem) {
+@media (width >= 48rem) {
   :root {
     --tile-w: 64px;
     --tile-h: 80px;

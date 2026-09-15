@@ -47,5 +47,5 @@
   --ring-focus: inset 0 0 0 2px var(--focus-ring), inset 0 0 0 3px var(--clay-900);
 
   --shadow-panel: 0 24px 60px rgb(0 0 0 / 45%);
-  --glow-reward: 0 0 12px rgba(201, 165, 74, 0.6);
+  --glow-reward: 0 0 12px rgb(201 165 74 / 60%);
 }

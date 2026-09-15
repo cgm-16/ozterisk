@@ -24,6 +24,7 @@
   box-shadow: var(--shadow-tile);
   text-shadow: 0 1px 0 rgb(255 255 255 / 85%);
   font: var(--weight-semibold) var(--size-tile) / var(--leading-tight) var(--font-numeral);
+
   /* 11C, the title entrance. The mark settles and the screen does not: a
      staggered sequence across the wordmark, the rules and the button would be
      decorative motion outside §1.12's named inventory, and the four material
@@ -145,7 +146,7 @@
   gap: var(--space-2);
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .screen {
     padding: var(--space-6) var(--space-3);
   }

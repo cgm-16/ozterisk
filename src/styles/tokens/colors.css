@@ -32,11 +32,11 @@
 
   /* ---- Ink on the dark field ------------------------------------------- */
   --ink-000: #f7f0e2;
-  --ink-100: rgba(240, 231, 214, 0.72);
-  --ink-200: rgba(240, 231, 214, 0.55);
-  --ink-300: rgba(240, 231, 214, 0.40);
-  --hair-100: rgba(240, 231, 214, 0.10);
-  --hair-200: rgba(240, 231, 214, 0.07);
+  --ink-100: rgb(240 231 214 / 72%);
+  --ink-200: rgb(240 231 214 / 55%);
+  --ink-300: rgb(240 231 214 / 40%);
+  --hair-100: rgb(240 231 214 / 10%);
+  --hair-200: rgb(240 231 214 / 7%);
 
   /* ---- Semantic aliases ------------------------------------------------
      Components reference THESE, not the ramps above. */
@@ -64,9 +64,9 @@
   --state-reward: var(--gold-500);
 
   --border-hairline: var(--hair-100);
-  --border-accent: rgba(201, 165, 74, 0.45);
-  --border-danger: rgba(181, 67, 47, 0.45);
-  --border-slot-empty: rgba(201, 165, 74, 0.75); /* dashed, the awaiting-input rim */
+  --border-accent: rgb(201 165 74 / 45%);
+  --border-danger: rgb(181 67 47 / 45%);
+  --border-slot-empty: rgb(201 165 74 / 75%); /* dashed, the awaiting-input rim */
 
   --focus-ring: var(--gold-300);
 }

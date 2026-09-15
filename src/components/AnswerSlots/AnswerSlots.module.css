@@ -23,14 +23,16 @@
   border-radius: var(--radius-md);
   background: var(--surface-socket);
   box-shadow: var(--shadow-socket), var(--rim-socket);
+
   /* A dashed, heavier border keeps slots visually distinct from the solid
      1px inventory tiles at every fill state (§1.12). --border-slot-empty is
-     the system's own awaiting-input rim: rgba(201, 165, 74, 0.75) composited
+     the system's own awaiting-input rim: rgb(201 165 74 / 75%) composited
      over --surface-socket (--well-900, #081a14) resolves to #99823c, which
      measures 4.80:1 against that socket -- clear of the >=3:1 floor. An
      empty slot sits on --surface-socket with no fill contrast of its own, so
      the border is the only cue defining its shape and has to clear that floor. */
   border: 2px dashed var(--border-slot-empty);
+
   /* No opacity dimming: the empty state is already signaled by the absence
      of a digit plus the dashed border, and dimming would push the border
      back below the contrast floor established above. */

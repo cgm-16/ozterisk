@@ -115,6 +115,7 @@
    confirms in place instead of pushing the screen down. */
 .confirmation {
   --chop-size: 34px;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,7 +155,7 @@
   color: var(--text-meta);
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .screen {
     padding: var(--space-6) var(--space-3);
   }

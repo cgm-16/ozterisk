@@ -3,14 +3,14 @@
    are the app's. Partials are plain .css, never .module.css — CSS Modules
    would scope the @keyframes names and every animation referencing them
    would silently do nothing. */
-@import "./tokens/fonts.css";
-@import "./tokens/colors.css";
-@import "./tokens/typography.css";
-@import "./tokens/spacing.css";
-@import "./tokens/radius.css";
-@import "./tokens/elevation.css";
-@import "./tokens/motion.css";
-@import "./tokens/keyframes.css";
+@import url("./tokens/fonts.css");
+@import url("./tokens/colors.css");
+@import url("./tokens/typography.css");
+@import url("./tokens/spacing.css");
+@import url("./tokens/radius.css");
+@import url("./tokens/elevation.css");
+@import url("./tokens/motion.css");
+@import url("./tokens/keyframes.css");
 
 /* Reset */
 *,

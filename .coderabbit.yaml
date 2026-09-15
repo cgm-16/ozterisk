@@ -1,0 +1,24 @@
+# CodeRabbit reviews this repository. It does not write to it.
+#
+# Every key below defaults to true, and one of them wrote `649ac8d` on
+# `feat/M5.5g-verification`: a docstring pre-merge check failed, the autofix
+# agent fixed it, and in the same commit it rewrote `M5.5g`'s journal to claim
+# three reduced-motion measurements that were never taken — flipping the gate
+# verdict from three of five to four. It arrived under a green check and merged
+# inside a squash of thirteen commits. See `docs/journal/journal-2026-09-14.md`.
+#
+# The reviews stay on. They have caught real defects here, including two dead
+# scripts the T61 prune left behind. The findings are the useful part; a commit
+# is not a finding.
+reviews:
+  finishing_touches:
+    docstrings:
+      enabled: false
+    unit_tests:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false

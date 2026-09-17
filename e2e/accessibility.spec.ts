@@ -261,11 +261,26 @@ test("Korean copy renders in a Hangul face and does not clip", async ({ page }) 
      holds four more. */
   await page.locator("details").evaluate((el: HTMLDetailsElement) => (el.open = true));
 
+  /* The Hangul face is imported lazily, on the language rather than on load, so
+     it is still arriving when the page settles. Wait for the app's own face to
+     reach `loaded` — NOT `document.fonts.check()`, which is satisfied by a
+     system copy of the same family and therefore passes on a machine that has
+     Noto Sans KR installed even when the bundle ships none. That is a false
+     pass: it read green on macOS and red on CI, and CI was right. */
+  await page.waitForFunction(() =>
+    [...document.fonts].some((face) => /Noto Sans KR/.test(face.family) && face.status === "loaded"),
+  );
+
   const reading = await page.evaluate(() => {
     const all = [...document.querySelectorAll("*")];
     return {
       lang: document.documentElement.lang,
-      hangulFace: document.fonts.check('16px "Noto Sans KR"'),
+      hangulFaces: [...document.fonts]
+        .filter((face) => /Noto Sans KR/.test(face.family) && face.status === "loaded")
+        .map((face) => `${face.family} ${face.weight}`),
+      /* Loaded is not the same as used: §1.12 requires the locale's own face to
+         be in the stack that actually sets its interface text. */
+      interfaceStack: getComputedStyle(document.querySelector("main")!).fontFamily,
       elements: all.length,
       overflowing: all
         .filter((el) => el.clientWidth > 0 && el.scrollWidth > el.clientWidth + 1)
@@ -275,7 +290,8 @@ test("Korean copy renders in a Hangul face and does not clip", async ({ page }) 
   });
 
   expect(reading.lang, "document language").toBe("ko");
-  expect(reading.hangulFace, "a face covering Hangul is loaded").toBe(true);
+  expect(reading.hangulFaces, "the bundle's own Hangul faces, loaded").not.toEqual([]);
+  expect(reading.interfaceStack, "the face setting Korean interface text").toContain("Noto Sans KR");
   expect(reading.elements, "elements swept").toBeGreaterThan(20);
   expect(reading.text, "Korean copy rendered").toMatch(/[가-힣]/);
   expect(reading.overflowing, "elements whose content overflows their own box").toEqual([]);

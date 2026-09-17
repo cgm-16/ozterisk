@@ -191,12 +191,14 @@ for (const locale of LOCALES) {
       const de = document.documentElement;
       const main = document.querySelector("main")!;
       const rack = document.querySelector('[class*="inventory"]')!;
+      const cell = document.querySelector('[class*="cell"], [class*="socket"]')!;
       return {
         viewport: de.clientWidth,
         scrollWidth: de.scrollWidth,
         mainWidth: main.getBoundingClientRect().width,
         rackWidth: rack.getBoundingClientRect().width,
-        tileW: getComputedStyle(de).getPropertyValue("--tile-w").trim(),
+        renderedTileW: cell.getBoundingClientRect().width,
+        targetMin: parseFloat(getComputedStyle(de).getPropertyValue("--target-min")),
       };
     });
 
@@ -212,5 +214,12 @@ for (const locale of LOCALES) {
       reading.viewport,
     );
     expect(reading.scrollWidth, "document scroll width").toBeLessThanOrEqual(reading.viewport);
+
+    // §1.12 makes the tier figure a maximum and --target-min the floor. Both
+    // halves are load-bearing: a rack that fits by shrinking past the target
+    // minimum has traded a WCAG failure for a layout one, and the assertion
+    // above alone would not notice.
+    expect(reading.renderedTileW, "rendered tile width against the target minimum")
+      .toBeGreaterThanOrEqual(reading.targetMin);
   });
 }

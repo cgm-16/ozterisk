@@ -223,3 +223,42 @@ for (const locale of LOCALES) {
       .toBeGreaterThanOrEqual(reading.targetMin);
   });
 }
+
+/* Below a 276px content box the target minimum starts to bind — five tiles at
+   44 plus four gaps at 8 is 252, and the arena spends 24 more on padding. The
+   rack stops shrinking there and the page scrolls instead.
+ *
+ * That trade is the point of the floor, so it gets its own reading. §8.5 asks
+ * for no horizontal scroll at 320px and is silent below it; the target minimum
+ * has no lower bound. Browser zoom is how a real reader arrives here, and a
+ * reader at 400% is precisely the one who needs 44px kept.
+ *
+ * One locale: the rack's tracks are fixed lengths and the Hangul face changes
+ * no figure in this reading. The 305px sweep above covers both.
+ */
+test("the rack holds the target minimum below the 320px gate", async ({ page }) => {
+  await page.goto("/");
+  await page.setViewportSize({ width: 260, height: 900 });
+  await page.evaluate(() => document.fonts.ready);
+  await page.getByRole("button", { name: START_LABEL.en, exact: true }).click();
+  await expect(page.locator('[class*="inventory"]')).toBeVisible();
+
+  const reading = await page.evaluate(() => {
+    const de = document.documentElement;
+    const cell = document.querySelector('[class*="cell"], [class*="socket"]')!;
+    return {
+      viewport: de.clientWidth,
+      renderedTileW: cell.getBoundingClientRect().width,
+      targetMin: parseFloat(getComputedStyle(de).getPropertyValue("--target-min")),
+    };
+  });
+
+  expect(reading.viewport, "content width the harness produced").toBe(260);
+  expect(reading.viewport, "below the width where the floor binds").toBeLessThan(276);
+
+  // The only assertion this width gets. Horizontal scroll here is the
+  // deliberate consequence of keeping the control legal, so asserting its
+  // absence would lock in the opposite trade.
+  expect(reading.renderedTileW, "rendered tile width against the target minimum")
+    .toBeGreaterThanOrEqual(reading.targetMin);
+});

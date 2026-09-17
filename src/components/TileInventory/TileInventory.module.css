@@ -18,12 +18,20 @@
    query's figure does not; and `max-width` pins the natural width so every
    viewport that already fit is unchanged to the pixel.
 
-   §1.12's tier figures are maxima for exactly this reason. The floor is
-   --target-min: at the 320px gate with a 15px scrollbar the tracks land near
-   50px, still clear of 44. */
+   §1.12's tier figures are maxima for exactly this reason, and --target-min is
+   the floor the track minimum spells out: a tile is a control, so it may not
+   shrink below the 44px target minimum to make a layout fit. At the 320px gate
+   with a 15px scrollbar the tracks land near 50px and the floor is slack.
+
+   It binds below a 276px content box — 5 tiles at 44 plus 4 gaps at 8 is 252,
+   plus the arena's 24px of padding — and there the rack stops shrinking and
+   the page scrolls instead. That is the intended trade, not a gap: §8.5 asks
+   for no horizontal scroll at 320px and says nothing below it, while the
+   target minimum has no lower bound at all. Browser zoom is the realistic way
+   to get there, and a reader at 400% is exactly who needs the 44px kept. */
 .inventory {
   display: grid;
-  grid-template-columns: repeat(var(--rack-columns), minmax(0, var(--tile-w)));
+  grid-template-columns: repeat(var(--rack-columns), minmax(var(--target-min), var(--tile-w)));
   grid-template-rows: repeat(var(--rack-rows), var(--tile-h));
   grid-auto-rows: var(--tile-h);
   gap: var(--rack-gap);

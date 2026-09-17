@@ -32,6 +32,13 @@ section wins.
   `44 × 44` target minimum when the container is narrower than the tier's natural
   width. At every width where the tier already fits, the rendered size is exactly the
   figure above.
+- **The target minimum is a floor, and it outranks the layout.** A tile is a control,
+  so below the content width where five tiles at `44` plus their gaps no longer fit —
+  about `276px` once the arena's padding is counted — the rack stops shrinking and the
+  page scrolls instead. The `320px` rule below is silent under `320px`, while the
+  target minimum has no lower bound, so that is the order they resolve in. Browser
+  zoom is the realistic way to reach those widths, and a reader at high zoom is
+  exactly who the minimum protects.
 - **This is what the `320px` no-horizontal-scroll rule requires, because a boundary
   cannot carry it.** A `min-width` query matches the scrollbar-*inclusive* viewport
   while the content box excludes it, so wherever scrollbars take layout width every

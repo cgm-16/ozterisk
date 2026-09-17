@@ -27,6 +27,11 @@ const LOCALES = ["en", "ko"] as const;
 const NARROW_TIER_MAX = 407;
 const STATE_COUNT = 19;
 
+/* `action.start` in both locales. Pinned here because the arena sweep below
+   has to reach `answering`, and the accessible name is the only stable handle
+   on that control. */
+const START_LABEL = { en: "Start Run", ko: "게임 시작" } as const;
+
 interface StateReading {
   state: string;
   elements: number;
@@ -143,4 +148,69 @@ for (const width of CONTENT_WIDTHS) {
       expect(distinctCounts.size, "distinct element counts across states").toBeGreaterThan(1);
     });
   }
+}
+
+/* The sweep above walks `gallery.html`, and #85 is invisible from there. The
+   gallery renders each state inside `.board`, a mirror of `.screen` that sits
+   in `.stage` — a different element, with its own padding and its own
+   `min-width: 0`. The app's own `main.screen` is never in that tree, and
+   `main.screen` is the element that overflows.
+ *
+ * Why it overflows: `.app` is a column flex container, so `main` is a flex
+ * item whose cross axis is horizontal, and `.screen`'s `margin: 0 auto`
+ * suppresses the stretch that would size it to its container. That leaves it
+ * `fit-content`, which is floored by min-content — the rack's fixed tracks
+ * plus the arena's padding — and no `min-width` can lower a fit-content floor.
+ *
+ * 305 is the content width a 320px window gives the page once a classic
+ * scrollbar takes its 15px, and the narrow tier still fires there, so this
+ * reproduces the condition without depending on the platform to draw a
+ * scrollbar at all.
+ */
+for (const locale of LOCALES) {
+  test(`the arena fits a 305px viewport in ${locale}`, async ({ page }) => {
+    await page.addInitScript(
+      (lang) => window.localStorage.setItem("one-zero.language", lang),
+      locale,
+    );
+    await page.goto("/");
+    await page.setViewportSize({ width: 305, height: 900 });
+    await page.evaluate(() => document.fonts.ready);
+
+    // The rack only exists in `answering`, and the rack is what sets the
+    // floor. On `title` the arena has nothing wide in it and every assertion
+    // below would pass without measuring the thing this test is about.
+    //
+    // By name rather than position: `TitleScreen` renders `LanguageToggle`
+    // inside its own `<main>`, so the first button in the arena is `English`,
+    // and clicking that leaves the run unstarted and the rack absent.
+    await page.getByRole("button", { name: START_LABEL[locale], exact: true }).click();
+    await expect(page.locator('[class*="inventory"]')).toBeVisible();
+
+    const reading = await page.evaluate(() => {
+      const de = document.documentElement;
+      const main = document.querySelector("main")!;
+      const rack = document.querySelector('[class*="inventory"]')!;
+      return {
+        viewport: de.clientWidth,
+        scrollWidth: de.scrollWidth,
+        mainWidth: main.getBoundingClientRect().width,
+        rackWidth: rack.getBoundingClientRect().width,
+        tileW: getComputedStyle(de).getPropertyValue("--tile-w").trim(),
+      };
+    });
+
+    // Guards on the conditions, before the result: a reading taken at the
+    // wrong width, or with the rack absent, proves nothing.
+    expect(reading.viewport, "content width the harness produced").toBe(305);
+    expect(reading.viewport, "narrow rack tier — spacing.css min-width: 408px").toBeLessThanOrEqual(
+      NARROW_TIER_MAX,
+    );
+    expect(reading.rackWidth, "rack rendered").toBeGreaterThan(0);
+
+    expect(reading.mainWidth, "arena width against the viewport").toBeLessThanOrEqual(
+      reading.viewport,
+    );
+    expect(reading.scrollWidth, "document scroll width").toBeLessThanOrEqual(reading.viewport);
+  });
 }

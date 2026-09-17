@@ -1,54 +1,96 @@
+/* Five columns, rows that grow: ten sockets fit exactly the --rack-rows two
+   rows, and the one state that exceeds ten (an eleventh tile mid-overflow,
+   R5) lands alone on a third row (grid-auto-rows) rather than forcing a
+   sixth column. */
 .inventory {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  display: grid;
+  grid-template-columns: repeat(var(--rack-columns), var(--tile-w));
+  grid-template-rows: repeat(var(--rack-rows), var(--tile-h));
+  grid-auto-rows: var(--tile-h);
+  gap: var(--rack-gap);
   justify-content: center;
 }
 
-.tile {
-  position: relative;
-  min-width: var(--tile-size);
-  min-height: var(--tile-size);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-border);
+/* An empty or lifted socket is its own grid item, sized like a tile, with no
+   wrapper of its own. */
+.socket {
+  width: var(--tile-w);
+  height: var(--tile-h);
   border-radius: var(--radius-md);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-tile);
-  color: var(--color-text);
-  font-size: 1.25rem;
-  cursor: pointer;
-  transition:
-    border-color 150ms ease,
-    transform 100ms ease;
+  background: var(--surface-socket);
+  box-shadow: var(--shadow-socket), var(--rim-socket);
 }
 
-.tile:disabled {
-  cursor: default;
-  opacity: 0.6;
+/* A socket whose tile is out in the answer slots — owed back, not lost. */
+.socketLifted {
+  outline: var(--outline-socket-lifted);
+  outline-offset: var(--outline-socket-lifted-offset);
 }
 
-.tile:active:not(:disabled) {
-  transform: translateY(1px);
+/* The tile is the Tile primitive's own ceramic face; the cell is only sized
+   to it, matching the fixed --tile-w x --tile-h grid track: every cell
+   occupies the same footprint whether or not the tile inside it is a
+   reward.
+
+   position: relative has no positioned child left to hold, but it still makes
+   the cell paint above its unpositioned siblings — which is what a cell
+   animating out of its own track needs. Whether the rack still reads right
+   without it is a browser question, not one a test can settle, so it stays
+   until something measures it. */
+.cell {
+  position: relative;
+  width: var(--tile-w);
+  height: var(--tile-h);
 }
 
-.tile[aria-pressed="true"] {
-  border-color: var(--color-discard);
+/* The three rack moments, all mounted on the cell rather than on the Tile
+   inside it.
+
+   Two shapes below are not stylistic and must survive a tidy-up:
+
+   - `global()`. CSS Modules scopes an animation name exactly as it scopes a
+     class, so a bare `animation-name: oz-fire` here ships as `_oz-fire_1a2b3`,
+     matches no keyframe, and does nothing — with no error (global.css:3-5).
+   - longhands rather than the `animation` shorthand. Only the longhands are
+     legible to getComputedStyle under jsdom, and which element carries which
+     moment is the one motion fact the suite can hold. */
+
+/* 9i — a reward tile fires where it sits: it is already in its sorted
+   position and never travels. The class depends on nothing but the tile's own
+   isNew, so it survives a discard toggle and the phase change into feedback
+   unchanged, and an animation-name that does not change starts no second
+   animation. That, plus the tile id as the cell's key, is what makes 9i play
+   once on arrival rather than on every render that follows it. */
+.cellNew {
+  animation-name: global(oz-fire);
+  animation-duration: var(--dur-reward);
+  animation-timing-function: var(--ease-snap);
 }
 
-.newBadge,
-.discardBadge {
-  font-size: 0.625rem;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+/* 8a — the eleventh cell, which exists only while the rack overflows: the
+   tile is refused entry, drops onto the rail and stays perched there. The
+   frame's last keyframe is that perch, not a rest, so without a fill mode the
+   tile snaps back into the grid the instant it lands.
+
+   transform-origin carries the shape's pivot, which lives on the element in
+   the storyboard rather than in the frame: the rotation reads as a tile
+   catching on its lower-left edge, and around the default centre it reads as
+   a swivel instead. The rack is five columns at every tier, so the eleventh
+   cell sits alone in the leftmost column of a third row and the wider
+   rightward reach the pivot gives it lands in empty track. */
+.cellRimReject {
+  animation-name: global(oz-rim-reject);
+  animation-duration: var(--dur-select);
+  animation-fill-mode: forwards;
+  transform-origin: 0 100%;
 }
 
-.newBadge {
-  color: var(--color-reward);
-}
-
-.discardBadge {
-  color: var(--color-discard);
+/* 8c — a confirmed discard tips off the end of the rack. forwards for the
+   mirror of 8a's reason: the frame ends at opacity 0 and the element outlives
+   it by however long React takes to commit the removal, so without it the tile
+   flashes back into its cell for a frame on the way out. */
+.cellDeparting {
+  animation-name: global(oz-tip-off);
+  animation-duration: var(--dur-select);
+  animation-fill-mode: forwards;
 }

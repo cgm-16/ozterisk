@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.vercel
+.env*
+
+# Browser-automation scratch output
+.playwright-mcp/
+
+# Playwright run artifacts
+/test-results/
+/playwright-report/

@@ -50,7 +50,8 @@ export type GameAction =
   | { type: "TOGGLE_DISCARD"; tileId: string }
   | { type: "CONFIRM_DISCARD" }
   | { type: "NEXT_ROUND"; equation: Equation }
-  | { type: "RESTART_RUN"; equation: Equation; inventory: Tile[] };
+  | { type: "RESTART_RUN"; equation: Equation; inventory: Tile[] }
+  | { type: "CLEAR_SELECTION" };
 
 export type RandomSource = () => number; // Contract: 0 <= value < 1
 export type TileIdFactory = () => string;

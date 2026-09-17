@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { Language } from "../game/types";
+import { loadKoreanFont as loadKoreanFontDefault } from "./koreanFont";
 import { messages } from "./messages";
 import { getInitialLanguage, saveLanguage } from "./storage";
 import type { I18nProviderProps, I18nValue, TranslationKey } from "./types";
@@ -34,14 +35,24 @@ function interpolate(template: string, values?: Record<string, string | number>)
   );
 }
 
-export function I18nProvider({ children, initialLanguage }: I18nProviderProps) {
+export function I18nProvider({
+  children,
+  initialLanguage,
+  loadKoreanFont = loadKoreanFontDefault,
+}: I18nProviderProps) {
   const [language, setLanguageState] = useState<Language>(
     () => initialLanguage ?? getInitialLanguage(),
   );
 
   useEffect(() => {
     document.documentElement.lang = language;
-  }, [language]);
+    if (language === "ko") {
+      // loadKoreanFont is injectable and its type promises nothing about
+      // rejection, so a rejecting loader is swallowed here rather than left
+      // to surface as an unhandled rejection.
+      void loadKoreanFont().catch(() => undefined);
+    }
+  }, [language, loadKoreanFont]);
 
   const setLanguage = useCallback((next: Language) => {
     setLanguageState(next);

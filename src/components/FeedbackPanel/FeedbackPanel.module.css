@@ -1,28 +1,42 @@
+/* The verdict's only color is its edge. §1.12 permits semantic color on the
+   object concerned and forbids a full-screen wash, so the panel takes a border
+   and no fill. Measured on --surface-surround: jade 5.66:1, vermilion 3.34:1. */
 .panel {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border: 1px solid;
+  border-radius: var(--radius-lg);
   text-align: center;
 }
 
+/* The headline text ("Correct"/"Incorrect") already carries the state without
+   color; the branch class adds color as reinforcement only (§1.12). The class
+   comes from the same `kind` the headline is rendered from, so the two cannot
+   disagree — a selector keyed off a sibling element's presence can, and does so
+   silently. At --size-title/600 the headline is large text, so vermilion's
+   3.34:1 clears its 3:1 floor; it does not clear 4.5:1 and must not be reused
+   at body size. */
 .headline {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font: var(--weight-semibold) var(--size-title) / var(--leading-tight) var(--font-display);
 }
 
-/* The headline text ("Correct"/"Incorrect") already carries the state
-   without color; these rules add color as reinforcement only (§1.12).
-   :has() keys off the branch-specific list already in the DOM
-   (.rewards on the correct branch, .comparison on the incorrect branch),
-   so no markup change is needed. If FeedbackPanel.tsx ever stops rendering
-   one of those elements, this coloring silently stops applying. */
-.panel:has(.rewards) .headline {
-  color: var(--color-correct);
+.correct {
+  border-color: var(--state-correct);
 }
 
-.panel:has(.comparison) .headline {
-  color: var(--color-incorrect);
+.correct .headline {
+  color: var(--state-correct);
+}
+
+.incorrect {
+  border-color: var(--state-incorrect);
+}
+
+.incorrect .headline {
+  color: var(--state-incorrect);
 }
 
 .rewards {
@@ -34,34 +48,39 @@
   padding: 0;
 }
 
+/* The ceramic face belongs to the Tile primitive; this list item only stacks
+   that tile above its badge. */
 .reward {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-width: var(--tile-size);
-  min-height: var(--tile-size);
-  border: 1px solid var(--color-reward);
-  border-radius: var(--radius-md);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-tile);
+  gap: var(--space-1);
 }
 
-.rewardDigit {
-  font-size: 1.25rem;
-  font-weight: 600;
-}
-
+/* Gold on --surface-surround measures 7.87:1. This caption is 11px body text,
+   so it owes 4.5:1 rather than 3:1 — it clears with room. It sits below the
+   tile, not over the ceramic. The rack draws no badge at all — its text
+   labels overlapped the engraved digit and were deleted (#84), leaving the
+   tile's own reward state to carry the cue. This panel keeps its badge
+   because a panel has room for the words a 52px cell does not. */
 .rewardBadge {
-  font-size: 0.625rem;
+  font-size: var(--size-label);
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  color: var(--color-reward);
+  color: var(--state-reward);
 }
 
 .comparison {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  color: var(--color-text-muted);
+  color: var(--text-meta);
+}
+
+/* The correct branch states the submitted value on its own, with nothing to
+   compare it against, so it takes the caption colour without the stacking the
+   incorrect branch's pair needs. */
+.submitted {
+  color: var(--text-meta);
 }

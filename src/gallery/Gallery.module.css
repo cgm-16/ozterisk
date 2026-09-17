@@ -1,0 +1,114 @@
+.gallery {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+  padding: var(--space-4);
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 16rem;
+  gap: var(--space-4);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.groupHeading {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  color: var(--text-meta);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  list-style: none;
+  padding: 0;
+}
+
+.entryButton {
+  width: 100%;
+  min-height: var(--target-min);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-sm);
+  background: var(--surface-panel);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--dur-state) var(--ease-standard),
+    transform var(--dur-press) var(--ease-standard);
+}
+
+.entryButton:active {
+  transform: translateY(var(--press-offset));
+}
+
+.entryButton[aria-pressed="true"] {
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.stage {
+  flex: 1;
+  min-width: 0;
+  border-left: 1px solid var(--border-hairline);
+  padding-left: var(--space-6);
+}
+
+/* The interaction states are boards of controls rather than screens, and the
+   stage is wider than the game. These mirror GameScreen's .screen so a figure
+   read off a control here is the figure it has on the real screen. */
+.board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  max-width: var(--arena-max-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+}
+
+.boardRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+/* How the state has to be driven, for the walk that drives it. Left-aligned
+   because it is prose, not a caption. */
+.boardNote {
+  color: var(--text-meta);
+  text-align: left;
+}
+
+@media (width <= 40rem) {
+  .gallery {
+    flex-direction: column;
+
+    /* Stacked, the picker and stage should span the column. Without this they
+       are cross-axis sized to their content and only reach full width while
+       an entry label happens to be wider than the viewport. */
+    align-items: stretch;
+  }
+
+  .picker {
+    flex: none;
+  }
+
+  .stage {
+    border-left: none;
+    border-top: 1px solid var(--border-hairline);
+    padding-left: 0;
+    padding-top: var(--space-6);
+  }
+}

@@ -5,7 +5,7 @@
   justify-content: center;
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .hud {
     gap: var(--space-4);
   }
@@ -19,12 +19,70 @@
 
 .entry dt {
   font-size: 0.75rem;
-  color: var(--color-text-muted);
+  color: var(--text-meta);
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }
 
+/* typography.css names HUD values as display-serif territory alongside
+   equations and tile faces — "ozterisk's numbers are objects, not data".
+   Family only: the sizes below stay literal rem, because the guard below
+   compares two computed font sizes and jsdom does not substitute var(). */
 .entry dd {
+  font-family: var(--font-numeral);
   font-size: 1.25rem;
   font-weight: 600;
+}
+
+/* Rounds survived is Endless's win condition, so it gets the next step up
+   the existing type scale. `.entry dd.primary` is (0,2,1) against `.entry dd`
+   above's (0,1,1): it wins on specificity, not on source order. */
+.entry dd.primary {
+  font-size: 1.5rem;
+}
+
+/* Streak renders gold once it's above zero (GameHud.d.ts) — a plain color
+   rule, not competing with the .primary/.entry dd rules above. */
+dd.streakActive {
+  color: var(--accent);
+}
+
+/* 10e is two elements in one cell: a grid stacks the falling count over the
+   zero it uncovers without taking either out of flow, so the value keeps its
+   own width and the row never shifts while the break plays. Declares position
+   only in the grid sense — no font-size, so the .primary/.entry dd rules above
+   are untouched. */
+dd.streak {
+  display: grid;
+  justify-items: center;
+}
+
+/* The count that is being replaced. It is not text: content: attr() keeps the
+   glyph out of dd.textContent, which is how the streak value is read, so a
+   break still reads as the current streak alone. */
+.counterFall::before {
+  content: attr(data-fallen);
+}
+
+/* Both moments occupy the same cell, so the fall passes over the zero rather
+   than beside it. Longhands rather than the `animation` shorthand: jsdom
+   expands no shorthand, so the shorthand form reads back as animationName
+   `none` and no cascade assertion could tell a placed animation from a
+   misplaced one. global() because keyframes.css is not a CSS Module and this
+   file is — a locally scoped name matches no @keyframes and fails silently. */
+.counterFall,
+.counterZero {
+  grid-area: 1 / 1;
+  animation-duration: var(--dur-break);
+  animation-fill-mode: both;
+}
+
+.counterFall {
+  animation-name: global(oz-counter-fall);
+  animation-timing-function: var(--ease-fall);
+}
+
+.counterZero {
+  animation-name: global(oz-counter-zero);
+  animation-timing-function: var(--ease-standard);
 }

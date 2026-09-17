@@ -1,7 +1,7 @@
-# 1-0 Technical Contract
+# ozterisk Technical Contract
 
-File map, domain types, pure and browser-bound interfaces, reducer invariants,
-and test fixture conventions (§2).
+File map, domain types, pure and browser-bound interfaces, the tuning surface,
+reducer invariants, and test fixture conventions (§2).
 
 ### 2.1 Canonical file map
 
@@ -57,7 +57,14 @@ and test fixture conventions (§2).
 │   │       ├── TitleScreen.module.css
 │   │       ├── TitleScreen.test.tsx
 │   │       └── TitleScreen.tsx
+│   ├── gallery/
+│   │   ├── Gallery.module.css
+│   │   ├── Gallery.tsx
+│   │   ├── main.tsx
+│   │   └── states.tsx
 │   ├── game/
+│   │   ├── balance.test.ts
+│   │   ├── balance.ts
 │   │   ├── constants.ts
 │   │   ├── factories.test.ts
 │   │   ├── factories.ts
@@ -82,16 +89,19 @@ and test fixture conventions (§2).
 │   ├── styles/
 │   │   └── global.css
 │   ├── test/
+│   │   ├── economy.ts
 │   │   ├── fixtures.ts
 │   │   └── setup.ts
 │   ├── main.tsx
 │   └── vite-env.d.ts
 ├── AGENTS.md
 ├── eslint.config.js
+├── gallery.html
 ├── index.html
 ├── package-lock.json
 ├── package.json
 ├── README.md
+├── stylelint.config.js
 ├── tsconfig.app.json
 ├── tsconfig.json
 ├── tsconfig.node.json
@@ -149,6 +159,7 @@ export type GameAction =
   | { type: "START_RUN"; equation: Equation; inventory: Tile[] }
   | { type: "SELECT_TILE"; tileId: string }
   | { type: "RETURN_TILE"; tileId: string }
+  | { type: "CLEAR_SELECTION" }
   | { type: "SUBMIT_CORRECT"; rewardTiles: Tile[] }
   | { type: "SUBMIT_INCORRECT" }
   | { type: "TOGGLE_DISCARD"; tileId: string }
@@ -163,15 +174,25 @@ export type TileIdFactory = () => string;
 ### 2.3 Pure interfaces
 
 ```ts
+// game/balance.ts — hand-tuned dials (see § Tuning surface)
 export const INVENTORY_CAPACITY = 10;
+export const REWARD_BONUS = 1;
+export const KIND_EQUATION_RATE = 0.2;
+
+// game/constants.ts — domain definitions
 export const OPERAND_MIN = 1;
 export const OPERAND_MAX = 9;
+export const REWARD_DIGIT_COUNT = 10;
 
 export function createTitleState(): GameState;
 export function createInitialInventory(idFactory: TileIdFactory): Tile[];
 export function sortTiles(tiles: readonly Tile[]): Tile[];
 
 export function generateEquation(random: RandomSource): Equation;
+export function generateKindEquation(
+  random: RandomSource,
+  inventory: readonly Tile[],
+): Equation;
 export function generateRewardTiles(
   count: number,
   random: RandomSource,
@@ -185,11 +206,40 @@ export function canAttemptEquation(
   equation: Equation,
 ): boolean;
 export function getOverflowCount(inventory: readonly Tile[]): number;
+export function getRewardCount(spentCount: number): number;
+export function canConstruct(inventory: readonly Tile[], product: number): boolean;
 export function isSubmissionReady(state: GameState): boolean;
 export function isDiscardReady(state: GameState): boolean;
 
 export function gameReducer(state: GameState, action: GameAction): GameState;
 ```
+
+### Tuning surface
+
+The values that decide how the game *feels* live in one data-only module,
+`src/game/balance.ts`, so hand-tuning never means hunting through logic.
+
+| Concern | File | Change means |
+|---|---|---|
+| Feel | `game/balance.ts` | Retuning a shipped game. Safe to edit by hand, within the range each dial documents. |
+| Domain | `game/constants.ts` | Changing what the game *is* — operand range, digit spread. Not a tuning knob. |
+| Motion and metrics | `styles/global.css` tokens | Retuning press feel and hairlines in one place; no module hardcodes them. |
+
+Rules that keep the surface durable:
+
+- **One binding per dial.** A dial is imported by the module that uses it, never
+  threaded through a call site as a parameter. Injection is reserved for
+  impurity (`RandomSource`, `TileIdFactory`), not for constants — a dial passed
+  as an argument is a dial that can be silently overridden.
+- **Every dial documents its economy effect**, its safe range, and what breaks
+  outside that range.
+- **`game/balance.test.ts` is an executable invariant**, not a unit test. It
+  asserts that the shipped combination of dials still ends runs, and that a
+  `CLIFF_MARGIN` gap below the buildable-rate cliff remains. It models the
+  economy through `test/economy.ts`, which ships nothing.
+- **Agents may add dials; agents may not change a dial's value** without
+  explicit instruction (AGENTS.md §4.5). Tuning commits use `tune(balance):`
+  and carry nothing else, so tuning and feature work never collide in git.
 
 ### 2.4 Browser-bound interfaces
 
@@ -288,4 +338,87 @@ export const makeAnsweringState = (
   round: 1,
   ...overrides,
 });
+
+// A §2.5-legal feedback-phase state: lastResult is non-null and round === totalRounds.
+export const makeFeedbackState = (
+  equation: Equation,
+  overrides: Partial<GameState> = {},
+): GameState => ({
+  ...makeAnsweringState(equation, { round: 1, totalRounds: 1 }),
+  phase: "feedback",
+  lastResult: {
+    kind: "incorrect",
+    submittedValue: 1,
+    correctValue: equation.product,
+    submittedTiles: [],
+    rewardTileIds: [],
+  },
+  ...overrides,
+});
+
+// Overflow inventories are defined by size alone; the digits only need to
+// exist. `size - INVENTORY_CAPACITY` is the excess the player must discard.
+export const makeOverflowInventory = (size: number): Tile[] =>
+  Array.from({ length: size }, (_, index) => makeTile((index % 9) as Digit, `tile-${index}`));
+
+// A §2.5-legal overflow-phase state: inventory exceeds capacity (excess 1 by
+// default), lastResult is non-null, and round === totalRounds.
+export const makeOverflowState = (
+  equation: Equation,
+  overrides: Partial<GameState> = {},
+): GameState => ({
+  ...makeFeedbackState(equation, { inventory: makeOverflowInventory(11) }),
+  phase: "overflow",
+  ...overrides,
+});
+
+// A §2.5-legal gameOver state: round === totalRounds + 1 and the terminal
+// equation is still on screen (§1.8).
+export const makeGameOverState = (
+  equation: Equation,
+  overrides: Partial<GameState> = {},
+): GameState => ({
+  ...makeAnsweringState(equation, { round: 13, totalRounds: 12 }),
+  phase: "gameOver",
+  score: 7,
+  longestStreak: 4,
+  ...overrides,
+});
 ```
+
+### 2.7 Dev-only states gallery
+
+`gallery.html` is a second root HTML entry, parallel to `index.html`, that
+loads `src/gallery/main.tsx` instead of `src/main.tsx`. It mounts `Gallery`
+(`src/gallery/Gallery.tsx`) under the same `StrictMode` and `I18nProvider` as
+the real app, so every rendered state gets real i18n and the double-render
+behavior that catches `StrictMode`-only bugs.
+
+Vite's default build input is `index.html` alone; it does not auto-discover
+sibling root HTML files. `npm run build && ls dist/` confirms `dist/` holds
+only `assets/`, `favicon.svg`, and `index.html` — `gallery.html` never ships.
+The dev server serves it anyway, since `vite dev` transforms any HTML file
+under the project root on request, not just the configured build input. (Full
+probe record: `docs/journal/journal-2026-08-12.md`.)
+
+The catalogue, `src/gallery/states.tsx`, exports
+`GALLERY_STATES: Record<GamePhase, GalleryEntry[]>`. Keying by phase rather
+than a flat array means adding a member to `GamePhase` fails `tsc` until the
+gallery covers it — a flat array with a hand-written phase list would rot
+silently instead.
+
+`Gallery` renders exactly one entry at a time, chosen from a picker, rather
+than every state at once. `GameScreen` calls `useGameKeyboard`
+(`src/hooks/useGameKeyboard.ts`), which attaches a window-level `keydown`
+listener per mounted instance; N simultaneous screens would mean N listeners
+each calling `preventDefault()` on the same keypress. Rendering one state at a
+time also means each renders at the page's real width. Neither the picker's
+`<nav>` nor the stage `<div>` is a `<main>`, because several rendered states
+(`TitleScreen`, `GameOverScreen`) own that landmark themselves.
+
+The catalogue's phase coverage is enforced, not just conventional:
+`GALLERY_STATES`'s `Record<GamePhase, GalleryEntry[]>` type fails `tsc` the
+moment a new `GamePhase` member ships without a matching key, and
+`src/gallery/states.test.tsx` asserts every key's array is non-empty, which
+catches the type check's own blind spot — an empty array added just to
+satisfy the compiler.

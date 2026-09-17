@@ -1,9 +1,9 @@
-# AGENTS.md — 1-0 Agent Kernel
+# AGENTS.md — ozterisk Agent Kernel
 
 This file is loaded for every agent working in this repository. Everything else
 is read on demand through the routing map below.
 
-**Goal:** Build and deploy a responsive, bilingual, fully client-side proof of concept for `1-0`, an endless multiplication game in which digit tiles are both answer inputs and a managed inventory.
+**Goal:** Build and deploy a responsive, bilingual, fully client-side proof of concept for `ozterisk`, an endless multiplication game in which digit tiles are both answer inputs and a managed inventory.
 
 **Architecture:** A Vite + React + TypeScript single-page application uses a deterministic `useReducer` state machine for the five game phases. Pure domain utilities own equation generation, rewards, answer construction, sorting, loss detection, and share formatting; React owns rendering and event orchestration. Random values and tile IDs are injected at the boundary so all game rules remain deterministic in tests.
 
@@ -22,6 +22,7 @@ is read on demand through the routing map below.
 | Running quality gates (spec, architecture, interaction, a11y) | `docs/checklists/quality.md` |
 | Preparing or verifying the release | `docs/checklists/release.md` |
 | Recording insights that must outlive this session | `docs/journal/journal-*.md` |
+| Invoking a `mattpocock-skills` engineering skill | `docs/agents/*.md` |
 | Anything still unclear after all of the above | `docs/archive/complete-plan.md` (frozen snapshot) |
 
 ## Document precedence
@@ -37,17 +38,28 @@ plan, so cross-references resolve across files.
 
 ## Global Constraints
 
-- Product name is the working title `1-0`.
+- Product name is `ozterisk`.
 - Use Vite + React + TypeScript; do not use Next.js.
 - Run entirely in the browser; no backend, database, account, leaderboard, API, analytics, or anti-cheat system.
 - Use React `useReducer`; do not add Zustand, Redux, or another state library.
 - Keep the reducer pure and deterministic; never call `Math.random()`, `crypto.randomUUID()`, browser APIs, or storage APIs inside it.
-- Use CSS Modules plus one global stylesheet; do not add Tailwind, a component library, or an animation library.
-- Use CSS transitions only, and only for functional state changes.
+- Use CSS Modules plus one global stylesheet; do not add Tailwind, a component
+  library, or an animation library. The global stylesheet may `@import` token
+  partials under `src/styles/tokens/`, which is where global `@keyframes` live —
+  a CSS Module would scope the animation names and silently no-op every animation.
+- Self-host fonts and serve them same-origin; a full run makes zero non-origin
+  network requests.
+- Use CSS transitions for functional state changes, plus the named keyframe
+  inventory in `docs/spec/ui-i18n.md` §1.12. Motion outside that inventory is not
+  permitted; extending it amends §1.12 first.
 - Support responsive desktop and mobile layouts with mouse, touch, and keyboard input.
 - Support English and Korean through a typed in-code dictionary; do not add an i18n dependency.
 - Persist only the language preference in `localStorage`; never persist a run, score, record, equation, or inventory.
-- Use Vitest and React Testing Library; do not add Playwright or another E2E suite.
+- Use Vitest and React Testing Library for behavior: game rules, reducer
+  transitions, component interaction, and accessibility semantics are tested
+  there and never in a browser. A browser suite is permitted only for
+  properties jsdom cannot observe — layout geometry, overflow, and computed
+  font metrics — and must assert no behavior. See `docs/spec/product.md` §1.17.
 - Use ordinary browser randomness in production; do not generate, display, encode, or share run seeds.
 - Do not add sound, music, mute, or volume controls.
 - Deploy the static Vite build to Vercel.
@@ -59,11 +71,22 @@ plan, so cross-references resolve across files.
 
 ### 4.4 Branch and PR convention
 
-- Branch: `feat/T##-short-kebab-name`.
-- Commit: Conventional Commit with the task ID in body.
-- One task per PR unless a dependency task is fewer than 20 changed lines and cannot be reviewed meaningfully alone.
-- PR title: `[T##] Imperative outcome`.
-- PR body must contain:
+**A task is a unit of review, not a unit of merge.** It keeps its task file,
+its issue, its own commit, and its own review gate. It does not own a PR.
+
+**The PR is the milestone.** One branch carries a milestone's tasks as one
+coherent commit each, and one PR closes every issue in that milestone.
+
+- **A milestone must therefore be a reasonable PR-sized goal.** If planning
+  shows it is not, split the milestone in `docs/plan/roadmap.md` *before*
+  work starts. The unit of merge moves deliberately and on the record, never
+  ad hoc at branch time.
+- Branch: `feat/M#-short-kebab-name`.
+- Commit: Conventional Commit with `Task: T##` in the body. One commit per
+  task, independently reviewable.
+- PR title: `[M#] Imperative outcome`.
+- PR body must contain a `Closes #<issue>` line per task issue, plus the
+  template below.
 
 ```markdown
 Closes #<issue>
@@ -82,6 +105,41 @@ Closes #<issue>
 ## Manual checks
 - [ ] Relevant acceptance path exercised
 ```
+
+M0–M3 used one branch and PR *per task* (`feat/T##-…`, `[T##] …`), which was
+right for fourteen tasks building a codebase from nothing. From M4 the suite
+is comprehensive and milestones are small, so the merge unit is the
+milestone. Older PR history reflects the previous convention.
+
+### 4.5 Tuning values
+
+Agents may **add** dials to `src/game/balance.ts` and must document each
+one's economy effect. Agents must **not change the value** of an existing
+dial without explicit instruction — those are hand-tuned. Tuning commits
+use `tune(balance):`; feature commits never carry value changes.
+
+### 4.6 Base branch and release
+
+`main` is where work lands, unchanged. **`prod` is what the public runs.**
+
+- Task work is unaffected: cut feature branches from `main`, open PRs
+  against `main`, squash-merge them. `main` is still the default branch.
+- Vercel's production branch is `prod`. `main` and every open PR get a
+  preview deployment; only a commit reaching `prod` is a production deploy.
+- `prod` is never a base branch and never takes a direct commit. It
+  receives one thing: a release of `main`.
+- **A release merges with a merge commit, never a squash.** Feature PRs are
+  squashed, which is exactly why this matters: a squashed release writes a
+  commit `prod` shares with no ancestor on `main`, the two diverge
+  permanently, and every later release replays the whole history as
+  conflicts. A merge commit instead keeps the previous `prod` tip as a
+  parent, so each release builds on the last and the trees stay identical.
+- `prod` is an ancestor of `main` only until the first release. The merge
+  commit is a *descendant* of `main`, so from then on each branch is ahead
+  of the other by those merges. Nothing breaks, but ask "is this commit
+  deployed?" by testing against `prod` — never by assuming `prod` is behind.
+- `prod` therefore answers "what is actually deployed", which is a question
+  this project could not answer before.
 
 ## Loop-Agent Operating Protocol
 
@@ -166,3 +224,26 @@ Release completion additionally requires:
 
 Wave monitoring (§7.5) lives in `docs/plan/roadmap.md` because it gates waves,
 not single-task iterations.
+
+## Agent skills
+
+Configuration the `mattpocock-skills` engineering skills read. Each file is an
+adapter onto conventions this repo already had; none of them is canonical over
+`docs/spec/**`.
+
+### Issue tracker
+
+Issues live in this repo's GitHub Issues, via `gh`. See
+`docs/agents/issue-tracker.md`; label, schema, and object conventions stay in
+`docs/plan/github.md`.
+
+### Triage labels
+
+Five `triage:`-prefixed labels, matching the prefixed vocabulary in
+`docs/plan/github.md` §4.2. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context. `CONTEXT.md` and `docs/adr/` do not exist yet and are created
+lazily; `docs/spec/**` holds the vocabulary meanwhile. See
+`docs/agents/domain.md`.

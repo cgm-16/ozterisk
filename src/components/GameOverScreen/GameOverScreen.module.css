@@ -9,8 +9,43 @@
   text-align: center;
 }
 
+/* The equation and its reason are one unit. A gap tighter than .screen's
+   keeps the reason reading as a caption on the equation rather than as the
+   first result. */
+.terminal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* The equation that ended the run is a record, not a prompt. EquationBoard's
+   68px headline steps down to title size in meta ink, so the reason line below
+   supports it instead of rescuing it from reading live. The selector reaches
+   the board's own paragraph — .reason is the sibling that follows it — and at
+   (0,1,1) it beats EquationBoard's (0,1,0) rule whatever the sheet order. */
+.terminal > p:first-child {
+  font-size: var(--size-title);
+  color: var(--text-meta);
+}
+
+.reason {
+  padding: 0 var(--space-4);
+  color: var(--text-meta);
+  text-align: center;
+}
+
+/* The verdict is a mono label, not a headline: the run's numbers below carry
+   the screen's one focal point. Vermilion is the hue for a tile leaving.
+   --state-incorrect is the wrong step of it here: at 11px this is body text
+   and owes 4.5:1, and verm-600 measures 3.34:1 on --surface-surround. verm-400
+   measures 6.26:1 and keeps the hue. The larger vermilion surfaces elsewhere
+   on this screen stay on --state-incorrect, which clears the 3:1 they owe. */
 .title {
-  font-size: 2.5rem;
+  font: var(--weight-medium) var(--size-label) / var(--leading-tight) var(--font-mono);
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--verm-400);
 }
 
 .stats {
@@ -27,67 +62,102 @@
 }
 
 .entry dt {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
+  font: var(--weight-medium) var(--size-label) / var(--leading-tight) var(--font-mono);
+  letter-spacing: var(--track-label);
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  color: var(--text-meta);
 }
 
+/* typography.css names run values as display-serif territory alongside
+   equations and tile faces — "ozterisk's numbers are objects, not data".
+   Family only: the sizes stay literal rem, because the guard below compares
+   two computed font sizes and jsdom does not substitute var(). */
 .entry dd {
-  font-size: 1.25rem;
+  font-family: var(--font-numeral);
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
+/* Rounds survived is Endless's win condition, so it is the number the screen
+   is built around. `.entry dd.primary` is (0,2,1) against `.entry dd`'s
+   (0,1,1): it wins on specificity, not on source order. */
+.entry dd.primary {
+  font-size: 2.125rem;
+}
+
+/* The primary action leads on its own line; the two it is chosen over share
+   the row beneath. Their variants — raised and ghost — carry the rest. */
 .actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* The hint names the key that presses the button above it, so it stays meta
+   text: label size, meta ink, and none of --size-label's mono/uppercase/tracked
+   treatment, which belongs to labels rather than to a sentence. At 11px this is
+   body text and owes 4.5:1 — --text-meta composites to #87897d over
+   --surface-surround and measures 5.18:1. */
+.restartHint {
+  font-size: var(--size-label);
+  color: var(--text-meta);
+}
+
+.secondaryActions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
   justify-content: center;
 }
 
-.playAgain,
-.secondary {
-  min-width: var(--tile-size);
-  min-height: var(--tile-size);
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 150ms ease,
-    border-color 150ms ease,
-    transform 100ms ease;
+/* The chop's height is reserved whether or not it is stamped, so a copy
+   confirms in place instead of pushing the screen down. */
+.confirmation {
+  --chop-size: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: var(--chop-size);
 }
 
-.playAgain:active,
-.secondary:active {
-  transform: translateY(1px);
-}
-
-.playAgain {
-  border: none;
-  background: var(--color-accent);
-  color: var(--color-canvas);
-}
-
-.secondary {
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
+/* Ref 11C, the vermilion chop bearing ✳: it lands oversized and turned, comes
+   down square, holds while it is read, then lifts. The element mounts only
+   when a copy succeeds, so mounting is the trigger and no state flag is needed.
+   `forwards` because oz-chop ends at zero opacity — that fade is the moment's
+   ending, and without the fill mode the chop would snap back to full and stay.
+   Longhands rather than the `animation` shorthand: jsdom expands no shorthand,
+   so the shorthand form reads back as animationName `none` and no test can
+   tell a placed animation from a misplaced one. `global()` because
+   keyframes.css is not a CSS Module and this file is: without the escape the
+   name is rewritten to a locally scoped one that matches no @keyframes
+   anywhere, and an animation naming a keyframe nothing defines fails
+   silently. */
+.chop {
+  animation-name: global(oz-chop);
+  animation-duration: var(--dur-share);
+  animation-timing-function: var(--ease-snap);
+  animation-fill-mode: forwards;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--chop-size);
+  height: var(--chop-size);
+  border-radius: var(--radius-sm);
+  background: var(--state-incorrect);
+  color: var(--ink-000);
+  font: var(--weight-medium) var(--size-body) / var(--leading-tight) var(--font-display);
 }
 
 .status {
-  color: var(--color-text-muted);
-  min-height: 1.25em;
+  color: var(--text-meta);
 }
 
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .screen {
     padding: var(--space-6) var(--space-3);
-  }
-
-  .title {
-    font-size: 2rem;
   }
 
   .stats {

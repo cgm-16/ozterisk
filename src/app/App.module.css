@@ -12,14 +12,7 @@
   padding: var(--space-4) var(--space-4) 0;
 }
 
-.gameOverArena {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-@media (max-width: 40rem) {
+@media (width <= 40rem) {
   .languageBar {
     padding: var(--space-3) var(--space-3) 0;
   }

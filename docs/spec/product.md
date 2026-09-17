@@ -1,11 +1,11 @@
-# 1-0 Product Specification
+# ozterisk Product Specification
 
 Canonical game rules (§1.1–§1.11, §1.17). The visual, language, copy, sharing,
 and persistence contracts (§1.12–§1.16) live in `docs/spec/ui-i18n.md`.
 
 ### 1.1 Product thesis
 
-`1-0` is an endless arithmetic inventory game. A digit tile is simultaneously:
+`ozterisk` is an endless arithmetic inventory game. A digit tile is simultaneously:
 
 1. a resource required to construct an answer;
 2. a consumable spent on every submission; and
@@ -17,7 +17,9 @@ The PoC validates whether this loop is understandable and engaging. It does not 
 
 - Operands are integers `1` through `9`, inclusive.
 - The sampling pool contains the 45 unordered pairs `(a, b)` where `1 <= a <= b <= 9`.
-- Draw one pair uniformly with replacement for every new equation.
+- Every new equation draws a gate sample first. At or above the kind-equation rate (a tuning dial; see § Tuning surface in the technical contract) the pair is drawn uniformly with replacement from the full pool; below it, the pair is drawn uniformly from only those pairs whose product the current inventory can spell.
+- If the inventory can spell no product at all, the kind draw falls back to the uniform draw.
+- The bias is a generosity dial, not a difficulty curve: it never adapts to player skill, and its rate is fixed for the run. `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` §1.1 derives why the rate must stay below the economy cliff.
 - Immediate repetition is legal.
 - After drawing the unordered pair, independently randomize display order.
 - `3 × 7` and `7 × 3` are presentations of one sampling entry, not two entries.
@@ -94,7 +96,9 @@ An incorrect answer is legal even when the correct answer cannot be constructed 
 - If `excess > 0`, the player must discard exactly `excess` tiles.
 - The player may mark any owned tile, including a new reward or an older tile.
 - Marking is reversible until confirmation.
-- **Confirm Discard** and `Enter` are enabled only when exactly `excess` tile IDs are marked.
+- When `excess === 1`, marking a tile *is* the whole decision, so marking confirms it in the same action; no **Confirm Discard** button is rendered. Endless at a fixed capacity always overflows by exactly one, so this is the only path it takes.
+- When `excess > 1`, **Confirm Discard** and `Enter` are rendered and enabled only when exactly `excess` tile IDs are marked.
+- The collapse is driven by the player's action, never by a render: reaching the required count without acting confirms nothing.
 - Confirmation removes those exact tiles, clears the overflow selection, and returns to feedback.
 - The next equation cannot be drawn while overflow remains unresolved.
 
@@ -116,7 +120,10 @@ Loss is based only on tile count versus answer-slot count:
 inventory.length < getAnswerLength(equation)
 ```
 
-The terminal equation remains visible to explain why the run ended. It is not counted as a submitted round.
+The terminal equation remains visible to explain why the run ended, alongside a
+stated reason. The equation on its own reads as a question still awaiting an
+answer, so it explains nothing without the accompanying line. It is not counted
+as a submitted round.
 
 ### 1.9 Statistics semantics
 
@@ -132,18 +139,26 @@ The terminal equation remains visible to explain why the run ended. It is not co
 
 #### `title`
 
-- Working title `1-0`.
-- Three-line rules summary.
-- Expandable **How to Play**.
+- Wordmark `ozterisk`.
+- One-paragraph pitch.
+- Four always-visible rules, each preceded by the material swatch it concerns —
+  socket, tile, gold, vermilion. Between them they cover capacity, both outcomes,
+  and overflow.
+- Expandable **More**, holding the required topics the four rules do not: keyboard
+  controls first, then selecting and returning tiles, ordered answer slots, and
+  the score/streak/round/loss rules.
 - Visible `English / 한국어` language selector.
 - One primary **Start Run** button.
 
 #### `answering`
 
-- HUD order: score, current streak, round.
+- HUD order: round, score, current streak. Round carries primary emphasis — Endless is a survival mode, so rounds survived is the headline figure.
+- A capacity meter states tiles held against the ten-tile capacity. It sits below the three HUD figures; it does not displace round's primary emphasis and does not reorder them.
 - Equation and exact answer-slot count.
-- Submit action.
+- Submit and Clear actions. Clear is disabled while nothing is selected.
+- Filled answer slots are clickable to return a single tile, and show a hover/focus affordance.
 - Sorted digit inventory.
+- Selecting a tile leaves its socket in place, marked as on loan rather than empty. The rack neither compacts nor re-sorts until the round resolves.
 - Mouse, touch, and keyboard input.
 
 #### `feedback`
@@ -159,13 +174,18 @@ The terminal equation remains visible to explain why the run ended. It is not co
 - Preserve the correctness feedback context.
 - State how many tiles must be removed.
 - Allow reversible tile marking.
-- Enable confirmation only at the exact required count.
+- At a required count of one, marking completes the discard; render no confirmation control.
+- Above a required count of one, enable confirmation only at the exact required count.
 - After confirmation, move to `feedback`; do not draw the next equation automatically.
 
 #### `gameOver`
 
 - Keep the terminal equation visible.
-- Show score, total submitted rounds, and longest streak.
+- Print the product on the board. `gameOver` is the only phase that does: during
+  play the answer slots complete the equation, and the feedback text is the only
+  place the real value is stated.
+- State why the run ended, grouped with the terminal equation rather than with the statistics, so it reads as a caption on the equation instead of a result.
+- Show total submitted rounds first, then score and longest streak. Rounds carries the same primary emphasis it holds in the HUD.
 - Show **Play Again**, **Share**, and **Copy Result**.
 - **Play Again** starts a fresh Round 1 immediately without returning to title.
 
@@ -175,20 +195,34 @@ The terminal equation remains visible to explain why the run ended. It is not co
 |---|---|---|
 | `answering` | `0`–`9` | Select first available matching tile if a slot is empty |
 | `answering` | `Backspace` | Return most recently selected answer tile |
+| `answering` | `Escape` | Return every selected tile at once; no-op at zero selection |
 | `answering` | `Enter` | Submit only if all answer slots are filled |
-| `overflow` | `Enter` | Confirm only if exactly the excess number is selected |
+| `overflow` | `0`–`9` | Mark the first matching tile not already marked; at a required count of one this also completes the discard |
+| `overflow` | `Enter` | Confirm only if exactly the excess number is selected. Unreachable in Endless, which always overflows by one and so completes on marking |
 | `feedback` | `Enter` | Draw and advance to the next equation |
-| `gameOver` | `Enter` | Start a fresh run, equivalent to **Play Again** |
+| `gameOver` | `R` | Start a fresh run, equivalent to **Play Again**. Accepts the key by either its value or its physical position, so neither a Korean IME nor a Dvorak layout can make it unreachable |
+| `gameOver` | `Enter` | No global shortcut; a focused button retains normal browser behavior |
 | `title` | `Enter` | No global shortcut; the focused **Start Run** button retains normal browser behavior |
 
 Disabled keyboard actions are no-ops. Language changes are available in every phase and never reset game state.
+
+`gameOver` restarts on `R` rather than `Enter` because `Enter` cannot be made
+safe there. A player advancing a run by keyboard — Submit, `Enter`, Submit,
+`Enter` — destroys the score screen with the tap already in flight, before it can
+be read or shared; measured as `{ reachedGameOver: true, survivedSecondEnter:
+false, activeTag: "BODY" }`. `event.repeat` does not help, because it catches a
+held key rather than two discrete presses, and scoping the shortcut to an unfocused
+document fixes a different failure. `Enter` on the language toggle, which renders
+buttons and is present in this phase, also restarted the run and discarded the
+language change — contradicting the line above. `R` activates no button, so it
+needs no focus guard.
 
 ### 1.17 Explicitly out of scope
 
 - Wildcard or special tiles.
 - Operand `0`.
 - Division, addition, or subtraction modes.
-- Difficulty curves or weighted equations.
+- Difficulty curves — any weighting that adapts to player skill or escalates over a run. The fixed-rate constructibility bias in §1.2 is in scope and shipped; it is a generosity dial, not a curve.
 - Timers.
 - Multiple attempts.
 - Skip buttons or a separate manual-discard action during answering.
@@ -198,6 +232,9 @@ Disabled keyboard actions are no-ops. Language changes are available in every ph
 - Result pages or result parameters.
 - Leaderboards, authentication, backend APIs, databases, and server authority.
 - Audio and haptics.
-- Playwright/E2E tests.
+- End-to-end tests of game behavior. A browser suite is in scope only for
+  layout properties jsdom cannot observe, and must assert no game rule,
+  reducer transition, or interaction flow. §8.5's `320px` and Korean-clipping
+  gates are unverifiable without one, because jsdom performs no layout.
 - Analytics and telemetry.
 - Offline/PWA behavior.

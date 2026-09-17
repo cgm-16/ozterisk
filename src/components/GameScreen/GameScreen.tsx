@@ -1,3 +1,4 @@
+import { sortTiles } from "../../game/factories";
 import type { GameAction, GameState } from "../../game/types";
 import {
   getAnswerLength,
@@ -7,7 +8,9 @@ import {
 } from "../../game/selectors";
 import { useGameKeyboard } from "../../hooks/useGameKeyboard";
 import { useI18n } from "../../i18n/I18nContext";
+import { ActionButton } from "../ActionButton/ActionButton";
 import { AnswerSlots } from "../AnswerSlots/AnswerSlots";
+import { CapacityMeter } from "../CapacityMeter/CapacityMeter";
 import { EquationBoard } from "../EquationBoard/EquationBoard";
 import { FeedbackPanel } from "../FeedbackPanel/FeedbackPanel";
 import { GameHud } from "../GameHud/GameHud";
@@ -39,6 +42,11 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
   return (
     <main className={styles.screen}>
       <GameHud score={state.score} currentStreak={state.currentStreak} round={state.round} />
+      {/* Capacity is what you hold, and a tile in an answer slot is still
+          yours — you can return it. Reading state.inventory alone would drop
+          by one per selection and disagree with the rack beside it, which
+          keeps a socket for every tile in the same union. */}
+      <CapacityMeter held={state.inventory.length + state.selectedTiles.length} />
       <EquationBoard equation={state.equation} />
 
       {state.phase === "answering" && (
@@ -50,23 +58,41 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         />
       )}
 
+      {/* Feedback keeps the slots mounted so the verdict lands on the tiles the
+          player submitted. The reducer clears selectedTiles on submit and hands
+          the same array to lastResult.submittedTiles, so that is where they are.
+          No onReturn: read-only slots carry no button role, and the phase offers
+          no control to take a tile back. */}
+      {state.phase === "feedback" && lastResult !== null && (
+        <AnswerSlots
+          slotCount={getAnswerLength(state.equation)}
+          selectedTiles={lastResult.submittedTiles}
+          verdict={lastResult.kind}
+          streak={state.currentStreak}
+          disabled={false}
+        />
+      )}
+
       {lastResult !== null && <FeedbackPanel result={lastResult} rewardTiles={rewardTiles} />}
 
       {state.phase === "answering" && (
-        <button
-          type="button"
-          className={styles.action}
-          onClick={onSubmit}
-          disabled={!isSubmissionReady(state)}
-        >
-          {t("action.submit")}
-        </button>
+        <div className={styles.actions}>
+          <ActionButton onClick={onSubmit} disabled={!isSubmissionReady(state)}>
+            {t("action.submit")}
+          </ActionButton>
+
+          <ActionButton
+            variant="secondary"
+            onClick={() => dispatch({ type: "CLEAR_SELECTION" })}
+            disabled={state.selectedTiles.length === 0}
+          >
+            {t("action.clear")}
+          </ActionButton>
+        </div>
       )}
 
       {state.phase === "feedback" && (
-        <button type="button" className={styles.action} onClick={onNextRound}>
-          {t("action.next")}
-        </button>
+        <ActionButton onClick={onNextRound}>{t("action.next")}</ActionButton>
       )}
 
       {state.phase === "overflow" && (
@@ -78,12 +104,20 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
       )}
 
       <TileInventory
-        tiles={state.inventory}
+        tiles={sortTiles([...state.inventory, ...state.selectedTiles])}
+        liftedIds={state.selectedTiles.map((tile) => tile.id)}
         mode={state.phase === "answering" ? "select" : state.phase === "overflow" ? "discard" : "readOnly"}
         pendingDiscards={state.pendingDiscards}
         onTile={(tileId) => {
           if (state.phase === "answering") dispatch({ type: "SELECT_TILE", tileId });
-          if (state.phase === "overflow") dispatch({ type: "TOGGLE_DISCARD", tileId });
+          if (state.phase === "overflow") {
+            dispatch({ type: "TOGGLE_DISCARD", tileId });
+            // A forced single-tile discard needs no confirmation step: marking the
+            // only tile that can go is the whole decision. Dispatched from the click
+            // handler and never from an effect, so rendering an already-marked state
+            // still requires user action.
+            if (getOverflowCount(state.inventory) === 1) dispatch({ type: "CONFIRM_DISCARD" });
+          }
         }}
       />
     </main>

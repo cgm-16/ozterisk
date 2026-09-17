@@ -52,7 +52,8 @@ Done (§9) live in `docs/checklists/release.md`.
 - [ ] Representative invalid transitions return identical state.
 - [ ] Generator boundary values are tested.
 - [ ] Component tests cover all requested interaction slices.
-- [ ] No Playwright dependency or test exists.
+- [ ] No browser test asserts a game rule, reducer transition, or interaction
+      flow.
 - [ ] Lint passes with zero warnings.
 - [ ] Typecheck passes.
 - [ ] Production build passes.
@@ -62,7 +63,8 @@ Done (§9) live in `docs/checklists/release.md`.
 
 - [ ] Semantic buttons for all actions/tiles/slots.
 - [ ] Logical focus order follows visual hierarchy.
-- [ ] Visible focus on every control.
+- [ ] Visible focus on every control, at `3:1` or better against every surface the
+      indicator can appear on, including the ceramic tile face.
 - [ ] Status feedback is announced.
 - [ ] State does not rely only on color.
 - [ ] Minimum target size is 44px.

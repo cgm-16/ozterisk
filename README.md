@@ -1,6 +1,6 @@
-# 1-0
+# ozterisk
 
-`1-0` is a browser-based, fully client-side endless multiplication game. A
+`ozterisk` is a browser-based, fully client-side endless multiplication game. A
 digit tile is simultaneously an answer input, a consumable spent on every
 submission, and an inventory-management choice: correct play returns one net
 tile before capacity resolution. The game validates whether that loop is
@@ -114,13 +114,15 @@ or other state library).
   as dependencies rather than called directly so they stay testable.
 - Styling uses CSS Modules per component plus one global stylesheet
   (`src/styles/global.css`); no Tailwind, component library, or animation
-  library. Only CSS transitions are used, and only for functional state
-  changes; `prefers-reduced-motion` removes nonessential transitions.
+  library. Motion is limited to CSS transitions for functional state changes
+  plus the named keyframe inventory in `docs/spec/ui-i18n.md` §1.12;
+  `prefers-reduced-motion` removes nonessential transitions.
 
 ## Test strategy
 
-Vitest + React Testing Library + `@testing-library/user-event`; no
-Playwright or other end-to-end suite. Tests are deterministic: `game/`
+Vitest + React Testing Library + `@testing-library/user-event` for all
+behavior; a browser suite covers only layout properties jsdom cannot
+observe, and asserts no behavior. Tests are deterministic: `game/`
 fixtures (`sequenceRandom`, `sequentialIds`) inject fixed random sequences
 and tile IDs instead of mocking `Math.random()` globally.
 
@@ -141,10 +143,31 @@ and tile IDs instead of mocking `Math.random()` globally.
 
 The app is a static Vite build with no serverless function or backend
 service. `vercel.json` pins the Vercel project to `framework: vite`,
-`buildCommand: npm run build`, and `outputDirectory: dist`. GitHub Actions
-(`.github/workflows/ci.yml`) runs lint, typecheck, test, and build on every
-pull request and on push to `main`; only the exact commit that passed CI is
-promoted to production.
+`buildCommand: npm run build`, and `outputDirectory: dist`.
+
+Two long-lived branches carry it. Work merges to **`main`**, which Vercel
+builds as a preview; a release is a merge commit from `main` to **`prod`**,
+which Vercel builds as production. `prod` is a pointer to the live commit.
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, typecheck, test, the
+viewport sweep, and build on every pull request and on every push to either
+branch. That reports, it does not block: `prod` carries no required status
+checks, so a green run before a release is the convention rather than an
+enforced gate.
+
+## Fonts
+
+Four typefaces are self-hosted through `@fontsource` and served from the
+app's own origin: EB Garamond as the display and numeral face, Zen Kaku
+Gothic New for UI text, IBM Plex Mono for the monospace role, and Noto
+Sans KR for Hangul. Nothing is fetched from a font CDN, which is what
+keeps the zero-non-origin-request property true. Only Latin subsets ship
+eagerly; the Korean face loads on demand when the language is `ko`, so an
+English session never downloads it.
+
+All four are under the SIL Open Font License, Version 1.1. Its section 2
+requires each redistributed copy to carry the copyright notice and the
+licence, so both ship with the build at `/OFL.txt` (`public/OFL.txt` in
+the source tree) alongside the font files they cover.
 
 ## Supported languages
 
@@ -180,5 +203,5 @@ equation; skip buttons or a separate manual-discard action during
 answering; exact-answer-constructibility loss detection; saved best score
 or history; seeded or replayable runs; result pages or result parameters;
 leaderboards, authentication, backend APIs, databases, or server authority;
-audio and haptics; Playwright or other end-to-end tests; analytics and
+audio and haptics; end-to-end tests of game behavior; analytics and
 telemetry; and offline/PWA behavior.

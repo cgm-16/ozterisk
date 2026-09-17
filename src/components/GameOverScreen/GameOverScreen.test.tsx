@@ -1,26 +1,30 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "../../i18n/I18nContext";
 import type { ShareDependencies } from "../../services/sharing";
+import { makeEquation } from "../../test/fixtures";
 import { LanguageToggle } from "../LanguageToggle/LanguageToggle";
 import { GameOverScreen, type GameOverScreenProps } from "./GameOverScreen";
+import styles from "./GameOverScreen.module.css";
 
 const STATS = { score: 7, totalRounds: 9, longestStreak: 4 };
+const EQUATION = makeEquation(2, 3);
 const URL = "https://example.test/";
 const EN_TEXT =
-  "1-0 — Score: 7\nRounds: 9\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
+  "ozterisk — Rounds: 9\nScore: 7\nLongest streak: 4\n\nCan you beat it?\nhttps://example.test/";
 const KO_TEXT =
-  "1-0 — 점수: 7\n라운드: 9\n최장 연속 정답: 4\n\n이 기록을 넘을 수 있나요?\nhttps://example.test/";
+  "ozterisk — 라운드: 9\n점수: 7\n최장 연속 정답: 4\n\n이 기록을 넘을 수 있나요?\nhttps://example.test/";
 
 function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
   const onPlayAgain = vi.fn();
   const dependencies: ShareDependencies = {
     writeClipboard: vi.fn().mockResolvedValue(undefined),
   };
-  render(
+  const { container } = render(
     <I18nProvider initialLanguage="en">
       <GameOverScreen
+        equation={EQUATION}
         stats={STATS}
         url={URL}
         dependencies={dependencies}
@@ -29,10 +33,18 @@ function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
       />
     </I18nProvider>,
   );
-  return { onPlayAgain, dependencies };
+  return { onPlayAgain, dependencies, container };
 }
 
 describe("GameOverScreen", () => {
+  it("renders the terminal equation and its reason inside the main landmark", () => {
+    renderScreen({ equation: makeEquation(7, 8) });
+
+    const main = screen.getByRole("main");
+    expect(within(main).getByText("7 × 8 =")).toBeInTheDocument();
+    expect(within(main).getByText("Not enough tiles left to answer.")).toBeInTheDocument();
+  });
+
   it("shows the run statistics", () => {
     renderScreen();
     expect(screen.getByRole("heading", { name: "Game Over" })).toBeInTheDocument();
@@ -42,6 +54,62 @@ describe("GameOverScreen", () => {
     expect(screen.getByText("9")).toBeInTheDocument();
     expect(screen.getByText("Longest streak")).toBeInTheDocument();
     expect(screen.getByText("4")).toBeInTheDocument();
+  });
+
+  it("orders the statistics rounds, score, longest streak", () => {
+    renderScreen();
+
+    const rounds = screen.getByText("Rounds played");
+    const score = screen.getByText("Score");
+    const streak = screen.getByText("Longest streak");
+
+    // DOCUMENT_POSITION_FOLLOWING (4) means the argument node comes after `this` node.
+    expect(rounds.compareDocumentPosition(score) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(score.compareDocumentPosition(streak) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  // Mirrors the HUD's emphasis guard in App.test.tsx: reading getComputedStyle
+  // catches a `.primary` rule that loses the cascade, which a className
+  // assertion would not.
+  it("renders the rounds value at a larger computed font size than score", () => {
+    renderScreen();
+
+    const roundsValue = screen.getByText("Rounds played").nextElementSibling as HTMLElement;
+    const scoreValue = screen.getByText("Score").nextElementSibling as HTMLElement;
+
+    const roundsFontSize = parseFloat(getComputedStyle(roundsValue).fontSize);
+    const scoreFontSize = parseFloat(getComputedStyle(scoreValue).fontSize);
+
+    expect(roundsFontSize).toBeGreaterThan(scoreFontSize);
+  });
+
+  // The R shortcut has no other affordance in the product, so its hint has to
+  // sit with the button it presses: after Play Again, before the alternatives.
+  it("names the R shortcut between Play Again and the secondary actions, in either language", async () => {
+    render(
+      <I18nProvider initialLanguage="en">
+        <LanguageToggle />
+        <GameOverScreen
+          equation={EQUATION}
+          stats={STATS}
+          url={URL}
+          dependencies={{ writeClipboard: vi.fn().mockResolvedValue(undefined) }}
+          onPlayAgain={vi.fn()}
+        />
+      </I18nProvider>,
+    );
+
+    const hint = screen.getByText("Press R to play again");
+    const playAgain = screen.getByRole("button", { name: "Play Again" });
+    const share = screen.getByRole("button", { name: "Share" });
+
+    // DOCUMENT_POSITION_FOLLOWING (4) means the argument node comes after `this` node.
+    expect(playAgain.compareDocumentPosition(hint) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(hint.compareDocumentPosition(share) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    await userEvent.click(screen.getByRole("button", { name: "한국어" }));
+
+    expect(screen.getByText("R 키를 눌러 다시 하기")).toBeInTheDocument();
   });
 
   it("invokes the Play Again callback", async () => {
@@ -103,6 +171,21 @@ describe("GameOverScreen", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Result copied.");
   });
 
+  // Queried by the CSS Modules key rather than by role: the chop is
+  // aria-hidden, and a key that does not exist would render class="undefined"
+  // with no error, so the selector is the guard.
+  it("stamps the chop when a copy succeeds, with the status region still announcing", async () => {
+    const writeClipboard = vi.fn().mockResolvedValue(undefined);
+    const { container } = renderScreen({ dependencies: { writeClipboard } });
+
+    expect(container.querySelector(`.${styles.chop}`)).toBeNull();
+
+    await userEvent.click(screen.getByRole("button", { name: "Copy Result" }));
+
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Result copied."));
+    expect(container.querySelector(`.${styles.chop}`)).toBeInTheDocument();
+  });
+
   it("shows an inline failure status when the clipboard write rejects", async () => {
     const writeClipboard = vi.fn().mockRejectedValue(new Error("denied"));
     renderScreen({ dependencies: { writeClipboard } });
@@ -121,6 +204,7 @@ describe("GameOverScreen", () => {
       <I18nProvider initialLanguage="en">
         <LanguageToggle />
         <GameOverScreen
+          equation={EQUATION}
           stats={STATS}
           url={URL}
           dependencies={{ nativeShare, writeClipboard }}
@@ -138,5 +222,43 @@ describe("GameOverScreen", () => {
 
     await waitFor(() => expect(nativeShare).toHaveBeenCalledTimes(2));
     expect(nativeShare).toHaveBeenNthCalledWith(2, { text: KO_TEXT, url: URL });
+  });
+
+  // 11C. Cascade resolution, which jsdom does decide; that the stamp actually
+  // plays, how long it holds and what it looks like are T56's to measure in a
+  // browser. The animation names are longhands rather than the `animation`
+  // shorthand precisely so this read is possible at all.
+  it("stamps the chop only once a copy has succeeded", async () => {
+    const { container } = renderScreen({
+      dependencies: { writeClipboard: vi.fn().mockResolvedValue(undefined) },
+    });
+
+    expect(container.querySelector(`.${styles.chop}`)).toBeNull();
+
+    await userEvent.click(screen.getByRole("button", { name: "Share" }));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Result copied."));
+
+    const chop = container.querySelector(`.${styles.chop}`);
+    expect(chop).not.toBeNull();
+    expect(getComputedStyle(chop as Element).animationName).toBe("oz-chop");
+    // The chop is reinforcement; the status region is the confirmation. A
+    // screen reader must hear the copy from the region and never from here.
+    expect(chop).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("leaves the chop unstamped when the share fails", async () => {
+    const { container } = renderScreen({
+      dependencies: {
+        nativeShare: vi.fn().mockRejectedValue(new Error("cancelled")),
+        writeClipboard: vi.fn().mockResolvedValue(undefined),
+      },
+    });
+
+    await userEvent.click(screen.getByRole("button", { name: "Share" }));
+    await waitFor(() =>
+      expect(screen.getByRole("status")).toHaveTextContent("Could not share or copy the result."),
+    );
+
+    expect(container.querySelector(`.${styles.chop}`)).toBeNull();
   });
 });

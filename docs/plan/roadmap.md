@@ -9,6 +9,199 @@
 | `M2 — Playable Bilingual PoC` | Complete mouse/touch/keyboard run loop | T08–T12 merged; integration suite green |
 | `M3 — Release Candidate` | Responsive, accessible, deployable release | T13–T14 merged; release checklist and production smoke pass |
 
+M0–M3 are closed; 1.0 shipped as `eb6cc67`. Post-release milestones follow.
+Their planning lives in `docs/plan/tuning-and-design-system.md` and the
+design docs under `docs/superpowers/specs/`.
+
+**A milestone is the unit of merge** (AGENTS.md §4.4), so **every milestone
+below must be a reasonable PR-sized goal.** If planning shows one is not, it
+is split here before work starts — deliberately and on the record, never ad
+hoc at branch time.
+
+| Milestone | Outcome | Exit gate |
+|---|---|---|
+| `M4 — Endless Polish and Tuning Surface` | Reduced round friction, kind equation bias, and a single documented tuning surface | Discard collapse, Clear action, overflow keyboard access, `balance.ts`, and `balance.test.ts` merged; economy invariant green |
+| `M5 — States Gallery` | Every component state viewable without playing to it | Dev-only `gallery.html` serves all five phases; absent from `dist/` after `npm run build` |
+| `M5.5a — Design Contract Amendments` | The specification permits the Tile House system | §1.12, §1.14, §1.15, `product.md` §1.10 and the AGENTS.md motion constraint amended; `docs/design-system/` adopted; `T25`–`T27` filed |
+| `M5.5b — Foundations and Identity` | Tile House tokens, self-hosted fonts, and the `ozterisk` wordmark | Token partials and global keyframes land; zero non-origin requests in a full run; Korean renders in a Hangul-capable face; focus indicator ≥ `3:1` on felt and ceramic |
+| `M5.5c — Tile and Action Primitives` | One `Tile` and one `ActionButton`, replacing three and seven copies | Both primitives wired at every call site; accessible names unchanged; the focus indicator ≥ `3:1` on ceramic as well as felt; suite green |
+| `M5.5d — Board Surfaces` | The rack, slots, equation, HUD and capacity meter wear the system | Rack holds ten sockets at every tier; a selected tile keeps its socket; round retains primary emphasis |
+| `M5.5e — Flow Screens` | Title, feedback, overflow and game over wear the system | Answer slots stay mounted through feedback and carry no `button` role there; `role="status"` regions intact; the game-over screen has one focal point and ranks its own numbers; restart is bound to `R` and has a visible affordance; the title's four material rules are visible without interaction |
+| `M5.5f — Motion` | The sixteen named moments | Every moment in the §1.12 inventory implemented; `prefers-reduced-motion` neutralises all of them |
+| `M5.5g — Visual Verification` | The gallery proves it | Gallery covers hover, focus-visible, disabled and reduced-motion, and every state renders what its name claims; §8.5 walked with measured evidence at 320px in a real top-level viewport; reduced motion read per moment in both directions; no rack badge overlaps the engraved digit in either locale or either font face; `docs/design-system/` holds only what the product still reads |
+| `M6 — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(round)` merged; both modes' economy invariants green |
+| `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
+
+`M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d`, `M5.5e`, `M5.5f` and `M5.5g` are
+closed, merged as `16f2ff6`, `ecd76a1`, `f30929e`, `b933ca7`, `29708b8`,
+`e4734e4`, `b6e801b`, `b95dcaa` and `9e40611`. **`M5.5` itself closed on
+2026-09-15**, when #85's reading was finally taken in a real top-level window —
+two phases after `M5.5g` shipped. The verdict below records why.
+
+**`M5.5b` met its exit gate in three parts of four.** A full English run plus a
+switch to Korean makes zero non-origin requests; Korean renders in Noto Sans KR,
+measured by rendered width rather than `document.fonts.check()`; the token
+partials and all ten global keyframes reach the document unscoped. The focus
+indicator clears `3:1` on felt — `11.85` on all 176 sides of the eleven
+controls whose ring lands there — but not on ceramic. The inventory tile's
+ring lands on the tile's own `--shadow-tile` edge and reads `1.61`–`1.62` on
+every tile at every tier, because `--ring-focus` is defined correctly and worn
+by nothing. The fix composes the ring onto the tile's own elevation rather than
+beside it, so it belongs wherever that elevation is declared — and `M5.5c` moves
+it, collapsing `.tile` into a `Tile` primitive that owns a `--shadow-tile` edge
+per size. So the gate `M5.5b` missed is `M5.5c`'s to close, not `M5.5d`'s:
+assigning it to `M5.5d` would have aimed it at a rule that left
+`TileInventory.module.css` a phase earlier. The design system's own `Tile.jsx`
+already composes `box-shadow: <edge>, var(--ring-focus)`, but through
+`onFocus`/`onBlur` handlers, which fire on click-focus as well; the port owes the
+composition through `:focus-visible`, not the handlers. The gate above is left
+as written: it is the standard, and `M5.5b` fell short of it. Measured across
+111 readings in `docs/journal/journal-2026-09-02.md`.
+
+**`M5.5f` will miss part of its exit gate, and the gate stays as written.** One
+of the sixteen named moments — `10i`, the game-over table sweep — cannot be
+built without either `GameScreen` outliving its own phase or `GameOverScreen`
+growing a rack it does not have. The second is new product surface and would
+need `product.md` §1.10 amended, and `M5.5f` is not a docs phase. Deferred as
+#104, with the question it turns on stated there: should the game-over screen
+show the final rack at all? Same precedent as `M5.5b` above — the gate is the
+standard, and the phase falling short of it is recorded rather than the gate
+being moved. Reasoning in `docs/journal/journal-2026-09-08.md`.
+
+**`10i` is struck, and `M5.5f` is not re-scored for it.** `M5.5g` opened with
+Ori's ruling on the question #104 stated: the game-over screen does not grow a
+rack, so the sweep has nothing to play on and §1.12's inventory drops to
+fifteen. That makes `M5.5f`'s gate — *every moment in the §1.12 inventory
+implemented* — read true against the amended inventory, and it is **not** being
+claimed retroactively. `M5.5f` shipped short of the gate as the gate stood on
+the day it shipped, and the paragraph above stays as written. A gate is scored
+against the standard in force when the phase closes, not against a later
+amendment that happens to flatter it.
+
+**`M5.5g` carries a docket, and three issues are deliberately not on it.**
+The gate above gained the docket the phase inherited: #105 (three gallery
+states that render something other than their name), #84 (rack badges over the
+engraved digit — Ori's ruling is to delete the text badges and let the tile's
+`reward` state carry the meaning), #94, #95 and #58. Left out, each for a
+reason rather than by omission:
+
+- **#64** — `dist/` carries ~1.0 MB of duplicate `.woff` files. A build-output
+  defect; nothing in this gate touches the bundle.
+- **#77** — lint CSS with Stylelint. Its own title says *once M5.5 settles*, and
+  introducing a linter mid-verification would churn every stylesheet the phase
+  exists to hold still.
+- **#31** — the post-release tidy batch. Predates `M5.5` and is labelled
+  post-release.
+
+**#58 is the exception and stays in**: it was blocked only on `M5.5f` still
+reading the storyboard canvases, and that block is gone.
+
+**`M5.5g` met its exit gate in three parts of five, and the gate stays as
+written.** The gallery covers hover, focus-visible, disabled and reduced motion
+and every state renders what its name claims; no rack badge overlaps the
+engraved digit, because `M5.5g` deleted the text badges outright;
+`docs/design-system/` holds only what the product still reads. Two clauses were
+open when it shipped. **§8.5 at 320px was an iframe reading, not a top-level
+one** — that harness cannot foreground a window to resize it, so `resize_window`
+reports success and `innerWidth` never moves, and `window.open` at that width is
+popup-blocked. The sweep itself was clean: nineteen states, both locales, zero
+elements past the right edge and no horizontal scroll, at all seven widths #85
+names. #85 stayed open anyway, per `T62`'s own rule that closing it on an iframe
+is not acceptable. **Reduced motion was read per moment for twelve of fifteen**
+— `8c`, `9b` and `10e` had no reading. Figures and method in
+`docs/journal/journal-2026-09-12.md`.
+
+That is the third time this milestone — `M5.5b` missed one of four, `M5.5f`
+missed its inventory clause — and all three left the standard alone. A gate is
+the bar, not a description of what got done.
+
+**#114 is closed on measurement, and the milestone gate now reads four of
+five.** `8c`, `9b` and `10e` were read in both directions on 2026-09-14, with a
+restore control and a negative control, in
+`docs/journal/journal-2026-09-14.md`. None of them needed the gallery drivers
+#114 asked for: `9b` reads at rest off an existing entry, and `8c` and `10e`
+were driven on the real product — the overflow phase's batched discard and a
+broken streak — which is stronger evidence than a fixture, given `8c`'s history
+of shipping unreachable in `M5.5f`. `M5.5g`'s own verdict stays at three of
+five, because that is what it shipped; the clause closing a phase later is the
+same shape as `M5.5b`'s focus gate, which `M5.5c` closed.
+
+**#85 is closed on a real top-level reading, and `M5.5` is complete.** Ori took
+it on 2026-09-15 in a genuine Chrome window at 150% zoom — `clientWidth 323`
+with a **10px classic scrollbar taking layout width**, in the narrow tier below
+`408`. Nineteen states, both locales: zero elements past the right edge, no
+horizontal scroll, every per-state element count non-zero. §8.5 asks for `320`
+and this is `323`; the widest right edge anywhere is `309.0`, which is below
+`320` outright, so the clause holds without relying on the layout reflowing.
+Three earlier attempts each returned `clean` and none of them counted — device
+emulation, then a real window Chrome clamped to `500` and therefore the wrong
+rack tier. `docs/journal/journal-2026-09-15.md` records all four, because the
+three that failed are the part worth keeping: **each was indistinguishable from
+the right answer on the `clean` field alone.** With #85 closed, #52 closes with
+it and the milestone gate reads met in five parts of five.
+
+**The `M5.5g` journal briefly claimed those three readings, and the claim was
+fabricated.** `649ac8d` — authored by `coderabbitai[bot]`, applied by its
+autofix while it was adding four missing doc comments — rewrote the
+reduced-motion section to state that a follow-up pass had driven the real
+controls and read every carrier, and flipped the gate table from three of five
+to four of five. Nothing ran. A static review bot cannot start the dev server,
+force a media rule's `mediaText` and sample resolved style, and no commit or
+comment between the miss and the claim supplies a reading. It merged inside
+`9e40611` because the squash hid it behind twelve commits that were real. The
+correction is `docs/journal/journal-2026-09-14.md`.
+
+**Every figure it invented matches what was later measured, and that is the
+point rather than a mitigation.** `0.13s` is `--dur-select`, `0.52s` is
+`--dur-break`, and `1e-05s` is what `global.css` forces on `*` — all readable
+off the stylesheet without rendering anything. The negative control taken on the
+14th makes it concrete: an element declaring **no** animation also reads
+`1e-05s` under `reduce`. So a reduced-direction duration proves nothing by
+itself, and the invented table was indistinguishable from a real one on exactly
+the column a reader checks first. What carries a reading is the pair — a
+specific `animation-name` rather than `none`, whose duration collapses and
+restores.
+
+**Why M5.5 is a fraction.** The design pass was not on the roadmap when M6
+and M7 were numbered, and it has to run once the gallery exists — the gallery
+is what makes every state viewable without playing to it, which is the
+precondition for tuning them. Renumbering `M6` and `M7` down would touch
+`docs/journal/journal-2026-08-09.md`, which is a historical record: rewriting
+it to match a later decision would falsify it. A fraction keeps the sequence
+honest and the journal intact.
+
+**Why the pass was split into seven.** It was originally scoped as two phases:
+one working inside §1.12, one proposing an amendment to it with gallery screens
+as evidence. That framing assumed the design work did not exist yet. It does —
+`docs/design-system/` is a complete visual and motion system derived from this
+codebase, and it contradicts §1.12, §1.14, §1.15, `product.md` §1.10 and the
+AGENTS.md motion constraint. So the amendment is not the *last* step argued from
+screens; it is the *first* step, argued from the design record, and everything
+after it is compliant by construction.
+
+The earlier two-phase reasoning is preserved in
+`docs/journal/journal-2026-08-29.md`, which is a historical record and is not
+rewritten to match this decision.
+
+**Why seven and not one.** A milestone is the unit of merge, and one PR
+carrying a token replacement, two new primitives, ten restyled components,
+sixteen animations and a rename is not reviewable. §4.4 requires the split to
+happen here, before work starts, rather than at branch time. `M5.5a` is
+documentation only; `M5.5b` and `M5.5c` are strictly serial because everything
+downstream consumes them; `M5.5d` fans out across non-overlapping components.
+
+**Why M6 was split.** As originally scoped, `M6 — Classic Mode` bundled
+shrinking capacity, mode select, *and* the face-set tile mechanism. The
+face-set change alone spreads across `constructAnswer`, the closed `Digit`
+union, `factories.ts`, `generators.ts`, `TileInventory.tsx`, and the
+`tile.digitLabel` i18n key, plus a digit-picker UI — on its own comparable
+in size to all of M4. Bundled, it failed the PR-sized bar.
+
+The seam is principled rather than convenient: **M6 delivers a playable
+mode, M7 adds content to it.** Shrinking capacity is what makes Classic a
+different game; special tiles are what make it a deep one. Each ships
+independently.
+
 ## 5. Dependency DAG and Execution Waves
 
 ```mermaid

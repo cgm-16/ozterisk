@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { START_LABEL } from "./labels.js";
 
 /* §8.5 — "No horizontal scroll at 320px" — walked across every gallery state in
    both locales.
@@ -26,11 +27,6 @@ const CONTENT_WIDTHS = [305, 320, 407] as const;
 const LOCALES = ["en", "ko"] as const;
 const NARROW_TIER_MAX = 407;
 const STATE_COUNT = 19;
-
-/* `action.start` in both locales. Pinned here because the arena sweep below
-   has to reach `answering`, and the accessible name is the only stable handle
-   on that control. */
-const START_LABEL = { en: "Start Run", ko: "게임 시작" } as const;
 
 interface StateReading {
   state: string;

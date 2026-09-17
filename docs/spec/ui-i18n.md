@@ -20,20 +20,32 @@ section wins.
   grid never resizes as tiles are lost, because the empty sockets are the score.
 - Rack sizing has three tiers: below `408px`, tiles are `52 × 64` with an `8px` gap;
   from `408px`, `66 × 64` with a `12px` gap; from `48rem`, `64 × 80` with a `12px`
-  gap. Every tier must satisfy the `44 × 44` target minimum and the `320px`
-  no-horizontal-scroll rule below. A tier's rack width — five tiles plus four gaps
-  — must also leave room for the arena's horizontal padding at that tier's lower
-  bound. The arena spends `24px` of that width on its own padding below `40rem`, so
-  the narrow tier needs `292px` of `296px` and the middle tier needs `378px` of the
-  `384px` a `408px` viewport leaves. (The design document draws this tier at `390px`.
-  The boundary is `408px` rather than the `402px` the arithmetic bottoms out at, for a
-  little slack; it stays below `412px` so that phone tier keeps the larger tile.)
-- **These boundaries assume no vertical scrollbar.** A `min-width` query matches the
-  scrollbar-*inclusive* viewport while the content box excludes it, so wherever
-  scrollbars take layout width every tier fires about `15px` early and the rack asks
-  for more room than it has. No choice of boundary corrects this — the same query
-  answers both cases identically — so the rule above is necessary and not sufficient.
-  Making the rack fit its container rather than the viewport is tracked separately.
+  gap. A tier's rack width — five tiles plus four gaps — must leave room for the
+  arena's horizontal padding at that tier's lower bound. The arena spends `24px` of
+  that width on its own padding below `40rem`, so the narrow tier needs `292px` of
+  `296px` and the middle tier needs `378px` of the `384px` a `408px` viewport leaves.
+  (The design document draws this tier at `390px`. The boundary is `408px` rather
+  than the `402px` the arithmetic bottoms out at, for a little slack; it stays below
+  `412px` so that phone tier keeps the larger tile.)
+- **A tier's figures are the tile's maximum size, not a fixed size.** The rack is
+  sized from its container rather than from the viewport, and scales down toward the
+  `44 × 44` target minimum when the container is narrower than the tier's natural
+  width. At every width where the tier already fits, the rendered size is exactly the
+  figure above.
+- **The target minimum is a floor, and it outranks the layout.** A tile is a control,
+  so below the content width where five tiles at `44` plus their gaps no longer fit —
+  about `276px` once the arena's padding is counted — the rack stops shrinking and the
+  page scrolls instead. The `320px` rule below is silent under `320px`, while the
+  target minimum has no lower bound, so that is the order they resolve in. Browser
+  zoom is the realistic way to reach those widths, and a reader at high zoom is
+  exactly who the minimum protects.
+- **This is what the `320px` no-horizontal-scroll rule requires, because a boundary
+  cannot carry it.** A `min-width` query matches the scrollbar-*inclusive* viewport
+  while the content box excludes it, so wherever scrollbars take layout width every
+  tier fires about `15px` early and the tier's natural width exceeds the room
+  available. No choice of boundary corrects this — the same query answers both cases
+  identically. Scaling within the tier does, and the target minimum bounds how far:
+  at the `320px` gate with a `15px` scrollbar the tiles land near `50 × 64`.
 
 **Material and colour**
 

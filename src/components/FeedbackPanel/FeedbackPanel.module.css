@@ -39,6 +39,14 @@
   color: var(--state-incorrect);
 }
 
+/* §1.14's result.rewards. Gold rather than the caption grey .submitted takes,
+   so the line groups with the arrivals it counts. Same pair the badge below
+   measures at 7.87:1 on --surface-surround, and this line is body size rather
+   than 11px, so it clears its 4.5:1 floor with more room than the badge does. */
+.rewardSummary {
+  color: var(--state-reward);
+}
+
 .rewards {
   display: flex;
   flex-wrap: wrap;
@@ -63,7 +71,9 @@
    tile, not over the ceramic. The rack draws no badge at all — its text
    labels overlapped the engraved digit and were deleted (#84), leaving the
    tile's own reward state to carry the cue. This panel keeps its badge
-   because a panel has room for the words a 52px cell does not. */
+   because a panel has room for the words a 52px cell does not. It is read by
+   eye only: .rewardSummary states the count for the live region, and the list
+   is aria-hidden so the badge is not announced once per arrival. */
 .rewardBadge {
   font-size: var(--size-label);
   text-transform: uppercase;

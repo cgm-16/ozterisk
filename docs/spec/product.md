@@ -196,7 +196,7 @@ as a submitted round.
 | `answering` | `0`–`9` | Select first available matching tile if a slot is empty |
 | `answering` | `Backspace` | Return most recently selected answer tile |
 | `answering` | `Escape` | Return every selected tile at once; no-op at zero selection |
-| `answering` | `Enter` | Submit only if all answer slots are filled |
+| `answering` | `Enter` | Submit only if all answer slots are filled; a focused button retains normal browser behavior |
 | `overflow` | `0`–`9` | Mark the first matching tile not already marked; at a required count of one this also completes the discard |
 | `overflow` | `Enter` | Confirm only if exactly the excess number is selected. Unreachable in Endless, which always overflows by one and so completes on marking |
 | `feedback` | `Enter` | Draw and advance to the next equation |
@@ -205,6 +205,9 @@ as a submitted round.
 | `title` | `Enter` | No global shortcut; the focused **Start Run** button retains normal browser behavior |
 
 Disabled keyboard actions are no-ops. Language changes are available in every phase and never reset game state.
+
+In every phase a focused button retains normal browser behavior, and the global
+shortcut bound to that key stands aside for it.
 
 `gameOver` restarts on `R` rather than `Enter` because `Enter` cannot be made
 safe there. A player advancing a run by keyboard — Submit, `Enter`, Submit,
@@ -216,6 +219,15 @@ document fixes a different failure. `Enter` on the language toggle, which render
 buttons and is present in this phase, also restarted the run and discarded the
 language change — contradicting the line above. `R` activates no button, so it
 needs no focus guard.
+
+The two failures are different, which is why the phases take different rules. On
+`gameOver` the stray `Enter` arrives with focus on `BODY`, so no focus guard can
+see it and the key itself has to change. In `answering`, `feedback` and
+`overflow` a shortcut and a focused control compete for one key, and standing
+aside is the whole fix: every control that wins the key reaches the same action
+through its own activation. Without it, `Enter` on a focused **Clear** submitted
+the answer rather than clearing it, spending tiles that submission does not give
+back.
 
 ### 1.17 Explicitly out of scope
 

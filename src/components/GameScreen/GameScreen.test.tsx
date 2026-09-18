@@ -252,12 +252,12 @@ describe("GameScreen interactions", () => {
   });
 
   // Regression coverage: the phase action button (Next Round / Confirm
-  // Discard) is a real focusable <button>. Enter on a focused button
-  // natively triggers a click, so if the keyboard hook's Enter handling
-  // didn't preventDefault() the keydown, the browser's own click-on-Enter
-  // activation would fire the same callback a second time. This locks in
-  // that the hook's dispatch/callback and the button's own onClick collapse
-  // into exactly one call.
+  // Discard / Submit) is a real focusable <button>, and Enter on a focused
+  // button natively triggers a click. The shortcut and the button agree on
+  // these three, so both mechanisms give the right answer and only the count
+  // can be wrong. The hook stands aside for a focused control, leaving the
+  // button's own activation as the single path to the callback; these lock
+  // in that it is a single path, whichever side of the guard it runs on.
   describe("Enter does not double-fire when the phase action button has focus", () => {
     it("calls onNextRound exactly once with Next Round focused", async () => {
       const equation = makeEquation(3, 3);
@@ -301,9 +301,46 @@ describe("GameScreen interactions", () => {
       expect(onSubmit).toHaveBeenCalledTimes(1);
     });
   });
+
+  // The mirror of the block above: there the shortcut and the focused button
+  // agree, so either mechanism gives the right answer. Clear is the control
+  // they disagree on. Enter reached the window listener, preventDefault()
+  // suppressed the button's own activation, and the answer submitted instead
+  // of clearing — spending the tiles the player was trying to take back,
+  // with no undo.
+  describe("Enter defers to a focused control the shortcut does not stand in for", () => {
+    it("clears instead of submitting with Clear focused", async () => {
+      // Both conditions hold together by construction: Clear is enabled
+      // whenever a tile is selected, and a full set of slots implies that.
+      const equation = makeEquation(7, 8);
+      const state = makeAnsweringState(equation, {
+        inventory: [],
+        selectedTiles: [makeTile(5, "a"), makeTile(6, "b")],
+      });
+      const { dispatch, onSubmit } = renderScreen(state);
+
+      screen.getByRole("button", { name: "Clear" }).focus();
+      await userEvent.keyboard("{Enter}");
+
+      expect(dispatch).toHaveBeenCalledWith({ type: "CLEAR_SELECTION" });
+      expect(onSubmit).not.toHaveBeenCalled();
+    });
+  });
 });
 
 describe("GameScreen phase composition", () => {
+  // The other half of §1.10's claim that gameOver is the only phase to print
+  // the product: printing it here hands the player the answer they are being
+  // asked for.
+  it("does not print the product while the round is live", () => {
+    const equation = makeEquation(3, 4); // product 12
+    const state = makeAnsweringState(equation, { inventory: [makeTile(1, "a")] });
+    renderScreen(state);
+
+    expect(screen.getByText("3 × 4 =")).toBeInTheDocument();
+    expect(screen.queryByText("12")).not.toBeInTheDocument();
+  });
+
   it("orders HUD, equation, Submit, and inventory for the answering phase", () => {
     const equation = makeEquation(3, 4);
     const state = makeAnsweringState(equation, { inventory: [makeTile(1, "a")] });

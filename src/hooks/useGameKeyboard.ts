@@ -4,6 +4,11 @@ import { getAnswerLength, getOverflowCount, isDiscardReady, isSubmissionReady } 
 
 const DIGIT_KEY_PATTERN = /^[0-9]$/;
 
+// Controls the browser activates on Enter by itself. This is a property of
+// HTML rather than of this screen's current markup, so it names the whole set
+// and not only the buttons that happen to be mounted today.
+const ENTER_ACTIVATES = "a[href], button, input, select, textarea";
+
 export interface UseGameKeyboardArgs {
   state: GameState;
   dispatch: React.Dispatch<GameAction>;
@@ -21,6 +26,16 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
     function handleKeyDown(event: KeyboardEvent) {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       if (event.key === "Enter" && event.repeat) return;
+      // §1.11 already states this rule for gameOver and title: a focused
+      // button keeps normal browser behavior and the global shortcut stands
+      // aside. `answering` is where leaving it unstated cost the player
+      // tiles — Enter on a focused Clear reached this listener, and
+      // preventDefault() below suppressed the button's own activation, so
+      // CLEAR_SELECTION never dispatched and the answer submitted instead.
+      // Standing aside changes the mechanism, not the outcome: every control
+      // this defers to reaches the same callback through its own onClick.
+      if (event.key === "Enter" && event.target instanceof Element && event.target.matches(ENTER_ACTIVATES))
+        return;
 
       if (state.phase === "answering") {
         if (DIGIT_KEY_PATTERN.test(event.key)) {

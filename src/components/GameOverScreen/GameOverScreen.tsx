@@ -48,7 +48,7 @@ export function GameOverScreen({
   return (
     <main className={styles.screen}>
       <div className={styles.terminal}>
-        <EquationBoard equation={equation} />
+        <EquationBoard equation={equation} showProduct />
         {/* §1.8 keeps the terminal equation on screen to explain the loss, but
             the equation alone reads as a live prompt. The reason sits with the
             equation rather than inside the results block, so it defuses the

@@ -45,6 +45,21 @@ describe("GameOverScreen", () => {
     expect(within(main).getByText("Not enough tiles left to answer.")).toBeInTheDocument();
   });
 
+  // §1.10: gameOver is the only phase that prints the product. During play
+  // the answer slots complete the equation, and a run that ends on "not
+  // enough tiles left to answer" never reaches feedback — so without this
+  // the player is shown an equation whose answer they were never told.
+  it("prints the product of the terminal equation", () => {
+    renderScreen({ equation: makeEquation(7, 8) });
+
+    const main = screen.getByRole("main");
+    expect(within(main).getByText("56")).toBeInTheDocument();
+    // The equation text keeps an element of its own: this suite and
+    // App.test.tsx both pin it by exact text, and a product absorbed into
+    // that element would match neither.
+    expect(within(main).getByText("7 × 8 =")).toBeInTheDocument();
+  });
+
   it("shows the run statistics", () => {
     renderScreen();
     expect(screen.getByRole("heading", { name: "Game Over" })).toBeInTheDocument();

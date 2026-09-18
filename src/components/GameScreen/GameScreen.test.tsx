@@ -329,6 +329,18 @@ describe("GameScreen interactions", () => {
 });
 
 describe("GameScreen phase composition", () => {
+  // The other half of §1.10's claim that gameOver is the only phase to print
+  // the product: printing it here hands the player the answer they are being
+  // asked for.
+  it("does not print the product while the round is live", () => {
+    const equation = makeEquation(3, 4); // product 12
+    const state = makeAnsweringState(equation, { inventory: [makeTile(1, "a")] });
+    renderScreen(state);
+
+    expect(screen.getByText("3 × 4 =")).toBeInTheDocument();
+    expect(screen.queryByText("12")).not.toBeInTheDocument();
+  });
+
   it("orders HUD, equation, Submit, and inventory for the answering phase", () => {
     const equation = makeEquation(3, 4);
     const state = makeAnsweringState(equation, { inventory: [makeTile(1, "a")] });

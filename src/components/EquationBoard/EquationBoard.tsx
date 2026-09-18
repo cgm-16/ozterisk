@@ -4,9 +4,13 @@ import styles from "./EquationBoard.module.css";
 
 export interface EquationBoardProps {
   equation: Equation;
+  /** §1.10: `gameOver` prints the product and no other phase does. During
+   * play the answer slots are what completes the equation, so printing it
+   * there would hand the player the answer being asked for. */
+  showProduct?: boolean;
 }
 
-export function EquationBoard({ equation }: EquationBoardProps) {
+export function EquationBoard({ equation, showProduct = false }: EquationBoardProps) {
   // 10b fires once per arriving equation, and only a fresh element restarts a
   // CSS animation — EquationBoard stays mounted across a round change, so the
   // rise has to come from a key that changes when the equation does.
@@ -26,9 +30,22 @@ export function EquationBoard({ equation }: EquationBoardProps) {
     setArrivals({ equation, count: arrivals.count + 1 });
   }
 
+  const statement = `${equation.left} × ${equation.right} =`;
+
   return (
     <p key={arrivals.count} className={styles.equation}>
-      {equation.left} × {equation.right} =
+      {showProduct ? (
+        // The equation keeps an element of its own so it stays addressable as
+        // one string, while the paragraph still reads as the whole statement
+        // to a screen reader. The split appears only alongside a product:
+        // splitting with nothing after it would leave the paragraph and the
+        // span carrying identical text and neither one distinguishable.
+        <>
+          <span>{statement}</span> <span>{equation.product}</span>
+        </>
+      ) : (
+        statement
+      )}
     </p>
   );
 }

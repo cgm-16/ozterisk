@@ -133,7 +133,7 @@
 
 .summaryLabel {
   cursor: pointer;
-  font-weight: 600;
+  font-weight: var(--weight-bold);
   min-height: var(--target-min);
   padding-block: var(--space-2);
 }

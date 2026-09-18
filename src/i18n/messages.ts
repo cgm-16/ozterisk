@@ -58,6 +58,7 @@ const en = {
     incorrect: "Incorrect",
     submitted: "Your answer: {value}",
     answer: "Correct answer: {value}",
+    rewards: "Received {count} tiles",
   },
   overflow: {
     instruction: "Choose {count} tile(s) to discard.",
@@ -130,6 +131,7 @@ const ko = {
     incorrect: "오답",
     submitted: "제출한 답: {value}",
     answer: "정답: {value}",
+    rewards: "타일 {count}개 획득",
   },
   overflow: {
     instruction: "버릴 타일 {count}개를 선택하세요.",

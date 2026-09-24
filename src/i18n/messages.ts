@@ -72,6 +72,8 @@ const en = {
   gameOver: {
     title: "Game Over",
     reason: "Not enough tiles left to answer.",
+    winTitle: "Run Complete",
+    winReason: "You reached the floor with tiles in hand.",
     rounds: "Rounds played",
     longestStreak: "Longest streak",
     restartHint: "Press R to play again",
@@ -151,6 +153,8 @@ const ko = {
   gameOver: {
     title: "게임 종료",
     reason: "답을 만들 타일이 부족합니다.",
+    winTitle: "완주",
+    winReason: "타일을 남긴 채 바닥에 도달했습니다.",
     rounds: "진행한 라운드",
     longestStreak: "최장 연속 정답",
     restartHint: "R 키를 눌러 다시 하기",

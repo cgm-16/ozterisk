@@ -48,14 +48,16 @@ export function GameOverScreen({
   return (
     <main className={styles.screen}>
       <div className={styles.terminal}>
-        <EquationBoard equation={equation} showProduct />
+        {/* A Classic win shows no equation: the one drawn after it was never
+            answered, and nothing needs explaining — the run is complete. */}
+        {!stats.won && <EquationBoard equation={equation} showProduct />}
         {/* §1.8 keeps the terminal equation on screen to explain the loss, but
             the equation alone reads as a live prompt. The reason sits with the
             equation rather than inside the results block, so it defuses the
             thing it explains. */}
-        <p className={styles.reason}>{t("gameOver.reason")}</p>
+        <p className={styles.reason}>{t(stats.won ? "gameOver.winReason" : "gameOver.reason")}</p>
       </div>
-      <h1 className={styles.title}>{t("gameOver.title")}</h1>
+      <h1 className={styles.title}>{t(stats.won ? "gameOver.winTitle" : "gameOver.title")}</h1>
       <dl className={styles.stats}>
         <div className={styles.entry}>
           <dt>{t("gameOver.rounds")}</dt>

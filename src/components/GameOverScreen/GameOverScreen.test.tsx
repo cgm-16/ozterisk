@@ -8,7 +8,7 @@ import { LanguageToggle } from "../LanguageToggle/LanguageToggle";
 import { GameOverScreen, type GameOverScreenProps } from "./GameOverScreen";
 import styles from "./GameOverScreen.module.css";
 
-const STATS = { score: 7, totalRounds: 9, longestStreak: 4 };
+const STATS = { mode: "endless", won: false, score: 7, totalRounds: 9, longestStreak: 4 } as const;
 const EQUATION = makeEquation(2, 3);
 const URL = "https://example.test/";
 const EN_TEXT =
@@ -37,6 +37,22 @@ function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
 }
 
 describe("GameOverScreen", () => {
+  // §1.10: a Classic win is complete, not stopped, so it names itself and
+  // shows no equation — the one drawn after the win was never answered.
+  it("states Run Complete and its reason on a Classic win, with no equation", () => {
+    renderScreen({ stats: { ...STATS, mode: "classic", won: true } });
+    expect(screen.getByRole("heading", { name: "Run Complete" })).toBeInTheDocument();
+    expect(screen.getByText("You reached the floor with tiles in hand.")).toBeInTheDocument();
+    expect(screen.queryByText("Game Over")).not.toBeInTheDocument();
+    expect(screen.queryByText("2 × 3 =", { exact: false })).not.toBeInTheDocument();
+  });
+
+  it("renders a Classic loss like an Endless one", () => {
+    renderScreen({ stats: { ...STATS, mode: "classic", won: false } });
+    expect(screen.getByRole("heading", { name: "Game Over" })).toBeInTheDocument();
+    expect(screen.getByText("Not enough tiles left to answer.")).toBeInTheDocument();
+  });
+
   it("renders the terminal equation and its reason inside the main landmark", () => {
     renderScreen({ equation: makeEquation(7, 8) });
 

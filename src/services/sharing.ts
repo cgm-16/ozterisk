@@ -1,16 +1,28 @@
-import type { Language } from "../game/types";
+import type { GameMode, Language } from "../game/types";
 
 export interface ShareStats {
+  mode: GameMode;
+  /** A Classic run that reached the floor. Always false in Endless. */
+  won: boolean;
   score: number;
   totalRounds: number;
   longestStreak: number;
 }
 
+// §1.15: Classic names its mode and outcome ahead of the rounds; Endless's
+// first line is unchanged.
+function shareHeading(stats: ShareStats, language: Language): string {
+  if (stats.mode === "endless") return "ozterisk";
+  if (language === "ko") return `ozterisk 클래식 — ${stats.won ? "완주" : "게임 종료"}`;
+  return `ozterisk Classic — ${stats.won ? "Run Complete" : "Game Over"}`;
+}
+
 export function formatShareText(stats: ShareStats, language: Language, url: string): string {
+  const heading = shareHeading(stats, language);
   if (language === "ko") {
-    return `ozterisk — 라운드: ${stats.totalRounds}\n점수: ${stats.score}\n최장 연속 정답: ${stats.longestStreak}\n\n이 기록을 넘을 수 있나요?\n${url}`;
+    return `${heading} — 라운드: ${stats.totalRounds}\n점수: ${stats.score}\n최장 연속 정답: ${stats.longestStreak}\n\n이 기록을 넘을 수 있나요?\n${url}`;
   }
-  return `ozterisk — Rounds: ${stats.totalRounds}\nScore: ${stats.score}\nLongest streak: ${stats.longestStreak}\n\nCan you beat it?\n${url}`;
+  return `${heading} — Rounds: ${stats.totalRounds}\nScore: ${stats.score}\nLongest streak: ${stats.longestStreak}\n\nCan you beat it?\n${url}`;
 }
 
 export interface ShareDependencies {

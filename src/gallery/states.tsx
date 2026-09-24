@@ -5,6 +5,7 @@ import { LanguageToggle } from "../components/LanguageToggle/LanguageToggle";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { sortTiles } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
+import { isClassicWin } from "../game/selectors";
 import type { GamePhase, GameState, Tile } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
 import {
@@ -44,7 +45,13 @@ function renderGameOverScreen(state: GameState, dependencies: ShareDependencies)
   return (
     <GameOverScreen
       equation={state.equation}
-      stats={{ score: state.score, totalRounds: state.totalRounds, longestStreak: state.longestStreak }}
+      stats={{
+        mode: state.mode,
+        won: isClassicWin(state),
+        score: state.score,
+        totalRounds: state.totalRounds,
+        longestStreak: state.longestStreak,
+      }}
       url="https://example.test/"
       dependencies={dependencies}
       onPlayAgain={noop}

@@ -12,6 +12,7 @@ const tile = (digit: Tile["digit"], id: string, isNew = false): Tile => ({ id, d
 /** Renders the rack with stable callbacks and exposes a same-tree rerender helper. */
 function renderInventory(overrides: Partial<TileInventoryProps> = {}) {
   const onTile = vi.fn();
+  const onSettled = vi.fn();
   const inventory = (props: Partial<TileInventoryProps>) => (
     <I18nProvider initialLanguage="en">
       <TileInventory
@@ -19,7 +20,9 @@ function renderInventory(overrides: Partial<TileInventoryProps> = {}) {
         mode="select"
         pendingDiscards={[]}
         liftedIds={[]}
+        capacity={INVENTORY_CAPACITY}
         onTile={onTile}
+        onSettled={onSettled}
         {...props}
       />
     </I18nProvider>
@@ -27,6 +30,7 @@ function renderInventory(overrides: Partial<TileInventoryProps> = {}) {
   const result = render(inventory(overrides));
   return {
     onTile,
+    onSettled,
     container: result.container,
     // The rack holds a departing tile across a props change, so the moments
     // that outlive one render can only be read by re-rendering the same tree.
@@ -62,6 +66,15 @@ function animationOn(cell: HTMLElement): string {
 function endAnimation(cell: HTMLElement): void {
   fireEvent.animationEnd(cell);
   fireEvent(cell, new Event("webkitAnimationEnd", { bubbles: true }));
+}
+
+// Ten seated tiles and one on the rail, as the reducer leaves an Endless
+// overflow: sorted seats, the newest arrival past capacity.
+function railedRack(): Tile[] {
+  return [
+    ...Array.from({ length: 10 }, (_, index) => tile((index % 10) as Tile["digit"], `s${index}`)),
+    tile(7, "rail", true),
+  ];
 }
 
 describe("TileInventory", () => {
@@ -320,5 +333,81 @@ describe("TileInventory", () => {
     const { container, rerender } = renderInventory({ tiles });
     rerender({ tiles: [tiles[0]] });
     expect(cells(container)[1].textContent).toBe("");
+  });
+
+  it("sizes the rack by the capacity it is given, and rim-rejects the first cell past it", () => {
+    const twenty = Array.from({ length: 20 }, (_, index) => tile((index % 10) as Tile["digit"], `t${index}`));
+    const { container } = renderInventory({ tiles: twenty, capacity: 19 });
+    expect(cellCount(container)).toBe(20);
+    expect(animationOn(cells(container)[19])).toBe("oz-rim-reject");
+    expect(animationOn(cells(container)[10])).toBe("none");
+    cleanup();
+
+    const { container: sparse } = renderInventory({ tiles: [tile(1, "a")], capacity: 19 });
+    expect(cellCount(sparse)).toBe(19);
+  });
+
+  // The reducer seats a surviving rail tile in the freed socket in the same
+  // action that drops the discarded one. Splicing the departing tile back in
+  // would shove every later tile one cell over; the rack instead keeps
+  // drawing the hand as it stood until the departure has played.
+  it("draws the pre-discard hand while a seated tile departs, then the reducer's", () => {
+    const before = railedRack();
+    const after = [...before.slice(0, 10)];
+    after[4] = before[10]!;
+    const { container, rerender } = renderInventory({ tiles: before, mode: "discard" });
+    rerender({ tiles: after, mode: "readOnly" });
+
+    expect(cells(container)[4].textContent).toBe("4");
+    expect(cells(container)[5].textContent).toBe("5");
+    expect(cells(container)[10].textContent).toBe("7");
+
+    endAnimation(cells(container)[4]);
+    expect(cellCount(container)).toBe(10);
+    expect(cells(container)[4].textContent).toBe("7");
+    expect(cells(container)[5].textContent).toBe("5");
+  });
+
+  it("settles once, when the last of two departing tiles has played", () => {
+    const before = [...railedRack(), tile(8, "rail-2", true)];
+    const after = [...before.slice(0, 10)];
+    after[2] = before[10]!;
+    after[6] = before[11]!;
+    const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
+    rerender({ tiles: after, mode: "readOnly" });
+
+    endAnimation(cells(container)[2]);
+    expect(onSettled).not.toHaveBeenCalled();
+    endAnimation(cells(container)[6]);
+    expect(onSettled).toHaveBeenCalledTimes(1);
+  });
+
+  it("settles when the rail tile itself is the one discarded", () => {
+    const before = railedRack();
+    const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
+    rerender({ tiles: before.slice(0, 10), mode: "readOnly" });
+
+    endAnimation(cells(container)[10]);
+    expect(onSettled).toHaveBeenCalledTimes(1);
+    expect(cellCount(container)).toBe(10);
+  });
+
+  // With Next Round gone after a discard, a departure that never reports its
+  // end would freeze the run. A cancelled animation still ends the departure.
+  it("settles on animationcancel as well as animationend", () => {
+    const before = railedRack();
+    const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
+    rerender({ tiles: before.slice(0, 10), mode: "readOnly" });
+
+    // React has no onAnimationCancel, so the rack listens natively.
+    fireEvent(cells(container)[10], new Event("animationcancel", { bubbles: true }));
+    expect(onSettled).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not settle for a tile that leaves the rack by submission", () => {
+    const tiles = [tile(1, "a"), tile(2, "b")];
+    const { rerender, onSettled } = renderInventory({ tiles });
+    rerender({ tiles: [tiles[0]] });
+    expect(onSettled).not.toHaveBeenCalled();
   });
 });

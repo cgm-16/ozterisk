@@ -90,7 +90,8 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
       }
 
       if (state.phase === "feedback") {
-        if (event.key === "Enter") {
+        // After a discard the round advances on its own (§1.11).
+        if (event.key === "Enter" && !state.lastResult?.discarded) {
           event.preventDefault();
           onNextRound();
         }

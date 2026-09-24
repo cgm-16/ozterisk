@@ -2,6 +2,7 @@ import { sortTiles } from "../../game/factories";
 import type { GameAction, GameState } from "../../game/types";
 import {
   getAnswerLength,
+  getCapacity,
   getOverflowCount,
   isSubmissionReady,
 } from "../../game/selectors";
@@ -90,7 +91,9 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         </div>
       )}
 
-      {state.phase === "feedback" && (
+      {/* After a discard the round advances on its own once the rack has
+          settled (§1.7), so there is nothing to press. */}
+      {state.phase === "feedback" && !lastResult?.discarded && (
         <ActionButton onClick={onNextRound}>{t("action.next")}</ActionButton>
       )}
 
@@ -99,10 +102,21 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
       )}
 
       <TileInventory
-        tiles={sortTiles([...state.inventory, ...state.selectedTiles])}
+        // Only answering re-sorts, to keep lifted tiles in their sockets; every
+        // other phase draws the reducer's order, which perches the newest
+        // arrivals past capacity (§1.5 step 7).
+        tiles={
+          state.phase === "answering"
+            ? sortTiles([...state.inventory, ...state.selectedTiles])
+            : state.inventory
+        }
         liftedIds={state.selectedTiles.map((tile) => tile.id)}
+        capacity={getCapacity(state.mode, state.totalRounds)}
         mode={state.phase === "answering" ? "select" : state.phase === "overflow" ? "discard" : "readOnly"}
         pendingDiscards={state.pendingDiscards}
+        onSettled={() => {
+          if (state.phase === "feedback" && lastResult?.discarded) onNextRound();
+        }}
         onTile={(tileId) => {
           if (state.phase === "answering") dispatch({ type: "SELECT_TILE", tileId });
           // The mark that reaches the required count completes the discard in the

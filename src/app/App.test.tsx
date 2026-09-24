@@ -60,6 +60,16 @@ function renderApp(
 // GameHud and GameOverScreen both render <dt>label</dt><dd>value</dd> pairs;
 // only one of those screens is ever mounted at a time, so the label text is
 // unambiguous. Digit tiles show plain digit text, never these labels.
+// Plays out a discard's 8c exit. jsdom runs no animations, so the rack's
+// departing tiles are ended by hand, on both event names React may bind
+// (see TileInventory.test's endAnimation).
+function finishDeparture(): void {
+  for (const cell of document.querySelectorAll("[data-departing]")) {
+    fireEvent.animationEnd(cell);
+    fireEvent(cell, new Event("webkitAnimationEnd", { bubbles: true }));
+  }
+}
+
 function hudField(label: string): string | null {
   return screen.getByText(label).nextElementSibling?.textContent ?? null;
 }
@@ -151,7 +161,7 @@ describe("App", () => {
     expect(roundFontSize).toBeGreaterThan(scoreFontSize);
   });
 
-  it("resolves a correct answer through reward, overflow, exact discard, and Next Round", async () => {
+  it("resolves a correct answer through reward, overflow, and an exact discard that advances the round on its own", async () => {
     const user = userEvent.setup();
     const randomValues = [
       ...equationSamples(2, 3), // round 1: product 6, one answer slot
@@ -183,7 +193,10 @@ describe("App", () => {
     expect(screen.getByRole("button", { name: "Digit 0, New tile" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Digit 1, New tile" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    // No Next Round after a discard (§1.7): the round advances once the
+    // departing tile has played.
+    expect(screen.queryByRole("button", { name: "Next Round" })).not.toBeInTheDocument();
+    finishDeparture();
 
     expect(screen.getByText("4 × 5 =")).toBeInTheDocument();
     expect(hudField("Round")).toBe("2");
@@ -208,7 +221,7 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Digit 6" }));
     await user.click(screen.getByRole("button", { name: "Submit" }));
     await user.click(screen.getByRole("button", { name: "Digit 9" })); // completes the forced single discard
-    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    finishDeparture(); // and the round advances on its own
 
     expect(hudField("Streak")).toBe("1");
 
@@ -418,7 +431,7 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Digit 9" })); // completes the forced single discard
     expect(calls).toBe(5); // completing the discard draws no randomness
 
-    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    finishDeparture(); // the discard settles and the round advances on its own
     expect(calls).toBe(8); // NEXT_ROUND: one more equation draw (gate + pair + order)
   });
 });

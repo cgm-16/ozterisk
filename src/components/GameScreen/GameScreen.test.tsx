@@ -621,3 +621,53 @@ describe("GameScreen capacity meter", () => {
     expect(screen.getByRole("img", { name: "Capacity 8 of 10" })).toBeInTheDocument();
   });
 });
+
+describe("GameScreen after a discard", () => {
+  const discardedFeedback = (inventory = makeOverflowInventory(10)) => {
+    const state = makeFeedbackState(makeEquation(3, 3), { inventory });
+    return { ...state, lastResult: { ...state.lastResult!, discarded: true } };
+  };
+
+  it("renders no Next Round, because the round advances on its own (§1.7)", () => {
+    renderScreen(discardedFeedback());
+    expect(screen.queryByRole("button", { name: "Next Round" })).not.toBeInTheDocument();
+  });
+
+  it("leaves Enter inert while the discard settles", async () => {
+    const { onNextRound } = renderScreen(discardedFeedback());
+    await userEvent.keyboard("{Enter}");
+    expect(onNextRound).not.toHaveBeenCalled();
+  });
+
+  it("advances to the next round once the departing tile has played", () => {
+    const overflow = makeOverflowState(makeEquation(3, 3));
+    const onNextRound = vi.fn();
+    const screenFor = (state: GameState) => (
+      <I18nProvider initialLanguage="en">
+        <GameScreen state={state} dispatch={vi.fn()} onSubmit={vi.fn()} onNextRound={onNextRound} />
+      </I18nProvider>
+    );
+    const { container, rerender } = render(screenFor(overflow));
+    const gone = overflow.inventory[10]!;
+    rerender(screenFor(discardedFeedback(overflow.inventory.filter((tile) => tile !== gone))));
+
+    const departing = container.querySelector(`[data-departing="${gone.id}"]`)!;
+    expect(onNextRound).not.toHaveBeenCalled();
+    fireEvent.animationEnd(departing);
+    fireEvent(departing, new Event("webkitAnimationEnd", { bubbles: true }));
+    expect(onNextRound).toHaveBeenCalledTimes(1);
+  });
+
+  it("draws the rack in the reducer's order outside answering, so the newest arrival stays on the rail", () => {
+    // The reducer leaves the newest arrival past capacity (§1.5 step 7); a
+    // re-sort here would pull this 0 to the front and perch a 9 instead.
+    const seated = makeOverflowInventory(10).map((tile) => ({ ...tile, digit: 9 as const }));
+    const state = makeOverflowState(makeEquation(3, 3), {
+      inventory: [...seated, makeTile(0, "newest", true)],
+    });
+    renderScreen(state);
+    const tiles = screen.getAllByRole("button", { name: /^Digit/ });
+    expect(tiles.at(-1)).toHaveAccessibleName("Digit 0, New tile");
+  });
+});
+

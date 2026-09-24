@@ -828,10 +828,13 @@ describe("Classic", () => {
     });
     const next = gameReducer(state, {
       type: "SUBMIT_CORRECT",
-      rewardTiles: [makeTile(1, "r-1"), makeTile(2, "r-2"), makeTile(3, "r-3")],
+      rewardTiles: [makeTile(1, "r-1"), makeTile(3, "r-3"), makeTile(2, "r-2")],
     });
     expect(next.phase).toBe("overflow");
     expect(getOverflowCount(next)).toBe(2);
+    // Both past capacity perch in arrival order, 3 before 2: sorting or
+    // reversing the rail would put the 2 first (§1.5 step 7).
+    expect(next.inventory.slice(-2).map((tile) => tile.id)).toEqual(["r-3", "r-2"]);
   });
 
   it("never overflows on an incorrect answer, even on a sealing submission", () => {

@@ -456,16 +456,35 @@ describe("TileInventory", () => {
     const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
     rerender({ tiles: after, mode: "readOnly" });
 
-    endAnimation(cells(container)[4]); // the slide-off
+    // jsdom lays nothing out, so place the perch up and to the right of seat 4:
+    // the drop's offsets are rail minus seat, and a flipped sign would show.
+    const at = (element: HTMLElement, rail: number, seat: number) =>
+      element.dataset.rail !== undefined ? rail : element.dataset.cell === "4" ? seat : 0;
+    const offsetLeft = vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (this: HTMLElement) {
+      return at(this, 200, 120);
+    });
+    const offsetTop = vi.spyOn(HTMLElement.prototype, "offsetTop", "get").mockImplementation(function (this: HTMLElement) {
+      return at(this, 9, 90);
+    });
+    try {
+      endAnimation(cells(container)[4]); // the slide-off
+    } finally {
+      offsetLeft.mockRestore();
+      offsetTop.mockRestore();
+    }
     const seated = cells(container)[4];
     expect(seated.textContent).toBe("7");
     expect(animationOn(seated)).toBe("oz-perch-drop");
-    expect(seated.style.getPropertyValue("--dx")).toMatch(/^-?\d+(\.\d+)?px$/);
-    expect(seated.style.getPropertyValue("--dy")).toMatch(/^-?\d+(\.\d+)?px$/);
+    expect(seated.style.getPropertyValue("--dx")).toBe("80px");
+    expect(seated.style.getPropertyValue("--dy")).toBe("-81px");
+    // The rail stays in flow until the tile lands: dropping it with the fall
+    // would move the seat up by the rail's height under the measured offsets.
+    expect(container.querySelector(`.${rackStyles.rail}`)).not.toBeNull();
     expect(onSettled).not.toHaveBeenCalled();
 
     endAnimation(seated);
     expect(onSettled).toHaveBeenCalledTimes(1);
+    expect(container.querySelector(`.${rackStyles.rail}`)).toBeNull();
     expect(animationOn(cells(container)[4])).not.toBe("oz-perch-drop");
     // Still new until the round changes, the landed tile must not fire 9i:
     // oz-fire starts from nothing and would blink it out of the seat.

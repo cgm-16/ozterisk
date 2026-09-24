@@ -365,12 +365,11 @@ export function TileInventory({
 
   return (
     <div ref={rackRef} className={styles.rack} data-size={tier?.size}>
-      {/* Gotcha: the rail is in flow above the tray and unmounts in the
-          commit that starts the last perch-drop, so the tray jumps up by the
-          rail's height as the tile falls. The drop still lands true (both ends
-          are measured in one layout). Keeping the rail until the tile lands is
-          deferred to the §7.6 review; see the 2026-09-24 journal. */}
-      {perched.length > 0 && (
+      {/* The rail is in flow above the tray, and 8a·2's offsets were measured
+          with it there. It stays, empty and one tile high, until the last
+          dropping tile lands: gone with the fall, it would lift every seat by
+          its height mid-drop and start the tile that far above its perch. */}
+      {(perched.length > 0 || dropping.size > 0) && (
         <div className={`${styles.rail}${tier ? ` ${styles.railOverTray}` : ""}`}>
           {perched.map((tile) => renderTile(tile, null))}
         </div>

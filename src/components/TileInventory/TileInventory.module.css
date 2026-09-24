@@ -12,11 +12,9 @@
 }
 
 /* Tiles past capacity perch here, above the rack, never in a new row of it
-   (§1.12): the newest arrivals, right-aligned, at the rack's tile size. The
-   56px is a floor, not the band's height: the row grows to the tile, so a
-   populated rail is the tile's height plus its padding and rule, and the
-   tray below moves by that much when the rail comes and goes (§7.6 decides;
-   see the journal, 2026-09-24).
+   (§1.12): the newest arrivals, right-aligned, at the tier's tile size. Its
+   one row is a tile high whether or not a tile is in it, so the rail left
+   empty while a perch drops (8a·2) holds the tray where it was measured.
 
    8a leaves the perched tile turned 11 degrees on its lower-left edge and
    nudged 3px right, so its top-right corner reaches past its own cell by
@@ -32,7 +30,7 @@
   gap: var(--rack-gap);
   width: 100%;
   max-width: var(--rack-width);
-  min-height: 56px;
+  grid-template-rows: var(--tile-h);
   margin-bottom: var(--space-2);
   padding-top: var(--space-2);
   border-top: 1px solid var(--border-accent);

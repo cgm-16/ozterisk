@@ -414,6 +414,8 @@ for (const locale of LOCALES) {
           tileW: tile.getBoundingClientRect().width,
           slotW: slot ? slot.getBoundingClientRect().width : 0,
           targetMin: parseFloat(getComputedStyle(de).getPropertyValue("--target-min")),
+          // The arena's tile width: the rack sets its own --tile-w, the slots do not.
+          arenaTileW: parseFloat(getComputedStyle(de).getPropertyValue("--tile-w")),
         };
       });
 
@@ -426,7 +428,7 @@ for (const locale of LOCALES) {
       expect(reading.trayRight, "tray right edge").toBeLessThanOrEqual(reading.viewport);
       expect(reading.tileW, "tile against the target minimum").toBeGreaterThanOrEqual(reading.targetMin);
       expect(reading.rows * reading.columns, "rows are the footprint's, never one more").toBe(reading.cells);
-      expect(reading.slotW, "answer slots are not drawn at the rack's size").toBeGreaterThan(reading.tileW);
+      expect(reading.slotW, "answer slots stay at the arena's tier, not the rack's size").toBe(reading.arenaTileW);
     });
   }
 }
@@ -471,10 +473,15 @@ for (const width of OVERFLOW_WIDTHS) {
       viewport: document.documentElement.clientWidth,
       scrollWidth: document.documentElement.scrollWidth,
       tileRight: document.querySelector("[data-rail]")!.getBoundingClientRect().right,
+      // Resolved tracks include any implicit row a perched tile would add.
+      gridRows: getComputedStyle(document.querySelector("[data-cell]")!.parentElement!).gridTemplateRows.split(" ").length,
+      railInGrid: document.querySelector("[data-cell]")!.parentElement!.contains(document.querySelector("[data-rail]")),
     }));
     expect(perch.viewport, "content width the harness produced").toBe(width);
     expect(perch.tileRight, "perched tile's right edge").toBeLessThanOrEqual(perch.viewport);
     expect(perch.scrollWidth, "document scroll width with a tile perched").toBeLessThanOrEqual(perch.viewport);
+    expect(perch.railInGrid, "the perched tile sits outside the rack's grid").toBe(false);
+    expect(perch.gridRows, "the rail adds no row to the rack").toBe(2);
 
     // Mark the perched tile: the one required mark completes the discard, and
     // the tile tips off the rack.

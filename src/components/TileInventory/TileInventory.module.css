@@ -13,8 +13,10 @@
 
 /* Tiles past capacity perch here, above the rack, never in a new row of it
    (§1.12): the newest arrivals, right-aligned, at the rack's tile size. The
-   band's own height is 56px; a taller tile overhangs it rather than moving
-   the rack twice.
+   56px is a floor, not the band's height: the row grows to the tile, so a
+   populated rail is the tile's height plus its padding and rule, and the
+   tray below moves by that much when the rail comes and goes (§7.6 decides;
+   see the journal, 2026-09-24).
 
    8a leaves the perched tile turned 11 degrees on its lower-left edge and
    nudged 3px right, so its top-right corner reaches past its own cell by

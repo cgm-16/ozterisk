@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { sortTiles } from "../../game/factories";
 import type { GameAction, GameState } from "../../game/types";
 import {
@@ -28,6 +29,27 @@ export interface GameScreenProps {
 export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScreenProps) {
   const { t } = useI18n();
   useGameKeyboard({ state, dispatch, onSubmit, onNextRound });
+
+  // After a discard the round advances on its own (§1.7), once both halves of
+  // the moment have played: the rack's exit and the verdict's celebration on
+  // the answer slots. The celebration mounts with feedback, when the discard
+  // completes, so a streak-8 burst (720ms) outlasts a 420ms exit, and
+  // advancing on the exit alone unmounted it midway. Each half reports the
+  // submission it settled, so a report from one round never counts for the
+  // next.
+  const [rackSettled, setRackSettled] = useState<number | null>(null);
+  const [slotsSettled, setSlotsSettled] = useState<number | null>(null);
+  const advancesAlone =
+    state.phase === "feedback" && state.lastResult?.discarded === true;
+  const readyToAdvance =
+    advancesAlone && rackSettled === state.totalRounds && slotsSettled === state.totalRounds;
+  const onNextRoundRef = useRef(onNextRound);
+  useEffect(() => {
+    onNextRoundRef.current = onNextRound;
+  });
+  useEffect(() => {
+    if (readyToAdvance) onNextRoundRef.current();
+  }, [readyToAdvance]);
 
   // Reducer invariant (§2.5): equation === null only in `title`. GameScreen
   // never renders `title` (TitleScreen owns it), so this only guards the type.
@@ -79,6 +101,7 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
           verdict={lastResult.kind}
           streak={state.currentStreak}
           disabled={false}
+          onSettled={() => setSlotsSettled(state.totalRounds)}
         />
       )}
 
@@ -129,7 +152,7 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         mode={state.phase === "answering" ? "select" : state.phase === "overflow" ? "discard" : "readOnly"}
         pendingDiscards={state.pendingDiscards}
         onSettled={() => {
-          if (state.phase === "feedback" && lastResult?.discarded) onNextRound();
+          if (advancesAlone) setRackSettled(state.totalRounds);
         }}
         onTile={(tileId) => {
           if (state.phase === "answering") dispatch({ type: "SELECT_TILE", tileId });

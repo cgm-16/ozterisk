@@ -61,10 +61,12 @@ function renderApp(
 // only one of those screens is ever mounted at a time, so the label text is
 // unambiguous. Digit tiles show plain digit text, never these labels.
 // Plays out a discard: the 8c exits, then the 8a·2 drops of any rail tile the
-// discard spared. jsdom runs no animations, so each is ended by hand, on both
-// event names React may bind (see TileInventory.test's endAnimation).
+// discard spared, and the verdict's moments on the answer slots, which mount
+// with the feedback the discard completes. jsdom runs no animations, so each
+// is ended by hand, on both event names React may bind (see
+// TileInventory.test's endAnimation).
 function finishDeparture(): void {
-  for (const stage of ["[data-departing]", "[data-seating]"]) {
+  for (const stage of ["[data-departing]", "[data-seating]", "[data-moment]"]) {
     for (const cell of document.querySelectorAll(stage)) {
       fireEvent.animationEnd(cell);
       fireEvent(cell, new Event("webkitAnimationEnd", { bubbles: true }));

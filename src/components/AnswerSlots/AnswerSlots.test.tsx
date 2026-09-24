@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { Tile } from "../../game/types";
@@ -183,6 +183,42 @@ describe("AnswerSlots motion", () => {
    readable here. Every count is asserted at a rung as well as below it: a
    mistyped CSS Modules key renders `class="undefined"`, and against that a
    zero-count assertion passes for the wrong reason. */
+describe("AnswerSlots settling", () => {
+  const end = (element: Element) => {
+    fireEvent.animationEnd(element);
+    fireEvent(element, new Event("webkitAnimationEnd", { bubbles: true }));
+  };
+
+  it("settles an incorrect verdict once each tile's crack and dust have ended, and only once", () => {
+    const onSettled = vi.fn();
+    const { container } = renderSlots({
+      selectedTiles: [tile(8, "a"), tile(7, "b")],
+      onReturn: undefined,
+      verdict: "incorrect",
+      onSettled,
+    });
+    const moments = [...container.querySelectorAll("[data-moment]")];
+    expect(moments).toHaveLength(4);
+
+    // The same element twice is still one moment.
+    end(moments[0]!);
+    end(moments[0]!);
+    moments.slice(1, -1).forEach(end);
+    expect(onSettled).not.toHaveBeenCalled();
+    end(moments[3]!);
+    end(moments[3]!);
+    expect(onSettled).toHaveBeenCalledTimes(1);
+  });
+
+  it("marks no moment and never settles while the round is unjudged", () => {
+    const onSettled = vi.fn();
+    const { container } = renderSlots({ selectedTiles: [tile(5, "a")], onSettled });
+    expect(container.querySelectorAll("[data-moment]")).toHaveLength(0);
+    end(container.querySelector(`.${styles.arriving}`)!);
+    expect(onSettled).not.toHaveBeenCalled();
+  });
+});
+
 describe("AnswerSlots streak ladder", () => {
   // One slot, so the counts below are the ladder's own and not a multiple of
   // it: rings and chips are drawn per filled slot.

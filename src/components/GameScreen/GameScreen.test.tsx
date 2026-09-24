@@ -658,6 +658,47 @@ describe("GameScreen after a discard", () => {
     expect(onNextRound).toHaveBeenCalledTimes(1);
   });
 
+  it("waits for the verdict's celebration as well as the departure before advancing", () => {
+    // A correct answer at streak 8 plays the bloom, three rings and the burst
+    // on its slot. Those mount with feedback, after the discard completes, so
+    // the 420ms exit ends before the 720ms burst does.
+    const answer = makeTile(9, "answer");
+    const correct = (state: GameState): GameState => ({
+      ...state,
+      currentStreak: 8,
+      lastResult: {
+        ...state.lastResult!,
+        kind: "correct",
+        submittedValue: 9,
+        submittedTiles: [answer],
+      },
+    });
+    const overflow = correct(makeOverflowState(makeEquation(3, 3)));
+    const onNextRound = vi.fn();
+    const screenFor = (state: GameState) => (
+      <I18nProvider initialLanguage="en">
+        <GameScreen state={state} dispatch={vi.fn()} onSubmit={vi.fn()} onNextRound={onNextRound} />
+      </I18nProvider>
+    );
+    const { container, rerender } = render(screenFor(overflow));
+    const gone = overflow.inventory[10]!;
+    rerender(screenFor(correct(discardedFeedback(overflow.inventory.filter((tile) => tile !== gone)))));
+
+    const end = (element: Element) => {
+      fireEvent.animationEnd(element);
+      fireEvent(element, new Event("webkitAnimationEnd", { bubbles: true }));
+    };
+    end(container.querySelector(`[data-departing="${gone.id}"]`)!);
+    expect(onNextRound).not.toHaveBeenCalled();
+
+    const moments = [...container.querySelectorAll("[data-moment]")];
+    expect(moments).toHaveLength(1 + 3 + 6); // the bloom, three rings, six chips
+    moments.slice(0, -1).forEach(end);
+    expect(onNextRound).not.toHaveBeenCalled();
+    end(moments[moments.length - 1]!);
+    expect(onNextRound).toHaveBeenCalledTimes(1);
+  });
+
   it("draws the rack in the reducer's order outside answering, so the newest arrival stays on the rail", () => {
     // The reducer leaves the newest arrival past capacity (§1.5 step 7); a
     // re-sort here would pull this 0 to the front and perch a 9 instead.

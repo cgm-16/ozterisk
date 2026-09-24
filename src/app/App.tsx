@@ -28,7 +28,7 @@ export function App({ dependencies, shareDependencies }: AppProps) {
   const handleStart = useCallback(() => {
     const inventory = createInitialInventory(dependencies.nextTileId);
     const equation = generateKindEquation(dependencies.random, inventory);
-    dispatch({ type: "START_RUN", equation, inventory });
+    dispatch({ type: "START_RUN", mode: "endless", equation, inventory });
   }, [dependencies]);
 
   const handleRestart = useCallback(() => {

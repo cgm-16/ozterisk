@@ -1,9 +1,11 @@
-import type { Equation, GameAction, GameState, Tile } from "./types";
+import type { Equation, GameAction, GameMode, GameState, Tile } from "./types";
+import { CLASSIC_FLOOR } from "./balance";
 import { sortTiles } from "./factories";
 import {
   canAttemptEquation,
   constructAnswer,
   getAnswerLength,
+  getCapacity,
   getOverflowCount,
   getRewardCount,
   isDiscardReady,
@@ -11,9 +13,10 @@ import {
 
 // Round 1, zero statistics, straight into answering — shared by START_RUN and
 // RESTART_RUN, which both begin a run from action-provided equation/inventory.
-function freshRunState(equation: Equation, inventory: Tile[]): GameState {
+function freshRunState(mode: GameMode, equation: Equation, inventory: Tile[]): GameState {
   return {
     phase: "answering",
+    mode,
     equation,
     inventory,
     selectedTiles: [],
@@ -30,7 +33,7 @@ function freshRunState(equation: Equation, inventory: Tile[]): GameState {
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
     case "START_RUN":
-      return freshRunState(action.equation, action.inventory);
+      return freshRunState(action.mode, action.equation, action.inventory);
 
     case "SELECT_TILE": {
       if (state.phase !== "answering" || state.equation === null) return state;
@@ -67,16 +70,24 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const newRewardTiles = action.rewardTiles.map((tile) => ({ ...tile, isNew: true }));
       const nextInventory = sortTiles([...state.inventory, ...newRewardTiles]);
       const nextCurrentStreak = state.currentStreak + 1;
+      const nextTotalRounds = state.totalRounds + 1;
+      // Checked against the capacity after this submission, so a seal it makes
+      // is already counted (§1.7).
+      const overflowCount = getOverflowCount({
+        mode: state.mode,
+        inventory: nextInventory,
+        totalRounds: nextTotalRounds,
+      });
 
       return {
         ...state,
-        phase: getOverflowCount(nextInventory) > 0 ? "overflow" : "feedback",
+        phase: overflowCount > 0 ? "overflow" : "feedback",
         inventory: nextInventory,
         selectedTiles: [],
         score: state.score + 1,
         currentStreak: nextCurrentStreak,
         longestStreak: Math.max(state.longestStreak, nextCurrentStreak),
-        totalRounds: state.totalRounds + 1,
+        totalRounds: nextTotalRounds,
         lastResult: {
           kind: "correct",
           submittedValue,
@@ -114,7 +125,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const tile = state.inventory.find((item) => item.id === action.tileId);
       if (!tile) return state;
       const alreadyMarked = state.pendingDiscards.includes(action.tileId);
-      if (!alreadyMarked && state.pendingDiscards.length >= getOverflowCount(state.inventory)) {
+      if (!alreadyMarked && state.pendingDiscards.length >= getOverflowCount(state)) {
         return state;
       }
       return {
@@ -141,9 +152,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const nextInventory = state.inventory.map((tile) =>
         tile.isNew ? { ...tile, isNew: false } : tile,
       );
+      // A Classic run at the floor is complete: the win is checked before the
+      // loss, so a hand that could still answer does not play on (§1.8).
+      const atFloor =
+        state.mode === "classic" && getCapacity(state.mode, state.totalRounds) <= CLASSIC_FLOOR;
+      const canPlay = !atFloor && canAttemptEquation(nextInventory, action.equation);
       return {
         ...state,
-        phase: canAttemptEquation(nextInventory, action.equation) ? "answering" : "gameOver",
+        phase: canPlay ? "answering" : "gameOver",
         equation: action.equation,
         inventory: nextInventory,
         selectedTiles: [],
@@ -155,7 +171,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "RESTART_RUN":
       if (state.phase !== "gameOver") return state;
-      return freshRunState(action.equation, action.inventory);
+      return freshRunState(state.mode, action.equation, action.inventory);
 
     case "CLEAR_SELECTION": {
       if (state.phase !== "answering") return state;

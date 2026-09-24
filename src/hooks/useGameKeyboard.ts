@@ -74,7 +74,7 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
 
       if (state.phase === "overflow") {
         if (DIGIT_KEY_PATTERN.test(event.key)) {
-          const required = getOverflowCount(state.inventory);
+          const required = getOverflowCount(state);
           if (state.pendingDiscards.length >= required) return;
           const digit = Number(event.key) as Digit;
           // Skip tiles already marked, so repeated presses walk through duplicates

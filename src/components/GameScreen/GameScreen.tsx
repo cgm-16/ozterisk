@@ -97,7 +97,7 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
 
       {state.phase === "overflow" && (
         <OverflowControls
-          requiredCount={getOverflowCount(state.inventory)}
+          requiredCount={getOverflowCount(state)}
           onConfirm={() => dispatch({ type: "CONFIRM_DISCARD" })}
           disabled={!isDiscardReady(state)}
         />
@@ -116,7 +116,7 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
             // only tile that can go is the whole decision. Dispatched from the click
             // handler and never from an effect, so rendering an already-marked state
             // still requires user action.
-            if (getOverflowCount(state.inventory) === 1) dispatch({ type: "CONFIRM_DISCARD" });
+            if (getOverflowCount(state) === 1) dispatch({ type: "CONFIRM_DISCARD" });
           }
         }}
       />

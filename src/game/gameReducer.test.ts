@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { Digit, GameAction, GameState } from "./types";
 import { gameReducer } from "./gameReducer";
 import { createInitialInventory, createTitleState, sortTiles } from "./factories";
-import { getAnswerLength } from "./selectors";
+import { getAnswerLength, getOverflowCount, isClassicWin } from "./selectors";
+import { CLASSIC_FLOOR, CLASSIC_SEAL_EVERY, CLASSIC_START_CAPACITY } from "./balance";
 import {
   makeAnsweringState,
   makeEquation,
@@ -33,10 +34,11 @@ describe("START_RUN", () => {
     const equation = makeEquation(3, 4);
     const inventory = createInitialInventory(sequentialIds());
 
-    const next = gameReducer(priorState, { type: "START_RUN", equation, inventory });
+    const next = gameReducer(priorState, { type: "START_RUN", mode: "endless", equation, inventory });
 
     expect(next).toEqual({
       phase: "answering",
+      mode: "endless",
       equation,
       inventory,
       selectedTiles: [],
@@ -630,6 +632,7 @@ describe("RESTART_RUN", () => {
 
     expect(next).toEqual({
       phase: "answering",
+      mode: "endless",
       equation,
       inventory,
       selectedTiles: [],
@@ -773,6 +776,105 @@ describe("CLEAR_SELECTION", () => {
   });
 });
 
+describe("Classic", () => {
+  const classicInventory = () => createInitialInventory(sequentialIds(), CLASSIC_START_CAPACITY);
+  const toFloor = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY;
+
+  it("START_RUN carries the mode into the run", () => {
+    const next = gameReducer(createTitleState(), {
+      type: "START_RUN",
+      mode: "classic",
+      equation: makeEquation(2, 3),
+      inventory: classicInventory(),
+    });
+    expect(next.mode).toBe("classic");
+    expect(next.inventory).toHaveLength(CLASSIC_START_CAPACITY);
+  });
+
+  it("RESTART_RUN keeps the mode of the run that ended", () => {
+    const state: GameState = {
+      ...makeFeedbackState(makeEquation(7, 8)),
+      phase: "gameOver",
+      mode: "classic",
+    };
+    const next = gameReducer(state, {
+      type: "RESTART_RUN",
+      equation: makeEquation(2, 3),
+      inventory: classicInventory(),
+    });
+    expect(next.mode).toBe("classic");
+  });
+
+  it("counts the seal made by this submission when checking overflow, correct answer at a full rack", () => {
+    // Submission 2 seals a socket: capacity 20 -> 19. A full rack spending two
+    // tiles on 4 x 5 = 20 gets three back, 21 tiles against 19 sockets.
+    const inventory = classicInventory();
+    const two = inventory.find((tile) => tile.digit === 2)!;
+    const zero = inventory.find((tile) => tile.digit === 0)!;
+    const state = makeAnsweringState(makeEquation(4, 5), {
+      mode: "classic",
+      totalRounds: CLASSIC_SEAL_EVERY - 1,
+      round: CLASSIC_SEAL_EVERY,
+      inventory: inventory.filter((tile) => tile !== two && tile !== zero),
+      selectedTiles: [two, zero],
+    });
+    const next = gameReducer(state, {
+      type: "SUBMIT_CORRECT",
+      rewardTiles: [makeTile(1, "r-1"), makeTile(2, "r-2"), makeTile(3, "r-3")],
+    });
+    expect(next.phase).toBe("overflow");
+    expect(getOverflowCount(next)).toBe(2);
+  });
+
+  it("never overflows on an incorrect answer, even on a sealing submission", () => {
+    const inventory = classicInventory();
+    const nine = inventory.find((tile) => tile.digit === 9)!;
+    const state = makeAnsweringState(makeEquation(2, 3), {
+      mode: "classic",
+      totalRounds: CLASSIC_SEAL_EVERY - 1,
+      round: CLASSIC_SEAL_EVERY,
+      inventory: inventory.filter((tile) => tile !== nine),
+      selectedTiles: [nine],
+    });
+    const next = gameReducer(state, { type: "SUBMIT_INCORRECT" });
+    expect(next.phase).toBe("feedback");
+    expect(getOverflowCount(next)).toBe(0);
+  });
+
+  it("NEXT_ROUND at the floor ends the run as a win, even with a hand that could answer", () => {
+    const state = makeFeedbackState(makeEquation(2, 3), {
+      mode: "classic",
+      totalRounds: toFloor,
+      round: toFloor,
+    });
+    const next = gameReducer(state, { type: "NEXT_ROUND", equation: makeEquation(2, 2) });
+    expect(next.phase).toBe("gameOver");
+    expect(isClassicWin(next)).toBe(true);
+  });
+
+  it("NEXT_ROUND above the floor with too few tiles ends the run as a loss", () => {
+    const state = makeFeedbackState(makeEquation(2, 3), {
+      mode: "classic",
+      totalRounds: toFloor - 1,
+      round: toFloor - 1,
+      inventory: [makeTile(4)],
+    });
+    const next = gameReducer(state, { type: "NEXT_ROUND", equation: makeEquation(3, 4) });
+    expect(next.phase).toBe("gameOver");
+    expect(isClassicWin(next)).toBe(false);
+  });
+
+  it("NEXT_ROUND above the floor with enough tiles keeps playing", () => {
+    const state = makeFeedbackState(makeEquation(2, 3), {
+      mode: "classic",
+      totalRounds: toFloor - 1,
+      round: toFloor - 1,
+    });
+    const next = gameReducer(state, { type: "NEXT_ROUND", equation: makeEquation(3, 4) });
+    expect(next.phase).toBe("answering");
+  });
+});
+
 describe("reducer lifecycle invariants (§2.5)", () => {
   it("walks a full legal lifecycle path, asserting every §2.5 invariant after each transition", () => {
     interface Step {
@@ -786,6 +888,7 @@ describe("reducer lifecycle invariants (§2.5)", () => {
         label: "start the run",
         getAction: () => ({
           type: "START_RUN",
+          mode: "endless",
           equation: makeEquation(3, 3), // product 9, one slot
           inventory: createInitialInventory(sequentialIds()),
         }),

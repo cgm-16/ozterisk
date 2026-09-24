@@ -1,7 +1,7 @@
 /* The arena takes its container's width, up to its maximum, rather than
-   fitting its content: the stepped rack measures the width it is given to
-   choose its size (§1.12), and a fit-content arena would hand back the rack's
-   own width and lock it at whichever size it drew first. */
+   fitting its content: the stepped rack is a size container (§1.12), and a
+   container contributes no width of its own, so a fit-content arena would
+   shrink to its other children and starve the rack of the width it reads. */
 .screen {
   display: flex;
   flex-direction: column;

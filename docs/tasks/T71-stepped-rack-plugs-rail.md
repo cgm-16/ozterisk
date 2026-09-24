@@ -26,7 +26,7 @@ paths:
 
 - `rackTier(capacity, narrow)` — pure, exported from `TileInventory`; thresholds `15`/`10` beside it.
 - `TileInventory` takes `stepped` (Classic), `drawnCapacity` = `getCapacity(mode, round − 1)` (size and footprint) and `capacity` = the live capacity (which tiles seat, which perch, which socket is closing). Passing only the drawn one would seat a tile in the socket that is sealing.
-- `narrow` is measured from the container (a `min-width` query fires ~15px early, §1.12). jsdom cannot measure, so tests pass `narrow` explicitly and `T74` owns the geometry.
+- Narrow is a CSS container query on the rack (a `min-width` query fires ~15px early, §1.12), so the component only names the size (`data-size`) and draws the fallback's whole rows. jsdom cannot evaluate it; `T74` owns the geometry. Built first with a `ResizeObserver`, which either painted a 7-column frame or raised a "ResizeObserver loop" error; see the journal.
 
 ## Why
 

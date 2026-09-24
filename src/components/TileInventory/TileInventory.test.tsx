@@ -500,25 +500,29 @@ describe("TileInventory", () => {
     const hand = (count: number) =>
       Array.from({ length: count }, (_, index) => tile((index % 10) as Tile["digit"], `h${index}`));
 
-    it("steps its size with the drawn capacity: 7 x 44 above 15, 6 x 48 above 10, the Endless rack at 10 and below", () => {
-      expect(rackTier(20)).toMatchObject({ cols: 7, top: 20, size: { w: 44, h: 55, gap: 4 } });
-      expect(rackTier(16)).toMatchObject({ cols: 7, top: 20 });
-      expect(rackTier(15)).toMatchObject({ cols: 6, top: 15, size: { w: 48, h: 60, gap: 6 } });
-      expect(rackTier(11)).toMatchObject({ cols: 6, top: 15 });
-      expect(rackTier(10)).toEqual({ cols: 5, top: 10, size: null });
-      expect(rackTier(6)).toEqual({ cols: 5, top: 10, size: null });
+    // The sizes' figures, and the narrow 6 x 44 fallback, are CSS: a container
+    // query jsdom cannot evaluate. What the component owns is which size, and
+    // enough cells for the fallback's whole rows.
+    it("steps its size with the drawn capacity: small above 15, mid above 10, home at 10 and below", () => {
+      expect(rackTier(20)).toEqual({ size: "small", top: 20, footprint: 24 });
+      expect(rackTier(16)).toEqual({ size: "small", top: 20, footprint: 24 });
+      expect(rackTier(15)).toEqual({ size: "mid", top: 15, footprint: 18 });
+      expect(rackTier(11)).toEqual({ size: "mid", top: 15, footprint: 18 });
+      expect(rackTier(10)).toEqual({ size: "home", top: 10, footprint: 10 });
+      expect(rackTier(6)).toEqual({ size: "home", top: 10, footprint: 10 });
     });
 
-    it("caps both upper sizes at 6 x 44 where the arena is narrow (§1.12)", () => {
-      expect(rackTier(20, true)).toMatchObject({ cols: 6, top: 20, size: { w: 44, h: 55, gap: 2, pad: 2 } });
-      expect(rackTier(15, true)).toMatchObject({ cols: 6, top: 15, size: { w: 44, gap: 2 } });
-      expect(rackTier(10, true)).toEqual(rackTier(10));
+    it("names its size for the stylesheet", () => {
+      const { container } = renderInventory({ tiles: hand(15), capacity: 15, drawnCapacity: 15, stepped: true });
+      expect(container.querySelector(`.${rackStyles.rack}`)).toHaveAttribute("data-size", "mid");
     });
 
-    it("draws the whole-row footprint, sealing the house plug at twenty", () => {
+    // 24 cells: the narrow fallback's four rows of six. Wide, CSS draws the
+    // first 21 — seven by three — so the house plug is the one at index 20.
+    it("draws the whole-row footprint, sealing the house plugs at twenty", () => {
       const { container } = renderInventory({ tiles: hand(20), capacity: 20, drawnCapacity: 20, stepped: true });
-      expect(cellCount(container)).toBe(21);
-      expect(plugCount(container)).toBe(1);
+      expect(cellCount(container)).toBe(24);
+      expect(plugCount(container)).toBe(4);
       const plug = cells(container).find((cell) => cell.classList.contains(rackStyles.plug))!;
       expect(plug).toHaveAttribute("aria-hidden", "true");
     });
@@ -526,14 +530,14 @@ describe("TileInventory", () => {
     it("closes the socket a seal took before the round change, and seats no tile there", () => {
       // Live 19 after the second submission; the rack is still drawn at 20.
       const { container } = renderInventory({ tiles: hand(19), capacity: 19, drawnCapacity: 20, stepped: true });
-      expect(cellCount(container)).toBe(21);
-      expect(plugCount(container)).toBe(2);
+      expect(cellCount(container)).toBe(24);
+      expect(plugCount(container)).toBe(5);
       expect(cells(container)[19].textContent).toBe("");
     });
 
     it("perches Classic's two-tile excess on the rail and keeps the grid whole", () => {
       const { container } = renderInventory({ tiles: hand(21), capacity: 19, drawnCapacity: 20, stepped: true });
-      expect(cellCount(container)).toBe(21);
+      expect(cellCount(container)).toBe(24);
       expect(railCells(container)).toHaveLength(2);
     });
 

@@ -95,12 +95,6 @@ async function sweep(page: Page): Promise<StateReading[]> {
   const readings: StateReading[] = [];
   for (let i = 0; i < STATE_COUNT; i += 1) {
     await buttons.nth(i).click();
-    // Read what the player sees: the first painted frame. A state that sizes
-    // itself from a ResizeObserver (Classic's stepped rack) settles in the
-    // rendering step, and a read straight after the click lands before it.
-    await page.evaluate(
-      () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
-    );
     readings.push(
       await page.evaluate(() => {
         const stage = document.querySelector('div[class*="stage"]');
@@ -398,11 +392,10 @@ for (const locale of LOCALES) {
       await page
         .getByRole("button", { name: START_LABEL[locale], exact: true })
         .click();
+      // Read straight after the click, with no frame awaited: the rack's size
+      // is a container query, resolved in style, so this is already the frame
+      // a player first sees.
       await expect(page.locator('[class*="tray"]')).toBeVisible();
-      // The rack sizes itself from a ResizeObserver; read the painted frame.
-      await page.evaluate(
-        () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
-      );
 
       const reading = await page.evaluate(() => {
         const de = document.documentElement;
@@ -416,7 +409,8 @@ for (const locale of LOCALES) {
           trayRight: tray.getBoundingClientRect().right,
           columns: style.gridTemplateColumns.split(" ").length,
           rows: style.gridTemplateRows.split(" ").length,
-          cells: tray.children.length,
+          // Wide, the 20-size draws 21 of its 24 cells; CSS hides the rest.
+          cells: [...tray.children].filter((cell) => getComputedStyle(cell).display !== "none").length,
           tileW: tile.getBoundingClientRect().width,
           slotW: slot ? slot.getBoundingClientRect().width : 0,
           targetMin: parseFloat(getComputedStyle(de).getPropertyValue("--target-min")),

@@ -690,8 +690,11 @@ describe("GameScreen with Classic's stepped rack", () => {
         <GameScreen state={state} dispatch={vi.fn()} onSubmit={vi.fn()} onNextRound={vi.fn()} />
       </I18nProvider>,
     );
-    const plugs = container.querySelectorAll("[aria-hidden='true'][class*='plug']");
-    expect(plugs).toHaveLength(2); // the house plug, and the socket this seal closed
+    // Cell 19 is the socket this seal closed; cell 20 the house plug.
+    const cell = (index: number) => container.querySelector(`[data-cell="${index}"]`)!;
+    expect(cell(18).className).not.toMatch(/plug/);
+    expect(cell(19).className).toMatch(/plug/);
+    expect(cell(20).className).toMatch(/plug/);
   });
 });
 

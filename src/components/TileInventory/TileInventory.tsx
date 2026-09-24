@@ -1,10 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { flushSync } from "react-dom";
 import type { Tile as TileModel } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
 import { CLASSIC_START_CAPACITY } from "../../game/balance";
-import { rackTier, trayWidth } from "./rackTier";
+import { rackTier } from "./rackTier";
 import styles from "./TileInventory.module.css";
 
 /** A discard the rack is still drawing (8c): the hand as it stood before the
@@ -185,24 +184,6 @@ export function TileInventory({
     };
   }, []);
 
-  // Narrow is a property of the container, not the viewport (§1.12): a
-  // min-width query fires about 15px early wherever a scrollbar takes layout
-  // width. ResizeObserver reports after layout and before paint, and flushSync
-  // commits the change inside that same step — left to React's scheduler it
-  // lands after the paint, and a 320px player sees a frame of seven columns.
-  const [narrow, setNarrow] = useState(false);
-  useLayoutEffect(() => {
-    const rack = rackRef.current;
-    const natural = trayWidth(rackTier(drawnCapacity));
-    if (!stepped || rack === null || natural === 0 || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(([entry]) => {
-      const width = entry.contentRect.width;
-      flushSync(() => setNarrow(width > 0 && width < natural));
-    });
-    observer.observe(rack);
-    return () => observer.disconnect();
-  }, [stepped, drawnCapacity]);
-
   // M6·1: when the rack changes size, every tile flies from its old seat at
   // the old size to its new one (oz-reseat, a FLIP). Seats are read from
   // layout offsets after each commit; at a size change the offset and scale
@@ -249,25 +230,16 @@ export function TileInventory({
   // cell past the live capacity is a sealed plug: the rack is always a full
   // rectangle, and the plug count is the descent. Tiles past the live capacity
   // never add a row; they perch on the rail above.
-  const tier = stepped ? rackTier(drawnCapacity, narrow) : null;
-  const footprint = tier ? Math.ceil(tier.top / tier.cols) * tier.cols : capacity;
+  //
+  // Which size, and where it falls back to 6 x 44, is CSS's: a container
+  // query on the rack, because narrow is a property of the container and not
+  // the viewport (§1.12) — a min-width query fires about 15px early wherever a
+  // scrollbar takes layout width. Resolved in style, the first frame is
+  // already the right size.
+  const tier = stepped ? rackTier(drawnCapacity) : null;
+  const footprint = tier ? tier.footprint : capacity;
   const perched = rackTiles.slice(capacity);
-  const sizing: CSSProperties | undefined = tier
-    ? ({
-        "--rack-columns": tier.cols,
-        "--rack-rows": footprint / tier.cols,
-        ...(tier.size && {
-          "--tile-w": `${tier.size.w}px`,
-          "--tile-h": `${tier.size.h}px`,
-          "--size-tile": `${tier.size.font}px`,
-          "--rack-gap": `${tier.size.gap}px`,
-          "--rack-pad": `${tier.size.pad}px`,
-          ...(tier.size.smallRadius && { "--radius-md": "var(--radius-sm)" }),
-        }),
-      } as CSSProperties)
-    : undefined;
 
-  // `cell` is the grid index a tile sits at, or null for a tile on the rail.
   const renderTile = (tile: TileModel, cell: number | null) => {
     const onRail = cell === null;
     const place = onRail ? { "data-rail": tile.id } : { "data-cell": cell, "data-tile": tile.id };
@@ -375,7 +347,7 @@ export function TileInventory({
   };
 
   return (
-    <div ref={rackRef} className={styles.rack} style={sizing}>
+    <div ref={rackRef} className={styles.rack} data-size={tier?.size}>
       {perched.length > 0 && (
         <div className={`${styles.rail}${tier ? ` ${styles.railOverTray}` : ""}`}>
           {perched.map((tile) => renderTile(tile, null))}

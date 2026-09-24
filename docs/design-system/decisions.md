@@ -570,7 +570,7 @@ landed. A resize round runs about 560ms, twice a run.
 - Run length (~30 submissions, ~6.5 min) is kept; revisit once M7 face-sets move the win rate.
 - "House takes a seat" is kept.
 - Floor moves 6 → 5 when M7 ships.
-- Stepped rack and plugs are promoted into `TileInventory` (`stepped`, `capacity`, `thresholds`, `reseatFrom`).
+- Stepped rack and plugs are promoted into `TileInventory` (`stepped`, `drawnCapacity`, `capacity`; `rackTier` and its 15/10 thresholds in `rackTier.ts`; the re-seat reads the previous render, so there is no `reseatFrom` prop — T71, T73).
 
 ### M7 opening calls, 24 Sep 2026
 

@@ -183,6 +183,20 @@ describe("TileInventory", () => {
     expect(cellCount(allHeld)).toBe(INVENTORY_CAPACITY);
   });
 
+  // M6·1 reads every seat's layout after each commit to re-seat at a size
+  // change; Endless never changes size, so its taps pay for no forced layout.
+  it("reads no layout on an Endless render", () => {
+    const offsetLeft = vi.spyOn(HTMLElement.prototype, "offsetLeft", "get");
+    try {
+      const tiles = railedRack().slice(0, 10);
+      const { rerender } = renderInventory({ tiles });
+      rerender({ tiles: tiles.slice(1) });
+      expect(offsetLeft).not.toHaveBeenCalled();
+    } finally {
+      offsetLeft.mockRestore();
+    }
+  });
+
   it("keeps ten sockets and perches an eleventh tile on the rail, never in a new row", () => {
     const eleven = Array.from({ length: 11 }, (_, index) => tile(0, `t${index}`));
     const { container } = renderInventory({ tiles: eleven });

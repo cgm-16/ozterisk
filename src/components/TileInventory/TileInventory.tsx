@@ -204,7 +204,8 @@ export function TileInventory({
   const top = stepped ? rackTier(drawnCapacity).top : null;
   useLayoutEffect(() => {
     const rack = rackRef.current;
-    if (rack === null) return;
+    // Endless never changes size, so it never re-seats, and reads no layout.
+    if (rack === null || top === null) return;
     const cells = [...rack.querySelectorAll<HTMLElement>("[data-tile]")];
     const reseat = top !== null && shownTop.current !== null && shownTop.current !== top;
     // Clearing first lets a second re-seat in the run restart the frame.

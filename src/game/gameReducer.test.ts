@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Digit, GameAction, GameState } from "./types";
 import { gameReducer } from "./gameReducer";
 import { createInitialInventory, createTitleState, sortTiles } from "./factories";
-import { getAnswerLength, getOverflowCount, isClassicWin } from "./selectors";
+import { getAnswerLength, getCapacity, getOverflowCount, getRewardCount, isClassicWin } from "./selectors";
 import { CLASSIC_FLOOR, CLASSIC_SEAL_EVERY, CLASSIC_START_CAPACITY } from "./balance";
 import {
   makeAnsweringState,
@@ -720,14 +720,16 @@ function assertInvariants(state: GameState): void {
     expect(pendingDiscards).toEqual([]);
   }
 
-  // inventory.length <= 10 when phase is answering, feedback, or gameOver.
+  // inventory.length <= getCapacity(mode, totalRounds) when phase is
+  // answering, feedback, or gameOver.
+  const capacity = getCapacity(state.mode, state.totalRounds);
   if (phase === "answering" || phase === "feedback" || phase === "gameOver") {
-    expect(inventory.length).toBeLessThanOrEqual(10);
+    expect(inventory.length).toBeLessThanOrEqual(capacity);
   }
 
-  // inventory.length > 10 when phase is overflow.
+  // inventory.length > getCapacity(mode, totalRounds) when phase is overflow.
   if (phase === "overflow") {
-    expect(inventory.length).toBeGreaterThan(10);
+    expect(inventory.length).toBeGreaterThan(capacity);
   }
 
   // lastResult === null in title and answering.
@@ -1004,5 +1006,56 @@ describe("reducer lifecycle invariants (§2.5)", () => {
 
     expect(state.round).toBe(1);
     expect(state.totalRounds).toBe(0);
+  });
+});
+
+describe("Classic lifecycle", () => {
+  it("holds every invariant on a run from twenty to the floor, through seals, misses and discards", () => {
+    // Every round asks 1 × d for a digit d the hand holds, so a one-tile
+    // answer is always possible. Every third submission misses; the rest are
+    // correct and rewarded, so a sealing submission overflows by two.
+    const ids = sequentialIds("reward");
+    const rewardDigits: Digit[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const nextEquation = (s: GameState) => {
+      const tile = s.inventory.find((candidate) => candidate.digit > 0);
+      return makeEquation(1, tile?.digit ?? 9);
+    };
+    const step = (s: GameState, action: GameAction): GameState => {
+      const next = gameReducer(s, action);
+      expect(next, action.type).not.toBe(s);
+      assertInvariants(next);
+      return next;
+    };
+
+    let state = step(createTitleState(), {
+      type: "START_RUN",
+      mode: "classic",
+      equation: makeEquation(1, 1),
+      inventory: createInitialInventory(sequentialIds(), CLASSIC_START_CAPACITY),
+    });
+    let sawDoubleDiscard = false;
+    while (state.phase === "answering") {
+      const product = state.equation!.product;
+      const miss = state.round % 3 === 0;
+      const tile = state.inventory.find((candidate) => (candidate.digit === product) !== miss)!;
+      state = step(state, { type: "SELECT_TILE", tileId: tile.id });
+      if (miss) {
+        state = step(state, { type: "SUBMIT_INCORRECT" });
+      } else {
+        const rewardTiles = Array.from({ length: getRewardCount(1) }, (_, index) =>
+          makeTile(rewardDigits[(state.round + index) % rewardDigits.length]!, ids(), true),
+        );
+        state = step(state, { type: "SUBMIT_CORRECT", rewardTiles });
+      }
+      if (getOverflowCount(state) >= 2) sawDoubleDiscard = true;
+      while (state.phase === "overflow") {
+        const unmarked = state.inventory.find((candidate) => !state.pendingDiscards.includes(candidate.id))!;
+        state = step(state, { type: "TOGGLE_DISCARD", tileId: unmarked.id });
+      }
+      state = step(state, { type: "NEXT_ROUND", equation: nextEquation(state) });
+    }
+
+    expect(sawDoubleDiscard).toBe(true);
+    expect(isClassicWin(state)).toBe(true);
   });
 });

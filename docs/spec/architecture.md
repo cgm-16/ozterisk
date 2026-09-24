@@ -214,6 +214,7 @@ export function canAttemptEquation(
 ): boolean;
 export function getCapacity(mode: GameMode, totalRounds: number): number;
 export function getOverflowCount(state: GameState): number;
+export function isAtClassicFloor(state: GameState): boolean; // Classic, at the floor's capacity
 export function isClassicWin(state: GameState): boolean; // gameOver at the floor with tiles in hand
 export function getRewardCount(spentCount: number): number;
 export function canConstruct(inventory: readonly Tile[], product: number): boolean;
@@ -296,8 +297,8 @@ The reducer returns the unchanged `state` object for invalid known actions. Unkn
 - `selectedTiles.length <= getAnswerLength(equation)`.
 - `pendingDiscards` contains unique IDs that exist in inventory.
 - `pendingDiscards` is non-empty only in `overflow`.
-- `inventory.length <= 10` when phase is `answering`, `feedback`, or `gameOver`.
-- `inventory.length > 10` when phase is `overflow`.
+- `inventory.length <= getCapacity(mode, totalRounds)` when phase is `answering`, `feedback`, or `gameOver`.
+- `inventory.length > getCapacity(mode, totalRounds)` when phase is `overflow`.
 - `lastResult === null` in `title` and `answering`.
 - `lastResult !== null` in `feedback` and `overflow`.
 - `score <= totalRounds`.

@@ -50,7 +50,8 @@ export const KIND_EQUATION_RATE = 0.2;
  * buildable rate b'(20) ~= 0.84 against the 0.63 cliff, so the early tray is
  * generous — and the descent to CLASSIC_FLOOR carries it back under. Board
  * count is START - FLOOR, so this is the run's decision budget.
- * Range: >= 10, so the opening deal holds every digit; above FLOOR.
+ * Range: 19–21, the rows the small rack draws (7 x 3 wide, 6 x 4 narrow, in
+ * TileInventory.module.css); that also holds every digit in the opening deal.
  */
 export const CLASSIC_START_CAPACITY = 20;
 

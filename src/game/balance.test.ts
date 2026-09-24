@@ -80,5 +80,14 @@ describe("Classic economy invariant", () => {
     expect(CLASSIC_START_CAPACITY).toBeGreaterThanOrEqual(10);
     expect(Number.isInteger(CLASSIC_SEAL_EVERY) && CLASSIC_SEAL_EVERY >= 1).toBe(true);
   });
+
+  // The small rack's CSS draws twenty in 7 x 3 wide (21 cells, the rest
+  // hidden) and 6 x 4 narrow (24). Past 21 a live tile would be hidden, its
+  // discard would start no exit, and the run would freeze; below 19 the
+  // footprint drops to 18 and the wide rack's last row is ragged.
+  it("keeps the start inside the small rack's drawn rows", () => {
+    expect(CLASSIC_START_CAPACITY).toBeGreaterThanOrEqual(19);
+    expect(CLASSIC_START_CAPACITY).toBeLessThanOrEqual(21);
+  });
 });
 

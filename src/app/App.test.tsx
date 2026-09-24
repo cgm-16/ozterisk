@@ -60,13 +60,15 @@ function renderApp(
 // GameHud and GameOverScreen both render <dt>label</dt><dd>value</dd> pairs;
 // only one of those screens is ever mounted at a time, so the label text is
 // unambiguous. Digit tiles show plain digit text, never these labels.
-// Plays out a discard's 8c exit. jsdom runs no animations, so the rack's
-// departing tiles are ended by hand, on both event names React may bind
-// (see TileInventory.test's endAnimation).
+// Plays out a discard: the 8c exits, then the 8a·2 drops of any rail tile the
+// discard spared. jsdom runs no animations, so each is ended by hand, on both
+// event names React may bind (see TileInventory.test's endAnimation).
 function finishDeparture(): void {
-  for (const cell of document.querySelectorAll("[data-departing]")) {
-    fireEvent.animationEnd(cell);
-    fireEvent(cell, new Event("webkitAnimationEnd", { bubbles: true }));
+  for (const stage of ["[data-departing]", "[data-seating]"]) {
+    for (const cell of document.querySelectorAll(stage)) {
+      fireEvent.animationEnd(cell);
+      fireEvent(cell, new Event("webkitAnimationEnd", { bubbles: true }));
+    }
   }
 }
 

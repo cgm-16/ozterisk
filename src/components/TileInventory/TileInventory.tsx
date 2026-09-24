@@ -11,6 +11,10 @@ import styles from "./TileInventory.module.css";
 interface Departure {
   tiles: readonly TileModel[];
   leaving: readonly string[];
+  /** Rail tiles that survived, still to drop into the freed seats (8a·2). */
+  seating: readonly string[];
+  /** Each seating tile's offset from its seat to where it perched. */
+  drops: Readonly<Record<string, { dx: number; dy: number }>>;
 }
 
 export interface TileInventoryProps {
@@ -70,7 +74,13 @@ export function TileInventory({
         ? previous.tiles.filter((tile) => !present.has(tile.id)).map((tile) => tile.id)
         : [];
     setPrevious({ tiles, mode });
-    if (leaving.length > 0) setDeparture({ tiles: previous.tiles, leaving });
+    // The tiles that were past capacity and are still held survived the
+    // discard on the rail; the reducer has seated them in the freed sockets.
+    const seating = previous.tiles
+      .slice(capacity)
+      .filter((tile) => present.has(tile.id))
+      .map((tile) => tile.id);
+    if (leaving.length > 0) setDeparture({ tiles: previous.tiles, leaving, seating, drops: {} });
   }
 
   // While a discard plays, the rack draws the hand as it stood before it. The
@@ -86,13 +96,39 @@ export function TileInventory({
   // Tiles leaving together end in the same frame and React batches their
   // handlers, so each retire is a functional update: read from the render's
   // closure, the second handler would restore the id the first removed.
-  const retire = (tileId: string) =>
+  //
+  // When the exits end, each surviving rail tile's seat is still on screen —
+  // the departing tile it replaces holds it — so the fall 8a·2 draws is
+  // measured then, from layout offsets, which transforms do not move.
+  const measureDrops = (): Departure["drops"] => {
+    const rack = rackRef.current;
+    if (rack === null || departure === null) return {};
+    const drops: Record<string, { dx: number; dy: number }> = {};
+    for (const id of departure.seating) {
+      const from = rack.querySelector<HTMLElement>(`[data-rail="${id}"]`);
+      const to = rack.querySelector<HTMLElement>(`[data-cell="${tiles.findIndex((tile) => tile.id === id)}"]`);
+      if (from && to) drops[id] = { dx: from.offsetLeft - to.offsetLeft, dy: from.offsetTop - to.offsetTop };
+    }
+    return drops;
+  };
+  const retire = (tileId: string) => {
+    const drops = measureDrops();
+    setDeparture((current) => {
+      if (current === null) return current;
+      const leaving = current.leaving.filter((id) => id !== tileId);
+      return { ...current, leaving, drops: leaving.length > 0 ? current.drops : drops };
+    });
+  };
+  const land = (tileId: string) =>
     setDeparture((current) =>
-      current && { ...current, leaving: current.leaving.filter((id) => id !== tileId) },
+      current && { ...current, seating: current.seating.filter((id) => id !== tileId) },
     );
+  const dropping =
+    departure !== null && departure.leaving.length === 0 ? new Set(departure.seating) : new Set<string>();
   // A settled departure stays in state, drawn as no departure at all, until
   // the next discard replaces it; the effect only has to announce it, once.
-  const settled = departure !== null && departure.leaving.length === 0;
+  const settled =
+    departure !== null && departure.leaving.length === 0 && departure.seating.length === 0;
   const onSettledRef = useRef(onSettled);
   useEffect(() => {
     onSettledRef.current = onSettled;
@@ -101,6 +137,14 @@ export function TileInventory({
     if (settled) onSettledRef.current?.();
   }, [settled]);
   const rackRef = useRef<HTMLDivElement>(null);
+  // The native cancel listener below is bound once; these carry it the
+  // current render's handlers, whose measurement reads the current hand.
+  const retireRef = useRef(retire);
+  const landRef = useRef(land);
+  useEffect(() => {
+    retireRef.current = retire;
+    landRef.current = land;
+  });
   useEffect(() => {
     // React has no onAnimationCancel, so the rack listens for it natively.
     const rack = rackRef.current;
@@ -109,12 +153,14 @@ export function TileInventory({
     // reward tile discarded inside its 9i fire cancels oz-fire as its exit
     // starts — so only a cancel of the exit the cell is running retires it.
     const onCancel = (event: Event) => {
-      const cell = (event.target as Element).closest("[data-departing]");
-      const tileId = cell?.getAttribute("data-departing");
-      if (!cell || !tileId) return;
+      const cell = (event.target as Element).closest("[data-departing], [data-seating]");
+      if (!cell) return;
       const cancelled = (event as AnimationEvent).animationName;
       if (cancelled !== getComputedStyle(cell).animationName) return;
-      retire(tileId);
+      const departing = cell.getAttribute("data-departing");
+      const seating = cell.getAttribute("data-seating");
+      if (departing) retireRef.current(departing);
+      if (seating) landRef.current(seating);
     };
     rack.addEventListener("animationcancel", onCancel);
     return () => rack.removeEventListener("animationcancel", onCancel);
@@ -161,7 +207,10 @@ export function TileInventory({
       } as CSSProperties)
     : undefined;
 
-  const renderTile = (tile: TileModel, onRail: boolean) => {
+  // `cell` is the grid index a tile sits at, or null for a tile on the rail.
+  const renderTile = (tile: TileModel, cell: number | null) => {
+    const onRail = cell === null;
+    const place = onRail ? { "data-rail": tile.id } : { "data-cell": cell };
     if (!present.has(tile.id)) {
       // The reducer has already dropped this tile and nothing outside the
       // rack needs to know it is still drawn, so it carries no role and is
@@ -175,6 +224,7 @@ export function TileInventory({
           key={tile.id}
           className={`${styles.cell} ${styles.cellDeparting}`}
           aria-hidden="true"
+          {...place}
           data-departing={tile.id}
           onAnimationEnd={() => retire(tile.id)}
         >
@@ -187,7 +237,7 @@ export function TileInventory({
       // A lifted cell is a socket, not a styled Tile: the tile it holds
       // is already named in the answer slots, so this cell must carry
       // no button role and no accessible name of its own.
-      return <div key={tile.id} className={`${styles.socket} ${styles.socketLifted}`} />;
+      return <div key={tile.id} className={`${styles.socket} ${styles.socketLifted}`} {...place} />;
     }
 
     const isMarkedForDiscard = mode === "discard" && pendingDiscards.includes(tile.id);
@@ -205,8 +255,26 @@ export function TileInventory({
           ? ` ${styles.cellNew}`
           : "";
 
+    // 8a·2: a rail tile the discard spared falls into the seat it freed, from
+    // where it perched. It is mounted in that seat and flies in from the rail.
+    const drop = !onRail && dropping.has(tile.id) ? (departure?.drops[tile.id] ?? { dx: 0, dy: 0 }) : null;
+    if (drop !== null) {
+      return (
+        <div
+          key={tile.id}
+          className={`${styles.cell} ${styles.cellPerchDrop}`}
+          style={{ "--dx": `${drop.dx}px`, "--dy": `${drop.dy}px` } as CSSProperties}
+          {...place}
+          data-seating={tile.id}
+          onAnimationEnd={() => land(tile.id)}
+        >
+          <Tile digit={tile.digit} state="disabled" label={labelParts.join(", ")} />
+        </div>
+      );
+    }
+
     return (
-      <div key={tile.id} className={`${styles.cell}${moment}`}>
+      <div key={tile.id} className={`${styles.cell}${moment}`} {...place}>
         <Tile
           digit={tile.digit}
           state={
@@ -230,7 +298,7 @@ export function TileInventory({
     <div ref={rackRef} className={styles.rack} style={sizing}>
       {perched.length > 0 && (
         <div className={`${styles.rail}${tier ? ` ${styles.railOverTray}` : ""}`}>
-          {perched.map((tile) => renderTile(tile, true))}
+          {perched.map((tile) => renderTile(tile, null))}
         </div>
       )}
       <div className={`${styles.inventory}${tier ? ` ${styles.tray}` : ""}`}>
@@ -238,7 +306,7 @@ export function TileInventory({
           if (index >= capacity) return <div key={`plug-${index}`} className={styles.plug} aria-hidden="true" />;
           const tile = rackTiles[index];
           if (tile === undefined) return <div key={`empty-${index}`} className={styles.socket} />;
-          return renderTile(tile, false);
+          return renderTile(tile, index);
         })}
       </div>
     </div>

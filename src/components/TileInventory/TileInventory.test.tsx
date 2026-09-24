@@ -399,6 +399,11 @@ describe("TileInventory", () => {
     endAnimation(cells(container)[2]);
     expect(onSettled).not.toHaveBeenCalled();
     endAnimation(cells(container)[6]);
+    // Both rail tiles now drop into the freed seats (8a·2); the discard
+    // settles when they land.
+    expect(onSettled).not.toHaveBeenCalled();
+    endAnimation(cells(container)[2]);
+    endAnimation(cells(container)[6]);
     expect(onSettled).toHaveBeenCalledTimes(1);
   });
 
@@ -415,13 +420,39 @@ describe("TileInventory", () => {
     rerender({ tiles: after, mode: "readOnly" });
 
     const [first, second] = [cells(container)[2], cells(container)[6]];
-    act(() => {
-      for (const cell of [first, second]) {
-        cell.dispatchEvent(new Event("animationend", { bubbles: true }));
-        cell.dispatchEvent(new Event("webkitAnimationEnd", { bubbles: true }));
-      }
-    });
+    const endTogether = (pair: HTMLElement[]) =>
+      act(() => {
+        for (const cell of pair) {
+          cell.dispatchEvent(new Event("animationend", { bubbles: true }));
+          cell.dispatchEvent(new Event("webkitAnimationEnd", { bubbles: true }));
+        }
+      });
+    endTogether([first, second]);
+    // The two perched tiles land together too.
+    endTogether([cells(container)[2], cells(container)[6]]);
     expect(onSettled).toHaveBeenCalledTimes(1);
+  });
+
+  // 8a·2: the tile perched on the rail takes the seat the discard freed, and
+  // falls into it from where it perched — the perch was real, so the fall is.
+  it("drops the surviving rail tile into the freed seat, and settles when it lands", () => {
+    const before = railedRack();
+    const after = [...before.slice(0, 10)];
+    after[4] = before[10]!;
+    const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
+    rerender({ tiles: after, mode: "readOnly" });
+
+    endAnimation(cells(container)[4]); // the slide-off
+    const seated = cells(container)[4];
+    expect(seated.textContent).toBe("7");
+    expect(animationOn(seated)).toBe("oz-perch-drop");
+    expect(seated.style.getPropertyValue("--dx")).toMatch(/^-?\d+(\.\d+)?px$/);
+    expect(seated.style.getPropertyValue("--dy")).toMatch(/^-?\d+(\.\d+)?px$/);
+    expect(onSettled).not.toHaveBeenCalled();
+
+    endAnimation(seated);
+    expect(onSettled).toHaveBeenCalledTimes(1);
+    expect(animationOn(cells(container)[4])).not.toBe("oz-perch-drop");
   });
 
   it("settles when the rail tile itself is the one discarded", () => {

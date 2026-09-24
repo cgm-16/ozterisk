@@ -2,6 +2,9 @@
    what the stepped rack measures to decide whether it is narrow (§1.12) —
    measuring the grid itself would feed its own width back into the choice. */
 .rack {
+  /* The offset parent the perch drop (8a·2) measures rail and seat against. */
+  position: relative;
+
   /* The tracks' natural width, shared by the grid, the tray and the rail. */
   --rack-width: calc(var(--rack-columns) * var(--tile-w) + (var(--rack-columns) - 1) * var(--rack-gap));
 
@@ -199,4 +202,15 @@
   animation-duration: var(--dur-discard);
   animation-timing-function: var(--ease-fall);
   animation-fill-mode: forwards;
+}
+
+/* 8a·2 — the perched tile takes the seat a discard freed. Mounted in the seat,
+   it falls from the rail: --dx / --dy are the rail position less the seat's,
+   measured by TileInventory, and the frame starts exactly where 8a's perch
+   left it, pivoting on the same lower-left edge. */
+.cellPerchDrop {
+  animation-name: global(oz-perch-drop);
+  animation-duration: var(--dur-perch);
+  animation-timing-function: var(--ease-fall);
+  transform-origin: 0 100%;
 }

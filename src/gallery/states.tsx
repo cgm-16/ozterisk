@@ -258,7 +258,7 @@ const FEEDBACK_AFTER_DISCARD_STATE = gameReducer(OVERFLOW_REQUIRED_1_STATE, {
   tileId: "tile-5",
 });
 
-// A Classic game over at the floor is the win (§1.8): Run Complete, no
+// A Classic game over at the floor with tiles in hand is the win (§1.8): Run Complete, no
 // equation. Above the floor it is a loss, which renders exactly as
 // game-over-idle does — so it has no entry of its own.
 const CLASSIC_TO_FLOOR = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY;

@@ -60,7 +60,7 @@ export function App({ dependencies, shareDependencies }: AppProps) {
   }, [state.equation, state.selectedTiles, dependencies]);
 
   const handleNextRound = useCallback(() => {
-    // At the floor the advance is the win (§1.8 step 0): no equation is drawn,
+    // At the floor the advance ends the run (§1.8 step 0): no equation is drawn,
     // and the current one, never shown again, keeps the reducer's invariant.
     if (isAtClassicFloor(state)) {
       if (state.equation === null) return;

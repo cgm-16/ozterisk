@@ -858,6 +858,18 @@ describe("Classic", () => {
     expect(isClassicWin(next)).toBe(true);
   });
 
+  it("NEXT_ROUND at the floor with an empty hand ends the run as a loss", () => {
+    const state = makeFeedbackState(makeEquation(2, 3), {
+      mode: "classic",
+      totalRounds: toFloor,
+      round: toFloor,
+      inventory: [],
+    });
+    const next = gameReducer(state, { type: "NEXT_ROUND", equation: makeEquation(2, 3) });
+    expect(next.phase).toBe("gameOver");
+    expect(isClassicWin(next)).toBe(false);
+  });
+
   it("NEXT_ROUND above the floor with too few tiles ends the run as a loss", () => {
     const state = makeFeedbackState(makeEquation(2, 3), {
       mode: "classic",

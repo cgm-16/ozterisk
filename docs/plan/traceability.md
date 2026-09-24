@@ -51,7 +51,7 @@ M6a — Classic Core:
 |---|---|---|
 | R-31 Classic is specified before it is built | T63 | `product.md` §1.7a, amended §1.3/§1.5/§1.7/§1.8/§1.10/§1.11/§1.17; `ui-i18n.md` §1.12/§1.14/§1.15 |
 | R-32 capacity is a function of mode and submissions; a socket seals every second submission down to the floor | T64 | selector tests for `getCapacity`; reducer tests for a two-tile Classic overflow and a miss that never overflows |
-| R-33 reaching the floor wins; too few tiles loses | T64 | reducer tests for the win-before-loss order at `NEXT_ROUND` |
+| R-33 reaching the floor with tiles in hand wins; too few tiles, or an empty hand at the floor, loses | T64 | reducer tests for the win-before-loss order at `NEXT_ROUND` |
 | R-34 Classic's economy starts above the cliff and crosses it | T64 | `balance.test.ts` Classic invariant |
 | R-35 only the tiles that fit are sorted; the last mark completes the discard; survivors take the freed seats | T65 | reducer tests in both modes |
 | R-36 no Confirm and no Next Round after a discard | T66 | component tests: the second mark of two removes both, and `animationend` advances the round; `Enter` is inert while settling |

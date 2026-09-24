@@ -49,10 +49,10 @@ no new state beyond `mode`.
   - Classic at 20/20 tiles, `totalRounds: 1`, a correct 2-digit answer: phase `overflow`, `getOverflowCount === 2`.
   - The overflow test runs at `totalRounds: 1`, where checking before or after the increment differs (20 vs 19). It asserts phase and count only; the order is `T65`'s.
   - `SUBMIT_INCORRECT` in Classic never yields a positive overflow count.
-  - `NEXT_ROUND` in Classic at the floor goes to `gameOver` even when the hand can answer, and `isClassicWin` is true; a hand too short goes to `gameOver` with `isClassicWin` false above the floor.
+  - `NEXT_ROUND` in Classic at the floor goes to `gameOver` even when the hand can answer, and `isClassicWin` is true; at the floor with an empty hand it is false; a hand too short goes to `gameOver` with `isClassicWin` false above the floor.
   - `balance.test.ts`: Classic's buildable rate at `CLASSIC_START_CAPACITY` is above the cliff and at `CLASSIC_FLOOR` below it minus `CLIFF_MARGIN`; `START > FLOOR >= 2`; `START >= 10`.
 - [ ] Implement; add each dial with its economy effect (AGENTS.md §4.5). Existing dial values untouched.
-- [ ] `isClassicWin` = phase `gameOver` and mode `classic` and capacity at the floor; a Classic loss above the floor reads false.
+- [ ] `isClassicWin` = phase `gameOver` and mode `classic` and capacity at the floor and at least one tile in hand; a Classic loss above the floor, or at it with an empty hand, reads false.
 - [ ] `isDiscardReady` moves to `getOverflowCount(state)`; it survives until `T65`.
 - [ ] Endless fixtures gain `mode: "endless"`, mirrored in `architecture.md` §2.6; no other change to existing tests.
 

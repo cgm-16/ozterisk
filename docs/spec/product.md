@@ -116,7 +116,7 @@ An incorrect answer is legal even when the correct answer cannot be constructed 
 
 When the player advances:
 
-0. In Classic, if capacity has reached the floor, enter `gameOver` as a **win**; the run is complete and no equation is shown.
+0. In Classic, if capacity has reached the floor, enter `gameOver` and draw no equation. The run is a **win** if the player holds at least one tile, and a **loss** if the hand is empty: a miss that spends the last tile on the final submission is still a failure.
 1. Generate the next equation outside the reducer.
 2. Clear `isNew` on surviving inventory tiles, and sort the whole inventory — the one re-sort per round.
 3. Clear the previous answer selection, pending discards, and prior result.

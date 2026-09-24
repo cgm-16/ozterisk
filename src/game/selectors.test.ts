@@ -202,10 +202,16 @@ describe("isSubmissionReady", () => {
 
 describe("isClassicWin", () => {
   const atFloor = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY;
-  const gameOver = { ...createTitleState(), phase: "gameOver" as const };
+  const gameOver = { ...createTitleState(), phase: "gameOver" as const, inventory: [makeTile(4)] };
 
-  it("is true for a Classic game over at the floor", () => {
+  it("is true for a Classic game over at the floor with tiles in hand", () => {
     expect(isClassicWin({ ...gameOver, mode: "classic", totalRounds: atFloor })).toBe(true);
+  });
+
+  // A miss that spends the last tile on the final submission is a failure,
+  // floor or not (§1.8 step 0).
+  it("is false for a Classic game over at the floor with an empty hand", () => {
+    expect(isClassicWin({ ...gameOver, mode: "classic", totalRounds: atFloor, inventory: [] })).toBe(false);
   });
 
   it("is false for a Classic game over above the floor, which is a loss", () => {

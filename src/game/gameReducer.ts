@@ -164,8 +164,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const nextInventory = sortTiles(
         state.inventory.map((tile) => (tile.isNew ? { ...tile, isNew: false } : tile)),
       );
-      // A Classic run at the floor is complete: the win is checked before the
-      // loss, so a hand that could still answer does not play on (§1.8).
+      // A Classic run at the floor is over before the loss check, so a hand
+      // that could still answer does not play on; isClassicWin tells the win
+      // from an empty-hand loss (§1.8).
       const canPlay = !isAtClassicFloor(state) && canAttemptEquation(nextInventory, action.equation);
       return {
         ...state,

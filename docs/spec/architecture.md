@@ -214,7 +214,7 @@ export function canAttemptEquation(
 ): boolean;
 export function getCapacity(mode: GameMode, totalRounds: number): number;
 export function getOverflowCount(state: GameState): number;
-export function isClassicWin(state: GameState): boolean; // gameOver at the floor
+export function isClassicWin(state: GameState): boolean; // gameOver at the floor with tiles in hand
 export function getRewardCount(spentCount: number): number;
 export function canConstruct(inventory: readonly Tile[], product: number): boolean;
 export function isSubmissionReady(state: GameState): boolean;

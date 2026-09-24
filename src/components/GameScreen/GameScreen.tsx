@@ -3,7 +3,6 @@ import type { GameAction, GameState } from "../../game/types";
 import {
   getAnswerLength,
   getOverflowCount,
-  isDiscardReady,
   isSubmissionReady,
 } from "../../game/selectors";
 import { useGameKeyboard } from "../../hooks/useGameKeyboard";
@@ -96,11 +95,7 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
       )}
 
       {state.phase === "overflow" && (
-        <OverflowControls
-          requiredCount={getOverflowCount(state)}
-          onConfirm={() => dispatch({ type: "CONFIRM_DISCARD" })}
-          disabled={!isDiscardReady(state)}
-        />
+        <OverflowControls requiredCount={getOverflowCount(state)} />
       )}
 
       <TileInventory
@@ -110,14 +105,9 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         pendingDiscards={state.pendingDiscards}
         onTile={(tileId) => {
           if (state.phase === "answering") dispatch({ type: "SELECT_TILE", tileId });
-          if (state.phase === "overflow") {
-            dispatch({ type: "TOGGLE_DISCARD", tileId });
-            // A forced single-tile discard needs no confirmation step: marking the
-            // only tile that can go is the whole decision. Dispatched from the click
-            // handler and never from an effect, so rendering an already-marked state
-            // still requires user action.
-            if (getOverflowCount(state) === 1) dispatch({ type: "CONFIRM_DISCARD" });
-          }
+          // The mark that reaches the required count completes the discard in the
+          // reducer, so rendering an already-marked state still requires user action.
+          if (state.phase === "overflow") dispatch({ type: "TOGGLE_DISCARD", tileId });
         }}
       />
     </main>

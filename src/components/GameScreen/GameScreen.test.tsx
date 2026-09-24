@@ -15,10 +15,10 @@ import {
 import slotStyles from "../AnswerSlots/AnswerSlots.module.css";
 import { GameScreen, type GameScreenProps } from "./GameScreen";
 
-// A 12-tile inventory (excess 2) for exercising the multi-tile Confirm path.
-// makeOverflowState's 11-tile default collapses at requiredCount === 1, so
-// covering Confirm's continued existence needs an inventory override, not a
-// change to that default (which every other overflow test still relies on).
+// A 12-tile inventory (excess 2), where a first mark is only a mark.
+// makeOverflowState's 11-tile default completes on its first mark, so
+// covering the unfinished state needs an inventory override, not a change to
+// that default (which every other overflow test still relies on).
 const TWELVE_TILE_INVENTORY = makeOverflowInventory(12);
 
 function renderScreen(state: GameState) {
@@ -134,15 +134,18 @@ describe("GameScreen interactions", () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  // 6. Enter confirms overflow only at exact selection
-  it("confirms discard on Enter when exactly the excess tile count is marked", async () => {
+  // 6. Enter has no overflow action: there is nothing to confirm (§1.11)
+  it("does nothing on Enter in overflow, even with marks placed", async () => {
     const equation = makeEquation(3, 3);
-    const state = makeOverflowState(equation, { pendingDiscards: ["tile-0"] }); // excess is 1
+    const state = makeOverflowState(equation, {
+      inventory: TWELVE_TILE_INVENTORY,
+      pendingDiscards: ["tile-0"],
+    });
     const { dispatch } = renderScreen(state);
 
     await userEvent.keyboard("{Enter}");
 
-    expect(dispatch).toHaveBeenCalledWith({ type: "CONFIRM_DISCARD" });
+    expect(dispatch).not.toHaveBeenCalled();
   });
 
   it("does not confirm discard on Enter when the marked count is short of the excess", async () => {
@@ -268,23 +271,6 @@ describe("GameScreen interactions", () => {
       await userEvent.keyboard("{Enter}");
 
       expect(onNextRound).toHaveBeenCalledTimes(1);
-    });
-
-    it("dispatches CONFIRM_DISCARD exactly once with Confirm Discard focused", async () => {
-      const equation = makeEquation(3, 3);
-      // requiredCount 2: a single-tile discard collapses without Confirm, so
-      // this needs the multi-tile inventory to keep exercising Confirm at all.
-      const state = makeOverflowState(equation, {
-        inventory: TWELVE_TILE_INVENTORY,
-        pendingDiscards: ["tile-0", "tile-1"],
-      });
-      const { dispatch } = renderScreen(state);
-
-      screen.getByRole("button", { name: "Confirm Discard" }).focus();
-      await userEvent.keyboard("{Enter}");
-
-      const confirmCalls = dispatch.mock.calls.filter(([action]) => action.type === "CONFIRM_DISCARD");
-      expect(confirmCalls).toHaveLength(1);
     });
 
     it("calls onSubmit exactly once with Submit focused", async () => {
@@ -429,26 +415,24 @@ describe("GameScreen phase composition", () => {
     expect(nextRound.compareDocumentPosition(inventoryTile) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it("renders a discard-mode inventory, preserved feedback, and Confirm Discard in overflow", () => {
+  it("renders a discard-mode inventory, preserved feedback, and the instruction with no Confirm in overflow", () => {
     const equation = makeEquation(3, 3);
-    // requiredCount 2: a single-tile discard collapses without Confirm, so
-    // this needs the multi-tile inventory to keep exercising Confirm at all.
     const state = makeOverflowState(equation, {
       inventory: TWELVE_TILE_INVENTORY,
-      pendingDiscards: ["tile-0", "tile-1"],
+      pendingDiscards: ["tile-0"],
     });
     renderScreen(state);
 
     const status = screen.getByRole("status");
     expect(status).toHaveTextContent("Incorrect");
-    const confirmButton = screen.getByRole("button", { name: "Confirm Discard" });
-    expect(confirmButton).toBeEnabled();
+    const instruction = screen.getByText("Choose 2 tile(s) to discard.");
+    expect(screen.queryByRole("button", { name: "Confirm Discard" })).not.toBeInTheDocument();
     const discardTile = screen.getByRole("button", { name: "Digit 0, Marked for discard" });
     expect(discardTile).toHaveAttribute("aria-pressed", "true");
 
     // HUD -> equation/feedback context -> phase action -> inventory (§1.10).
-    expect(status.compareDocumentPosition(confirmButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(confirmButton.compareDocumentPosition(discardTile) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(status.compareDocumentPosition(instruction) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(instruction.compareDocumentPosition(discardTile) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("keeps the feedback status region mounted across the overflow-to-feedback transition", () => {
@@ -492,7 +476,7 @@ describe("GameScreen phase composition", () => {
 });
 
 describe("GameScreen overflow collapse", () => {
-  it("completes a forced single-tile discard in one tap under StrictMode", async () => {
+  it("dispatches exactly one TOGGLE_DISCARD for a forced single-tile discard under StrictMode", async () => {
     const user = userEvent.setup();
     const state = makeOverflowState(makeEquation(3, 3)); // 11 tiles -> required 1
     const dispatch = vi.fn();
@@ -509,21 +493,17 @@ describe("GameScreen overflow collapse", () => {
     // one accessible name guaranteed to resolve to a single button.
     await user.click(screen.getByRole("button", { name: "Digit 5" }));
 
-    expect(dispatch.mock.calls.map(([action]) => action.type)).toEqual([
-      "TOGGLE_DISCARD",
-      "CONFIRM_DISCARD",
-    ]);
+    // The reducer completes the discard on this mark (§1.7); the screen only
+    // forwards it, once, so StrictMode's double render cannot double it.
+    expect(dispatch.mock.calls.map(([action]) => action.type)).toEqual(["TOGGLE_DISCARD"]);
   });
 
-  it("still renders Confirm and does not auto-complete a multi-tile (12-tile) overflow discard", async () => {
+  it("dispatches a single mark on a multi-tile (12-tile) overflow tap and renders no Confirm", async () => {
     const equation = makeEquation(3, 3);
     const state = makeOverflowState(equation, { inventory: TWELVE_TILE_INVENTORY }); // required 2
     const { dispatch } = renderScreen(state);
 
-    // Disabled until enough tiles are marked. This is the only assertion on
-    // the isDiscardReady wire: without it, OverflowControls could be handed a
-    // hardcoded disabled={false} and the whole suite would still pass.
-    expect(screen.getByRole("button", { name: "Confirm Discard" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "Confirm Discard" })).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole("button", { name: "Digit 5" }));
 
@@ -542,17 +522,14 @@ describe("GameScreen overflow collapse", () => {
     expect(dispatch).toHaveBeenCalledWith({ type: "TOGGLE_DISCARD", tileId: "tile-5" });
   });
 
-  it("completes a forced single-tile discard on a digit key press", async () => {
+  it("marks on a digit key press at a required count of one, leaving completion to the reducer", async () => {
     const equation = makeEquation(3, 3);
     const state = makeOverflowState(equation); // 11 tiles -> required 1
     const { dispatch } = renderScreen(state);
 
     await userEvent.keyboard("5");
 
-    expect(dispatch.mock.calls.map(([action]) => action.type)).toEqual([
-      "TOGGLE_DISCARD",
-      "CONFIRM_DISCARD",
-    ]);
+    expect(dispatch.mock.calls.map(([action]) => action.type)).toEqual(["TOGGLE_DISCARD"]);
   });
 
   it("walks through duplicate-digit tiles on repeated presses instead of re-toggling an already-marked one", async () => {

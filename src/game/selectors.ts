@@ -77,9 +77,3 @@ export function isSubmissionReady(state: GameState): boolean {
   );
 }
 
-export function isDiscardReady(state: GameState): boolean {
-  return (
-    state.phase === "overflow" &&
-    state.pendingDiscards.length === getOverflowCount(state)
-  );
-}

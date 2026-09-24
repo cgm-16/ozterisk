@@ -8,7 +8,6 @@ import {
   getOverflowCount,
   getRewardCount,
   isClassicWin,
-  isDiscardReady,
   isSubmissionReady,
 } from "./selectors";
 import {
@@ -198,46 +197,6 @@ describe("isSubmissionReady", () => {
       selectedTiles: [makeTile(9)],
     });
     expect(isSubmissionReady(state)).toBe(false);
-  });
-});
-
-describe("isDiscardReady", () => {
-  it("is true in overflow phase when marked discards equal the excess", () => {
-    const inventory = Array.from({ length: 11 }, (_, index) => makeTile(0, `tile-${index}`));
-    const state = makeAnsweringState(makeEquation(3, 3), {
-      phase: "overflow",
-      inventory,
-      pendingDiscards: ["tile-0"],
-    });
-    expect(isDiscardReady(state)).toBe(true);
-  });
-
-  it("is false in overflow phase when fewer discards are marked than the excess", () => {
-    const inventory = Array.from({ length: 13 }, (_, index) => makeTile(0, `tile-${index}`));
-    const state = makeAnsweringState(makeEquation(3, 3), {
-      phase: "overflow",
-      inventory,
-      pendingDiscards: ["tile-0"],
-    });
-    expect(isDiscardReady(state)).toBe(false);
-  });
-
-  it("is false in overflow phase when more discards are marked than the excess", () => {
-    const inventory = Array.from({ length: 11 }, (_, index) => makeTile(0, `tile-${index}`));
-    const state = makeAnsweringState(makeEquation(3, 3), {
-      phase: "overflow",
-      inventory,
-      pendingDiscards: ["tile-0", "tile-1"],
-    });
-    expect(isDiscardReady(state)).toBe(false);
-  });
-
-  it("is false outside the overflow phase", () => {
-    const state = makeAnsweringState(makeEquation(3, 3), {
-      phase: "answering",
-      pendingDiscards: [],
-    });
-    expect(isDiscardReady(state)).toBe(false);
   });
 });
 

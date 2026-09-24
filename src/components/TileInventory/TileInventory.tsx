@@ -29,18 +29,15 @@ export function TileInventory({ tiles, mode, pendingDiscards, liftedIds, onTile 
   // A tile that leaves state unmounts, and CSS cannot animate an unmounted
   // node, so 8c has to be drawn from a copy the rack keeps. Both halves of
   // "which tile just left, and did it leave by discard" are only legible
-  // against the previous render, because CONFIRM_DISCARD drops the tile in the
-  // same action that leaves the discard phase. Adjusting state during render
+  // against the previous render, because the TOGGLE_DISCARD that completes a
+  // discard drops the tile in the same action that leaves the discard phase. Adjusting state during render
   // rather than in an effect keeps the held tile on screen from the first
   // frame after the drop, with no gap for it to disappear in.
   //
-  // The discard test is the phase the rack was in, not pendingDiscards. A
-  // forced single-tile discard dispatches TOGGLE_DISCARD and CONFIRM_DISCARD
-  // from one click handler (GameScreen), React batches them into one update,
-  // and the rack goes straight from "not marked" to "gone" — so a tile that
-  // left by discard was never once rendered with its id in pendingDiscards.
-  // Since INVENTORY_CAPACITY + REWARD_BONUS caps overflow at one tile, that
-  // batched path is the only discard the product can reach. `mode` is
+  // The discard test is the phase the rack was in, not pendingDiscards. The
+  // mark that reaches the required count completes the discard in the reducer,
+  // so that tile goes straight from "not marked" to "gone" — it was never once
+  // rendered with its id in pendingDiscards. `mode` is
   // "discard" for exactly the overflow phase, which is the one phase a tile
   // can leave the rack this way, and a submitted tile leaves from "select".
   const [previous, setPrevious] = useState({ tiles, mode });

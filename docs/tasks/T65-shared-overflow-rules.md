@@ -22,6 +22,12 @@ paths:
   - src/game/selectors.ts
   - src/game/selectors.test.ts
   - src/game/types.ts
+  - src/components/GameScreen/  # Confirm dispatches and their tests: deleting the action breaks compilation here
+  - src/components/OverflowControls/  # the Confirm button and its props
+  - src/hooks/useGameKeyboard.ts  # the CONFIRM_DISCARD dispatches and the overflow Enter handler
+  - src/i18n/messages.ts  # action.confirmDiscard
+  - src/gallery/  # comments and a test that named Confirm
+  - src/app/App.test.tsx  # comments that named CONFIRM_DISCARD
 ```
 
 **Interfaces**
@@ -45,6 +51,10 @@ completes it" removes the only control Classic would add.
   - After the discard the phase is `feedback` with `lastResult.discarded === true`.
   - `NEXT_ROUND` sorts the whole inventory and clears `discarded`.
 - [ ] Implement; delete the dead action and selector and their tests.
+- [ ] Deleting `CONFIRM_DISCARD` breaks compilation in the UI, so its dispatches,
+  the Confirm button, the overflow `Enter` handler and `action.confirmDiscard` go
+  here too, with the tests that asserted them. Behaviour-preserving: the reducer
+  now completes the discard on the mark those paths used to follow with Confirm.
 
 ## Acceptance
 

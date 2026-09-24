@@ -220,9 +220,8 @@ const OVERFLOW_REQUIRED_1_STATE = makeOverflowState(makeEquation(3, 3), {
   },
 });
 
-// Classic's case: excess 2 needs an explicit Confirm click. Classic mode
-// doesn't exist in the shipped game, so this state is otherwise unreachable
-// by playing. lastResult is "correct" for the same reason as required-1
+// Classic's case: excess 2, where the first mark is only a mark and the second
+// completes the discard. lastResult is "correct" for the same reason as required-1
 // above; its three reward tiles reflect REWARD_BONUS = 2, which only
 // Classic would need (Endless ships REWARD_BONUS = 1), so that reward count
 // is unreachable for the same reason the inventory size is: 10 - 1 + 3 = 12.
@@ -249,11 +248,8 @@ const OVERFLOW_REQUIRED_2_STATE = makeOverflowState(makeEquation(3, 3), {
 // its lift and its rim — had only ever been rendered by jsdom, which performs
 // no layout.
 //
-// Built on required 2, not required 1: at excess 1 GameScreen's onTile
-// handler dispatches TOGGLE_DISCARD and CONFIRM_DISCARD from the same click,
-// so a tile marked and unconfirmed is a state the reducer permits and the
-// product never shows. It carries required 2's caveat with it — Classic is
-// not in the shipped game, so this hand is unreachable by playing.
+// Built on required 2, not required 1: at excess 1 the one mark completes the
+// discard, so a tile marked and not yet gone exists only at excess 2.
 //
 // tile-0 is the first of the hand's two 0s and carries no reward badge of its
 // own, which is the duplicate a player would let go. Marked through the

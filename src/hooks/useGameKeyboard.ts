@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { Digit, GameAction, GameState } from "../game/types";
-import { getAnswerLength, getOverflowCount, isDiscardReady, isSubmissionReady } from "../game/selectors";
+import { getAnswerLength, getOverflowCount, isSubmissionReady } from "../game/selectors";
 
 const DIGIT_KEY_PATTERN = /^[0-9]$/;
 
@@ -85,14 +85,6 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
           if (!tile) return;
           event.preventDefault();
           dispatch({ type: "TOGGLE_DISCARD", tileId: tile.id });
-          if (required === 1) dispatch({ type: "CONFIRM_DISCARD" });
-          return;
-        }
-
-        if (event.key === "Enter") {
-          if (!isDiscardReady(state)) return;
-          event.preventDefault();
-          dispatch({ type: "CONFIRM_DISCARD" });
         }
         return;
       }

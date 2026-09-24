@@ -26,6 +26,8 @@ export interface RoundResult {
   correctValue: number;
   submittedTiles: Tile[];
   rewardTileIds: string[];
+  /** Set when this round's overflow discard completed; the round then advances on its own (§1.7). */
+  discarded?: boolean;
 }
 
 export interface GameState {
@@ -50,7 +52,6 @@ export type GameAction =
   | { type: "SUBMIT_CORRECT"; rewardTiles: Tile[] }
   | { type: "SUBMIT_INCORRECT" }
   | { type: "TOGGLE_DISCARD"; tileId: string }
-  | { type: "CONFIRM_DISCARD" }
   | { type: "NEXT_ROUND"; equation: Equation }
   | { type: "RESTART_RUN"; equation: Equation; inventory: Tile[] } // keeps state.mode
   | { type: "CLEAR_SELECTION" };

@@ -175,10 +175,9 @@ describe("App", () => {
     // (non-reward) tile completes the discard immediately, no Confirm needed.
     await user.click(screen.getByRole("button", { name: "Digit 9" }));
 
-    // Confirm's absence at requiredCount 1 doesn't by itself prove the discard
-    // completed (it's also hidden while still overflowing at count 1), so
-    // check the overflow instruction itself is gone: that only happens once
-    // CONFIRM_DISCARD has actually advanced the phase past "overflow".
+    // No Confirm is ever rendered, so its absence proves nothing; check the
+    // overflow instruction itself is gone: that only happens once the marking
+    // TOGGLE_DISCARD has actually advanced the phase past "overflow".
     expect(screen.queryByText("Choose 1 tile(s) to discard.")).not.toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Correct");
     expect(screen.getByRole("button", { name: "Digit 0, New tile" })).toBeInTheDocument();
@@ -417,7 +416,7 @@ describe("App", () => {
     expect(calls).toBe(5); // SUBMIT_CORRECT: two reward tiles
 
     await user.click(screen.getByRole("button", { name: "Digit 9" })); // completes the forced single discard
-    expect(calls).toBe(5); // CONFIRM_DISCARD draws no randomness
+    expect(calls).toBe(5); // completing the discard draws no randomness
 
     await user.click(screen.getByRole("button", { name: "Next Round" }));
     expect(calls).toBe(8); // NEXT_ROUND: one more equation draw (gate + pair + order)

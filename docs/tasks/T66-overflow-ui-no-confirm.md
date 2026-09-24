@@ -27,7 +27,7 @@ paths:
 **Interfaces**
 
 - `TileInventory` gains `capacity: number` and `onSettled?: () => void`.
-- `OverflowControls` loses `onConfirm` and `disabled`; it states the count only.
+- `OverflowControls` already states the count only (`T65` removed Confirm with the action).
 
 ## Why
 
@@ -46,7 +46,6 @@ motion already fires `animationend` at `0.01ms`).
   - Removing Next Round means a missed `animationend` would freeze the run, so settle also on `animationcancel`, when nothing departing animates, and when the departing clone unmounts early — one test each.
   - Rim-reject marks cells at `index >= capacity`, not index 10.
 - [ ] GameScreen stops re-sorting the rack outside `answering`; the reducer's order is the rack's order.
-- [ ] Delete the Confirm path, the duplicated `=== 1` collapse and the overflow `Enter` handler.
 
 ## Acceptance
 

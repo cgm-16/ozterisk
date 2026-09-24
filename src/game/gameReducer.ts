@@ -8,7 +8,6 @@ import {
   getCapacity,
   getOverflowCount,
   getRewardCount,
-  isDiscardReady,
 } from "./selectors";
 
 // Round 1, zero statistics, straight into answering — shared by START_RUN and
@@ -68,16 +67,21 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (action.rewardTiles.some((tile) => inventoryIds.has(tile.id))) return state;
 
       const newRewardTiles = action.rewardTiles.map((tile) => ({ ...tile, isNew: true }));
-      const nextInventory = sortTiles([...state.inventory, ...newRewardTiles]);
+      const arrived = [...state.inventory, ...newRewardTiles];
       const nextCurrentStreak = state.currentStreak + 1;
       const nextTotalRounds = state.totalRounds + 1;
       // Checked against the capacity after this submission, so a seal it makes
       // is already counted (§1.7).
       const overflowCount = getOverflowCount({
         mode: state.mode,
-        inventory: nextInventory,
+        inventory: arrived,
         totalRounds: nextTotalRounds,
       });
+      // Sort only what fits. The tiles past capacity are the newest arrivals, in
+      // arrival order, and perch on the rail — sorting first would always perch
+      // the highest digits (§1.5 step 7).
+      const fits = arrived.length - overflowCount;
+      const nextInventory = [...sortTiles(arrived.slice(0, fits)), ...arrived.slice(fits)];
 
       return {
         ...state,
@@ -125,32 +129,41 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const tile = state.inventory.find((item) => item.id === action.tileId);
       if (!tile) return state;
       const alreadyMarked = state.pendingDiscards.includes(action.tileId);
-      if (!alreadyMarked && state.pendingDiscards.length >= getOverflowCount(state)) {
+      const required = getOverflowCount(state);
+      if (!alreadyMarked && state.pendingDiscards.length >= required) {
         return state;
       }
-      return {
-        ...state,
-        pendingDiscards: alreadyMarked
-          ? state.pendingDiscards.filter((id) => id !== action.tileId)
-          : [...state.pendingDiscards, action.tileId],
-      };
-    }
+      const pendingDiscards = alreadyMarked
+        ? state.pendingDiscards.filter((id) => id !== action.tileId)
+        : [...state.pendingDiscards, action.tileId];
+      if (pendingDiscards.length < required) return { ...state, pendingDiscards };
 
-    case "CONFIRM_DISCARD": {
-      if (!isDiscardReady(state)) return state;
-      const discardIds = new Set(state.pendingDiscards);
+      // The mark that reaches the required count completes the discard (§1.7).
+      // Surviving rail tiles take the freed sockets in order; nothing else moves.
+      // Exactly `required` tiles go and exactly `required` sit on the rail, so
+      // every freed seat has a survivor to fill it.
+      const discardIds = new Set(pendingDiscards);
+      const seatCount = state.inventory.length - required;
+      const railSurvivors = state.inventory
+        .slice(seatCount)
+        .filter((tile) => !discardIds.has(tile.id));
+      const nextInventory = state.inventory
+        .slice(0, seatCount)
+        .map((tile) => (discardIds.has(tile.id) ? railSurvivors.shift()! : tile));
       return {
         ...state,
         phase: "feedback",
-        inventory: state.inventory.filter((tile) => !discardIds.has(tile.id)),
+        inventory: nextInventory,
         pendingDiscards: [],
+        lastResult: state.lastResult && { ...state.lastResult, discarded: true },
       };
     }
 
     case "NEXT_ROUND": {
       if (state.phase !== "feedback") return state;
-      const nextInventory = state.inventory.map((tile) =>
-        tile.isNew ? { ...tile, isNew: false } : tile,
+      // The one re-sort per round (§1.8).
+      const nextInventory = sortTiles(
+        state.inventory.map((tile) => (tile.isNew ? { ...tile, isNew: false } : tile)),
       );
       // A Classic run at the floor is complete: the win is checked before the
       // loss, so a hand that could still answer does not play on (§1.8).

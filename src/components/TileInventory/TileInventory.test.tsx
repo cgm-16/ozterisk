@@ -593,5 +593,32 @@ describe("TileInventory", () => {
       rerender({ tiles, capacity: 18, drawnCapacity: 18, stepped: true });
       expect(cells(container)[0].style.animationName).toBe("");
     });
+
+    // The re-seat's frame is written inline, and inline beats a class: left
+    // in place, a re-seated tile discarded later would keep computing
+    // oz-reseat instead of oz-slide-off, start no exit, fire no animationend,
+    // and — with no Next Round after a discard — freeze the run.
+    it("lets a re-seated tile leave by its own exit later in the run", () => {
+      const tiles = hand(15);
+      const { container, rerender, onSettled } = renderInventory({
+        tiles, capacity: 15, drawnCapacity: 16, stepped: true,
+      });
+      rerender({ tiles, capacity: 15, drawnCapacity: 15, stepped: true });
+      for (const cell of cells(container).slice(0, 15)) {
+        fireEvent(cell, Object.assign(new Event("animationend", { bubbles: true }), { animationName: "oz-reseat" }));
+      }
+
+      const railed = [...tiles, tile(7, "rail", true)];
+      rerender({ tiles: railed, capacity: 15, drawnCapacity: 15, stepped: true, mode: "discard" });
+      const after = [...tiles];
+      after[3] = railed[15]!;
+      rerender({ tiles: after, capacity: 15, drawnCapacity: 15, stepped: true, mode: "readOnly" });
+
+      const departing = cells(container)[3];
+      expect(animationOn(departing)).toBe("oz-slide-off");
+      endAnimation(departing);
+      endAnimation(cells(container)[3]); // the rail tile lands
+      expect(onSettled).toHaveBeenCalledTimes(1);
+    });
   });
 });

@@ -163,8 +163,26 @@ export function TileInventory({
       if (departing) retireRef.current(departing);
       if (seating) landRef.current(seating);
     };
+    // M6·1 writes its frame inline, and inline beats a class: left in place,
+    // a re-seated tile discarded later in the run would keep computing
+    // oz-reseat instead of its exit, start nothing, fire no animationend, and
+    // freeze a round that no longer has a Next Round. So the frame is removed
+    // the moment it ends, or is cancelled.
+    const onReseatDone = (event: Event) => {
+      const cell = event.target as HTMLElement;
+      if ((event as AnimationEvent).animationName !== "oz-reseat" || !cell.dataset?.tile) return;
+      for (const property of ["--fx", "--fy", "--fs", "transform-origin", "animation-name", "animation-duration", "animation-timing-function", "animation-fill-mode"]) {
+        cell.style.removeProperty(property);
+      }
+    };
     rack.addEventListener("animationcancel", onCancel);
-    return () => rack.removeEventListener("animationcancel", onCancel);
+    rack.addEventListener("animationend", onReseatDone);
+    rack.addEventListener("animationcancel", onReseatDone);
+    return () => {
+      rack.removeEventListener("animationcancel", onCancel);
+      rack.removeEventListener("animationend", onReseatDone);
+      rack.removeEventListener("animationcancel", onReseatDone);
+    };
   }, []);
 
   // Narrow is a property of the container, not the viewport (§1.12): a

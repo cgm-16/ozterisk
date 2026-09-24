@@ -28,17 +28,15 @@ export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
               {t("result.rewards", { count: rewardTiles.length })}
             </p>
           )}
-          {/* The tiles stay on screen and leave the accessibility tree. The
-              panel announces itself, so a badge per arrival read "New tile"
-              once per tile where §1.14's result.rewards states the count once.
-              Nothing is lost by hiding them: TileInventory renders the same
-              arrivals in every phase, and a tile carries "New tile" in its own
-              accessible name until NEXT_ROUND clears isNew. */}
+          {/* The tiles stay on screen and leave the accessibility tree: the
+              panel announces itself, and §1.14's result.rewards states the
+              count once. Nothing is lost by hiding them: TileInventory renders
+              the same arrivals in every phase, and a tile carries "New tile" in
+              its own accessible name until NEXT_ROUND clears isNew. */}
           <ul className={styles.rewards} aria-hidden="true">
             {rewardTiles.map((tile) => (
               <li key={tile.id} className={styles.reward}>
                 <Tile digit={tile.digit} size="sm" state="reward" />
-                <span className={styles.rewardBadge}>{t("tile.newLabel")}</span>
               </li>
             ))}
           </ul>

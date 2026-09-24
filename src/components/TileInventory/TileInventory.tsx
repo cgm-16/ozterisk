@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { flushSync } from "react-dom";
 import type { Tile as TileModel } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
+import { rackTier, trayWidth } from "./rackTier";
 import styles from "./TileInventory.module.css";
 
 /** A discard the rack is still drawing (8c): the hand as it stood before the
@@ -18,8 +20,14 @@ export interface TileInventoryProps {
   /** Ids of tiles sitting in the answer slots. Each renders as an empty
    * socket in its own cell instead of a tile, so the rack never reflows. */
   liftedIds: readonly string[];
-  /** Live capacity: the sockets drawn, and the index past which tiles perch. */
+  /** Live capacity: the tiles seated, and the index past which tiles perch. */
   capacity: number;
+  /** Classic: the rack steps its tile size with drawnCapacity and keeps closed
+   * sockets as sealed plugs (§1.12). */
+  stepped?: boolean;
+  /** The capacity the rack is drawn at, which changes only at the round
+   * change. Defaults to capacity. */
+  drawnCapacity?: number;
   onTile(tileId: string): void;
   /** Called once a discard's departing tiles have all finished leaving. */
   onSettled?(): void;
@@ -32,6 +40,8 @@ export function TileInventory({
   pendingDiscards,
   liftedIds,
   capacity,
+  stepped = false,
+  drawnCapacity = capacity,
   onTile,
   onSettled,
 }: TileInventoryProps) {
@@ -110,82 +120,127 @@ export function TileInventory({
     return () => rack.removeEventListener("animationcancel", onCancel);
   }, []);
 
+  // Narrow is a property of the container, not the viewport (§1.12): a
+  // min-width query fires about 15px early wherever a scrollbar takes layout
+  // width. ResizeObserver reports after layout and before paint, and flushSync
+  // commits the change inside that same step — left to React's scheduler it
+  // lands after the paint, and a 320px player sees a frame of seven columns.
+  const [narrow, setNarrow] = useState(false);
+  useLayoutEffect(() => {
+    const rack = rackRef.current;
+    const natural = trayWidth(rackTier(drawnCapacity));
+    if (!stepped || rack === null || natural === 0 || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      const width = entry.contentRect.width;
+      flushSync(() => setNarrow(width > 0 && width < natural));
+    });
+    observer.observe(rack);
+    return () => observer.disconnect();
+  }, [stepped, drawnCapacity]);
+
   // §1.12: the live capacity's sockets always render — the empty sockets are
-  // the score. Mid-overflow the hand runs past capacity, so the count only
-  // grows to fit the tiles past it, never shrinks below capacity.
-  const cellCount = Math.max(capacity, rackTiles.length);
+  // the score. Classic draws whole rows for its size's top capacity, and every
+  // cell past the live capacity is a sealed plug: the rack is always a full
+  // rectangle, and the plug count is the descent. Tiles past the live capacity
+  // never add a row; they perch on the rail above.
+  const tier = stepped ? rackTier(drawnCapacity, narrow) : null;
+  const footprint = tier ? Math.ceil(tier.top / tier.cols) * tier.cols : capacity;
+  const perched = rackTiles.slice(capacity);
+  const sizing: CSSProperties | undefined = tier
+    ? ({
+        "--rack-columns": tier.cols,
+        "--rack-rows": footprint / tier.cols,
+        ...(tier.size && {
+          "--tile-w": `${tier.size.w}px`,
+          "--tile-h": `${tier.size.h}px`,
+          "--size-tile": `${tier.size.font}px`,
+          "--rack-gap": `${tier.size.gap}px`,
+          "--rack-pad": `${tier.size.pad}px`,
+          ...(tier.size.smallRadius && { "--radius-md": "var(--radius-sm)" }),
+        }),
+      } as CSSProperties)
+    : undefined;
+
+  const renderTile = (tile: TileModel, onRail: boolean) => {
+    if (!present.has(tile.id)) {
+      // The reducer has already dropped this tile and nothing outside the
+      // rack needs to know it is still drawn, so it carries no role and is
+      // hidden: it has left the game. Retired on animationend rather than
+      // on a timer, which would be a second source of truth for a duration
+      // the stylesheet owns — and under prefers-reduced-motion the global
+      // 0.01ms rule still fires the event, so the same path retires the
+      // tile instantly with no branch for it.
+      return (
+        <div
+          key={tile.id}
+          className={`${styles.cell} ${styles.cellDeparting}`}
+          aria-hidden="true"
+          data-departing={tile.id}
+          onAnimationEnd={() => retire(tile.id)}
+        >
+          <Tile digit={tile.digit} state="marked" />
+        </div>
+      );
+    }
+
+    if (liftedIds.includes(tile.id)) {
+      // A lifted cell is a socket, not a styled Tile: the tile it holds
+      // is already named in the answer slots, so this cell must carry
+      // no button role and no accessible name of its own.
+      return <div key={tile.id} className={`${styles.socket} ${styles.socketLifted}`} />;
+    }
+
+    const isMarkedForDiscard = mode === "discard" && pendingDiscards.includes(tile.id);
+    const labelParts = [t("tile.digitLabel", { digit: tile.digit })];
+    if (tile.isNew) labelParts.push(t("tile.newLabel"));
+    if (isMarkedForDiscard) labelParts.push(t("tile.discardLabel"));
+
+    // 8a and 9i collide on the cells past capacity, which hold the newest
+    // arrivals — reward tiles, almost every time (§1.5 step 7). Those are
+    // the arrivals that did not land, so they rim-reject instead of firing.
+    const moment =
+      onRail
+        ? ` ${styles.cellRimReject}`
+        : tile.isNew
+          ? ` ${styles.cellNew}`
+          : "";
+
+    return (
+      <div key={tile.id} className={`${styles.cell}${moment}`}>
+        <Tile
+          digit={tile.digit}
+          state={
+            isMarkedForDiscard
+              ? "marked"
+              : mode === "readOnly"
+                ? "disabled"
+                : tile.isNew
+                  ? "reward"
+                  : "resting"
+          }
+          label={labelParts.join(", ")}
+          pressed={mode === "discard" ? isMarkedForDiscard : undefined}
+          onClick={() => onTile(tile.id)}
+        />
+      </div>
+    );
+  };
 
   return (
-    <div ref={rackRef} className={styles.inventory}>
-      {Array.from({ length: cellCount }, (_, index) => {
-        const tile = rackTiles[index];
-        if (tile === undefined) {
-          return <div key={`empty-${index}`} className={styles.socket} />;
-        }
-
-        if (!present.has(tile.id)) {
-          // The reducer has already dropped this tile and nothing outside the
-          // rack needs to know it is still drawn, so it carries no role and is
-          // hidden: it has left the game. Retired on animationend rather than
-          // on a timer, which would be a second source of truth for a duration
-          // the stylesheet owns — and under prefers-reduced-motion the global
-          // 0.01ms rule still fires the event, so the same path retires the
-          // tile instantly with no branch for it.
-          return (
-            <div
-              key={tile.id}
-              className={`${styles.cell} ${styles.cellDeparting}`}
-              aria-hidden="true"
-              data-departing={tile.id}
-              onAnimationEnd={() => retire(tile.id)}
-            >
-              <Tile digit={tile.digit} state="marked" />
-            </div>
-          );
-        }
-
-        if (liftedIds.includes(tile.id)) {
-          // A lifted cell is a socket, not a styled Tile: the tile it holds
-          // is already named in the answer slots, so this cell must carry
-          // no button role and no accessible name of its own.
-          return <div key={tile.id} className={`${styles.socket} ${styles.socketLifted}`} />;
-        }
-
-        const isMarkedForDiscard = mode === "discard" && pendingDiscards.includes(tile.id);
-        const labelParts = [t("tile.digitLabel", { digit: tile.digit })];
-        if (tile.isNew) labelParts.push(t("tile.newLabel"));
-        if (isMarkedForDiscard) labelParts.push(t("tile.discardLabel"));
-
-        // 8a and 9i collide on the cells past capacity, which hold the newest
-        // arrivals — reward tiles, almost every time (§1.5 step 7). Those are
-        // the arrivals that did not land, so they rim-reject instead of firing.
-        const moment =
-          index >= capacity
-            ? ` ${styles.cellRimReject}`
-            : tile.isNew
-              ? ` ${styles.cellNew}`
-              : "";
-
-        return (
-          <div key={tile.id} className={`${styles.cell}${moment}`}>
-            <Tile
-              digit={tile.digit}
-              state={
-                isMarkedForDiscard
-                  ? "marked"
-                  : mode === "readOnly"
-                    ? "disabled"
-                    : tile.isNew
-                      ? "reward"
-                      : "resting"
-              }
-              label={labelParts.join(", ")}
-              pressed={mode === "discard" ? isMarkedForDiscard : undefined}
-              onClick={() => onTile(tile.id)}
-            />
-          </div>
-        );
-      })}
+    <div ref={rackRef} className={styles.rack} style={sizing}>
+      {perched.length > 0 && (
+        <div className={`${styles.rail}${tier ? ` ${styles.railOverTray}` : ""}`}>
+          {perched.map((tile) => renderTile(tile, true))}
+        </div>
+      )}
+      <div className={`${styles.inventory}${tier ? ` ${styles.tray}` : ""}`}>
+        {Array.from({ length: footprint }, (_, index) => {
+          if (index >= capacity) return <div key={`plug-${index}`} className={styles.plug} aria-hidden="true" />;
+          const tile = rackTiles[index];
+          if (tile === undefined) return <div key={`empty-${index}`} className={styles.socket} />;
+          return renderTile(tile, false);
+        })}
+      </div>
     </div>
   );
 }

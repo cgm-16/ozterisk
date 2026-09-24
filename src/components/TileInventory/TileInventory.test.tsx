@@ -5,7 +5,9 @@ import { INVENTORY_CAPACITY } from "../../game/balance";
 import type { Tile } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
 import tileStyles from "../Tile/Tile.module.css";
+import { rackTier } from "./rackTier";
 import { TileInventory, type TileInventoryProps } from "./TileInventory";
+import rackStyles from "./TileInventory.module.css";
 
 const tile = (digit: Tile["digit"], id: string, isNew = false): Tile => ({ id, digit, isNew });
 
@@ -44,11 +46,20 @@ function renderInventory(overrides: Partial<TileInventoryProps> = {}) {
 // at all, so cell count has to be read off the DOM shape rather than a query
 // that only ever finds buttons.
 function cellCount(container: HTMLElement): number {
-  return container.firstElementChild?.children.length ?? 0;
+  return cells(container).length;
 }
 
 function cells(container: HTMLElement): HTMLElement[] {
-  return Array.from(container.firstElementChild?.children ?? []) as HTMLElement[];
+  return Array.from(container.querySelector(`.${rackStyles.inventory}`)?.children ?? []) as HTMLElement[];
+}
+
+// The rail band above the grid, where tiles past capacity perch (§1.12).
+function railCells(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelector(`.${rackStyles.rail}`)?.children ?? []) as HTMLElement[];
+}
+
+function plugCount(container: HTMLElement): number {
+  return cells(container).filter((cell) => cell.classList.contains(rackStyles.plug)).length;
 }
 
 // The one motion fact jsdom can settle: which element the cascade puts an
@@ -172,24 +183,26 @@ describe("TileInventory", () => {
     expect(cellCount(allHeld)).toBe(INVENTORY_CAPACITY);
   });
 
-  it("renders eleven cells when eleven tiles are held", () => {
+  it("keeps ten sockets and perches an eleventh tile on the rail, never in a new row", () => {
     const eleven = Array.from({ length: 11 }, (_, index) => tile(0, `t${index}`));
     const { container } = renderInventory({ tiles: eleven });
-    expect(cellCount(container)).toBe(11);
+    expect(cellCount(container)).toBe(10);
+    expect(railCells(container)).toHaveLength(1);
+  });
+
+  it("draws no rail while nothing is past capacity", () => {
+    const { container } = renderInventory({ tiles: [tile(1, "a")] });
+    expect(container.querySelector(`.${rackStyles.rail}`)).toBeNull();
   });
 
   it("keeps the cell count and every other tile's cell unchanged when a tile becomes lifted", () => {
     const tiles = [tile(1, "a"), tile(2, "b"), tile(3, "c")];
     const { container: before } = renderInventory({ tiles });
-    const textsBefore = Array.from(before.firstElementChild?.children ?? []).map(
-      (cell) => cell.textContent,
-    );
+    const textsBefore = cells(before).map((cell) => cell.textContent);
     cleanup();
 
     const { container: after } = renderInventory({ tiles, liftedIds: ["b"] });
-    const textsAfter = Array.from(after.firstElementChild?.children ?? []).map(
-      (cell) => cell.textContent,
-    );
+    const textsAfter = cells(after).map((cell) => cell.textContent);
 
     expect(textsAfter).toHaveLength(textsBefore.length);
     expect(textsAfter[0]).toBe(textsBefore[0]); // tile "a" untouched
@@ -224,10 +237,10 @@ describe("TileInventory", () => {
     expect(animationOn(after)).toBe("oz-fire");
   });
 
-  it("rim-rejects the eleventh cell and none of the ten sockets", () => {
+  it("rim-rejects the perched tile and none of the ten sockets", () => {
     const eleven = Array.from({ length: 11 }, (_, index) => tile(0, `t${index}`));
     const { container } = renderInventory({ tiles: eleven });
-    expect(animationOn(cells(container)[INVENTORY_CAPACITY])).toBe("oz-rim-reject");
+    expect(animationOn(railCells(container)[0])).toBe("oz-rim-reject");
     expect(cells(container).slice(0, INVENTORY_CAPACITY).map(animationOn)).toEqual(
       Array.from({ length: INVENTORY_CAPACITY }, () => "none"),
     );
@@ -239,7 +252,7 @@ describe("TileInventory", () => {
   it("rim-rejects an eleventh cell that holds a reward tile rather than firing it", () => {
     const eleven = Array.from({ length: 11 }, (_, index) => tile(0, `t${index}`, index === 10));
     const { container } = renderInventory({ tiles: eleven });
-    expect(animationOn(cells(container)[INVENTORY_CAPACITY])).toBe("oz-rim-reject");
+    expect(animationOn(railCells(container)[0])).toBe("oz-rim-reject");
   });
 
   it("holds a confirmed discard in its own cell and retires it on animationend", () => {
@@ -344,8 +357,8 @@ describe("TileInventory", () => {
   it("sizes the rack by the capacity it is given, and rim-rejects the first cell past it", () => {
     const twenty = Array.from({ length: 20 }, (_, index) => tile((index % 10) as Tile["digit"], `t${index}`));
     const { container } = renderInventory({ tiles: twenty, capacity: 19 });
-    expect(cellCount(container)).toBe(20);
-    expect(animationOn(cells(container)[19])).toBe("oz-rim-reject");
+    expect(cellCount(container)).toBe(19);
+    expect(railCells(container).map(animationOn)).toEqual(["oz-rim-reject"]);
     expect(animationOn(cells(container)[10])).toBe("none");
     cleanup();
 
@@ -366,10 +379,11 @@ describe("TileInventory", () => {
 
     expect(cells(container)[4].textContent).toBe("4");
     expect(cells(container)[5].textContent).toBe("5");
-    expect(cells(container)[10].textContent).toBe("7");
+    expect(railCells(container)[0].textContent).toBe("7");
 
     endAnimation(cells(container)[4]);
     expect(cellCount(container)).toBe(10);
+    expect(railCells(container)).toHaveLength(0);
     expect(cells(container)[4].textContent).toBe("7");
     expect(cells(container)[5].textContent).toBe("5");
   });
@@ -415,7 +429,7 @@ describe("TileInventory", () => {
     const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
     rerender({ tiles: before.slice(0, 10), mode: "readOnly" });
 
-    endAnimation(cells(container)[10]);
+    endAnimation(railCells(container)[0]);
     expect(onSettled).toHaveBeenCalledTimes(1);
     expect(cellCount(container)).toBe(10);
   });
@@ -428,7 +442,7 @@ describe("TileInventory", () => {
     rerender({ tiles: before.slice(0, 10), mode: "readOnly" });
 
     // React has no onAnimationCancel, so the rack listens natively.
-    fireEvent(cells(container)[10], cancelEvent("oz-slide-off"));
+    fireEvent(railCells(container)[0], cancelEvent("oz-slide-off"));
     expect(onSettled).toHaveBeenCalledTimes(1);
   });
 
@@ -440,7 +454,7 @@ describe("TileInventory", () => {
     const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
     rerender({ tiles: before.slice(0, 10), mode: "readOnly" });
 
-    fireEvent(cells(container)[10], cancelEvent("oz-fire"));
+    fireEvent(railCells(container)[0], cancelEvent("oz-fire"));
     expect(onSettled).not.toHaveBeenCalled();
   });
 
@@ -449,5 +463,59 @@ describe("TileInventory", () => {
     const { rerender, onSettled } = renderInventory({ tiles });
     rerender({ tiles: [tiles[0]] });
     expect(onSettled).not.toHaveBeenCalled();
+  });
+
+  describe("the stepped Classic rack", () => {
+    const hand = (count: number) =>
+      Array.from({ length: count }, (_, index) => tile((index % 10) as Tile["digit"], `h${index}`));
+
+    it("steps its size with the drawn capacity: 7 x 44 above 15, 6 x 48 above 10, the Endless rack at 10 and below", () => {
+      expect(rackTier(20)).toMatchObject({ cols: 7, top: 20, size: { w: 44, h: 55, gap: 4 } });
+      expect(rackTier(16)).toMatchObject({ cols: 7, top: 20 });
+      expect(rackTier(15)).toMatchObject({ cols: 6, top: 15, size: { w: 48, h: 60, gap: 6 } });
+      expect(rackTier(11)).toMatchObject({ cols: 6, top: 15 });
+      expect(rackTier(10)).toEqual({ cols: 5, top: 10, size: null });
+      expect(rackTier(6)).toEqual({ cols: 5, top: 10, size: null });
+    });
+
+    it("caps both upper sizes at 6 x 44 where the arena is narrow (§1.12)", () => {
+      expect(rackTier(20, true)).toMatchObject({ cols: 6, top: 20, size: { w: 44, h: 55, gap: 2, pad: 2 } });
+      expect(rackTier(15, true)).toMatchObject({ cols: 6, top: 15, size: { w: 44, gap: 2 } });
+      expect(rackTier(10, true)).toEqual(rackTier(10));
+    });
+
+    it("draws the whole-row footprint, sealing the house plug at twenty", () => {
+      const { container } = renderInventory({ tiles: hand(20), capacity: 20, drawnCapacity: 20, stepped: true });
+      expect(cellCount(container)).toBe(21);
+      expect(plugCount(container)).toBe(1);
+      const plug = cells(container).find((cell) => cell.classList.contains(rackStyles.plug))!;
+      expect(plug).toHaveAttribute("aria-hidden", "true");
+    });
+
+    it("closes the socket a seal took before the round change, and seats no tile there", () => {
+      // Live 19 after the second submission; the rack is still drawn at 20.
+      const { container } = renderInventory({ tiles: hand(19), capacity: 19, drawnCapacity: 20, stepped: true });
+      expect(cellCount(container)).toBe(21);
+      expect(plugCount(container)).toBe(2);
+      expect(cells(container)[19].textContent).toBe("");
+    });
+
+    it("perches Classic's two-tile excess on the rail and keeps the grid whole", () => {
+      const { container } = renderInventory({ tiles: hand(21), capacity: 19, drawnCapacity: 20, stepped: true });
+      expect(cellCount(container)).toBe(21);
+      expect(railCells(container)).toHaveLength(2);
+    });
+
+    it("draws 18 cells with three plugs at fifteen", () => {
+      const { container } = renderInventory({ tiles: hand(15), capacity: 15, drawnCapacity: 15, stepped: true });
+      expect(cellCount(container)).toBe(18);
+      expect(plugCount(container)).toBe(3);
+    });
+
+    it("draws the ten-socket rack from ten down, where only a closed socket is a plug", () => {
+      const { container } = renderInventory({ tiles: hand(9), capacity: 9, drawnCapacity: 10, stepped: true });
+      expect(cellCount(container)).toBe(10);
+      expect(plugCount(container)).toBe(1);
+    });
   });
 });

@@ -1,7 +1,37 @@
-/* Five columns, rows that grow: ten sockets fit exactly the --rack-rows two
-   rows, and the one state that exceeds ten (an eleventh tile mid-overflow,
-   R5) lands alone on a third row (grid-auto-rows) rather than forcing a
-   sixth column.
+/* The rack and its rail. It takes the arena's full content width, which is
+   what the stepped rack measures to decide whether it is narrow (§1.12) —
+   measuring the grid itself would feed its own width back into the choice. */
+.rack {
+  /* The tracks' natural width, shared by the grid, the tray and the rail. */
+  --rack-width: calc(var(--rack-columns) * var(--tile-w) + (var(--rack-columns) - 1) * var(--rack-gap));
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Tiles past capacity perch here, above the rack, never in a new row of it
+   (§1.12): the newest arrivals, right-aligned, at the rack's tile size. The
+   band's own height is 56px; a taller tile overhangs it rather than moving
+   the rack twice. */
+.rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--tile-w);
+  justify-content: end;
+  gap: var(--rack-gap);
+  width: 100%;
+  max-width: var(--rack-width);
+  min-height: 56px;
+  margin-bottom: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-accent);
+}
+
+/* Columns and rows come from --rack-columns and --rack-rows: ten sockets in
+   5 x 2 for Endless, or the stepped footprint TileInventory sets for Classic.
+   Tiles past capacity go to the rail, so no row is ever added.
 
    The tracks are `minmax(0, --tile-w)` rather than a flat `--tile-w`, and that
    is what fixes #85. Fixed tracks gave the rack a min-content width the arena
@@ -37,9 +67,36 @@
   gap: var(--rack-gap);
   justify-content: center;
   width: 100%;
-  max-width: calc(
-    var(--rack-columns) * var(--tile-w) + (var(--rack-columns) - 1) * var(--rack-gap)
-  );
+  max-width: var(--rack-width);
+}
+
+/* Classic's tray: the panel the stepped rack sits in (§1.12). Its side
+   padding is --rack-pad, which the narrow size tightens to 2px — the width
+   budget is the only one that binds, so the top and bottom keep room for the
+   tiles' hard bottom edge. max-width grows by the side padding and the 1px
+   border so the tracks keep their full size. */
+.tray {
+  padding: var(--space-2) var(--rack-pad, var(--space-2));
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  background: var(--surface-panel);
+  max-width: calc(var(--rack-width) + 2 * var(--rack-pad, var(--space-2)) + 2px);
+}
+
+/* Over a tray, the rail spans the tray, not just its tracks. */
+.railOverTray {
+  max-width: calc(var(--rack-width) + 2 * var(--rack-pad, var(--space-2)) + 2px);
+}
+
+/* A sealed plug: the rest state of oz-seal, flush with the felt, a rim, and
+   no well. It is not an empty socket — an empty socket is a debt the run can
+   repay, a plug is gone (§1.12). */
+.plug {
+  width: 100%;
+  height: var(--tile-h);
+  border-radius: var(--radius-md);
+  background: var(--surface-table);
+  box-shadow: var(--rim-socket), inset 0 -1px 0 var(--hair-100);
 }
 
 /* An empty or lifted socket is its own grid item, sized like a tile, with no
@@ -111,7 +168,7 @@
   animation-timing-function: var(--ease-snap);
 }
 
-/* 8a — the eleventh cell, which exists only while the rack overflows: the
+/* 8a — a tile past capacity, which exists only while the rack overflows: the
    tile is refused entry, drops onto the rail and stays perched there. The
    frame's last keyframe is that perch, not a rest, so without a fill mode the
    tile snaps back into the grid the instant it lands.
@@ -119,9 +176,7 @@
    transform-origin carries the shape's pivot, which lives on the element in
    the storyboard rather than in the frame: the rotation reads as a tile
    catching on its lower-left edge, and around the default centre it reads as
-   a swivel instead. The rack is five columns at every tier, so the eleventh
-   cell sits alone in the leftmost column of a third row and the wider
-   rightward reach the pivot gives it lands in empty track. */
+   a swivel instead. */
 .cellRimReject {
   animation-name: global(oz-rim-reject);
   animation-duration: var(--dur-select);

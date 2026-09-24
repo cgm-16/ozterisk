@@ -666,8 +666,32 @@ describe("GameScreen after a discard", () => {
       inventory: [...seated, makeTile(0, "newest", true)],
     });
     renderScreen(state);
+    // The rail sits above the rack, so the perched tile comes first.
     const tiles = screen.getAllByRole("button", { name: /^Digit/ });
-    expect(tiles.at(-1)).toHaveAccessibleName("Digit 0, New tile");
+    expect(tiles[0]).toHaveAccessibleName("Digit 0, New tile");
+    expect(tiles.slice(1).every((tile) => tile.textContent === "9")).toBe(true);
+  });
+});
+
+describe("GameScreen with Classic's stepped rack", () => {
+  it("draws the rack at the displayed round's capacity, so a seal closes a socket without resizing it", async () => {
+    const { createInitialInventory } = await import("../../game/factories");
+    const { sequentialIds } = await import("../../test/fixtures");
+    // Feedback after the second submission: live capacity 19, the rack still
+    // drawn at 20 until the round change (§1.7a).
+    const state = makeFeedbackState(makeEquation(3, 3), {
+      mode: "classic",
+      round: 2,
+      totalRounds: 2,
+      inventory: createInitialInventory(sequentialIds(), 19),
+    });
+    const { container } = render(
+      <I18nProvider initialLanguage="en">
+        <GameScreen state={state} dispatch={vi.fn()} onSubmit={vi.fn()} onNextRound={vi.fn()} />
+      </I18nProvider>,
+    );
+    const plugs = container.querySelectorAll("[aria-hidden='true'][class*='plug']");
+    expect(plugs).toHaveLength(2); // the house plug, and the socket this seal closed
   });
 });
 

@@ -121,6 +121,11 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         }
         liftedIds={state.selectedTiles.map((tile) => tile.id)}
         capacity={getCapacity(state.mode, state.totalRounds)}
+        // Classic's rack is drawn at the displayed round's capacity, which
+        // moves only at the round change; the live capacity above says which
+        // tiles are seated (§1.7a).
+        stepped={state.mode === "classic"}
+        drawnCapacity={getCapacity(state.mode, state.round - 1)}
         mode={state.phase === "answering" ? "select" : state.phase === "overflow" ? "discard" : "readOnly"}
         pendingDiscards={state.pendingDiscards}
         onSettled={() => {

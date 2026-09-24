@@ -95,6 +95,12 @@ async function sweep(page: Page): Promise<StateReading[]> {
   const readings: StateReading[] = [];
   for (let i = 0; i < STATE_COUNT; i += 1) {
     await buttons.nth(i).click();
+    // Read what the player sees: the first painted frame. A state that sizes
+    // itself from a ResizeObserver (Classic's stepped rack) settles in the
+    // rendering step, and a read straight after the click lands before it.
+    await page.evaluate(
+      () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+    );
     readings.push(
       await page.evaluate(() => {
         const stage = document.querySelector('div[class*="stage"]');

@@ -24,15 +24,17 @@ section wins.
   scrolls vertically:
   - capacity `16–20`: `7` columns, tiles `44 × 55`, gap `4px`, radius `--radius-sm`; footprint `21` cells;
   - capacity `11–15`: `6` columns, tiles `48 × 60`, gap `6px`; footprint `18` cells;
-  - capacity `≤ 10`: `5` columns, tiles `64 × 80`, gap `8px`; footprint `10` cells.
+  - capacity `≤ 10`: the Endless rack itself — `5` columns at Endless's tiers above, scaling
+    with its container; footprint `10` cells. From ten sockets on, Classic's rack is Endless's.
   The thresholds (`15`, `10`) await a device playtest. **Narrow cap:** where the
   rack's container cannot hold a size's natural width, both upper sizes draw at
   `6` columns of `44 × 55` (`44px` is the target minimum and may not be undercut).
   The budget is the `320px` gate *with* a `15px` scrollbar, as above: a `305px`
   content box less the arena's `24px` padding leaves `281px`. `7 × 44` needs `332px`
   of tiles and `6 × 48` needs `318px`, so neither fits; `6 × 44` needs `264px`, which
-  leaves `17px` for five gaps, the panel's padding on both sides and its `1px` border
-  on both sides — so the narrow size uses a `2px` gap and `2px` padding (`280px`).
+  leaves `17px` for five gaps, the panel's side padding and its `1px` border on both
+  sides — so the narrow size uses a `2px` gap and `2px` of side padding (`280px`). Only
+  the width binds, so the panel keeps its `8px` top and bottom.
   "Narrow" is a property of the container, not the viewport: a `min-width` query
   fires about `15px` early wherever scrollbars take layout width (see above), so it
   cannot choose the column count. The narrow footprint is whole rows of `6`.

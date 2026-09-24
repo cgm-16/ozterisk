@@ -106,6 +106,10 @@ describe("TitleScreen", () => {
     expect(
       screen.getByText(/Press a digit key to select a matching tile/),
     ).toBeInTheDocument();
+    // Classic's twenty closing to six, and that the floor is the win (§1.14)
+    expect(
+      screen.getByText(/Classic starts with twenty sockets .* reach six sockets and the run is complete/),
+    ).toBeInTheDocument();
   });
 
   it("states the four material rules on the felt, outside the disclosure", () => {

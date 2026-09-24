@@ -37,6 +37,8 @@ const en = {
       "If a reward would push your inventory past ten tiles, you must choose tiles to discard before play continues.",
     progress:
       "Round shows which equation is currently on screen, score counts correct answers, and streak counts consecutive correct answers. Rounds played counts every equation you have submitted, correct or incorrect. The run ends once you hold fewer tiles than the next answer requires.",
+    classic:
+      "Classic starts with twenty sockets and closes one every second submission, correct or not. Keep enough tiles to reach six sockets and the run is complete.",
     keyboard:
       "Press a digit key to select a matching tile or, during a discard, to mark it and complete the discard, Backspace to return the most recently selected tile, Escape to clear your selection, Enter to submit or continue, and R to play again once the run ends.",
   },
@@ -121,6 +123,8 @@ const ko = {
     overflow: "보상으로 인벤토리가 열 개를 초과하면, 계속하기 전에 버릴 타일을 선택해야 합니다.",
     progress:
       "라운드는 현재 화면에 표시된 문제의 번호이며, 점수는 정답 횟수를, 연속 정답은 이어지는 정답 횟수를 나타냅니다. 진행한 라운드는 정답과 오답을 포함해 지금까지 제출한 문제 수를 나타냅니다. 다음 정답에 필요한 타일보다 보유한 타일이 적어지면 게임이 종료됩니다.",
+    classic:
+      "클래식은 스무 칸으로 시작해 정답 여부와 관계없이 두 번 제출할 때마다 한 칸씩 닫힙니다. 여섯 칸에 도달할 때까지 타일을 지키면 완주합니다.",
     keyboard:
       "숫자 키를 누르면 일치하는 타일을 선택하거나, 버리기 중에는 타일을 표시해 바로 버리기를 완료하며, Backspace 키로 가장 최근에 선택한 타일을 되돌리고, Escape 키로 선택을 지우며, Enter 키로 제출하거나 다음으로 진행하고, 게임이 끝나면 R 키로 다시 시작합니다.",
   },

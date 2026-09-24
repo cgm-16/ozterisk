@@ -28,7 +28,7 @@ const MATERIAL_RULES: { swatch: string; topic: keyof MessageTree["howToPlay"] }[
 
 /** Topics play never teaches on its own. Keyboard controls lead: it is the one
     of the four that no amount of playing reveals. */
-const MORE_TOPICS = ["keyboard", "selecting", "slots", "progress"] as const;
+const MORE_TOPICS = ["keyboard", "selecting", "slots", "progress", "classic"] as const;
 
 export function TitleScreen({ onStart }: TitleScreenProps) {
   const { t } = useI18n();

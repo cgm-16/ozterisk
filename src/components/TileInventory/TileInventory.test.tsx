@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { INVENTORY_CAPACITY } from "../../game/balance";
@@ -379,6 +379,28 @@ describe("TileInventory", () => {
     endAnimation(cells(container)[2]);
     expect(onSettled).not.toHaveBeenCalled();
     endAnimation(cells(container)[6]);
+    expect(onSettled).toHaveBeenCalledTimes(1);
+  });
+
+  // Two tiles leaving together finish in the same frame, and React batches the
+  // updates their animationend handlers make. Measured in a real browser: a
+  // retire that read the departure from its render's closure let the second
+  // handler undo the first, one id was never retired, and the run froze.
+  it("settles when two departures end in the same batch", () => {
+    const before = [...railedRack(), tile(8, "rail-2", true)];
+    const after = [...before.slice(0, 10)];
+    after[2] = before[10]!;
+    after[6] = before[11]!;
+    const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
+    rerender({ tiles: after, mode: "readOnly" });
+
+    const [first, second] = [cells(container)[2], cells(container)[6]];
+    act(() => {
+      for (const cell of [first, second]) {
+        cell.dispatchEvent(new Event("animationend", { bubbles: true }));
+        cell.dispatchEvent(new Event("webkitAnimationEnd", { bubbles: true }));
+      }
+    });
     expect(onSettled).toHaveBeenCalledTimes(1);
   });
 

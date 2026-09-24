@@ -67,26 +67,29 @@ export function TileInventory({
   // reducer has already seated a surviving rail tile in the freed socket, so
   // splicing the departing tile back into the new hand would shove every later
   // tile a cell over; the snapshot keeps each tile where the player saw it.
-  const rackTiles = departure?.tiles ?? tiles;
+  const rackTiles = departure !== null && departure.leaving.length > 0 ? departure.tiles : tiles;
   const present = new Set(tiles.map((tile) => tile.id));
 
   // Retires one departing tile; the last one settles the discard. The next
   // round waits on this (§1.7), so a departure that never reported its end
   // would freeze the run — which is why a cancelled animation retires too.
-  const retire = (tileId: string) => {
-    if (departure === null || !departure.leaving.includes(tileId)) return;
-    const leaving = departure.leaving.filter((id) => id !== tileId);
-    if (leaving.length > 0) {
-      setDeparture({ ...departure, leaving });
-      return;
-    }
-    setDeparture(null);
-    onSettled?.();
-  };
-  const retireRef = useRef(retire);
+  // Tiles leaving together end in the same frame and React batches their
+  // handlers, so each retire is a functional update: read from the render's
+  // closure, the second handler would restore the id the first removed.
+  const retire = (tileId: string) =>
+    setDeparture((current) =>
+      current && { ...current, leaving: current.leaving.filter((id) => id !== tileId) },
+    );
+  // A settled departure stays in state, drawn as no departure at all, until
+  // the next discard replaces it; the effect only has to announce it, once.
+  const settled = departure !== null && departure.leaving.length === 0;
+  const onSettledRef = useRef(onSettled);
   useEffect(() => {
-    retireRef.current = retire;
+    onSettledRef.current = onSettled;
   });
+  useEffect(() => {
+    if (settled) onSettledRef.current?.();
+  }, [settled]);
   const rackRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // React has no onAnimationCancel, so the rack listens for it natively.
@@ -95,7 +98,7 @@ export function TileInventory({
     const onCancel = (event: Event) => {
       const cell = (event.target as Element).closest("[data-departing]");
       const tileId = cell?.getAttribute("data-departing");
-      if (tileId) retireRef.current(tileId);
+      if (tileId) retire(tileId);
     };
     rack.addEventListener("animationcancel", onCancel);
     return () => rack.removeEventListener("animationcancel", onCancel);

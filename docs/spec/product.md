@@ -167,7 +167,7 @@ as a submitted round.
 #### `answering`
 
 - HUD order: round, score, current streak. Round carries primary emphasis — Endless is a survival mode, so rounds survived is the headline figure.
-- Endless: a capacity meter states tiles held against the ten-tile capacity. Classic: the HUD states the live capacity as a number and has no pip meter; the plugs in the rack show the descent. Either sits below the three HUD figures; it does not displace round's primary emphasis and does not reorder them.
+- Endless: a capacity meter states tiles held against the ten-tile capacity. Classic: the HUD states the live capacity as a number and has no pip meter; the plugs in the rack show the descent. Endless's meter sits below the three HUD figures; Classic's figure follows them as a fourth HUD entry. Neither displaces round's primary emphasis or reorders the three.
 - Equation and exact answer-slot count.
 - Submit and Clear actions. Clear is disabled while nothing is selected.
 - Filled answer slots are clickable to return a single tile, and show a hover/focus affordance.

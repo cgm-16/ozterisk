@@ -249,10 +249,16 @@ describe("App", () => {
 
     await user.click(screen.getByRole("button", { name: /^Classic/ }));
     await user.click(screen.getByRole("button", { name: "Start Run" }));
+    // 84 presses over a 20-tile rack took this test to ~4.3s against
+    // Vitest's 5s default, and it timed out on a loaded run. Nearly all of it
+    // was the presses: userEvent's pointer sequence, and *ByRole computing
+    // every button's accessible name on each query. The rounds only need the
+    // clicks, so fireEvent plays them against the tiles' aria-label and the
+    // buttons' text; the role queries above and below still hold the names.
     for (const digit of rounds) {
-      await user.click(screen.getAllByRole("button", { name: `Digit ${digit}` })[0]!);
-      await user.click(screen.getByRole("button", { name: "Submit" }));
-      await user.click(screen.getByRole("button", { name: "Next Round" }));
+      fireEvent.click(screen.getAllByLabelText(new RegExp(`^Digit ${digit}`))[0]!);
+      fireEvent.click(screen.getByText("Submit"));
+      fireEvent.click(screen.getByText("Next Round"));
     }
 
     expect(screen.getByRole("heading", { name: "Run Complete" })).toBeInTheDocument();

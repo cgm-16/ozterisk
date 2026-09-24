@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { Digit, GameAction, GameState } from "../game/types";
-import { getAnswerLength, getOverflowCount, isDiscardReady, isSubmissionReady } from "../game/selectors";
+import { getAnswerLength, getOverflowCount, isSubmissionReady } from "../game/selectors";
 
 const DIGIT_KEY_PATTERN = /^[0-9]$/;
 
@@ -74,7 +74,7 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
 
       if (state.phase === "overflow") {
         if (DIGIT_KEY_PATTERN.test(event.key)) {
-          const required = getOverflowCount(state.inventory);
+          const required = getOverflowCount(state);
           if (state.pendingDiscards.length >= required) return;
           const digit = Number(event.key) as Digit;
           // Skip tiles already marked, so repeated presses walk through duplicates
@@ -85,20 +85,13 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
           if (!tile) return;
           event.preventDefault();
           dispatch({ type: "TOGGLE_DISCARD", tileId: tile.id });
-          if (required === 1) dispatch({ type: "CONFIRM_DISCARD" });
-          return;
-        }
-
-        if (event.key === "Enter") {
-          if (!isDiscardReady(state)) return;
-          event.preventDefault();
-          dispatch({ type: "CONFIRM_DISCARD" });
         }
         return;
       }
 
       if (state.phase === "feedback") {
-        if (event.key === "Enter") {
+        // After a discard the round advances on its own (§1.11).
+        if (event.key === "Enter" && !state.lastResult?.discarded) {
           event.preventDefault();
           onNextRound();
         }

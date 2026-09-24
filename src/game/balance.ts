@@ -43,3 +43,31 @@ export const REWARD_BONUS = 1;
  * The value most likely to need retuning after real play.
  */
 export const KIND_EQUATION_RATE = 0.2;
+
+/**
+ * Classic's opening capacity, and the size of its round-robin opening hand.
+ * Economy: Classic deliberately opens above the cliff — at 20 the biased
+ * buildable rate b'(20) ~= 0.84 against the 0.63 cliff, so the early tray is
+ * generous — and the descent to CLASSIC_FLOOR carries it back under. Board
+ * count is START - FLOOR, so this is the run's decision budget.
+ * Range: 19–21, the rows the small rack draws (7 x 3 wide, 6 x 4 narrow, in
+ * TileInventory.module.css); that also holds every digit in the opening deal.
+ */
+export const CLASSIC_START_CAPACITY = 20;
+
+/**
+ * The capacity at which a Classic run is complete (the win).
+ * Economy: b'(6) ~= 0.42, well below the cliff, so the late tray is where
+ * runs are lost. Lower floors make the finish harder and the run longer.
+ * Range: >= 2, the longest answer. Moves to 5 when M7's face-set tiles ship.
+ */
+export const CLASSIC_FLOOR = 6;
+
+/**
+ * Submissions, correct or not, between two Classic seals.
+ * Economy: sets run length — (START - FLOOR) * CLASSIC_SEAL_EVERY submissions,
+ * 28 at the shipped values — without spending boards. A submission clock is
+ * positional: it never watches how well the player is doing.
+ * Range: integer >= 1.
+ */
+export const CLASSIC_SEAL_EVERY = 2;

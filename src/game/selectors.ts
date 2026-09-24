@@ -1,5 +1,11 @@
-import type { Equation, GameState, Tile } from "./types";
-import { INVENTORY_CAPACITY, REWARD_BONUS } from "./balance";
+import type { Equation, GameMode, GameState, Tile } from "./types";
+import {
+  CLASSIC_FLOOR,
+  CLASSIC_SEAL_EVERY,
+  CLASSIC_START_CAPACITY,
+  INVENTORY_CAPACITY,
+  REWARD_BONUS,
+} from "./balance";
 
 export function getAnswerLength(equation: Equation): 1 | 2 {
   return equation.product >= 10 ? 2 : 1;
@@ -39,8 +45,32 @@ export function canConstruct(inventory: readonly Tile[], product: number): boole
   return true;
 }
 
-export function getOverflowCount(inventory: readonly Tile[]): number {
-  return Math.max(0, inventory.length - INVENTORY_CAPACITY);
+// Live capacity after `totalRounds` submissions. Classic seals one socket every
+// CLASSIC_SEAL_EVERY submissions, correct or not, down to the floor (§1.7a).
+export function getCapacity(mode: GameMode, totalRounds: number): number {
+  if (mode === "endless") return INVENTORY_CAPACITY;
+  const sealed = Math.floor(totalRounds / CLASSIC_SEAL_EVERY);
+  return Math.max(CLASSIC_FLOOR, CLASSIC_START_CAPACITY - sealed);
+}
+
+type CapacityState = Pick<GameState, "inventory" | "mode" | "totalRounds">;
+
+export function getOverflowCount(state: CapacityState): number {
+  return Math.max(0, state.inventory.length - getCapacity(state.mode, state.totalRounds));
+}
+
+// A Classic run at the floor is complete: the next advance ends it,
+// before any equation is generated (§1.8 step 0).
+export function isAtClassicFloor(state: Pick<GameState, "mode" | "totalRounds">): boolean {
+  return state.mode === "classic" && getCapacity(state.mode, state.totalRounds) <= CLASSIC_FLOOR;
+}
+
+// A Classic run that reaches the floor with tiles in hand is the win; one that
+// reaches it with an empty hand spent its last tile on a miss, and loses (§1.8).
+export function isClassicWin(
+  state: Pick<GameState, "phase" | "mode" | "totalRounds" | "inventory">,
+): boolean {
+  return state.phase === "gameOver" && isAtClassicFloor(state) && state.inventory.length > 0;
 }
 
 export function isSubmissionReady(state: GameState): boolean {
@@ -51,9 +81,3 @@ export function isSubmissionReady(state: GameState): boolean {
   );
 }
 
-export function isDiscardReady(state: GameState): boolean {
-  return (
-    state.phase === "overflow" &&
-    state.pendingDiscards.length === getOverflowCount(state.inventory)
-  );
-}

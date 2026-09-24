@@ -4,12 +4,20 @@ import {
   canConstruct,
   constructAnswer,
   getAnswerLength,
+  getCapacity,
   getOverflowCount,
   getRewardCount,
-  isDiscardReady,
+  isClassicWin,
   isSubmissionReady,
 } from "./selectors";
-import { REWARD_BONUS } from "./balance";
+import {
+  CLASSIC_FLOOR,
+  CLASSIC_SEAL_EVERY,
+  CLASSIC_START_CAPACITY,
+  INVENTORY_CAPACITY,
+  REWARD_BONUS,
+} from "./balance";
+import { createTitleState } from "./factories";
 import { makeAnsweringState, makeEquation, makeTile } from "../test/fixtures";
 
 describe("getRewardCount", () => {
@@ -107,25 +115,52 @@ describe("canConstruct", () => {
   });
 });
 
+describe("getCapacity", () => {
+  it("holds Endless at its fixed capacity however many submissions pass", () => {
+    expect(getCapacity("endless", 0)).toBe(INVENTORY_CAPACITY);
+    expect(getCapacity("endless", 99)).toBe(INVENTORY_CAPACITY);
+  });
+
+  it("starts Classic at its start capacity and seals one socket every step", () => {
+    expect(getCapacity("classic", 0)).toBe(CLASSIC_START_CAPACITY);
+    expect(getCapacity("classic", CLASSIC_SEAL_EVERY - 1)).toBe(CLASSIC_START_CAPACITY);
+    expect(getCapacity("classic", CLASSIC_SEAL_EVERY)).toBe(CLASSIC_START_CAPACITY - 1);
+    expect(getCapacity("classic", 2 * CLASSIC_SEAL_EVERY)).toBe(CLASSIC_START_CAPACITY - 2);
+  });
+
+  it("stops Classic at the floor", () => {
+    const toFloor = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY;
+    expect(getCapacity("classic", toFloor)).toBe(CLASSIC_FLOOR);
+    expect(getCapacity("classic", toFloor + 99)).toBe(CLASSIC_FLOOR);
+  });
+});
+
 describe("getOverflowCount", () => {
+  it("measures Classic's excess against the live capacity, not ten", () => {
+    const inventory = Array.from({ length: 20 }, (_, index) => makeTile(0, `tile-${index}`));
+    const base = { ...createTitleState(), mode: "classic" as const, inventory };
+    expect(getOverflowCount({ ...base, totalRounds: 0 })).toBe(0);
+    expect(getOverflowCount({ ...base, totalRounds: CLASSIC_SEAL_EVERY })).toBe(1);
+  });
+
   it("returns 0 when inventory is under capacity", () => {
     const inventory = Array.from({ length: 8 }, (_, index) => makeTile(0, `tile-${index}`));
-    expect(getOverflowCount(inventory)).toBe(0);
+    expect(getOverflowCount({ ...createTitleState(), inventory })).toBe(0);
   });
 
   it("returns 0 when inventory is exactly at capacity", () => {
     const inventory = Array.from({ length: 10 }, (_, index) => makeTile(0, `tile-${index}`));
-    expect(getOverflowCount(inventory)).toBe(0);
+    expect(getOverflowCount({ ...createTitleState(), inventory })).toBe(0);
   });
 
   it("returns 1 when inventory has one tile over capacity", () => {
     const inventory = Array.from({ length: 11 }, (_, index) => makeTile(0, `tile-${index}`));
-    expect(getOverflowCount(inventory)).toBe(1);
+    expect(getOverflowCount({ ...createTitleState(), inventory })).toBe(1);
   });
 
   it("returns 3 when inventory has three tiles over capacity", () => {
     const inventory = Array.from({ length: 13 }, (_, index) => makeTile(0, `tile-${index}`));
-    expect(getOverflowCount(inventory)).toBe(3);
+    expect(getOverflowCount({ ...createTitleState(), inventory })).toBe(3);
   });
 });
 
@@ -165,42 +200,28 @@ describe("isSubmissionReady", () => {
   });
 });
 
-describe("isDiscardReady", () => {
-  it("is true in overflow phase when marked discards equal the excess", () => {
-    const inventory = Array.from({ length: 11 }, (_, index) => makeTile(0, `tile-${index}`));
-    const state = makeAnsweringState(makeEquation(3, 3), {
-      phase: "overflow",
-      inventory,
-      pendingDiscards: ["tile-0"],
-    });
-    expect(isDiscardReady(state)).toBe(true);
+describe("isClassicWin", () => {
+  const atFloor = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY;
+  const gameOver = { ...createTitleState(), phase: "gameOver" as const, inventory: [makeTile(4)] };
+
+  it("is true for a Classic game over at the floor with tiles in hand", () => {
+    expect(isClassicWin({ ...gameOver, mode: "classic", totalRounds: atFloor })).toBe(true);
   });
 
-  it("is false in overflow phase when fewer discards are marked than the excess", () => {
-    const inventory = Array.from({ length: 13 }, (_, index) => makeTile(0, `tile-${index}`));
-    const state = makeAnsweringState(makeEquation(3, 3), {
-      phase: "overflow",
-      inventory,
-      pendingDiscards: ["tile-0"],
-    });
-    expect(isDiscardReady(state)).toBe(false);
+  // A miss that spends the last tile on the final submission is a failure,
+  // floor or not (§1.8 step 0).
+  it("is false for a Classic game over at the floor with an empty hand", () => {
+    expect(isClassicWin({ ...gameOver, mode: "classic", totalRounds: atFloor, inventory: [] })).toBe(false);
   });
 
-  it("is false in overflow phase when more discards are marked than the excess", () => {
-    const inventory = Array.from({ length: 11 }, (_, index) => makeTile(0, `tile-${index}`));
-    const state = makeAnsweringState(makeEquation(3, 3), {
-      phase: "overflow",
-      inventory,
-      pendingDiscards: ["tile-0", "tile-1"],
-    });
-    expect(isDiscardReady(state)).toBe(false);
+  it("is false for a Classic game over above the floor, which is a loss", () => {
+    expect(isClassicWin({ ...gameOver, mode: "classic", totalRounds: atFloor - 1 })).toBe(false);
   });
 
-  it("is false outside the overflow phase", () => {
-    const state = makeAnsweringState(makeEquation(3, 3), {
-      phase: "answering",
-      pendingDiscards: [],
-    });
-    expect(isDiscardReady(state)).toBe(false);
+  it("is false for an Endless game over and for a Classic run still in play", () => {
+    expect(isClassicWin({ ...gameOver, mode: "endless", totalRounds: atFloor })).toBe(false);
+    expect(
+      isClassicWin({ ...gameOver, phase: "feedback", mode: "classic", totalRounds: atFloor }),
+    ).toBe(false);
   });
 });

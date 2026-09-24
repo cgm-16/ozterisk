@@ -99,10 +99,16 @@
        are cross-axis sized to their content and only reach full width while
        an entry label happens to be wider than the viewport. */
     align-items: stretch;
+
+    /* The stage gets the page's full width, as the app's arena does: the
+       gallery's own inset would read every state 32px narrower than the
+       screen it stands in for (#130), below the Classic tray's 44px floor. */
+    padding-inline: 0;
   }
 
   .picker {
     flex: none;
+    padding-inline: var(--space-4);
   }
 
   .stage {

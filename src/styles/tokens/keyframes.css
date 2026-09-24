@@ -100,12 +100,19 @@
   100% { transform: translate(3px, 4px) rotate(11deg); }
 }
 
-/* 8c — discard confirm: the marked tile tips off the end of the rack and is
-   gone. From `sb-slide`, renormalised from its useful 24%–80% span. */
-@keyframes oz-tip-off {
+/* 8c — a tile leaves the table: fired once for each discarded tile. A tile
+   tips off its edge and gravity takes it. (The handoff also drew the game-over
+   sweep, 10i, with it; #104 struck that moment.) Supersedes `oz-tip-off`,
+   which was this frame with the discard's distances baked in; the caller now
+   supplies --dx, --drop and --rot, as `oz-fan`'s chips already do.
+
+   A confirmed discard is deliberately NOT `oz-crack`: vermilion and fracture
+   mean a tile was taken from you. Discard is a tile you chose to spend, and it
+   leaves the way the table clears — intact, off the edge. */
+@keyframes oz-slide-off {
   0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
-  64%  { transform: translate(26px, 8px) rotate(9deg); opacity: 0.6; }
-  100% { transform: translate(44px, 18px) rotate(16deg); opacity: 0; }
+  34%  { transform: translate(calc(var(--dx) * .34), calc(var(--drop) * .07)) rotate(calc(var(--rot) * .48)); opacity: 0.95; }
+  100% { transform: translate(var(--dx), var(--drop)) rotate(var(--rot)); opacity: 0; }
 }
 
 /* 9b — a chosen tile arrives in its answer slot. decisions.md records 9b as
@@ -143,4 +150,51 @@
   19%  { transform: scale(1) rotate(-7deg); opacity: 1; }
   69%  { opacity: 1; }
   100% { opacity: 0; }
+}
+
+/* Classic — the tray descends and a socket closes for good. Two halves, both
+   on --dur-seal: the well collapses to a hairline and the rim seals across
+   where it was. It fires fifteen times a run, so it is round-tempo (180ms) and
+   not a failure tempo — the threat is the arithmetic of a shrinking rack, not
+   the drama of each closing. A sealed socket is not an empty one: an empty
+   socket is a debt the run can still repay, a sealed one is gone. */
+@keyframes oz-seal {
+  0%   { transform: scaleY(1); opacity: 1; }
+  68%  { transform: scaleY(0.16); opacity: 1; }
+  100% { transform: scaleY(0.03); opacity: 0.85; }
+}
+
+@keyframes oz-seal-rim {
+  0%   { transform: scaleX(0.22); opacity: 0; }
+  58%  { opacity: 1; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+
+/* 8a aftermath — the perched eleventh tile takes the seat a discard just
+   freed. `oz-fire` was the other candidate and was rejected: firing in place
+   is for a tile that arrives from nowhere, and this one has been visibly
+   sitting on the rail at 11 degrees. The perch was real, so the fall is too.
+   Starts from exactly where oz-rim-reject left it.
+
+   Destination-relative: the tile is mounted IN the freed socket and flies in
+   from the rail. The caller sets --dx / --dy to the rail position minus the
+   socket position. The earlier rail-relative version only fell straight down
+   by --drop, so it landed wherever was below the rail's right end — never in
+   the seat that was actually freed. */
+@keyframes oz-perch-drop {
+  0%   { transform: translate(calc(var(--dx) + 3px), calc(var(--dy) + 4px)) rotate(11deg); }
+  58%  { transform: translate(calc(var(--dx) * 0.1), calc(var(--dy) * 0.08)) rotate(3deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+/* M6 · Rack re-seats. Classic's rack changes size at 15 and 10; the tiles lift
+   together, travel from their old seat at the old size, and set down in the
+   new one. The caller supplies the old seat as an offset and scale from the
+   new one (--fx / --fy / --fs, transform-origin 0 0) — a FLIP, so the frame
+   is size-agnostic. Twice a run, under the round rise. */
+@keyframes oz-reseat {
+  0%   { transform: translate(var(--fx), var(--fy)) scale(var(--fs)); }
+  22%  { transform: translate(var(--fx), calc(var(--fy) - var(--lift-offset))) scale(var(--fs)); }
+  80%  { transform: translate(0, calc(-1 * var(--lift-offset))) scale(1); }
+  100% { transform: translate(0, 0) scale(1); }
 }

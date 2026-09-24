@@ -12,6 +12,13 @@ const en = {
     summary:
       "Solve multiplication problems using limited digit tiles. Correct answers replace the tiles you spend and grant one extra tile. Incorrect answers consume your tiles without a reward. Keep your inventory balanced and survive as long as possible.",
     more: "More",
+    mode: "Mode",
+  },
+  mode: {
+    endless: "Endless",
+    endlessHint: "Ten sockets, no end",
+    classic: "Classic",
+    classicHint: "Twenty closing to six",
   },
   language: {
     groupLabel: "Language",
@@ -30,6 +37,8 @@ const en = {
       "If a reward would push your inventory past ten tiles, you must choose tiles to discard before play continues.",
     progress:
       "Round shows which equation is currently on screen, score counts correct answers, and streak counts consecutive correct answers. Rounds played counts every equation you have submitted, correct or incorrect. The run ends once you hold fewer tiles than the next answer requires.",
+    classic:
+      "Classic starts with twenty sockets and closes one every second submission, correct or not. Keep enough tiles to reach six sockets and the run is complete.",
     keyboard:
       "Press a digit key to select a matching tile or, during a discard, to mark it and complete the discard, Backspace to return the most recently selected tile, Escape to clear your selection, Enter to submit or continue, and R to play again once the run ends.",
   },
@@ -38,7 +47,6 @@ const en = {
     submit: "Submit",
     clear: "Clear",
     next: "Next Round",
-    confirmDiscard: "Confirm Discard",
     playAgain: "Play Again",
     share: "Share",
     copy: "Copy Result",
@@ -66,6 +74,8 @@ const en = {
   gameOver: {
     title: "Game Over",
     reason: "Not enough tiles left to answer.",
+    winTitle: "Run Complete",
+    winReason: "You reached the floor with tiles in hand.",
     rounds: "Rounds played",
     longestStreak: "Longest streak",
     restartHint: "Press R to play again",
@@ -91,6 +101,13 @@ const ko = {
     summary:
       "제한된 숫자 타일로 곱셈 문제를 푸세요. 정답을 맞히면 사용한 타일을 보충하고 타일 한 개를 추가로 받습니다. 오답에 사용한 타일은 보상 없이 사라집니다. 타일 구성을 관리하며 최대한 오래 살아남으세요.",
     more: "더 보기",
+    mode: "모드",
+  },
+  mode: {
+    endless: "엔드리스",
+    endlessHint: "열 칸, 끝없이",
+    classic: "클래식",
+    classicHint: "스물에서 여섯까지",
   },
   language: {
     groupLabel: "언어",
@@ -106,6 +123,8 @@ const ko = {
     overflow: "보상으로 인벤토리가 열 개를 초과하면, 계속하기 전에 버릴 타일을 선택해야 합니다.",
     progress:
       "라운드는 현재 화면에 표시된 문제의 번호이며, 점수는 정답 횟수를, 연속 정답은 이어지는 정답 횟수를 나타냅니다. 진행한 라운드는 정답과 오답을 포함해 지금까지 제출한 문제 수를 나타냅니다. 다음 정답에 필요한 타일보다 보유한 타일이 적어지면 게임이 종료됩니다.",
+    classic:
+      "클래식은 스무 칸으로 시작해 정답 여부와 관계없이 두 번 제출할 때마다 한 칸씩 닫힙니다. 여섯 칸에 도달할 때까지 타일을 지키면 완주합니다.",
     keyboard:
       "숫자 키를 누르면 일치하는 타일을 선택하거나, 버리기 중에는 타일을 표시해 바로 버리기를 완료하며, Backspace 키로 가장 최근에 선택한 타일을 되돌리고, Escape 키로 선택을 지우며, Enter 키로 제출하거나 다음으로 진행하고, 게임이 끝나면 R 키로 다시 시작합니다.",
   },
@@ -114,7 +133,6 @@ const ko = {
     submit: "제출",
     clear: "지우기",
     next: "다음 라운드",
-    confirmDiscard: "버리기 확정",
     playAgain: "다시 하기",
     share: "공유",
     copy: "결과 복사",
@@ -139,6 +157,8 @@ const ko = {
   gameOver: {
     title: "게임 종료",
     reason: "답을 만들 타일이 부족합니다.",
+    winTitle: "완주",
+    winReason: "타일을 남긴 채 바닥에 도달했습니다.",
     rounds: "진행한 라운드",
     longestStreak: "최장 연속 정답",
     restartHint: "R 키를 눌러 다시 하기",

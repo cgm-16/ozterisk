@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import type { Digit, GameAction, GameState } from "./types";
 import { gameReducer } from "./gameReducer";
 import { createInitialInventory, createTitleState, sortTiles } from "./factories";
-import { getAnswerLength } from "./selectors";
+import { getAnswerLength, getCapacity, getOverflowCount, getRewardCount, isClassicWin } from "./selectors";
+import { CLASSIC_FLOOR, CLASSIC_SEAL_EVERY, CLASSIC_START_CAPACITY } from "./balance";
 import {
   makeAnsweringState,
   makeEquation,
@@ -33,10 +34,11 @@ describe("START_RUN", () => {
     const equation = makeEquation(3, 4);
     const inventory = createInitialInventory(sequentialIds());
 
-    const next = gameReducer(priorState, { type: "START_RUN", equation, inventory });
+    const next = gameReducer(priorState, { type: "START_RUN", mode: "endless", equation, inventory });
 
     expect(next).toEqual({
       phase: "answering",
+      mode: "endless",
       equation,
       inventory,
       selectedTiles: [],
@@ -150,6 +152,25 @@ describe("RETURN_TILE", () => {
 });
 
 describe("SUBMIT_CORRECT", () => {
+  it("sorts only the tiles that fit and leaves the newest arrival past capacity, in arrival order", () => {
+    // Ten seated tiles, one spent on 3 x 3 = 9: nine stay, two come back.
+    const seated = Array.from({ length: 10 }, (_, index) => makeTile(index as Digit, `seat-${index}`));
+    const nine = seated[9]!;
+    const state = makeAnsweringState(makeEquation(3, 3), {
+      inventory: seated.slice(0, 9),
+      selectedTiles: [nine],
+    });
+    const early = makeTile(9, "reward-early");
+    const late = makeTile(0, "reward-late");
+
+    const next = gameReducer(state, { type: "SUBMIT_CORRECT", rewardTiles: [early, late] });
+
+    expect(next.phase).toBe("overflow");
+    expect(next.inventory.slice(0, 10)).toEqual(sortTiles(next.inventory.slice(0, 10)));
+    // The 0 would sort first; it perches because it arrived last, not by digit.
+    expect(next.inventory[10]).toEqual({ ...late, isNew: true });
+  });
+
   it("consumes tiles in append order, updates score/streak/totalRounds exactly once, inserts N+1 sorted new reward tiles, and enters feedback within capacity", () => {
     const equation = makeEquation(7, 8); // product 56
     const tileFive = makeTile(5, "tile-five");
@@ -421,54 +442,71 @@ describe("SUBMIT_INCORRECT", () => {
 });
 
 describe("TOGGLE_DISCARD", () => {
-  it("marks an exact inventory tile ID on first toggle and clears it on second toggle", () => {
-    const equation = makeEquation(3, 3);
-    const state = makeOverflowState(equation);
-    const target = state.inventory[3]!;
-
-    const marked = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: target.id });
-    expect(marked.pendingDiscards).toEqual([target.id]);
-    expect(marked.phase).toBe("overflow");
-    expect(marked.inventory).toBe(state.inventory);
-
-    const unmarked = gameReducer(marked, { type: "TOGGLE_DISCARD", tileId: target.id });
-    expect(unmarked.pendingDiscards).toEqual([]);
-  });
-
-  it("accumulates marks up to the excess count and addresses duplicate-digit tiles independently by exact ID", () => {
-    const equation = makeEquation(3, 3);
+  // 12 tiles against 10 sockets: excess 2, so a first mark is only a mark.
+  const excessTwo = () => {
     const tileA = makeTile(5, "tile-a");
     const tileB = makeTile(5, "tile-b");
     const rest = Array.from({ length: 10 }, (_, index) => makeTile((index % 9) as Digit, `tile-rest-${index}`));
-    const state = makeOverflowState(equation, {
-      inventory: [tileA, tileB, ...rest], // 12 tiles, excess 2
-    });
+    return { tileA, tileB, rest, state: makeOverflowState(makeEquation(3, 3), { inventory: [tileA, tileB, ...rest] }) };
+  };
 
-    const afterA = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: tileA.id });
-    expect(afterA.pendingDiscards).toEqual([tileA.id]);
+  it("marks an exact inventory tile ID on first toggle and clears it on second toggle, below the required count", () => {
+    const { state, tileA } = excessTwo();
 
-    const afterBoth = gameReducer(afterA, { type: "TOGGLE_DISCARD", tileId: tileB.id });
-    expect(afterBoth.pendingDiscards).toEqual([tileA.id, tileB.id]);
+    const marked = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: tileA.id });
+    expect(marked.pendingDiscards).toEqual([tileA.id]);
+    expect(marked.phase).toBe("overflow");
+    expect(marked.inventory).toBe(state.inventory);
 
-    const afterUnmarkA = gameReducer(afterBoth, { type: "TOGGLE_DISCARD", tileId: tileA.id });
-    expect(afterUnmarkA.pendingDiscards).toEqual([tileB.id]); // tileA's digit-twin stays marked
+    const unmarked = gameReducer(marked, { type: "TOGGLE_DISCARD", tileId: tileA.id });
+    expect(unmarked.pendingDiscards).toEqual([]);
   });
 
-  it("is a no-op when marking would exceed the excess count", () => {
-    const equation = makeEquation(3, 3);
-    const state = makeOverflowState(equation); // excess 1
-    const alreadyMarked = state.inventory[0]!;
-    const withOneMarked = gameReducer(state, {
-      type: "TOGGLE_DISCARD",
-      tileId: alreadyMarked.id,
-    });
+  it("completes the discard on the mark that reaches the required count of one", () => {
+    const state = makeOverflowState(makeEquation(3, 3)); // excess 1
+    const target = state.inventory[3]!;
 
-    const next = gameReducer(withOneMarked, {
-      type: "TOGGLE_DISCARD",
-      tileId: withOneMarked.inventory[1]!.id,
-    });
+    const next = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: target.id });
 
-    expect(next).toBe(withOneMarked);
+    expect(next.phase).toBe("feedback");
+    expect(next.pendingDiscards).toEqual([]);
+    expect(next.inventory).toHaveLength(10);
+    expect(next.inventory.map((tile) => tile.id)).not.toContain(target.id);
+    expect(next.lastResult?.discarded).toBe(true);
+  });
+
+  it("completes the discard on the second of two marks, removing both duplicate-digit tiles by exact ID", () => {
+    const { state, tileA, tileB } = excessTwo();
+
+    const afterA = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: tileA.id });
+    const afterBoth = gameReducer(afterA, { type: "TOGGLE_DISCARD", tileId: tileB.id });
+
+    expect(afterBoth.phase).toBe("feedback");
+    expect(afterBoth.inventory.map((tile) => tile.id)).not.toContain(tileA.id);
+    expect(afterBoth.inventory.map((tile) => tile.id)).not.toContain(tileB.id);
+    expect(afterBoth.inventory).toHaveLength(10);
+  });
+
+  it("seats a surviving rail tile in the socket the discard freed, and moves no other tile", () => {
+    const seated = Array.from({ length: 10 }, (_, index) => makeTile((index % 9) as Digit, `seat-${index}`));
+    const rail = makeTile(7, "rail", true);
+    const state = makeOverflowState(makeEquation(3, 3), { inventory: [...seated, rail] });
+
+    const next = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: seated[4]!.id });
+
+    const expected = [...seated];
+    expected[4] = rail;
+    expect(next.inventory).toEqual(expected);
+  });
+
+  it("discarding the rail tile itself leaves the seated tiles untouched", () => {
+    const seated = Array.from({ length: 10 }, (_, index) => makeTile((index % 9) as Digit, `seat-${index}`));
+    const rail = makeTile(7, "rail", true);
+    const state = makeOverflowState(makeEquation(3, 3), { inventory: [...seated, rail] });
+
+    const next = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: rail.id });
+
+    expect(next.inventory).toEqual(seated);
   });
 
   it("is a no-op for a tile ID not present in inventory", () => {
@@ -485,51 +523,6 @@ describe("TOGGLE_DISCARD", () => {
     const tile = state.inventory[0]!;
 
     const next = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: tile.id });
-
-    expect(next).toBe(state);
-  });
-});
-
-describe("CONFIRM_DISCARD", () => {
-  it("is a no-op when fewer than the exact excess count is marked", () => {
-    const equation = makeEquation(3, 3);
-    const state = makeOverflowState(equation); // excess 1, nothing marked yet
-
-    const next = gameReducer(state, { type: "CONFIRM_DISCARD" });
-
-    expect(next).toBe(state);
-  });
-
-  it("removes exactly the marked tiles (new or old), clears pendingDiscards, and returns to feedback at capacity 10", () => {
-    const equation = makeEquation(3, 3);
-    // oldTile/newTile share digits (2 and 4) with tiles inside `rest`, so a
-    // survival check by exact ID (not just by digit) is required for this
-    // assertion to pass.
-    const oldTile = makeTile(2, "tile-old", false);
-    const newTile = makeTile(4, "tile-new", true);
-    const rest = Array.from({ length: 10 }, (_, index) => makeTile((index % 9) as Digit, `tile-rest-${index}`));
-    const inventory = [oldTile, newTile, ...rest]; // 12 tiles, excess 2
-    const state = makeOverflowState(equation, {
-      inventory,
-      pendingDiscards: [oldTile.id, newTile.id],
-    });
-
-    const next = gameReducer(state, { type: "CONFIRM_DISCARD" });
-
-    expect(next.phase).toBe("feedback");
-    expect(next.pendingDiscards).toEqual([]);
-    expect(next.inventory).toHaveLength(10);
-    expect(next.inventory).toEqual(rest); // filtering preserves order, no re-sort
-    // the original arrays passed via overrides must be untouched
-    expect(inventory).toHaveLength(12);
-    expect(state.pendingDiscards).toEqual([oldTile.id, newTile.id]);
-  });
-
-  it("is a no-op outside the overflow phase", () => {
-    const equation = makeEquation(3, 3);
-    const state = makeFeedbackState(equation);
-
-    const next = gameReducer(state, { type: "CONFIRM_DISCARD" });
 
     expect(next).toBe(state);
   });
@@ -595,6 +588,21 @@ describe("NEXT_ROUND", () => {
     expect(next.phase).toBe("answering");
   });
 
+  it("re-sorts the whole rack once, and clears the discarded marker with the result", () => {
+    const state = makeFeedbackState(makeEquation(3, 3), {
+      inventory: [makeTile(7, "a"), makeTile(2, "b"), makeTile(5, "c")],
+    });
+    const withMarker: GameState = {
+      ...state,
+      lastResult: { ...state.lastResult!, discarded: true },
+    };
+
+    const next = gameReducer(withMarker, { type: "NEXT_ROUND", equation: makeEquation(2, 3) });
+
+    expect(next.inventory.map((tile) => tile.digit)).toEqual([2, 5, 7]);
+    expect(next.lastResult).toBeNull();
+  });
+
   it("is a no-op outside the feedback phase (overflow)", () => {
     const state = makeOverflowState(makeEquation(3, 3));
 
@@ -630,6 +638,7 @@ describe("RESTART_RUN", () => {
 
     expect(next).toEqual({
       phase: "answering",
+      mode: "endless",
       equation,
       inventory,
       selectedTiles: [],
@@ -711,14 +720,16 @@ function assertInvariants(state: GameState): void {
     expect(pendingDiscards).toEqual([]);
   }
 
-  // inventory.length <= 10 when phase is answering, feedback, or gameOver.
+  // inventory.length <= getCapacity(mode, totalRounds) when phase is
+  // answering, feedback, or gameOver.
+  const capacity = getCapacity(state.mode, state.totalRounds);
   if (phase === "answering" || phase === "feedback" || phase === "gameOver") {
-    expect(inventory.length).toBeLessThanOrEqual(10);
+    expect(inventory.length).toBeLessThanOrEqual(capacity);
   }
 
-  // inventory.length > 10 when phase is overflow.
+  // inventory.length > getCapacity(mode, totalRounds) when phase is overflow.
   if (phase === "overflow") {
-    expect(inventory.length).toBeGreaterThan(10);
+    expect(inventory.length).toBeGreaterThan(capacity);
   }
 
   // lastResult === null in title and answering.
@@ -773,6 +784,120 @@ describe("CLEAR_SELECTION", () => {
   });
 });
 
+describe("Classic", () => {
+  const classicInventory = () => createInitialInventory(sequentialIds(), CLASSIC_START_CAPACITY);
+  const toFloor = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY;
+
+  it("START_RUN carries the mode into the run", () => {
+    const next = gameReducer(createTitleState(), {
+      type: "START_RUN",
+      mode: "classic",
+      equation: makeEquation(2, 3),
+      inventory: classicInventory(),
+    });
+    expect(next.mode).toBe("classic");
+    expect(next.inventory).toHaveLength(CLASSIC_START_CAPACITY);
+  });
+
+  it("RESTART_RUN keeps the mode of the run that ended", () => {
+    const state: GameState = {
+      ...makeFeedbackState(makeEquation(7, 8)),
+      phase: "gameOver",
+      mode: "classic",
+    };
+    const next = gameReducer(state, {
+      type: "RESTART_RUN",
+      equation: makeEquation(2, 3),
+      inventory: classicInventory(),
+    });
+    expect(next.mode).toBe("classic");
+  });
+
+  it("counts the seal made by this submission when checking overflow, correct answer at a full rack", () => {
+    // Submission 2 seals a socket: capacity 20 -> 19. A full rack spending two
+    // tiles on 4 x 5 = 20 gets three back, 21 tiles against 19 sockets.
+    const inventory = classicInventory();
+    const two = inventory.find((tile) => tile.digit === 2)!;
+    const zero = inventory.find((tile) => tile.digit === 0)!;
+    const state = makeAnsweringState(makeEquation(4, 5), {
+      mode: "classic",
+      totalRounds: CLASSIC_SEAL_EVERY - 1,
+      round: CLASSIC_SEAL_EVERY,
+      inventory: inventory.filter((tile) => tile !== two && tile !== zero),
+      selectedTiles: [two, zero],
+    });
+    const next = gameReducer(state, {
+      type: "SUBMIT_CORRECT",
+      rewardTiles: [makeTile(1, "r-1"), makeTile(3, "r-3"), makeTile(2, "r-2")],
+    });
+    expect(next.phase).toBe("overflow");
+    expect(getOverflowCount(next)).toBe(2);
+    // Both past capacity perch in arrival order, 3 before 2: sorting or
+    // reversing the rail would put the 2 first (§1.5 step 7).
+    expect(next.inventory.slice(-2).map((tile) => tile.id)).toEqual(["r-3", "r-2"]);
+  });
+
+  it("never overflows on an incorrect answer, even on a sealing submission", () => {
+    const inventory = classicInventory();
+    const nine = inventory.find((tile) => tile.digit === 9)!;
+    const state = makeAnsweringState(makeEquation(2, 3), {
+      mode: "classic",
+      totalRounds: CLASSIC_SEAL_EVERY - 1,
+      round: CLASSIC_SEAL_EVERY,
+      inventory: inventory.filter((tile) => tile !== nine),
+      selectedTiles: [nine],
+    });
+    const next = gameReducer(state, { type: "SUBMIT_INCORRECT" });
+    expect(next.phase).toBe("feedback");
+    expect(getOverflowCount(next)).toBe(0);
+  });
+
+  it("NEXT_ROUND at the floor ends the run as a win, even with a hand that could answer", () => {
+    const state = makeFeedbackState(makeEquation(2, 3), {
+      mode: "classic",
+      totalRounds: toFloor,
+      round: toFloor,
+    });
+    const next = gameReducer(state, { type: "NEXT_ROUND", equation: makeEquation(2, 2) });
+    expect(next.phase).toBe("gameOver");
+    expect(isClassicWin(next)).toBe(true);
+  });
+
+  it("NEXT_ROUND at the floor with an empty hand ends the run as a loss", () => {
+    const state = makeFeedbackState(makeEquation(2, 3), {
+      mode: "classic",
+      totalRounds: toFloor,
+      round: toFloor,
+      inventory: [],
+    });
+    const next = gameReducer(state, { type: "NEXT_ROUND", equation: makeEquation(2, 3) });
+    expect(next.phase).toBe("gameOver");
+    expect(isClassicWin(next)).toBe(false);
+  });
+
+  it("NEXT_ROUND above the floor with too few tiles ends the run as a loss", () => {
+    const state = makeFeedbackState(makeEquation(2, 3), {
+      mode: "classic",
+      totalRounds: toFloor - 1,
+      round: toFloor - 1,
+      inventory: [makeTile(4)],
+    });
+    const next = gameReducer(state, { type: "NEXT_ROUND", equation: makeEquation(3, 4) });
+    expect(next.phase).toBe("gameOver");
+    expect(isClassicWin(next)).toBe(false);
+  });
+
+  it("NEXT_ROUND above the floor with enough tiles keeps playing", () => {
+    const state = makeFeedbackState(makeEquation(2, 3), {
+      mode: "classic",
+      totalRounds: toFloor - 1,
+      round: toFloor - 1,
+    });
+    const next = gameReducer(state, { type: "NEXT_ROUND", equation: makeEquation(3, 4) });
+    expect(next.phase).toBe("answering");
+  });
+});
+
 describe("reducer lifecycle invariants (§2.5)", () => {
   it("walks a full legal lifecycle path, asserting every §2.5 invariant after each transition", () => {
     interface Step {
@@ -786,6 +911,7 @@ describe("reducer lifecycle invariants (§2.5)", () => {
         label: "start the run",
         getAction: () => ({
           type: "START_RUN",
+          mode: "endless",
           equation: makeEquation(3, 3), // product 9, one slot
           inventory: createInitialInventory(sequentialIds()),
         }),
@@ -808,13 +934,8 @@ describe("reducer lifecycle invariants (§2.5)", () => {
         expectedPhase: "overflow",
       },
       {
-        label: "mark a newly rewarded tile for discard",
+        label: "mark a newly rewarded tile, completing the discard and returning to feedback at capacity",
         getAction: () => ({ type: "TOGGLE_DISCARD", tileId: "reward-0" }),
-        expectedPhase: "overflow",
-      },
-      {
-        label: "confirm the discard, returning to feedback at capacity",
-        getAction: () => ({ type: "CONFIRM_DISCARD" }),
         expectedPhase: "feedback",
       },
       {
@@ -888,5 +1009,56 @@ describe("reducer lifecycle invariants (§2.5)", () => {
 
     expect(state.round).toBe(1);
     expect(state.totalRounds).toBe(0);
+  });
+});
+
+describe("Classic lifecycle", () => {
+  it("holds every invariant on a run from twenty to the floor, through seals, misses and discards", () => {
+    // Every round asks 1 × d for a digit d the hand holds, so a one-tile
+    // answer is always possible. Every third submission misses; the rest are
+    // correct and rewarded, so a sealing submission overflows by two.
+    const ids = sequentialIds("reward");
+    const rewardDigits: Digit[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const nextEquation = (s: GameState) => {
+      const tile = s.inventory.find((candidate) => candidate.digit > 0);
+      return makeEquation(1, tile?.digit ?? 9);
+    };
+    const step = (s: GameState, action: GameAction): GameState => {
+      const next = gameReducer(s, action);
+      expect(next, action.type).not.toBe(s);
+      assertInvariants(next);
+      return next;
+    };
+
+    let state = step(createTitleState(), {
+      type: "START_RUN",
+      mode: "classic",
+      equation: makeEquation(1, 1),
+      inventory: createInitialInventory(sequentialIds(), CLASSIC_START_CAPACITY),
+    });
+    let sawDoubleDiscard = false;
+    while (state.phase === "answering") {
+      const product = state.equation!.product;
+      const miss = state.round % 3 === 0;
+      const tile = state.inventory.find((candidate) => (candidate.digit === product) !== miss)!;
+      state = step(state, { type: "SELECT_TILE", tileId: tile.id });
+      if (miss) {
+        state = step(state, { type: "SUBMIT_INCORRECT" });
+      } else {
+        const rewardTiles = Array.from({ length: getRewardCount(1) }, (_, index) =>
+          makeTile(rewardDigits[(state.round + index) % rewardDigits.length]!, ids(), true),
+        );
+        state = step(state, { type: "SUBMIT_CORRECT", rewardTiles });
+      }
+      if (getOverflowCount(state) >= 2) sawDoubleDiscard = true;
+      while (state.phase === "overflow") {
+        const unmarked = state.inventory.find((candidate) => !state.pendingDiscards.includes(candidate.id))!;
+        state = step(state, { type: "TOGGLE_DISCARD", tileId: unmarked.id });
+      }
+      state = step(state, { type: "NEXT_ROUND", equation: nextEquation(state) });
+    }
+
+    expect(sawDoubleDiscard).toBe(true);
+    expect(isClassicWin(state)).toBe(true);
   });
 });

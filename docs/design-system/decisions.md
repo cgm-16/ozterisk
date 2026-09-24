@@ -38,8 +38,8 @@ this codebase's non-reflowing rack.
 | `7a` | Streak tier 1: one jade ring | storyboard (frame); **gating inferred** | **built** — `oz-ring`, gated at streak 3 | `AnswerSlots`, streak ≥ 3 |
 | `7b` | Streak tier 2: second gold ring + gold rim on answer tiles | storyboard | **built** — `oz-ring` at 70ms | `AnswerSlots`, streak ≥ 5 |
 | `7c` | Streak tier 3: third ring, brightest rim | storyboard | **built** — `oz-ring` at 140ms | `AnswerSlots`, streak ≥ 8 |
-| `8a` | Overflow: the eleventh tile rim-rejects, perches on the rail | storyboard | specified | `TileInventory`, cell 10 — `oz-rim-reject`. **Positional**: no per-tile identity for the refused tile exists |
-| `8c` | Discard confirm: the marked tile tips off the end | storyboard | specified | `TileInventory`, held past the drop — `oz-tip-off` |
+| `8a` | Overflow: the eleventh tile rim-rejects, perches on the rail | storyboard | specified | `TileInventory` `.rail` — `oz-rim-reject` on every tile past capacity: the newest arrivals, in arrival order (M6a) |
+| `8c` | Discard confirm: the marked tile tips off the end | storyboard | **built** — `oz-slide-off` (supersedes `oz-tip-off`) | `TileInventory` `.cellDeparting`, held past the drop — `oz-slide-off`, `--dx 46px --drop 88px --rot 18deg` |
 | `9b` | Tile to slot: flat slide, 130ms | storyboard | **built** — transition, not a keyframe | `AnswerSlots` `.arriving` — `oz-slot-arrive`. **A keyframe here**: our slot tile mounts rather than travels |
 | `9f` | Wrong answer: crack and dust | storyboard (shape); **duration inferred** | **built** — `oz-crack` + `oz-dust` | `AnswerSlots` `.crack` + `.dust` |
 | `9i` | Reward tiles fire in place, in sorted position | storyboard (shape); **fire/halo split inferred** | **built** — `oz-fire` | `TileInventory`, `isNew` cells. Measured firing in both `overflow` and `feedback` |
@@ -50,6 +50,11 @@ this codebase's non-reflowing rack.
 | `11d` | An action becomes available and rises to meet the hand | **inferred** — from "disabled is flat, not dim" | **built** — `oz-rise-ready` | `ActionButton`, a resting offset on `:disabled`. A transition, so `oz-rise-ready` stays unused |
 | `11C` | Title entrance (240ms) and share chop (900ms) | storyboard | specified | `TitleScreen` `.markTile` — `oz-title-settle`; `GameOverScreen` `.chop` — `oz-chop` |
 | `10d` | Persistent streak rings on the counter | storyboard | **struck** — see below | — |
+| `M6` | Classic: a socket seals as the tray descends | **inferred** — from the descending-capacity system | **built** — `oz-seal` + `oz-seal-rim`, `--dur-seal` 180ms | `TileInventory` `.sealing` on the socket a submission closed |
+| `8a·2` | The perched tile takes the seat a discard freed | **inferred** — 8a leaves a tile on the rail and nothing collected it | **built** — `oz-perch-drop`, 220ms | `TileInventory` `.cellPerchDrop`, offsets measured from layout when the exits end |
+| `M6·0` | House takes a seat: the 21st socket seals at run start | **inferred** | **built** — `oz-seal`, 240ms delay | `TileInventory` `.sealing`, plugs past twenty on the rack's first render |
+| `M6·1` | Rack re-seats at a size change (FLIP) | **inferred** | **built** — `oz-reseat`, 300ms, `--ease-settle` | `TileInventory` layout effect, written onto each cell at a size change |
+| `M6·2` | New plugs close after the re-seat | **inferred** | **built** — `oz-seal`, 300 + 40·k ms | `TileInventory` `.sealing`, plugs past a new size's top |
 
 ### Inferred, and therefore open to challenge
 
@@ -457,3 +462,246 @@ already-square syllable blocks apart until 라운드 read as three characters
 rather than one word, and Noto Sans KR runs optically smaller than Zen Kaku at
 the same nominal size. No component opts in; the override is invisible to
 callers.
+
+---
+
+## M6 — Classic, merged from the M6 handoff (24 Sep 2026)
+
+Merged from `docs/design_handoff_m6_classic/decisions.md`. The **24 Sep** calls
+below supersede the **21 Sep** tray theme recorded after them: the rack keeps
+felt-cut sockets and closed sockets are felt plugs, not lacquer boards, and there
+is no wind tile or felt drift. The 21 Sep record is kept because its economy
+reasoning (cadence, the cliff, why Classic is winnable) still stands. Two
+handoff items are **not** adopted: `10i` stays struck (#104), and the fire/halo
+split stays unbuilt. Mean density was dropped from the M6 scope as a score.
+
+### Found by building the run (Classic)
+
+- **Classic's rack cannot be scrolled.** Twenty 64px sockets in 5×4 need 344px,
+  which does not fit the phone beside a HUD, an equation, slots, a verdict and
+  the actions. The rack is the one element that must not give: empty sockets
+  *are* the score, so a rack you have to scroll to read is the game hiding its
+  own state. Classic buys the fourth row by tightening the rack gap to 8px and
+  dropping the pip meter (twenty sockets and ten pips are two disagreeing
+  accounts of one number anyway) — never by clipping.
+- **The tray descent needs its own beat.** Firing the seal alongside the round
+  change loses it: there is one effect record and `round` wins. The seal also
+  closes a socket that is already past the new capacity, so the rack has to
+  keep rendering it until it has finished closing. 220ms of breathing room
+  between the seal and the new equation.
+
+### The overflow flow is three taps, not five
+
+The prototype had drifted from the repo: select → Submit → Next Round → mark →
+Confirm Discard. The repo's reducer already sends an overflowing correct answer
+straight from `SUBMIT_CORRECT` to `overflow`, and `GameScreen` completes a
+forced single discard on the marking tap. The prototype now does both, and goes
+two steps further:
+
+- **The tap that marks the last tile that must go completes the discard**, at
+  any count. The repo keeps Confirm for more than one tile, which only Classic
+  produces; generalising the single-tile rule removes the only button Classic
+  added. Earlier marks can still be taken back until that final tap.
+- **No Next Round after a discard.** The discard is the player's acknowledgement
+  of the round, so the next equation comes in once the tile has left and the
+  perched tile has seated. Next Round remains for a round with nothing to
+  resolve.
+- **Classic's seal moves to Submit.** Boards drop on submissions, so resolving
+  the seal there lets the overflow count include it, and the discard is asked
+  for in the same beat as the verdict. The rail tile is discardable too.
+
+### The newest tile perches, not the highest (locked 24 Sep 2026)
+
+The rack stays auto-sorted in both modes, but on a correct answer only the tiles
+that fit are sorted; the ones past capacity are the latest arrivals, in arrival
+order, and they go to the rail. Sorting first sent the rail the highest digits
+every time, so the rim reject read as "the 9s get thrown out", which is worse
+the longer Classic goes on. Only the +1 of a correct answer can cause overflow
+(a miss or a seal alone can't), so the tiles past capacity are always ones that
+just came back. Tiles that stay on after a discard drop into the socket that was
+freed, and the rack re-sorts at the next round under the round rise (10b), which
+keeps the one-sort-per-round rule. Unsorting Classic was rejected: it breaks
+that rule and makes reading the hand a chore that says nothing about skill.
+
+### Classic's rack steps its tile size with capacity (locked 24 Sep 2026; 15/10 thresholds pending device playtest)
+
+At 64×80 in 5 columns, twenty sockets take four rows (~356px) and won't fit a
+667px-tall phone. Rather than shrinking tiles everywhere or making the rack
+scroll, the rack has three sizes: **7 × 44×55** at 16–20 sockets, **6 × 48×60**
+at 11–15, and at 10 and below the home rack, which is the Endless rack at its
+own tiers (§1.12): a fixed 5 × 64×80 is 352px wide and does not fit the 281px
+the 320px gate leaves. Every size is about 180px
+tall. The tiles grow as the table empties, and from 10 sockets on, Classic's
+rack is the same as Endless's. The size changes only at the round change, along
+with the re-sort, under 10b; never under a seal. The rail tile follows the rack
+size so the perch-drop lands true. The answer slots stay full size. 44px is the
+floor (`--target-min`), and the small size uses `--radius-sm`. The thresholds
+(15 and 10) are tweaks in Playable Run and still need a playtest on a real
+device.
+
+### Closed sockets stay as sealed plugs (locked 24 Sep 2026)
+
+With the rack in stepped sizes, capacity rarely fills whole rows: 20 in 7
+columns leaves one hole at the start, and every seal opens another. Each size
+now keeps a fixed footprint of whole rows for its top capacity (21 / 18 / 10),
+and closed sockets stay on as **sealed plugs**, which look like the resting state
+of `oz-seal`: flush with the felt, a rim, and no well. The rack is always a full
+rectangle, and the plug count shows the descent. The one plug at the start is
+matched by the first real seal at submission 2. The 6-column size starts with 3
+plugs, and the plugs move with the resize under 10b. Going back to 5×4 at 64×80
+was rejected: it only fixes the first round, and the rack needs scrolling again.
+
+### The rack's size changes are shown, not cut (locked 24 Sep 2026)
+
+The instant resize and the plugs were correct but not explained, so the jump
+cut is now the reduced-motion path and full motion adds three moments, all
+built from existing parts: **M6·0 House takes a seat**: the 21st socket seals
+(`oz-seal`) 240ms into the first round, and submission 2 repeats it.
+**M6·1 Rack re-seats**: at the round where the size changes, the tiles lift
+together, travel from their old seat and size to the new one, and set down
+(`oz-reseat`, a FLIP with caller-supplied `--fx/--fy/--fs`, 300ms,
+`--ease-settle`). The re-sort rides the same motion. **M6·2 New plugs
+close**: the extra cells in the new grid seal 40ms apart once the tiles have
+landed. A resize round runs about 560ms, twice a run.
+
+### M6 closed, 24 Sep 2026
+
+- Table sweep stays at 700ms; judged right in context.
+- Run length (~30 submissions, ~6.5 min) is kept; revisit once M7 face-sets move the win rate.
+- "House takes a seat" is kept.
+- Floor moves 6 → 5 when M7 ships.
+- Stepped rack and plugs are promoted into `TileInventory` (`stepped`, `drawnCapacity`, `capacity`; `rackTier` and its 15/10 thresholds in `rackTier.ts`; the re-seat reads the previous render, so there is no `reseatFrom` prop — T71, T73).
+
+### M7 opening calls, 24 Sep 2026
+
+- **No digit picker.** A face-set tile placed in a slot counts as the right digit if that digit is in its set; if not, the answer is wrong and is paid for like any wrong digit. Misplacing a special is a legitimate way to lose, and removing the picker removes the game's only would-be modal.
+- **Faces are not Hangul.** 홀 / 짝 are rejected as tile faces; they don't read as engraved objects and they tie a numeral game to one locale.
+- **Sets under study:** Wildcard, Odd, Even, Low 0–4, High 5–9, plus **Neighbours** (three consecutive digits, no wrap: 0·1·2 … 7·8·9). Face notation for Neighbours is open between `4–6` (joins the range family) and `5±1`.
+- **Material:** clay like a digit tile, set apart by an edge or inlay, not a new material.
+
+## M6 + M7 — Classic mode, settled 21 Sep 2026
+
+Designed across five documents in this project (see `readme.md`'s index) and
+settled over a 25-round review. Not in the repo: `docs/plan/roadmap.md` names M6
+and M7, but neither `product.md` nor `ui-i18n.md` mentions Classic, so the visual
+contract was genuinely open.
+
+### The theme — a hanchan on a wooden tray
+
+**Classic is a two-wind mahjong half-game.** The metaphor was already a mahjong
+table, and mahjong owns a finite arc the game had never used: a hand ends by
+*ryuukyoku* when the wall runs out, and the wall's last tiles are reserved —
+present, visible, permanently out of play. That is exactly a retired socket.
+
+- **The rack becomes a tray.** Dark wood, warmer and darker than the ceramic so
+  the tiles sit forward. Ten sockets cut into it — twenty at Classic's start —
+  plus one reserved cut at the right end for the wind marker. *Rejected:*
+  lacquer (spoken for by the boards), stone, bamboo (that is the tile's own
+  backing). Endless keeps felt-cut sockets.
+- **A retired socket is boarded over** with lacquer — the table's own finish
+  closing the gap, flush, no tile. *Rejected:* a face-down tile, which reads as
+  *owed* rather than gone.
+- **The march is a fact, not a choice.** Boards run row-major right to left.
+  Player nomination was chosen in review and then **dropped**: it contradicted
+  the fixed march, and a march the player can read beats a choice they must make.
+  The lacquer seam survived by changing jobs — it now forecasts the next board
+  one drop ahead instead of marking the player's pick.
+- **The floor line** is carved from round one, a short vertical cut where the
+  march stops. The last board fills it with lacquer.
+- **The wind** is a ceramic tile — the one tile never played — that spins flat
+  180° in its cut, 東 → 南, **in both locales**. It is an object on the table, not
+  copy to translate.
+
+### The felt rule, rescoped
+
+The locked rule was "the felt never lights up; escalation is the tiles behaving
+harder, not the table." That was written to keep the **streak ladder** from
+getting flashy in an endless mode with no arc to spend escalation on — it is a
+claim about frequency, not about material.
+
+**Rescoped: the felt never reacts to a *play*.** A mode with phases may drift it
+by round. The distinction is *positional* versus *reactive* — a Slay the Spire
+act's biome does not respond to anything, it is where you are; Balatro's ground
+responds to what just happened. Classic's ground is positional, so the streak
+ladder still owns every per-play escalation. The ladder itself runs in Classic
+unchanged.
+
+Consequence: a moving ground would turn every recorded contrast figure into one
+number per round, so **ink never sits on the felt** — panels and labels take an
+opaque carrier plate, and the tray does that job for the rack. One exception
+accepted deliberately: the empty answer slot's dashed gold stays on the felt,
+verified at both drift ends with a narrower margin at the far one. Under
+`prefers-reduced-motion` the ground snaps to two static felts.
+
+### Cadence — and what the simulation overturned
+
+| Dial | Value | Why |
+|---|---|---|
+| Starting capacity | 20 | Board count is `start − floor`, so the start is the *decision* budget. |
+| Opening hand | Full, round-robin | Two of every digit at 20. **This is what makes the tray bind at all.** |
+| Floor | 5 (6 before M7 ships) | The economy doc's figure is 6 — where a wildcard is worth ten digits in one slot. |
+| N | 2 submissions per board | Correct *or not*. The only dial that cuts playtime without spending boards. |
+| Run | 15 boards, 30 submissions | ~6.5 min, ~47% win rate at the shipped 20% kind rate. |
+
+**Boards count submissions, not correct answers.** Correct-answer-driven boards
+would mean the tray watches how well you are doing and moves accordingly — the
+same thing the felt is forbidden from doing. A submission clock is positional.
+
+Three things a simulation of the real 45-equation draw corrected, each recorded
+because the wrong version was written down first:
+
+1. **The cliff is real and derivable.** A correct answer nets +1; a miss costs
+   the answer's length, mean 1.71 digits. Drift is zero at `1.71 / 2.71` =
+   **63.1%** — the economy doc's figure, falling out of the shipped rules rather
+   than assumed.
+2. **There is no protected "buffer act."** Duplicates add no reach (no product of
+   two single digits repeats a digit), so they looked like free early discards.
+   But answering also consumes digits and returns random ones, so the tidy
+   opening is churned away by *play* within a few submissions. The two-act
+   structure and its East/South alignment are withdrawn.
+3. **A board drop and an overflow are different events.** A clamp *at* a board is
+   the tray taking a socket — Classic's mechanic. A clamp between boards is
+   ordinary overflow, which Endless already has. Conflating them produced an
+   impossible "13.2 of 15 boards."
+
+### Why Classic is winnable *and* scored
+
+Classic cannot have a definite arc, an uncapped high score, and no stable loop —
+pick two. M7's face-set tiles let a hoarding player re-cross the cliff *upward*,
+which at a fixed floor is a stable loop: Classic becomes Endless with a wooden
+tray. Burgun named this in 2017 as "the problem of ever-expanding match length."
+
+The resolution is Tetris Marathon's: **the arc is the course, the score is your
+round on it.** Reaching the floor is the win — the entry ticket — and **mean
+density** (coverage per socket) is the score that separates two players who both
+finished. A pure high-score build was rejected on its own terms: friend-versus-
+friend comparison needs a shared seed, which imposes a fixed arc anyway.
+
+- **Skill's language across the three eras:** preserve → ration → **concentrate**.
+  The metric moves from coverage `b` to density, `b` per socket.
+- **Dead-end detection is struck.** It existed only because nothing else ended
+  the run; reaching the last board is a counter comparison.
+- **Exhaustion became a win.** The settle-with-face-down-tiles ending specified
+  for a defeat was always the shape of an arrival. This resurrected
+  `--surface-tile-back` — one token, used once per run, and it earns it.
+- **No leaderboard.** The share string is the leaderboard; the chop carries the
+  wind the run ended in. Public daily leaderboards fail predictably (hackers,
+  unreadable, scores expiring); friend-scale comparison does not.
+
+### Open, and needing playtest rather than design
+
+- **The win rate is the whole calibration.** Wordle's unsung feat is landing
+  where the average player wins most days but losses still feel earned. ~47% is
+  in band by the model, but the model does not include M7 face-sets (which will
+  raise it) and its simulated player never reasons about coverage.
+- **Playtime.** 6.5 minutes runs longer than Wordle or Connections. Accepted as a
+  baseline to trim on feedback; N is the dial, at ~2 minutes per step.
+- **Daily seed or freeplay.** A seed makes friend comparison valid but imposes
+  one run a day. Dead Cells and OlliOlli chose opposite answers and both
+  defended it.
+- **Does the floor descend on repeat wins?** The Ascension pattern fits, but it
+  is the meta-system this project cut.
+- **The digit picker** for face-set tiles is the first modal choice in a game
+  with none, and it fires mid-answer. It should be tiles, not a menu.
+- **A 5×4 tray at 320px** is the hardest layout problem in the project; §8.5
+  needs re-walking.

@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useEffect, useRef, type AnimationEvent, type CSSProperties } from "react";
 import type { RoundResult, Tile as TileModel } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
@@ -53,6 +53,12 @@ export interface AnswerSlotsProps {
    * already includes the round being judged.
    */
   streak?: number;
+  /**
+   * Called once every moment the verdict plays on these slots has finished:
+   * the bloom or crack, the dust, the rings and the burst. Only a judged group
+   * settles; a group with no tile in it settles on its first render.
+   */
+  onSettled?(): void;
 }
 
 export function AnswerSlots({
@@ -62,6 +68,7 @@ export function AnswerSlots({
   disabled,
   verdict,
   streak = 0,
+  onSettled,
 }: AnswerSlotsProps) {
   const { t } = useI18n();
   const positions = Array.from({ length: slotCount }, (_, index) => index);
@@ -76,8 +83,36 @@ export function AnswerSlots({
   // not stacked with.
   const rim = rings[rings.length - 1]?.rim ?? "";
 
+  // Every element that plays part of the verdict carries data-moment, and the
+  // group has settled when each of them has ended once. Counted by element
+  // rather than by event, so a bubbling animationend from anything else — or
+  // the same element reported twice — cannot settle it early. Under
+  // prefers-reduced-motion every frame still runs, for 0.01ms, so the count
+  // is still reached.
+  const filledCount = selectedTiles.slice(0, slotCount).length;
+  const momentsPerTile =
+    1 + (verdict === "incorrect" ? 1 : 0) + rings.length + (burst ? CHIPS.length : 0);
+  const expectedMoments = verdict === undefined ? null : filledCount * momentsPerTile;
+  const ended = useRef(new Set<EventTarget>());
+  const settledRef = useRef(false);
+  const settle = () => {
+    if (settledRef.current) return;
+    settledRef.current = true;
+    onSettled?.();
+  };
+  const onAnimationEnd = (event: AnimationEvent<HTMLDivElement>) => {
+    if (expectedMoments === null) return;
+    if (!(event.target instanceof Element) || !event.target.hasAttribute("data-moment")) return;
+    ended.current.add(event.target);
+    if (ended.current.size >= expectedMoments) settle();
+  };
+  // Nothing to wait for: settle as soon as the group is on screen.
+  useEffect(() => {
+    if (expectedMoments === 0) settle();
+  });
+
   return (
-    <div className={styles.slots}>
+    <div className={styles.slots} onAnimationEnd={onAnimationEnd}>
       {positions.map((index) => {
         const tile = selectedTiles[index];
         const position = index + 1;
@@ -128,7 +163,7 @@ export function AnswerSlots({
           // reused and 9b, the most frequent motion in the app, would never
           // play again after the first selection.
           <span key={tile.id} className={styles.filled}>
-            {verdict === "incorrect" && <span className={styles.dust} aria-hidden="true" />}
+            {verdict === "incorrect" && <span className={styles.dust} aria-hidden="true" data-moment="" />}
             {/* The ladder is decoration on a moment the tile already carries:
                 nothing here is reachable, and nothing here is named. */}
             {rings.map((tier) => (
@@ -136,9 +171,13 @@ export function AnswerSlots({
                 key={tier.at}
                 className={`${styles.ring} ${tier.ring}`}
                 aria-hidden="true"
+                data-moment=""
               />
             ))}
-            <span className={rim === "" ? moment : `${moment} ${rim}`}>
+            <span
+              className={rim === "" ? moment : `${moment} ${rim}`}
+              data-moment={verdict === undefined ? undefined : ""}
+            >
               <Tile
                 digit={tile.digit}
                 state={disabled ? "disabled" : "resting"}
@@ -152,6 +191,7 @@ export function AnswerSlots({
                   key={chip.rot}
                   className={styles.chip}
                   aria-hidden="true"
+                  data-moment=""
                   style={
                     {
                       "--dx": chip.dx,

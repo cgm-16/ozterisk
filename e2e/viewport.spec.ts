@@ -33,7 +33,7 @@ import { START_LABEL } from "./labels.js";
    the three #85 attempts that reported `clean` and counted for nothing. */
 const CONTENT_WIDTHS = [305, 320, 407, 408] as const;
 const LOCALES = ["en", "ko"] as const;
-const STATE_COUNT = 19;
+const STATE_COUNT = 24;
 
 /* `spacing.css` — the narrow tier's tile, the middle tier's, and the boundary
    between them. The 48rem tier is out of range for every width swept here. */
@@ -86,13 +86,15 @@ async function setContentWidth(page: Page, width: number): Promise<number> {
     measures nothing and reports it clean, which is what T62 hit when it swept
     `main` on the four interaction boards. */
 async function sweep(page: Page): Promise<StateReading[]> {
-  const buttons = page.locator("button[aria-pressed]");
-  const states = (await buttons.count()) - 4; // the LanguageToggle segments render twice
+  // Scoped to the picker: the title's mode select and the LanguageToggle
+  // also carry aria-pressed, and render only in some states.
+  const buttons = page.locator("nav ul button[aria-pressed]");
+  const states = await buttons.count();
   expect(states, "gallery state count").toBe(STATE_COUNT);
 
   const readings: StateReading[] = [];
   for (let i = 0; i < STATE_COUNT; i += 1) {
-    await buttons.nth(i + 2).click();
+    await buttons.nth(i).click();
     readings.push(
       await page.evaluate(() => {
         const stage = document.querySelector('div[class*="stage"]');
@@ -109,11 +111,9 @@ async function sweep(page: Page): Promise<StateReading[]> {
           if (box.right > peak) peak = box.right;
           if (box.right > viewport + 0.5) past += 1;
         }
-        // Skip the two LanguageToggle segments, which also carry aria-pressed
-        // and would otherwise label every reading "English".
-        const picker = [
-          ...document.querySelectorAll("button[aria-pressed]"),
-        ].slice(2);
+        // The picker's own buttons: the LanguageToggle and the mode select
+        // also carry aria-pressed and would otherwise label the readings.
+        const picker = [...document.querySelectorAll("nav ul button[aria-pressed]")];
         return {
           state:
             picker.find((b) => b.getAttribute("aria-pressed") === "true")
@@ -360,3 +360,146 @@ test("the rack holds the target minimum below the 320px gate", async ({
     "rendered tile width against the target minimum",
   ).toBeGreaterThanOrEqual(reading.targetMin);
 });
+
+/* Classic's stepped rack in the app itself, not the gallery: its first size is
+   7 x 44 in a tray, capped at 6 x 44 where the arena cannot hold it (§1.12).
+   305 is the 320px gate with a scrollbar, where the narrow size must fit with
+   a pixel to spare; 402 is the phone the handoff drew; 1280 is desktop. The
+   answer slots keep the arena's tile size in every rack size, and the rack's
+   rows are the footprint's, never one more.
+ *
+ * Layout only: which size the rack chose is the reading, not a rule under test.
+ */
+const CLASSIC_WIDTHS = [
+  { width: 305, cols: 6 },
+  { width: 402, cols: 7 },
+  { width: 1280, cols: 7 },
+] as const;
+
+for (const locale of LOCALES) {
+  for (const { width, cols } of CLASSIC_WIDTHS) {
+    test(`Classic's rack fits a ${width}px content box in ${locale}`, async ({
+      page,
+    }) => {
+      await page.addInitScript(
+        (lang) => window.localStorage.setItem("one-zero.language", lang),
+        locale,
+      );
+      await page.goto("/");
+      await setContentWidth(page, width);
+      await page.evaluate(() => document.fonts.ready);
+      await page.getByRole("button", { name: /^(Classic|클래식)/ }).click();
+      await page
+        .getByRole("button", { name: START_LABEL[locale], exact: true })
+        .click();
+      // Read once the tray is visible. The rack's size is a container query,
+      // resolved in style, so no later frame differs from this one; this
+      // reading cannot itself tell a first frame from a later one.
+      await expect(page.locator('[class*="tray"]')).toBeVisible();
+
+      const reading = await page.evaluate(() => {
+        const de = document.documentElement;
+        const tray = document.querySelector('[class*="tray"]')!;
+        const style = getComputedStyle(tray);
+        const tile = tray.querySelector('[data-tile]')!;
+        const slot = document.querySelector('[aria-label^="Answer slot"], [aria-label^="정답 칸"]');
+        return {
+          viewport: de.clientWidth,
+          scrollWidth: de.scrollWidth,
+          trayRight: tray.getBoundingClientRect().right,
+          columns: style.gridTemplateColumns.split(" ").length,
+          rows: style.gridTemplateRows.split(" ").length,
+          // Wide, the 20-size draws 21 of its 24 cells; CSS hides the rest.
+          cells: [...tray.children].filter((cell) => getComputedStyle(cell).display !== "none").length,
+          tileW: tile.getBoundingClientRect().width,
+          slotW: slot ? slot.getBoundingClientRect().width : 0,
+          targetMin: parseFloat(getComputedStyle(de).getPropertyValue("--target-min")),
+          // The arena's tile width: the rack sets its own --tile-w, the slots do not.
+          arenaTileW: parseFloat(getComputedStyle(de).getPropertyValue("--tile-w")),
+        };
+      });
+
+      // Guards on the conditions, before the result.
+      expect(reading.viewport, "content width the harness produced").toBe(width);
+      expect(reading.columns, `rack size chosen at ${width}`).toBe(cols);
+      expect(reading.slotW, "an answer slot was found").toBeGreaterThan(0);
+
+      expect(reading.scrollWidth, "document scroll width").toBeLessThanOrEqual(reading.viewport);
+      expect(reading.trayRight, "tray right edge").toBeLessThanOrEqual(reading.viewport);
+      expect(reading.tileW, "tile against the target minimum").toBeGreaterThanOrEqual(reading.targetMin);
+      expect(reading.rows * reading.columns, "rows are the footprint's, never one more").toBe(reading.cells);
+      expect(reading.slotW, "answer slots stay at the arena's tier, not the rack's size").toBe(reading.arenaTileW);
+    });
+  }
+}
+
+/* §8.5 through an overflow, in the app. A correct answer in Endless's first
+   round always overflows — a one-digit answer spends one tile and earns two, a
+   two-digit one spends two and earns three — so the newest arrival perches on
+   the rail. The rail is right-aligned and 8a pivots the perched tile on its
+   lower-left edge, so its rest pose reaches right of its own cell; 8c then
+   tips a discarded tile further right still. Both are read here: the perch
+   after its frame has finished, and the slide-off at every tenth of its
+   frame, paused, because a reading straight after a click sees neither.
+ *
+ * 305 is the 320px gate with a classic scrollbar; 375 a common phone.
+ */
+const OVERFLOW_WIDTHS = [305, 320, 375] as const;
+
+for (const width of OVERFLOW_WIDTHS) {
+  test(`an overflow and its discard stay inside a ${width}px content box`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() => window.localStorage.setItem("one-zero.language", "en"));
+    await page.goto("/");
+    await setContentWidth(page, width);
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByRole("button", { name: START_LABEL.en, exact: true }).click();
+
+    // Answer the first equation correctly: its digits are all in the opening
+    // hand of one of each.
+    const equation = await page.getByText(/^\d+ × \d+ =$/).textContent();
+    const [a, b] = equation!.match(/\d+/g)!.map(Number);
+    for (const digit of String(a! * b!)) {
+      await page.getByRole("button", { name: `Digit ${digit}`, exact: true }).click();
+    }
+    await page.getByRole("button", { name: "Submit" }).click();
+
+    const railTile = page.locator("[data-rail]");
+    await expect(railTile).toBeVisible();
+    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+
+    const perch = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      tileRight: document.querySelector("[data-rail]")!.getBoundingClientRect().right,
+      // Resolved tracks include any implicit row a perched tile would add.
+      gridRows: getComputedStyle(document.querySelector("[data-cell]")!.parentElement!).gridTemplateRows.split(" ").length,
+      railInGrid: document.querySelector("[data-cell]")!.parentElement!.contains(document.querySelector("[data-rail]")),
+    }));
+    expect(perch.viewport, "content width the harness produced").toBe(width);
+    expect(perch.tileRight, "perched tile's right edge").toBeLessThanOrEqual(perch.viewport);
+    expect(perch.scrollWidth, "document scroll width with a tile perched").toBeLessThanOrEqual(perch.viewport);
+    expect(perch.railInGrid, "the perched tile sits outside the rack's grid").toBe(false);
+    expect(perch.gridRows, "the rail adds no row to the rack").toBe(2);
+
+    // Mark the perched tile: the one required mark completes the discard, and
+    // the tile tips off the rack.
+    await railTile.click();
+    const slideOff = await page.evaluate(() => {
+      const departing = document.querySelector("[data-departing]");
+      if (!departing) throw new Error("no departing tile — the discard did not start");
+      const [frame] = departing.getAnimations();
+      if (!frame) throw new Error("the departing tile plays no animation");
+      frame.pause();
+      const duration = Number(frame.effect!.getComputedTiming().duration);
+      const widths: number[] = [];
+      for (let step = 0; step <= 10; step += 1) {
+        frame.currentTime = (duration * step) / 10;
+        widths.push(document.documentElement.scrollWidth);
+      }
+      return { viewport: document.documentElement.clientWidth, widest: Math.max(...widths) };
+    });
+    expect(slideOff.widest, "document scroll width during the slide-off").toBeLessThanOrEqual(slideOff.viewport);
+  });
+}

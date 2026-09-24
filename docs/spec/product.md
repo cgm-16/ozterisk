@@ -99,7 +99,7 @@ An incorrect answer is legal even when the correct answer cannot be constructed 
 - A mark can be taken back until the discard completes.
 - **The mark that reaches `excess` completes the discard**, at any count. No confirmation control is rendered. The collapse is driven by the player's action, never by a render.
 - Completing the discard removes the marked tiles. Rail tiles that survive take the sockets the discard freed; the rest of the rack neither compacts nor re-sorts.
-- The round then advances on its own once the discard has visibly finished (§1.8); there is no **Next Round** after a discard.
+- The round then advances on its own once the discard and the verdict's celebration have both visibly finished (§1.8); there is no **Next Round** after a discard.
 - The next equation cannot be drawn while overflow remains unresolved.
 
 ### 1.7a Classic capacity

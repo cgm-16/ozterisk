@@ -33,7 +33,8 @@ paths:
 
 The reducer now finishes a discard on the last mark and leaves the round to
 advance on its own. The UI has to stop rendering Confirm, stop offering Next
-Round, and advance once the discard has visibly finished — on `animationend`,
+Round, and advance once the discard and the verdict's celebration have both
+visibly finished — on `animationend`,
 never a timer (a timer duplicates a duration the stylesheet owns, and reduced
 motion already fires `animationend` at `0.01ms`).
 

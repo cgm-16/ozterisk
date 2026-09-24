@@ -33,7 +33,7 @@ import { START_LABEL } from "./labels.js";
    the three #85 attempts that reported `clean` and counted for nothing. */
 const CONTENT_WIDTHS = [305, 320, 407, 408] as const;
 const LOCALES = ["en", "ko"] as const;
-const STATE_COUNT = 19;
+const STATE_COUNT = 22;
 
 /* `spacing.css` — the narrow tier's tile, the middle tier's, and the boundary
    between them. The 48rem tier is out of range for every width swept here. */
@@ -86,13 +86,15 @@ async function setContentWidth(page: Page, width: number): Promise<number> {
     measures nothing and reports it clean, which is what T62 hit when it swept
     `main` on the four interaction boards. */
 async function sweep(page: Page): Promise<StateReading[]> {
-  const buttons = page.locator("button[aria-pressed]");
-  const states = (await buttons.count()) - 4; // the LanguageToggle segments render twice
+  // Scoped to the picker: the title's mode select and the LanguageToggle
+  // also carry aria-pressed, and render only in some states.
+  const buttons = page.locator("nav ul button[aria-pressed]");
+  const states = await buttons.count();
   expect(states, "gallery state count").toBe(STATE_COUNT);
 
   const readings: StateReading[] = [];
   for (let i = 0; i < STATE_COUNT; i += 1) {
-    await buttons.nth(i + 2).click();
+    await buttons.nth(i).click();
     readings.push(
       await page.evaluate(() => {
         const stage = document.querySelector('div[class*="stage"]');
@@ -109,11 +111,9 @@ async function sweep(page: Page): Promise<StateReading[]> {
           if (box.right > peak) peak = box.right;
           if (box.right > viewport + 0.5) past += 1;
         }
-        // Skip the two LanguageToggle segments, which also carry aria-pressed
-        // and would otherwise label every reading "English".
-        const picker = [
-          ...document.querySelectorAll("button[aria-pressed]"),
-        ].slice(2);
+        // The picker's own buttons: the LanguageToggle and the mode select
+        // also carry aria-pressed and would otherwise label the readings.
+        const picker = [...document.querySelectorAll("nav ul button[aria-pressed]")];
         return {
           state:
             picker.find((b) => b.getAttribute("aria-pressed") === "true")

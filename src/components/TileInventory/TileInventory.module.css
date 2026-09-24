@@ -134,7 +134,14 @@
    it by however long React takes to commit the removal, so without it the tile
    flashes back into its cell for a frame on the way out. */
 .cellDeparting {
-  animation-name: global(oz-tip-off);
-  animation-duration: var(--dur-select);
+  /* 8c: the tile tips off its edge and gravity takes it (oz-slide-off). The
+     frame is distance-agnostic; the discard's own distances are these. */
+  --dx: 46px;
+  --drop: 88px;
+  --rot: 18deg;
+
+  animation-name: global(oz-slide-off);
+  animation-duration: var(--dur-discard);
+  animation-timing-function: var(--ease-fall);
   animation-fill-mode: forwards;
 }

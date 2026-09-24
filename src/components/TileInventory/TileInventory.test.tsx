@@ -253,7 +253,7 @@ describe("TileInventory", () => {
 
     const departing = cells(container)[1];
     expect(departing.textContent).toBe("2");
-    expect(animationOn(departing)).toBe("oz-tip-off");
+    expect(animationOn(departing)).toBe("oz-slide-off");
     expect(cells(container)[2].textContent).toBe("3");
 
     endAnimation(departing);
@@ -277,7 +277,7 @@ describe("TileInventory", () => {
 
     const departing = cells(container)[1];
     expect(departing.textContent).toBe("2");
-    expect(animationOn(departing)).toBe("oz-tip-off");
+    expect(animationOn(departing)).toBe("oz-slide-off");
   });
 
   // A tile leaving the rack from the answering phase was submitted, not
@@ -309,7 +309,7 @@ describe("TileInventory", () => {
     rerender({ tiles: [tiles[1]], mode: "readOnly", pendingDiscards: [] });
 
     const departing = cells(container)[0];
-    expect(animationOn(departing)).toBe("oz-tip-off");
+    expect(animationOn(departing)).toBe("oz-slide-off");
     endAnimation(departing);
     expect(cells(container)[0].textContent).toBe("3");
   });
@@ -428,7 +428,7 @@ describe("TileInventory", () => {
     rerender({ tiles: before.slice(0, 10), mode: "readOnly" });
 
     // React has no onAnimationCancel, so the rack listens natively.
-    fireEvent(cells(container)[10], cancelEvent("oz-tip-off"));
+    fireEvent(cells(container)[10], cancelEvent("oz-slide-off"));
     expect(onSettled).toHaveBeenCalledTimes(1);
   });
 

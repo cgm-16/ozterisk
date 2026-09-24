@@ -6,8 +6,8 @@ import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { createInitialInventory, createTitleState } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
 import { generateKindEquation, generateRewardTiles } from "../game/generators";
-import { constructAnswer, getRewardCount } from "../game/selectors";
-import type { RandomSource, TileIdFactory } from "../game/types";
+import { constructAnswer, getCapacity, getRewardCount } from "../game/selectors";
+import type { GameMode, RandomSource, TileIdFactory } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
 import styles from "./App.module.css";
 
@@ -25,17 +25,22 @@ export interface AppProps {
 export function App({ dependencies, shareDependencies }: AppProps) {
   const [state, dispatch] = useReducer(gameReducer, undefined, createTitleState);
 
-  const handleStart = useCallback(() => {
-    const inventory = createInitialInventory(dependencies.nextTileId);
-    const equation = generateKindEquation(dependencies.random, inventory);
-    dispatch({ type: "START_RUN", mode: "endless", equation, inventory });
-  }, [dependencies]);
+  // The opening hand fills the mode's starting capacity (§1.3).
+  const handleStart = useCallback(
+    (mode: GameMode) => {
+      const inventory = createInitialInventory(dependencies.nextTileId, getCapacity(mode, 0));
+      const equation = generateKindEquation(dependencies.random, inventory);
+      dispatch({ type: "START_RUN", mode, equation, inventory });
+    },
+    [dependencies],
+  );
 
+  // RESTART_RUN keeps the run's mode, so the hand is dealt for it too.
   const handleRestart = useCallback(() => {
-    const inventory = createInitialInventory(dependencies.nextTileId);
+    const inventory = createInitialInventory(dependencies.nextTileId, getCapacity(state.mode, 0));
     const equation = generateKindEquation(dependencies.random, inventory);
     dispatch({ type: "RESTART_RUN", equation, inventory });
-  }, [dependencies]);
+  }, [dependencies, state.mode]);
 
   const handleSubmit = useCallback(() => {
     // Reducer invariant (§2.5): equation === null only in `title`, and Submit

@@ -41,12 +41,21 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
 
   return (
     <main className={styles.screen}>
-      <GameHud score={state.score} currentStreak={state.currentStreak} round={state.round} />
+      <GameHud
+        score={state.score}
+        currentStreak={state.currentStreak}
+        round={state.round}
+        // Classic states its live capacity as a number; its rack's plugs show
+        // the descent, and twenty pips would be a second account of it (§1.10).
+        capacity={state.mode === "classic" ? getCapacity(state.mode, state.totalRounds) : undefined}
+      />
       {/* Capacity is what you hold, and a tile in an answer slot is still
           yours — you can return it. Reading state.inventory alone would drop
           by one per selection and disagree with the rack beside it, which
           keeps a socket for every tile in the same union. */}
-      <CapacityMeter held={state.inventory.length + state.selectedTiles.length} />
+      {state.mode === "endless" && (
+        <CapacityMeter held={state.inventory.length + state.selectedTiles.length} />
+      )}
       <EquationBoard equation={state.equation} />
 
       {state.phase === "answering" && (

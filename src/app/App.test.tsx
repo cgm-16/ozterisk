@@ -206,6 +206,30 @@ describe("App", () => {
     expect(localStorage.length).toBe(0);
   });
 
+  it("deals Classic twenty tiles, two of each digit, and states its live capacity", async () => {
+    const user = userEvent.setup();
+    const randomValues = [
+      ...equationSamples(2, 3), // round 1: product 6; submit a 5, incorrect
+      ...equationSamples(2, 3), // round 2: again incorrect, the sealing submission
+    ];
+    renderApp(randomValues, { initialLanguage: "en" });
+
+    await user.click(screen.getByRole("button", { name: /^Classic/ }));
+    await user.click(screen.getByRole("button", { name: "Start Run" }));
+
+    const digits = screen.getAllByRole("button", { name: /^Digit \d$/ }).map((tile) => tile.textContent);
+    expect(digits).toEqual(["0","0","1","1","2","2","3","3","4","4","5","5","6","6","7","7","8","8","9","9"]);
+    expect(hudField("Capacity")).toBe("20");
+
+    await user.click(screen.getAllByRole("button", { name: "Digit 5" })[0]!);
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    await user.click(screen.getAllByRole("button", { name: "Digit 5" })[0]!);
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    expect(hudField("Capacity")).toBe("19");
+  });
+
   it("grants no reward and resets the streak on an incorrect answer, then advances via Next Round", async () => {
     const user = userEvent.setup();
     const randomValues = [

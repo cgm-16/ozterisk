@@ -48,8 +48,8 @@ export function GameOverScreen({
   return (
     <main className={styles.screen}>
       <div className={styles.terminal}>
-        {/* A Classic win shows no equation: the one drawn after it was never
-            answered, and nothing needs explaining — the run is complete. */}
+        {/* A Classic win shows no equation: the run is complete, and there is
+            nothing left to explain. */}
         {!stats.won && <EquationBoard equation={equation} showProduct />}
         {/* §1.8 keeps the terminal equation on screen to explain the loss, but
             the equation alone reads as a live prompt. The reason sits with the

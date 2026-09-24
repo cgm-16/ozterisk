@@ -38,7 +38,7 @@ function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
 
 describe("GameOverScreen", () => {
   // §1.10: a Classic win is complete, not stopped, so it names itself and
-  // shows no equation — the one drawn after the win was never answered.
+  // shows no equation — there is nothing left to explain.
   it("states Run Complete and its reason on a Classic win, with no equation", () => {
     renderScreen({ stats: { ...STATS, mode: "classic", won: true } });
     expect(screen.getByRole("heading", { name: "Run Complete" })).toBeInTheDocument();

@@ -29,7 +29,8 @@ hoc at branch time.
 | `M5.5e — Flow Screens` | Title, feedback, overflow and game over wear the system | Answer slots stay mounted through feedback and carry no `button` role there; `role="status"` regions intact; the game-over screen has one focal point and ranks its own numbers; restart is bound to `R` and has a visible affordance; the title's four material rules are visible without interaction |
 | `M5.5f — Motion` | The sixteen named moments | Every moment in the §1.12 inventory implemented; `prefers-reduced-motion` neutralises all of them |
 | `M5.5g — Visual Verification` | The gallery proves it | Gallery covers hover, focus-visible, disabled and reduced-motion, and every state renders what its name claims; §8.5 walked with measured evidence at 320px in a real top-level viewport; reduced motion read per moment in both directions; no rack badge overlaps the engraved digit in either locale or either font face; `docs/design-system/` holds only what the product still reads |
-| `M6 — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(round)` merged; both modes' economy invariants green |
+| `M6a — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(mode, totalRounds)` merged; both modes' economy invariants green; the shared overflow rules (sort only what fits, the last mark completes the discard, no Next Round after a discard) hold in both modes; one Classic win and one loss played end to end |
+| `M6b — Classic Rack and Motion` | Classic's rack steps its tile size, keeps closed sockets as plugs, perches overflow on a rail, and shows every change | Stepped rack, plugs and rail merged; `M6`, `8a·2`, `M6·0`, `M6·1`, `M6·2` and `oz-slide-off` wired; no horizontal scroll at `320px` for any rack size; reduced motion jumps straight to each end state |
 | `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
 
 `M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d`, `M5.5e`, `M5.5f` and `M5.5g` are
@@ -189,6 +190,17 @@ sixteen animations and a rename is not reviewable. §4.4 requires the split to
 happen here, before work starts, rather than at branch time. `M5.5a` is
 documentation only; `M5.5b` and `M5.5c` are strictly serial because everything
 downstream consumes them; `M5.5d` fans out across non-overlapping components.
+
+**Why M6 was split again, into M6a and M6b.** The M6 design handoff
+(`docs/design_handoff_m6_classic/`, 24 Sep 2026) added a stepped rack, sealed
+plugs, a rail and five motion moments on top of the mode itself. Mode, capacity
+and the shared overflow rules touch the reducer and every flow screen; the rack
+and motion touch `TileInventory` and the token layer. Together they fail the
+PR-sized bar, and the seam is the same one M6/M7 used: M6a makes Classic
+playable on the existing five-column rack (usable on desktop, cramped on a
+phone), M6b gives it the rack it was designed for. The exit gate's
+`getCapacity(round)` is corrected to `getCapacity(mode, totalRounds)`: the tray
+counts submissions, not displayed rounds.
 
 **Why M6 was split.** As originally scoped, `M6 — Classic Mode` bundled
 shrinking capacity, mode select, *and* the face-set tile mechanism. The

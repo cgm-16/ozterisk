@@ -5,7 +5,7 @@ and persistence contracts (§1.12–§1.16) live in `docs/spec/ui-i18n.md`.
 
 ### 1.1 Product thesis
 
-`ozterisk` is an endless arithmetic inventory game. A digit tile is simultaneously:
+`ozterisk` is an arithmetic inventory game with two modes. **Endless** runs at a fixed capacity until the player runs out of tiles. **Classic** starts at a larger capacity that closes one socket at a time on a fixed schedule, and ends when it reaches its floor. A digit tile is simultaneously:
 
 1. a resource required to construct an answer;
 2. a consumable spent on every submission; and
@@ -30,8 +30,9 @@ The PoC validates whether this loop is understandable and engaging. It does not 
 
 ### 1.3 Initial run state
 
-- Initial inventory capacity: `10`.
-- Initial inventory: one tile for each digit `[0,1,2,3,4,5,6,7,8,9]`.
+- The player chooses the mode on the title screen. Endless is the default; the choice is not persisted.
+- Initial inventory capacity: `10` in Endless; `20` in Classic (tuning dials; see § Tuning surface).
+- Initial inventory: fills the capacity, dealing digits round-robin (`i % 10`): one of each digit `[0…9]` in Endless, two of each in Classic.
 - Inventory display order: ascending digit; duplicates are ordered deterministically by tile ID.
 - Score: `0`.
 - Current streak: `0`.
@@ -67,9 +68,9 @@ Given `N` submitted tiles:
 4. Set longest streak to `max(previous longest streak, current streak)`.
 5. Increment submitted rounds by `1`.
 6. Generate exactly `N + 1` random reward tiles.
-7. Insert all rewards into sorted inventory simultaneously.
+7. Append all rewards simultaneously. Sort only the tiles that fit within the live capacity (§1.7a). The tiles past capacity are the newest arrivals, kept in arrival order, and sit on the rail.
 8. Mark every reward as new for feedback presentation.
-9. If inventory size exceeds `10`, enter overflow resolution immediately.
+9. If inventory size exceeds the live capacity, enter overflow resolution immediately.
 10. Otherwise enter feedback with **Next Round** enabled.
 
 The score is the number of correct submissions, not a product-, speed-, streak-, or difficulty-weighted value.
@@ -91,28 +92,40 @@ An incorrect answer is legal even when the correct answer cannot be constructed 
 
 ### 1.7 Overflow resolution
 
-- Capacity is checked only after all correct-answer rewards have been inserted.
-- `excess = inventory.length - 10`.
-- If `excess > 0`, the player must discard exactly `excess` tiles.
-- The player may mark any owned tile, including a new reward or an older tile.
-- Marking is reversible until confirmation.
-- When `excess === 1`, marking a tile *is* the whole decision, so marking confirms it in the same action; no **Confirm Discard** button is rendered. Endless at a fixed capacity always overflows by exactly one, so this is the only path it takes.
-- When `excess > 1`, **Confirm Discard** and `Enter` are rendered and enabled only when exactly `excess` tile IDs are marked.
-- The collapse is driven by the player's action, never by a render: reaching the required count without acting confirms nothing.
-- Confirmation removes those exact tiles, clears the overflow selection, and returns to feedback.
+- Capacity is checked only after all correct-answer rewards have been inserted, and against the live capacity (§1.7a), which already includes a seal made by this submission.
+- `excess = inventory.length - capacity`.
+- If `excess > 0`, the player must discard exactly `excess` tiles. Endless always overflows by exactly one; Classic can overflow by two when a seal and a correct answer share a submission.
+- The player may mark any owned tile: a seated tile, or a tile on the rail.
+- A mark can be taken back until the discard completes.
+- **The mark that reaches `excess` completes the discard**, at any count. No confirmation control is rendered. The collapse is driven by the player's action, never by a render.
+- Completing the discard removes the marked tiles. Rail tiles that survive take the sockets the discard freed; the rest of the rack neither compacts nor re-sorts.
+- The round then advances on its own once the discard has visibly finished (§1.8); there is no **Next Round** after a discard.
 - The next equation cannot be drawn while overflow remains unresolved.
+
+### 1.7a Classic capacity
+
+- Capacity is a function of mode and submissions, never stored:
+  `getCapacity(endless, n) = 10`;
+  `getCapacity(classic, n) = max(floor, 20 − ⌊n / 2⌋)`, where `n` is `totalRounds`
+  and the start (`20`), the floor (`6`) and the step (`2` submissions) are tuning dials.
+- A socket seals on the submission that crosses a step, **correct or not**. The descent is positional: it never watches how well the player is doing.
+- An incorrect submission cannot overflow: it spends at least one tile and a seal takes at most one socket.
+- The rack is *drawn* at the capacity of the displayed round, `getCapacity(mode, round − 1)`, so its size changes only at the round change, never during feedback.
 
 ### 1.8 Next-round loss detection
 
 When the player advances:
 
+0. In Classic, if capacity has reached the floor, enter `gameOver` as a **win**; the run is complete and no equation is shown.
 1. Generate the next equation outside the reducer.
-2. Clear `isNew` on surviving inventory tiles.
+2. Clear `isNew` on surviving inventory tiles, and sort the whole inventory — the one re-sort per round.
 3. Clear the previous answer selection, pending discards, and prior result.
 4. Increment the equation ordinal.
 5. Compare `inventory.length` with the new equation's answer-slot count.
 6. If inventory has enough tiles, enter `answering`.
-7. If inventory has fewer tiles than required slots, enter `gameOver`.
+7. If inventory has fewer tiles than required slots, enter `gameOver` as a **loss**.
+
+The player advances with **Next Round** or `Enter` from feedback, or automatically when a discard finishes (§1.7).
 
 Loss is based only on tile count versus answer-slot count:
 
@@ -141,6 +154,7 @@ as a submitted round.
 
 - Wordmark `ozterisk`.
 - One-paragraph pitch.
+- A mode select, **Endless** or **Classic**, each with a one-line description. Endless is selected by default.
 - Four always-visible rules, each preceded by the material swatch it concerns —
   socket, tile, gold, vermilion. Between them they cover capacity, both outcomes,
   and overflow.
@@ -153,7 +167,7 @@ as a submitted round.
 #### `answering`
 
 - HUD order: round, score, current streak. Round carries primary emphasis — Endless is a survival mode, so rounds survived is the headline figure.
-- A capacity meter states tiles held against the ten-tile capacity. It sits below the three HUD figures; it does not displace round's primary emphasis and does not reorder them.
+- Endless: a capacity meter states tiles held against the ten-tile capacity. Classic: the HUD states the live capacity as a number and has no pip meter; the plugs in the rack show the descent. Either sits below the three HUD figures; it does not displace round's primary emphasis and does not reorder them.
 - Equation and exact answer-slot count.
 - Submit and Clear actions. Clear is disabled while nothing is selected.
 - Filled answer slots are clickable to return a single tile, and show a hover/focus affordance.
@@ -167,19 +181,19 @@ as a submitted round.
 - Subtle visual emphasis on equation and submitted tiles.
 - Correct feedback shows inserted rewards highlighted.
 - Incorrect feedback shows submitted and correct answers.
-- Feedback persists until **Next Round** or `Enter`.
+- Feedback persists until **Next Round** or `Enter`, except after a discard, when it advances on its own once the discard has finished.
 
 #### `overflow`
 
 - Preserve the correctness feedback context.
 - State how many tiles must be removed.
-- Allow reversible tile marking.
-- At a required count of one, marking completes the discard; render no confirmation control.
-- Above a required count of one, enable confirmation only at the exact required count.
-- After confirmation, move to `feedback`; do not draw the next equation automatically.
+- Allow reversible tile marking, of seated and rail tiles alike.
+- The mark that reaches the required count completes the discard; render no confirmation control.
+- After the discard, advance to the next round once its motion has finished (§1.7).
 
 #### `gameOver`
 
+- A Classic win states **Run Complete** and its reason, and shows no equation. Everything else below applies to a loss in either mode.
 - Keep the terminal equation visible.
 - Print the product on the board. `gameOver` is the only phase that does: during
   play the answer slots complete the equation, and the feedback text is the only
@@ -197,9 +211,8 @@ as a submitted round.
 | `answering` | `Backspace` | Return most recently selected answer tile |
 | `answering` | `Escape` | Return every selected tile at once; no-op at zero selection |
 | `answering` | `Enter` | Submit only if all answer slots are filled; a focused button retains normal browser behavior |
-| `overflow` | `0`–`9` | Mark the first matching tile not already marked; at a required count of one this also completes the discard |
-| `overflow` | `Enter` | Confirm only if exactly the excess number is selected. Unreachable in Endless, which always overflows by one and so completes on marking |
-| `feedback` | `Enter` | Draw and advance to the next equation |
+| `overflow` | `0`–`9` | Mark the first matching tile not already marked; the mark that reaches the required count completes the discard |
+| `feedback` | `Enter` | Draw and advance to the next equation. Inert after a discard, which advances on its own |
 | `gameOver` | `R` | Start a fresh run, equivalent to **Play Again**. Accepts the key by either its value or its physical position, so neither a Korean IME nor a Dvorak layout can make it unreachable |
 | `gameOver` | `Enter` | No global shortcut; a focused button retains normal browser behavior |
 | `title` | `Enter` | No global shortcut; the focused **Start Run** button retains normal browser behavior |
@@ -234,7 +247,7 @@ back.
 - Wildcard or special tiles.
 - Operand `0`.
 - Division, addition, or subtraction modes.
-- Difficulty curves — any weighting that adapts to player skill or escalates over a run. The fixed-rate constructibility bias in §1.2 is in scope and shipped; it is a generosity dial, not a curve.
+- Difficulty curves — any weighting that adapts to player skill or escalates over a run. The fixed-rate constructibility bias in §1.2 is in scope and shipped; it is a generosity dial, not a curve. Classic's descent (§1.7a) is in scope: it is a fixed schedule counted in submissions, identical for every player and blind to their play, and it is the mode's definite arc rather than a weighting.
 - Timers.
 - Multiple attempts.
 - Skip buttons or a separate manual-discard action during answering.

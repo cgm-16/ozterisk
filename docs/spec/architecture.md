@@ -139,10 +139,15 @@ export interface RoundResult {
   correctValue: number;
   submittedTiles: Tile[];
   rewardTileIds: string[];
+  /** Set when the round's overflow discard has completed; the round then advances on its own. */
+  discarded?: boolean;
 }
+
+export type GameMode = "endless" | "classic";
 
 export interface GameState {
   phase: GamePhase;
+  mode: GameMode;
   equation: Equation | null;
   inventory: Tile[];
   selectedTiles: Tile[];
@@ -156,16 +161,15 @@ export interface GameState {
 }
 
 export type GameAction =
-  | { type: "START_RUN"; equation: Equation; inventory: Tile[] }
+  | { type: "START_RUN"; mode: GameMode; equation: Equation; inventory: Tile[] }
   | { type: "SELECT_TILE"; tileId: string }
   | { type: "RETURN_TILE"; tileId: string }
   | { type: "CLEAR_SELECTION" }
   | { type: "SUBMIT_CORRECT"; rewardTiles: Tile[] }
   | { type: "SUBMIT_INCORRECT" }
   | { type: "TOGGLE_DISCARD"; tileId: string }
-  | { type: "CONFIRM_DISCARD" }
   | { type: "NEXT_ROUND"; equation: Equation }
-  | { type: "RESTART_RUN"; equation: Equation; inventory: Tile[] };
+  | { type: "RESTART_RUN"; equation: Equation; inventory: Tile[] }; // keeps state.mode
 
 export type RandomSource = () => number; // Contract: 0 <= value < 1
 export type TileIdFactory = () => string;
@@ -178,6 +182,9 @@ export type TileIdFactory = () => string;
 export const INVENTORY_CAPACITY = 10;
 export const REWARD_BONUS = 1;
 export const KIND_EQUATION_RATE = 0.2;
+export const CLASSIC_START_CAPACITY = 20;
+export const CLASSIC_FLOOR = 6;
+export const CLASSIC_SEAL_EVERY = 2;
 
 // game/constants.ts — domain definitions
 export const OPERAND_MIN = 1;
@@ -185,7 +192,7 @@ export const OPERAND_MAX = 9;
 export const REWARD_DIGIT_COUNT = 10;
 
 export function createTitleState(): GameState;
-export function createInitialInventory(idFactory: TileIdFactory): Tile[];
+export function createInitialInventory(idFactory: TileIdFactory, count?: number): Tile[]; // round-robin i % 10
 export function sortTiles(tiles: readonly Tile[]): Tile[];
 
 export function generateEquation(random: RandomSource): Equation;
@@ -205,11 +212,12 @@ export function canAttemptEquation(
   inventory: readonly Tile[],
   equation: Equation,
 ): boolean;
-export function getOverflowCount(inventory: readonly Tile[]): number;
+export function getCapacity(mode: GameMode, totalRounds: number): number;
+export function getOverflowCount(state: GameState): number;
+export function isClassicWin(state: GameState): boolean; // gameOver at the floor
 export function getRewardCount(spentCount: number): number;
 export function canConstruct(inventory: readonly Tile[], product: number): boolean;
 export function isSubmissionReady(state: GameState): boolean;
-export function isDiscardReady(state: GameState): boolean;
 
 export function gameReducer(state: GameState, action: GameAction): GameState;
 ```
@@ -245,6 +253,8 @@ Rules that keep the surface durable:
 
 ```ts
 export interface ShareStats {
+  mode: GameMode;
+  won: boolean;
   score: number;
   totalRounds: number;
   longestStreak: number;

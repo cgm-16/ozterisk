@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Design handoffs are references, not source; they ship prototype types.
+  globalIgnores(['dist', 'docs/design_handoff_*']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

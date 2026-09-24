@@ -14,10 +14,43 @@ section wins.
 **Layout and information architecture**
 
 - Use one centered vertical arena on desktop and mobile.
-- Preserve order across breakpoints: HUD → equation/slots → phase action → inventory.
+- Preserve order across breakpoints: HUD → equation/slots → phase action → rail (only while tiles are past capacity) → inventory. The rail sits directly above the rack, because a perched tile drops from it into a socket.
 - Mobile changes spacing, wrapping, and control size, not information architecture.
-- The inventory rack is ten fixed sockets in a `5 × 2` grid at every breakpoint. The
-  grid never resizes as tiles are lost, because the empty sockets are the score.
+- **Endless:** the inventory rack is ten fixed sockets in a `5 × 2` grid at every
+  breakpoint. The grid never resizes as tiles are lost, because the empty sockets are
+  the score.
+- **Classic (stepped rack):** the tile size steps with the rack's drawn capacity
+  (`product.md` §1.7a), so every size holds about `180px` of height and the rack never
+  scrolls vertically:
+  - capacity `16–20`: `7` columns, tiles `44 × 55`, gap `4px`, radius `--radius-sm`; footprint `21` cells;
+  - capacity `11–15`: `6` columns, tiles `48 × 60`, gap `6px`; footprint `18` cells;
+  - capacity `≤ 10`: `5` columns, tiles `64 × 80`, gap `8px`; footprint `10` cells.
+  The thresholds (`15`, `10`) await a device playtest. **Narrow cap:** where the
+  rack's container cannot hold a size's natural width, both upper sizes draw at
+  `6` columns of `44 × 55` (`44px` is the target minimum and may not be undercut).
+  The budget is the `320px` gate *with* a `15px` scrollbar, as above: a `305px`
+  content box less the arena's `24px` padding leaves `281px`. `7 × 44` needs `332px`
+  of tiles and `6 × 48` needs `318px`, so neither fits; `6 × 44` needs `264px`, which
+  leaves `17px` for five gaps, the panel's padding on both sides and its `1px` border
+  on both sides — so the narrow size uses a `2px` gap and `2px` padding (`280px`).
+  "Narrow" is a property of the container, not the viewport: a `min-width` query
+  fires about `15px` early wherever scrollbars take layout width (see above), so it
+  cannot choose the column count. The narrow footprint is whole rows of `6`.
+- **Two capacities.** The rack is *drawn* at the displayed round's capacity
+  (`product.md` §1.7a), which picks the size and the footprint. The *live* capacity
+  decides which tiles are seated and which are on the rail. Between a seal and the
+  next round they differ by one: the socket at the live capacity is closing (`M6`)
+  and takes no tile.
+- **Sealed plugs.** Each Classic size draws its whole-row footprint; cells past the
+  drawn capacity are sealed plugs: `--surface-table`, `--rim-socket` plus
+  `inset 0 -1px 0 var(--hair-100)`, no well and no tile. The rack is always a full
+  rectangle and the plug count shows the descent. A plug is not an empty socket: an
+  empty socket is a debt the run can repay, a plug is gone.
+- **The rail.** Tiles past capacity (the newest arrivals, `product.md` §1.5) perch on a
+  `56px` band above the rack with a `1px` `--border-accent` top rule, right-aligned
+  and drawn at the rack's current tile size. The rail exists only while tiles are past
+  capacity, in both modes. It never adds a row to the rack.
+- Answer slots stay `64 × 80` (at the arena's tier) in every Classic rack size.
 - Rack sizing has three tiers: below `408px`, tiles are `52 × 64` with an `8px` gap;
   from `408px`, `66 × 64` with a `12px` gap; from `48rem`, `64 × 80` with a `12px`
   gap. A tier's rack width — five tiles plus four gaps — must leave room for the
@@ -84,7 +117,11 @@ section wins.
 - Motion is budgeted by frequency: what happens every round is fastest and quietest;
   what happens once a run may be theatrical.
 - Permitted motion is the **named inventory** in `docs/design-system/decisions.md`
-  — the fifteen named storyboard moments. A moment whose duration and easing are
+  — the fifteen named storyboard moments, plus Classic's five: `M6` (a socket seals,
+  `oz-seal` + `oz-seal-rim`), `8a·2` (the perched tile takes the freed seat,
+  `oz-perch-drop`), `M6·0` (the house takes a seat), `M6·1` (the rack re-seats,
+  `oz-reseat`) and `M6·2` (new plugs close). `8c` is drawn with `oz-slide-off`, which
+  supersedes `oz-tip-off`. A moment whose duration and easing are
   not yet assigned in `docs/design-system/tokens/motion.css` gets them assigned by
   the milestone that implements it, and that assignment is not an amendment. Motion
   outside that inventory is not permitted; extending the inventory amends this
@@ -118,7 +155,6 @@ The implementation may improve punctuation but may not change rule meaning.
 | `action.submit` | `Submit` | `제출` |
 | `action.clear` | `Clear` | `지우기` |
 | `action.next` | `Next Round` | `다음 라운드` |
-| `action.confirmDiscard` | `Confirm Discard` | `버리기 확정` |
 | `action.playAgain` | `Play Again` | `다시 하기` |
 | `action.share` | `Share` | `공유` |
 | `action.copy` | `Copy Result` | `결과 복사` |
@@ -126,6 +162,11 @@ The implementation may improve punctuation but may not change rule meaning.
 | `hud.streak` | `Streak` | `연속 정답` |
 | `hud.round` | `Round` | `라운드` |
 | `hud.capacity` | `Capacity` | `용량` |
+| `title.mode` | `Mode` | `모드` |
+| `mode.endless` | `Endless` | `엔드리스` |
+| `mode.endlessHint` | `Ten sockets, no end` | `열 칸, 끝없이` |
+| `mode.classic` | `Classic` | `클래식` |
+| `mode.classicHint` | `Twenty closing to six` | `스물에서 여섯까지` |
 | `result.correct` | `Correct` | `정답` |
 | `result.incorrect` | `Incorrect` | `오답` |
 | `result.submitted` | `Your answer: {value}` | `제출한 답: {value}` |
@@ -134,6 +175,8 @@ The implementation may improve punctuation but may not change rule meaning.
 | `overflow.instruction` | `Choose {count} tile(s) to discard.` | `버릴 타일 {count}개를 선택하세요.` |
 | `gameOver.title` | `Game Over` | `게임 종료` |
 | `gameOver.reason` | `Not enough tiles left to answer.` | `답을 만들 타일이 부족합니다.` |
+| `gameOver.winTitle` | `Run Complete` | `완주` |
+| `gameOver.winReason` | `You reached the floor with tiles in hand.` | `타일을 남긴 채 바닥에 도달했습니다.` |
 | `gameOver.rounds` | `Rounds played` | `진행한 라운드` |
 | `gameOver.longestStreak` | `Longest streak` | `최장 연속 정답` |
 | `gameOver.restartHint` | `Press R to play again` | `R 키를 눌러 다시 하기` |
@@ -151,7 +194,7 @@ The expanded rules must explain:
 - selecting and returning tiles;
 - ordered answer slots;
 - correct and incorrect outcomes;
-- the ten-tile capacity;
+- the ten-tile capacity, and Classic's twenty closing to six;
 - overflow discarding;
 - score, streak, round, and loss rules;
 - keyboard controls.
@@ -189,6 +232,25 @@ ozterisk — 라운드: {totalRounds}
 
 이 기록을 넘을 수 있나요?
 {url}
+```
+
+The formats above are Endless's. Classic prefixes the first line with the mode and
+its outcome, and keeps the rest unchanged:
+
+```text
+ozterisk Classic — Run Complete — Rounds: {totalRounds}
+```
+
+```text
+ozterisk Classic — Game Over — Rounds: {totalRounds}
+```
+
+```text
+ozterisk 클래식 — 완주 — 라운드: {totalRounds}
+```
+
+```text
+ozterisk 클래식 — 게임 종료 — 라운드: {totalRounds}
 ```
 
 ### 1.16 Persistence and reload

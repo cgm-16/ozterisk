@@ -13,6 +13,8 @@ interface Departure {
   leaving: readonly string[];
   /** Rail tiles that survived, still to drop into the freed seats (8a·2). */
   seating: readonly string[];
+  /** Every rail tile that survived, landed or not: none of them fires 9i. */
+  seated: readonly string[];
   /** Each seating tile's offset from its seat to where it perched. */
   drops: Readonly<Record<string, { dx: number; dy: number }>>;
 }
@@ -87,7 +89,9 @@ export function TileInventory({
       .slice(capacity)
       .filter((tile) => present.has(tile.id))
       .map((tile) => tile.id);
-    if (leaving.length > 0) setDeparture({ tiles: previous.tiles, leaving, seating, drops: {} });
+    if (leaving.length > 0) {
+      setDeparture({ tiles: previous.tiles, leaving, seating, seated: seating, drops: {} });
+    }
   }
 
   // While a discard plays, the rack draws the hand as it stood before it. The
@@ -288,10 +292,12 @@ export function TileInventory({
     // 8a and 9i collide on the cells past capacity, which hold the newest
     // arrivals — reward tiles, almost every time (§1.5 step 7). Those are
     // the arrivals that did not land, so they rim-reject instead of firing.
+    // One that later drops into a freed seat is still new until the round
+    // changes, and firing then would start it from nothing in its seat.
     const moment =
       onRail
         ? ` ${styles.cellRimReject}`
-        : tile.isNew
+        : tile.isNew && !departure?.seated.includes(tile.id)
           ? ` ${styles.cellNew}`
           : "";
 

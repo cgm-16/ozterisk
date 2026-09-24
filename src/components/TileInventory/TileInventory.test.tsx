@@ -453,6 +453,9 @@ describe("TileInventory", () => {
     endAnimation(seated);
     expect(onSettled).toHaveBeenCalledTimes(1);
     expect(animationOn(cells(container)[4])).not.toBe("oz-perch-drop");
+    // Still new until the round changes, the landed tile must not fire 9i:
+    // oz-fire starts from nothing and would blink it out of the seat.
+    expect(animationOn(cells(container)[4])).not.toBe("oz-fire");
   });
 
   it("settles when the rail tile itself is the one discarded", () => {

@@ -548,5 +548,50 @@ describe("TileInventory", () => {
       expect(cellCount(container)).toBe(10);
       expect(plugCount(container)).toBe(1);
     });
+
+    // M6: the socket a submission sealed closes where it is — the well shrinks
+    // from the bottom and a hairline rim closes over it — and stays closed.
+    it("closes the socket the seal took: the well collapses and the rim seals over it", () => {
+      const { container } = renderInventory({ tiles: hand(19), capacity: 19, drawnCapacity: 20, stepped: true });
+      const closing = cells(container)[19];
+      const [well, rim] = Array.from(closing.children) as HTMLElement[];
+      expect(animationOn(well)).toBe("oz-seal");
+      expect(animationOn(rim)).toBe("oz-seal-rim");
+      expect(well.style.animationDelay).toBe("");
+    });
+
+    // M6·0: the twenty-first socket seals under the entrance, once a run.
+    it("seals the house plug 240ms into the first render at twenty", () => {
+      const { container } = renderInventory({ tiles: hand(20), capacity: 20, drawnCapacity: 20, stepped: true });
+      const [well] = Array.from(cells(container)[20].children) as HTMLElement[];
+      expect(animationOn(well)).toBe("oz-seal");
+      expect(well.style.animationDelay).toBe("240ms");
+    });
+
+    // M6·1 and M6·2: at a size change the tiles fly from their old seats, and
+    // the new size's plugs close 40ms apart once they have landed.
+    it("re-seats every tile and closes the new plugs at a size change", () => {
+      const tiles = hand(15);
+      const { container, rerender } = renderInventory({ tiles, capacity: 15, drawnCapacity: 16, stepped: true });
+      rerender({ tiles, capacity: 15, drawnCapacity: 15, stepped: true });
+
+      const seated = cells(container).slice(0, 15);
+      for (const cell of seated) {
+        expect(cell.style.animationName).toBe("oz-reseat");
+        expect(cell.style.getPropertyValue("--fx")).toMatch(/px$/);
+        expect(cell.style.getPropertyValue("--fs")).not.toBe("");
+      }
+      const delays = cells(container)
+        .slice(15)
+        .map((plug) => (plug.children[0] as HTMLElement).style.animationDelay);
+      expect(delays).toEqual(["300ms", "340ms", "380ms"]);
+    });
+
+    it("does not re-seat on a render that keeps the size", () => {
+      const tiles = hand(18);
+      const { container, rerender } = renderInventory({ tiles, capacity: 18, drawnCapacity: 19, stepped: true });
+      rerender({ tiles, capacity: 18, drawnCapacity: 18, stepped: true });
+      expect(cells(container)[0].style.animationName).toBe("");
+    });
   });
 });

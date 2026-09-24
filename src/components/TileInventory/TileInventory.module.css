@@ -214,3 +214,39 @@
   animation-timing-function: var(--ease-fall);
   transform-origin: 0 100%;
 }
+
+/* M6 — a socket closes as the tray descends: the well collapses to a hairline
+   from the bottom and the rim seals across where it was, both on --dur-seal.
+   The cell is a plug from the start, so the frame's end is the plug's rest
+   state and fill-mode both holds frame 0 through a positive delay. */
+.sealing {
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--rim-socket);
+}
+
+.sealWell,
+.sealRim {
+  position: absolute;
+  animation-duration: var(--dur-seal);
+  animation-timing-function: var(--ease-settle);
+  animation-fill-mode: both;
+}
+
+.sealWell {
+  inset: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface-socket);
+  box-shadow: var(--shadow-socket);
+  transform-origin: 50% 100%;
+  animation-name: global(oz-seal);
+}
+
+.sealRim {
+  right: var(--space-1);
+  bottom: 0;
+  left: var(--space-1);
+  height: 1px;
+  background: var(--hair-100);
+  animation-name: global(oz-seal-rim);
+}

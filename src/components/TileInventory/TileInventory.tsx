@@ -3,6 +3,7 @@ import { flushSync } from "react-dom";
 import type { Tile as TileModel } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
+import { CLASSIC_START_CAPACITY } from "../../game/balance";
 import { rackTier, trayWidth } from "./rackTier";
 import styles from "./TileInventory.module.css";
 
@@ -184,6 +185,47 @@ export function TileInventory({
     return () => observer.disconnect();
   }, [stepped, drawnCapacity]);
 
+  // M6·1: when the rack changes size, every tile flies from its old seat at
+  // the old size to its new one (oz-reseat, a FLIP). Seats are read from
+  // layout offsets after each commit; at a size change the offset and scale
+  // from the old seat are written straight onto the cell before paint, so
+  // the frame starts where the player last saw the tile. The re-sort that
+  // shares the round change rides the same motion.
+  const seats = useRef(new Map<string, { x: number; y: number; w: number }>());
+  const shownTop = useRef<number | null>(null);
+  const top = stepped ? rackTier(drawnCapacity).top : null;
+  useLayoutEffect(() => {
+    const rack = rackRef.current;
+    if (rack === null) return;
+    const cells = [...rack.querySelectorAll<HTMLElement>("[data-tile]")];
+    const reseat = top !== null && shownTop.current !== null && shownTop.current !== top;
+    // Clearing first lets a second re-seat in the run restart the frame.
+    if (reseat) for (const cell of cells) cell.style.animationName = "";
+    const now = new Map(
+      cells.map((cell) => [
+        cell.dataset.tile ?? "",
+        { x: cell.offsetLeft, y: cell.offsetTop, w: cell.offsetWidth },
+      ]),
+    );
+    if (reseat) {
+      for (const cell of cells) {
+        const from = seats.current.get(cell.dataset.tile ?? "");
+        const to = now.get(cell.dataset.tile ?? "");
+        if (!from || !to) continue;
+        cell.style.setProperty("--fx", `${from.x - to.x}px`);
+        cell.style.setProperty("--fy", `${from.y - to.y}px`);
+        cell.style.setProperty("--fs", String(to.w > 0 ? from.w / to.w : 1));
+        cell.style.transformOrigin = "0 0";
+        cell.style.animationDuration = "var(--dur-reseat)";
+        cell.style.animationTimingFunction = "var(--ease-settle)";
+        cell.style.animationFillMode = "both";
+        cell.style.animationName = "oz-reseat";
+      }
+    }
+    seats.current = now;
+    shownTop.current = top;
+  });
+
   // §1.12: the live capacity's sockets always render — the empty sockets are
   // the score. Classic draws whole rows for its size's top capacity, and every
   // cell past the live capacity is a sealed plug: the rack is always a full
@@ -210,7 +252,7 @@ export function TileInventory({
   // `cell` is the grid index a tile sits at, or null for a tile on the rail.
   const renderTile = (tile: TileModel, cell: number | null) => {
     const onRail = cell === null;
-    const place = onRail ? { "data-rail": tile.id } : { "data-cell": cell };
+    const place = onRail ? { "data-rail": tile.id } : { "data-cell": cell, "data-tile": tile.id };
     if (!present.has(tile.id)) {
       // The reducer has already dropped this tile and nothing outside the
       // rack needs to know it is still drawn, so it carries no role and is
@@ -294,6 +336,26 @@ export function TileInventory({
     );
   };
 
+  // A plug past its size's top capacity appears only when that size is first
+  // drawn, so it seals in front of the player: the house plug 240ms into the
+  // run (M6·0), a new size's plugs 40ms apart once the re-seat has landed
+  // (M6·2). The socket a seal took this submission closes at once (M6). Keyed
+  // by kind, each seals on mount and rests sealed after.
+  const renderSeal = (index: number, delay: string | undefined) => (
+    <div key={`seal-${index}`} className={`${styles.plug} ${styles.sealing}`} aria-hidden="true" data-cell={index}>
+      <span className={styles.sealWell} style={{ animationDelay: delay }} />
+      <span className={styles.sealRim} style={{ animationDelay: delay }} />
+    </div>
+  );
+  const renderClosed = (index: number) => {
+    if (index < drawnCapacity) return renderSeal(index, undefined);
+    if (tier === null || index < tier.top) {
+      return <div key={`plug-${index}`} className={styles.plug} aria-hidden="true" data-cell={index} />;
+    }
+    const delay = tier.top === CLASSIC_START_CAPACITY ? 240 : 300 + (index - tier.top) * 40;
+    return renderSeal(index, `${delay}ms`);
+  };
+
   return (
     <div ref={rackRef} className={styles.rack} style={sizing}>
       {perched.length > 0 && (
@@ -303,7 +365,7 @@ export function TileInventory({
       )}
       <div className={`${styles.inventory}${tier ? ` ${styles.tray}` : ""}`}>
         {Array.from({ length: footprint }, (_, index) => {
-          if (index >= capacity) return <div key={`plug-${index}`} className={styles.plug} aria-hidden="true" />;
+          if (index >= capacity) return renderClosed(index);
           const tile = rackTiles[index];
           if (tile === undefined) return <div key={`empty-${index}`} className={styles.socket} />;
           return renderTile(tile, index);

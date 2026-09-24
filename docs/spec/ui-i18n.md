@@ -14,7 +14,7 @@ section wins.
 **Layout and information architecture**
 
 - Use one centered vertical arena on desktop and mobile.
-- Preserve order across breakpoints: HUD → equation/slots → phase action → rail (only while tiles are past capacity) → inventory. The rail sits directly above the rack, because a perched tile drops from it into a socket.
+- Preserve order across breakpoints: HUD → equation/slots → phase action → rail (while tiles are past capacity, and until a dropping tile lands) → inventory. The rail sits directly above the rack, because a perched tile drops from it into a socket.
 - Mobile changes spacing, wrapping, and control size, not information architecture.
 - **Endless:** the inventory rack is ten fixed sockets in a `5 × 2` grid at every
   breakpoint. The grid never resizes as tiles are lost, because the empty sockets are
@@ -49,9 +49,11 @@ section wins.
   rectangle and the plug count shows the descent. A plug is not an empty socket: an
   empty socket is a debt the run can repay, a plug is gone.
 - **The rail.** Tiles past capacity (the newest arrivals, `product.md` §1.5) perch on a
-  `56px` band above the rack with a `1px` `--border-accent` top rule, right-aligned
-  and drawn at the rack's current tile size. The rail exists only while tiles are past
-  capacity, in both modes. It never adds a row to the rack.
+  band one tile high above the rack with a `1px` `--border-accent` top rule,
+  right-aligned and drawn at the tier's tile size (where the rack's tracks shrink below
+  it, a dropping tile narrows by a few pixels as it lands). The rail exists while tiles
+  are past capacity, and until a tile it held has landed in a freed socket (8a·2), in
+  both modes. It never adds a row to the rack.
 - Answer slots stay `64 × 80` (at the arena's tier) in every Classic rack size.
 - Rack sizing has three tiers: below `408px`, tiles are `52 × 64` with an `8px` gap;
   from `408px`, `66 × 64` with a `12px` gap; from `48rem`, `64 × 80` with a `12px`

@@ -38,10 +38,10 @@ inline styles and lacks this component's departing-tile and i18n logic. Take its
 
 - [ ] Failing tests first:
   - `rackTier(20)` → small, top 20, footprint 24 (the narrow fallback's whole rows; 21 drawn wide); `rackTier(15)` → mid, top 15, footprint 18; `rackTier(10)` → home, top 10, footprint 10, which is the Endless rack at its own tiers (§1.12).
-  - Drawn at 19 in the 7-column size: 21 cells, 2 plugs, `aria-hidden`.
+  - Drawn at 19: 24 cells and 5 plugs, `aria-hidden` (the narrow fallback's whole rows; the 7-column size draws 21 cells and 2 plugs of them).
   - In Endless overflow the 11th tile renders in the rail, and the grid still has 10 cells.
 - [ ] Narrow size: `2px` gap and `2px` padding so `6 × 44` fits `281px` (§1.12); record the arithmetic in a CSS comment.
-- [ ] The rail: `56px`, `--border-accent` top rule, right-aligned, current tile size.
+- [ ] The rail: one tile high, `--border-accent` top rule, right-aligned, the tier's tile size; kept until a dropping tile lands (§1.12).
 
 ## Acceptance
 

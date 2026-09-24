@@ -100,11 +100,9 @@
   100% { transform: translate(3px, 4px) rotate(11deg); }
 }
 
-/* 8c + 10i — a tile leaves the table. One shape, two stagger settings:
-   fired once for a confirmed discard, and fired ten times left to right for
-   the game-over sweep. They are the same event at different scales — a tile
-   tips off its edge and gravity takes it — and drawing them as two frames
-   would have been two answers to one question. Supersedes `oz-tip-off`,
+/* 8c — a tile leaves the table: fired once for each discarded tile. A tile
+   tips off its edge and gravity takes it. (The handoff also drew the game-over
+   sweep, 10i, with it; #104 struck that moment.) Supersedes `oz-tip-off`,
    which was this frame with the discard's distances baked in; the caller now
    supplies --dx, --drop and --rot, as `oz-fan`'s chips already do.
 

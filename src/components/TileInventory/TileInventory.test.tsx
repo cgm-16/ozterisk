@@ -612,23 +612,42 @@ describe("TileInventory", () => {
     // the new size's plugs close 40ms apart once they have landed.
     it("re-seats every tile and closes the new plugs at a size change", () => {
       const tiles = hand(15);
-      const { container, rerender } = renderInventory({ tiles, capacity: 15, drawnCapacity: 16, stepped: true });
-      // Cell 15 sealed at the submission; at the new size it is a new plug,
-      // and only a fresh element plays the seal again rather than rewinding.
-      const closedAtSubmission = cells(container)[15];
-      rerender({ tiles, capacity: 15, drawnCapacity: 15, stepped: true });
-      expect(cells(container)[15]).not.toBe(closedAtSubmission);
+      // jsdom lays nothing out, so give each seat a layout per size: 44px
+      // tiles on a 46px pitch at the top, then 48px tiles on a 50px pitch 10px
+      // lower. The FLIP starts each tile where it was, at its old width.
+      let layout = { pitch: 46, top: 0, width: 44 };
+      const seatIndex = (element: HTMLElement) => Number(element.dataset.tile?.slice(1) ?? 0);
+      const spies = [
+        vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (this: HTMLElement) {
+          return seatIndex(this) * layout.pitch;
+        }),
+        vi.spyOn(HTMLElement.prototype, "offsetTop", "get").mockImplementation(() => layout.top),
+        vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockImplementation(() => layout.width),
+      ];
+      try {
+        const { container, rerender } = renderInventory({ tiles, capacity: 15, drawnCapacity: 16, stepped: true });
+        // Cell 15 sealed at the submission; at the new size it is a new plug,
+        // and only a fresh element plays the seal again rather than rewinding.
+        const closedAtSubmission = cells(container)[15];
+        layout = { pitch: 50, top: 10, width: 48 };
+        rerender({ tiles, capacity: 15, drawnCapacity: 15, stepped: true });
+        expect(cells(container)[15]).not.toBe(closedAtSubmission);
 
-      const seated = cells(container).slice(0, 15);
-      for (const cell of seated) {
-        expect(cell.style.animationName).toBe("oz-reseat");
-        expect(cell.style.getPropertyValue("--fx")).toMatch(/px$/);
-        expect(cell.style.getPropertyValue("--fs")).not.toBe("");
+        const seated = cells(container).slice(0, 15);
+        seated.forEach((cell, index) => {
+          expect(cell.style.animationName).toBe("oz-reseat");
+          expect(cell.style.getPropertyValue("--fx")).toBe(`${index * -4}px`);
+          expect(cell.style.getPropertyValue("--fy")).toBe("-10px");
+          expect(Number(cell.style.getPropertyValue("--fs"))).toBeCloseTo(44 / 48, 5);
+          expect(cell.style.transformOrigin).toBe("0 0");
+        });
+        const delays = cells(container)
+          .slice(15)
+          .map((plug) => (plug.children[0] as HTMLElement).style.animationDelay);
+        expect(delays).toEqual(["300ms", "340ms", "380ms"]);
+      } finally {
+        for (const spy of spies) spy.mockRestore();
       }
-      const delays = cells(container)
-        .slice(15)
-        .map((plug) => (plug.children[0] as HTMLElement).style.animationDelay);
-      expect(delays).toEqual(["300ms", "340ms", "380ms"]);
     });
 
     it("does not re-seat on a render that keeps the size", () => {

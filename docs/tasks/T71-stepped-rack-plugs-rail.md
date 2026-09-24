@@ -24,7 +24,7 @@ paths:
 
 **Interfaces**
 
-- `rackTier(capacity, narrow)` — pure, exported from `TileInventory`; thresholds `15`/`10` beside it.
+- `rackTier(drawnCapacity)` — pure, in `TileInventory/rackTier.ts`; returns the size's name, top capacity and footprint, with thresholds `15`/`10` beside it. The sizes' figures live in the CSS, keyed by name.
 - `TileInventory` takes `stepped` (Classic), `drawnCapacity` = `getCapacity(mode, round − 1)` (size and footprint) and `capacity` = the live capacity (which tiles seat, which perch, which socket is closing). Passing only the drawn one would seat a tile in the socket that is sealing.
 - Narrow is a CSS container query on the rack (a `min-width` query fires ~15px early, §1.12), so the component only names the size (`data-size`) and draws the fallback's whole rows. jsdom cannot evaluate it; `T74` owns the geometry. Built first with a `ResizeObserver`, which either painted a 7-column frame or raised a "ResizeObserver loop" error; see the journal.
 
@@ -37,7 +37,7 @@ inline styles and lacks this component's departing-tile and i18n logic. Take its
 ## Steps
 
 - [ ] Failing tests first:
-  - `rackTier(20)` → 7 cols, 44×55; `rackTier(15)` → 6 cols, 48×60; `rackTier(10)` → 5 cols, 64×80; `rackTier(20, true)` → 6 cols, 44×55.
+  - `rackTier(20)` → small, top 20, footprint 24 (the narrow fallback's whole rows; 21 drawn wide); `rackTier(15)` → mid, top 15, footprint 18; `rackTier(10)` → home, top 10, footprint 10, which is the Endless rack at its own tiers (§1.12).
   - Drawn at 19 in the 7-column size: 21 cells, 2 plugs, `aria-hidden`.
   - In Endless overflow the 11th tile renders in the rail, and the grid still has 10 cells.
 - [ ] Narrow size: `2px` gap and `2px` padding so `6 × 44` fits `281px` (§1.12); record the arithmetic in a CSS comment.

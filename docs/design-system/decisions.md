@@ -528,7 +528,9 @@ that rule and makes reading the hand a chore that says nothing about skill.
 At 64×80 in 5 columns, twenty sockets take four rows (~356px) and won't fit a
 667px-tall phone. Rather than shrinking tiles everywhere or making the rack
 scroll, the rack has three sizes: **7 × 44×55** at 16–20 sockets, **6 × 48×60**
-at 11–15, and the home **5 × 64×80** at 10 and below. Every size is about 180px
+at 11–15, and at 10 and below the home rack, which is the Endless rack at its
+own tiers (§1.12): a fixed 5 × 64×80 is 352px wide and does not fit the 281px
+the 320px gate leaves. Every size is about 180px
 tall. The tiles grow as the table empties, and from 10 sockets on, Classic's
 rack is the same as Endless's. The size changes only at the round change, along
 with the re-sort, under 10b; never under a seal. The rail tile follows the rack

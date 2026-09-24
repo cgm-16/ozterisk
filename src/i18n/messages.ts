@@ -69,7 +69,10 @@ const en = {
     rewards: "Received {count} tiles",
   },
   overflow: {
-    instruction: "Choose {count} tile(s) to discard.",
+    // Classic can require two (a seal on the submission that overflows), so
+    // the count is one or two; English needs the singular spelled out.
+    instructionOne: "Choose a tile to discard.",
+    instruction: "Choose {count} tiles to discard.",
   },
   gameOver: {
     title: "Game Over",
@@ -152,6 +155,7 @@ const ko = {
     rewards: "타일 {count}개 획득",
   },
   overflow: {
+    instructionOne: "버릴 타일 1개를 선택하세요.",
     instruction: "버릴 타일 {count}개를 선택하세요.",
   },
   gameOver: {

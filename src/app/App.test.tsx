@@ -215,7 +215,7 @@ describe("App", () => {
     expect(hudField("Score")).toBe("1");
     expect(hudField("Streak")).toBe("1");
     expect(screen.getByRole("status")).toHaveTextContent("Correct");
-    expect(screen.getByText("Choose 1 tile(s) to discard.")).toBeInTheDocument();
+    expect(screen.getByText("Choose a tile to discard.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Confirm Discard" })).not.toBeInTheDocument();
 
     // A forced single-tile excess collapses to one tap: marking an old
@@ -225,7 +225,7 @@ describe("App", () => {
     // No Confirm is ever rendered, so its absence proves nothing; check the
     // overflow instruction itself is gone: that only happens once the marking
     // TOGGLE_DISCARD has actually advanced the phase past "overflow".
-    expect(screen.queryByText("Choose 1 tile(s) to discard.")).not.toBeInTheDocument();
+    expect(screen.queryByText("Choose a tile to discard.")).not.toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Correct");
     expect(screen.getByRole("button", { name: "Digit 0, New tile" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Digit 1, New tile" })).toBeInTheDocument();

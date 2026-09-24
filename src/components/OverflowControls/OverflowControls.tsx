@@ -12,7 +12,9 @@ export function OverflowControls({ requiredCount }: OverflowControlsProps) {
     <div className={styles.controls}>
       {/* No Confirm at any count: the mark that reaches the required count
           completes the discard in the reducer (§1.7). */}
-      <p className={styles.instruction}>{t("overflow.instruction", { count: requiredCount })}</p>
+      <p className={styles.instruction}>{requiredCount === 1
+          ? t("overflow.instructionOne")
+          : t("overflow.instruction", { count: requiredCount })}</p>
     </div>
   );
 }

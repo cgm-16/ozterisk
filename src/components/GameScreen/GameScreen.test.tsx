@@ -425,7 +425,7 @@ describe("GameScreen phase composition", () => {
 
     const status = screen.getByRole("status");
     expect(status).toHaveTextContent("Incorrect");
-    const instruction = screen.getByText("Choose 2 tile(s) to discard.");
+    const instruction = screen.getByText("Choose 2 tiles to discard.");
     expect(screen.queryByRole("button", { name: "Confirm Discard" })).not.toBeInTheDocument();
     const discardTile = screen.getByRole("button", { name: "Digit 0, Marked for discard" });
     expect(discardTile).toHaveAttribute("aria-pressed", "true");

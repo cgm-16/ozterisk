@@ -176,7 +176,8 @@ The implementation may improve punctuation but may not change rule meaning.
 | `result.submitted` | `Your answer: {value}` | `제출한 답: {value}` |
 | `result.answer` | `Correct answer: {value}` | `정답: {value}` |
 | `result.rewards` | `Received {count} tiles` | `타일 {count}개 획득` |
-| `overflow.instruction` | `Choose {count} tile(s) to discard.` | `버릴 타일 {count}개를 선택하세요.` |
+| `overflow.instructionOne` | `Choose a tile to discard.` | `버릴 타일 1개를 선택하세요.` |
+| `overflow.instruction` | `Choose {count} tiles to discard.` | `버릴 타일 {count}개를 선택하세요.` |
 | `gameOver.title` | `Game Over` | `게임 종료` |
 | `gameOver.reason` | `Not enough tiles left to answer.` | `답을 만들 타일이 부족합니다.` |
 | `gameOver.winTitle` | `Run Complete` | `완주` |

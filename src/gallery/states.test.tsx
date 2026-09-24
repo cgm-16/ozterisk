@@ -115,7 +115,7 @@ describe("gallery catalogue", () => {
       <I18nProvider initialLanguage="en">{entryById("overflow-marked").render()}</I18nProvider>,
     );
     expect(screen.getAllByRole("button", { name: /Marked for discard$/ })).toHaveLength(1);
-    expect(screen.getByText("Choose 2 tile(s) to discard.")).toBeInTheDocument();
+    expect(screen.getByText("Choose 2 tiles to discard.")).toBeInTheDocument();
   });
 
   it("shows the submitted tiles in feedback-incorrect", () => {

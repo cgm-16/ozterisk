@@ -624,5 +624,27 @@ describe("TileInventory", () => {
       endAnimation(cells(container)[3]); // the rail tile lands
       expect(onSettled).toHaveBeenCalledTimes(1);
     });
+
+    // A discard inside the 300ms re-seat: the leaving tile drops the re-seat
+    // for its exit at once, and the re-seat's cancel is not its exit ending.
+    it("plays the exit of a tile discarded while it is still re-seating", () => {
+      const tiles = hand(15);
+      const { container, rerender, onSettled } = renderInventory({
+        tiles, capacity: 15, drawnCapacity: 16, stepped: true,
+      });
+      rerender({ tiles, capacity: 15, drawnCapacity: 15, stepped: true });
+
+      const railed = [...tiles, tile(7, "rail", true)];
+      rerender({ tiles: railed, capacity: 15, drawnCapacity: 15, stepped: true, mode: "discard" });
+      const after = [...tiles];
+      after[3] = railed[15]!;
+      rerender({ tiles: after, capacity: 15, drawnCapacity: 15, stepped: true, mode: "readOnly" });
+
+      const departing = cells(container)[3];
+      expect(animationOn(departing)).toBe("oz-slide-off");
+      fireEvent(departing, cancelEvent("oz-reseat"));
+      expect(container.querySelector("[data-departing]")).not.toBeNull();
+      expect(onSettled).not.toHaveBeenCalled();
+    });
   });
 });

@@ -37,6 +37,13 @@ export interface TileInventoryProps {
   onSettled?(): void;
 }
 
+/** Removes M6·1's inline frame, which would otherwise outrank a class's animation. */
+function clearReseatFrame(cell: HTMLElement): void {
+  for (const property of ["--fx", "--fy", "--fs", "transform-origin", "animation-name", "animation-duration", "animation-timing-function", "animation-fill-mode"]) {
+    cell.style.removeProperty(property);
+  }
+}
+
 /** Renders the fixed-socket rack, including lifted and departing tile states. */
 export function TileInventory({
   tiles,
@@ -170,9 +177,7 @@ export function TileInventory({
     const onReseatDone = (event: Event) => {
       const cell = event.target as HTMLElement;
       if ((event as AnimationEvent).animationName !== "oz-reseat" || !cell.dataset?.tile) return;
-      for (const property of ["--fx", "--fy", "--fs", "transform-origin", "animation-name", "animation-duration", "animation-timing-function", "animation-fill-mode"]) {
-        cell.style.removeProperty(property);
-      }
+      clearReseatFrame(cell);
     };
     rack.addEventListener("animationcancel", onCancel);
     rack.addEventListener("animationend", onReseatDone);
@@ -221,6 +226,9 @@ export function TileInventory({
         cell.style.animationName = "oz-reseat";
       }
     }
+    // A tile discarded mid-re-seat leaves by its own exit at once; the
+    // re-seat's cancel is then not the exit the cell runs, so it retires nothing.
+    for (const cell of rack.querySelectorAll<HTMLElement>("[data-departing]")) clearReseatFrame(cell);
     seats.current = now;
     shownTop.current = top;
   });

@@ -1,4 +1,5 @@
 import type { GameMode, Language } from "../game/types";
+import { messages } from "../i18n/messages";
 
 export interface ShareStats {
   mode: GameMode;
@@ -10,11 +11,12 @@ export interface ShareStats {
 }
 
 // §1.15: Classic names its mode and outcome ahead of the rounds; Endless's
-// first line is unchanged.
+// first line is unchanged. The words are the dictionary's, so the shared text
+// and the screen cannot drift apart.
 function shareHeading(stats: ShareStats, language: Language): string {
   if (stats.mode === "endless") return "ozterisk";
-  if (language === "ko") return `ozterisk 클래식 — ${stats.won ? "완주" : "게임 종료"}`;
-  return `ozterisk Classic — ${stats.won ? "Run Complete" : "Game Over"}`;
+  const { mode, gameOver } = messages[language];
+  return `ozterisk ${mode.classic} — ${stats.won ? gameOver.winTitle : gameOver.title}`;
 }
 
 export function formatShareText(stats: ShareStats, language: Language, url: string): string {

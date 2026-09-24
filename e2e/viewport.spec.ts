@@ -430,3 +430,69 @@ for (const locale of LOCALES) {
     });
   }
 }
+
+/* §8.5 through an overflow, in the app. A correct answer in Endless's first
+   round always overflows — a one-digit answer spends one tile and earns two, a
+   two-digit one spends two and earns three — so the newest arrival perches on
+   the rail. The rail is right-aligned and 8a pivots the perched tile on its
+   lower-left edge, so its rest pose reaches right of its own cell; 8c then
+   tips a discarded tile further right still. Both are read here: the perch
+   after its frame has finished, and the slide-off at every tenth of its
+   frame, paused, because a reading straight after a click sees neither.
+ *
+ * 305 is the 320px gate with a classic scrollbar; 375 a common phone.
+ */
+const OVERFLOW_WIDTHS = [305, 320, 375] as const;
+
+for (const width of OVERFLOW_WIDTHS) {
+  test(`an overflow and its discard stay inside a ${width}px content box`, async ({
+    page,
+  }) => {
+    await page.addInitScript(() => window.localStorage.setItem("one-zero.language", "en"));
+    await page.goto("/");
+    await setContentWidth(page, width);
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByRole("button", { name: START_LABEL.en, exact: true }).click();
+
+    // Answer the first equation correctly: its digits are all in the opening
+    // hand of one of each.
+    const equation = await page.getByText(/^\d+ × \d+ =$/).textContent();
+    const [a, b] = equation!.match(/\d+/g)!.map(Number);
+    for (const digit of String(a! * b!)) {
+      await page.getByRole("button", { name: `Digit ${digit}`, exact: true }).click();
+    }
+    await page.getByRole("button", { name: "Submit" }).click();
+
+    const railTile = page.locator("[data-rail]");
+    await expect(railTile).toBeVisible();
+    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished)));
+
+    const perch = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      tileRight: document.querySelector("[data-rail]")!.getBoundingClientRect().right,
+    }));
+    expect(perch.viewport, "content width the harness produced").toBe(width);
+    expect(perch.tileRight, "perched tile's right edge").toBeLessThanOrEqual(perch.viewport);
+    expect(perch.scrollWidth, "document scroll width with a tile perched").toBeLessThanOrEqual(perch.viewport);
+
+    // Mark the perched tile: the one required mark completes the discard, and
+    // the tile tips off the rack.
+    await railTile.click();
+    const slideOff = await page.evaluate(() => {
+      const departing = document.querySelector("[data-departing]");
+      if (!departing) throw new Error("no departing tile — the discard did not start");
+      const [frame] = departing.getAnimations();
+      if (!frame) throw new Error("the departing tile plays no animation");
+      frame.pause();
+      const duration = Number(frame.effect!.getComputedTiming().duration);
+      const widths: number[] = [];
+      for (let step = 0; step <= 10; step += 1) {
+        frame.currentTime = (duration * step) / 10;
+        widths.push(document.documentElement.scrollWidth);
+      }
+      return { viewport: document.documentElement.clientWidth, widest: Math.max(...widths) };
+    });
+    expect(slideOff.widest, "document scroll width during the slide-off").toBeLessThanOrEqual(slideOff.viewport);
+  });
+}

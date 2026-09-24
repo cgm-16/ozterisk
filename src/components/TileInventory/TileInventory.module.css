@@ -14,7 +14,14 @@
 /* Tiles past capacity perch here, above the rack, never in a new row of it
    (§1.12): the newest arrivals, right-aligned, at the rack's tile size. The
    band's own height is 56px; a taller tile overhangs it rather than moving
-   the rack twice. */
+   the rack twice.
+
+   8a leaves the perched tile turned 11 degrees on its lower-left edge and
+   nudged 3px right, so its top-right corner reaches past its own cell by
+   3px + h·sin 11° − w·(1 − cos 11°) — about 14px at 52 x 64. Right-aligned
+   against the rack's edge, that reach took the page past a 305px content
+   box, so the rail keeps it as inline-end padding: the perch lands inside
+   the rack at every size. */
 .rail {
   display: grid;
   grid-auto-flow: column;
@@ -27,6 +34,7 @@
   margin-bottom: var(--space-2);
   padding-top: var(--space-2);
   border-top: 1px solid var(--border-accent);
+  padding-right: calc(3px + var(--tile-h) * sin(11deg) - var(--tile-w) * (1 - cos(11deg)));
 }
 
 /* Columns and rows come from --rack-columns and --rack-rows: ten sockets in

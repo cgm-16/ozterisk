@@ -253,6 +253,8 @@ describe("App", () => {
     const digits = screen.getAllByRole("button", { name: /^Digit \d$/ }).map((tile) => tile.textContent);
     expect(digits).toEqual(["0","0","1","1","2","2","3","3","4","4","5","5","6","6","7","7","8","8","9","9"]);
     expect(hudField("Capacity")).toBe("20");
+    // The figure replaces the pip meter; ten pips would contradict twenty.
+    expect(screen.queryByRole("img", { name: /^Capacity/ })).not.toBeInTheDocument();
 
     await user.click(screen.getAllByRole("button", { name: "Digit 5" })[0]!);
     await user.click(screen.getByRole("button", { name: "Submit" }));

@@ -95,10 +95,16 @@ export function TileInventory({
     // React has no onAnimationCancel, so the rack listens for it natively.
     const rack = rackRef.current;
     if (rack === null) return;
+    // Swapping a cell's animation-name cancels the animation it replaces — a
+    // reward tile discarded inside its 9i fire cancels oz-fire as its exit
+    // starts — so only a cancel of the exit the cell is running retires it.
     const onCancel = (event: Event) => {
       const cell = (event.target as Element).closest("[data-departing]");
       const tileId = cell?.getAttribute("data-departing");
-      if (tileId) retire(tileId);
+      if (!cell || !tileId) return;
+      const cancelled = (event as AnimationEvent).animationName;
+      if (cancelled !== getComputedStyle(cell).animationName) return;
+      retire(tileId);
     };
     rack.addEventListener("animationcancel", onCancel);
     return () => rack.removeEventListener("animationcancel", onCancel);

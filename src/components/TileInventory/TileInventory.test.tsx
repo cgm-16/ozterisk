@@ -68,6 +68,12 @@ function endAnimation(cell: HTMLElement): void {
   fireEvent(cell, new Event("webkitAnimationEnd", { bubbles: true }));
 }
 
+// jsdom has no AnimationEvent constructor, so the name a real cancel carries
+// is set by hand.
+function cancelEvent(animationName: string): Event {
+  return Object.assign(new Event("animationcancel", { bubbles: true }), { animationName });
+}
+
 // Ten seated tiles and one on the rail, as the reducer leaves an Endless
 // overflow: sorted seats, the newest arrival past capacity.
 function railedRack(): Tile[] {
@@ -422,8 +428,20 @@ describe("TileInventory", () => {
     rerender({ tiles: before.slice(0, 10), mode: "readOnly" });
 
     // React has no onAnimationCancel, so the rack listens natively.
-    fireEvent(cells(container)[10], new Event("animationcancel", { bubbles: true }));
+    fireEvent(cells(container)[10], cancelEvent("oz-tip-off"));
     expect(onSettled).toHaveBeenCalledTimes(1);
+  });
+
+  // Swapping a cell's animation-name cancels the animation it replaces: a
+  // reward tile discarded inside its 380ms 9i fire cancels oz-fire as its exit
+  // starts. That cancel is not the exit's, and must not settle the discard.
+  it("ignores the cancel of the animation a departing cell replaced", () => {
+    const before = railedRack();
+    const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
+    rerender({ tiles: before.slice(0, 10), mode: "readOnly" });
+
+    fireEvent(cells(container)[10], cancelEvent("oz-fire"));
+    expect(onSettled).not.toHaveBeenCalled();
   });
 
   it("does not settle for a tile that leaves the rack by submission", () => {

@@ -6,9 +6,11 @@ The game rules live in `docs/spec/product.md`.
 ### 1.12 Responsive and visual contract
 
 The visual and motion language is the **Tile House** system in
-`docs/design-system/`. That directory is the normative source for token values,
-material rules, and the motion inventory; this section states the contract those
-values must satisfy. Where a design document and this section disagree, this
+`docs/design-system/`. That directory is the normative source for material rules
+and the motion inventory. Token values live in `src/styles/tokens/`;
+`docs/design-system/tokens/` is a frozen M5.5b snapshot that the design
+references load, and it is not kept in step. This section states the contract
+those values must satisfy. Where a design document and this section disagree, this
 section wins.
 
 **Layout and information architecture**
@@ -126,7 +128,7 @@ section wins.
   `oz-perch-drop`), `M6·0` (the house takes a seat), `M6·1` (the rack re-seats,
   `oz-reseat`) and `M6·2` (new plugs close). `8c` is drawn with `oz-slide-off`, which
   supersedes `oz-tip-off`. A moment whose duration and easing are
-  not yet assigned in `docs/design-system/tokens/motion.css` gets them assigned by
+  not yet assigned in `src/styles/tokens/motion.css` gets them assigned by
   the milestone that implements it, and that assignment is not an amendment. Motion
   outside that inventory is not permitted; extending the inventory amends this
   section.

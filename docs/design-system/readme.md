@@ -1,8 +1,11 @@
 # ozterisk — Design System
 
 > **Contract precedence.** `docs/spec/ui-i18n.md` §1.12 is the contract; this
-> directory is the normative source for token values, material rules, and the
-> motion inventory it refers to. Where the two disagree, §1.12 wins.
+> directory is the normative source for the material rules and the motion
+> inventory it refers to. Where the two disagree, §1.12 wins.
+> The token values the app ships are in `src/styles/tokens/`. `tokens/` here
+> is a frozen M5.5b snapshot, loaded by this directory's `.dc.html`
+> references through `styles.css`; it is not kept in step (#160).
 
 **Start here, then read `decisions.md`.** This file states the rules;
 `decisions.md` states why they exist and what was rejected to reach them —

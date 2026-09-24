@@ -344,9 +344,11 @@ export function TileInventory({
   // drawn, so it seals in front of the player: the house plug 240ms into the
   // run (M6·0), a new size's plugs 40ms apart once the re-seat has landed
   // (M6·2). The socket a seal took this submission closes at once (M6). Keyed
-  // by kind, each seals on mount and rests sealed after.
+  // by kind and size, each seals on mount and rests sealed after: the socket
+  // that closed at a size change's submission is a new size's first plug, and
+  // remounts to seal again rather than rewind.
   const renderSeal = (index: number, delay: string | undefined) => (
-    <div key={`seal-${index}`} className={`${styles.plug} ${styles.sealing}`} aria-hidden="true" data-cell={index}>
+    <div key={`seal-${tier?.top}-${index}`} className={`${styles.plug} ${styles.sealing}`} aria-hidden="true" data-cell={index}>
       <span className={styles.sealWell} style={{ animationDelay: delay }} />
       <span className={styles.sealRim} style={{ animationDelay: delay }} />
     </div>

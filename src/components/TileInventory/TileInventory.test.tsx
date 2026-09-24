@@ -580,7 +580,11 @@ describe("TileInventory", () => {
     it("re-seats every tile and closes the new plugs at a size change", () => {
       const tiles = hand(15);
       const { container, rerender } = renderInventory({ tiles, capacity: 15, drawnCapacity: 16, stepped: true });
+      // Cell 15 sealed at the submission; at the new size it is a new plug,
+      // and only a fresh element plays the seal again rather than rewinding.
+      const closedAtSubmission = cells(container)[15];
       rerender({ tiles, capacity: 15, drawnCapacity: 15, stepped: true });
+      expect(cells(container)[15]).not.toBe(closedAtSubmission);
 
       const seated = cells(container).slice(0, 15);
       for (const cell of seated) {

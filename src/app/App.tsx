@@ -6,7 +6,7 @@ import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { createInitialInventory, createTitleState } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
 import { generateKindEquation, generateRewardTiles } from "../game/generators";
-import { constructAnswer, getCapacity, getRewardCount, isClassicWin } from "../game/selectors";
+import { constructAnswer, getCapacity, getRewardCount, isAtClassicFloor, isClassicWin } from "../game/selectors";
 import type { GameMode, RandomSource, TileIdFactory } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
 import styles from "./App.module.css";
@@ -60,11 +60,18 @@ export function App({ dependencies, shareDependencies }: AppProps) {
   }, [state.equation, state.selectedTiles, dependencies]);
 
   const handleNextRound = useCallback(() => {
+    // At the floor the advance is the win (§1.8 step 0): no equation is drawn,
+    // and the current one, never shown again, keeps the reducer's invariant.
+    if (isAtClassicFloor(state)) {
+      if (state.equation === null) return;
+      dispatch({ type: "NEXT_ROUND", equation: state.equation });
+      return;
+    }
     // state.inventory is already final (post-discard) at `feedback`; a stale
     // capture here would silently bias equations against the previous round's hand.
     const equation = generateKindEquation(dependencies.random, state.inventory);
     dispatch({ type: "NEXT_ROUND", equation });
-  }, [dependencies, state.inventory]);
+  }, [dependencies, state]);
 
   // §1.11: gameOver restarts the run on R, equivalent to Play Again. Enter has
   // no global shortcut in this phase — it destroyed the score screen with the

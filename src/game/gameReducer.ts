@@ -1,13 +1,12 @@
 import type { Equation, GameAction, GameMode, GameState, Tile } from "./types";
-import { CLASSIC_FLOOR } from "./balance";
 import { sortTiles } from "./factories";
 import {
   canAttemptEquation,
   constructAnswer,
   getAnswerLength,
-  getCapacity,
   getOverflowCount,
   getRewardCount,
+  isAtClassicFloor,
 } from "./selectors";
 
 // Round 1, zero statistics, straight into answering — shared by START_RUN and
@@ -167,9 +166,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       );
       // A Classic run at the floor is complete: the win is checked before the
       // loss, so a hand that could still answer does not play on (§1.8).
-      const atFloor =
-        state.mode === "classic" && getCapacity(state.mode, state.totalRounds) <= CLASSIC_FLOOR;
-      const canPlay = !atFloor && canAttemptEquation(nextInventory, action.equation);
+      const canPlay = !isAtClassicFloor(state) && canAttemptEquation(nextInventory, action.equation);
       return {
         ...state,
         phase: canPlay ? "answering" : "gameOver",

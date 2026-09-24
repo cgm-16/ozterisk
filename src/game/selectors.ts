@@ -59,14 +59,16 @@ export function getOverflowCount(state: CapacityState): number {
   return Math.max(0, state.inventory.length - getCapacity(state.mode, state.totalRounds));
 }
 
+// A Classic run at the floor is complete: the next advance ends it as a win,
+// before any equation is generated (§1.8 step 0).
+export function isAtClassicFloor(state: Pick<GameState, "mode" | "totalRounds">): boolean {
+  return state.mode === "classic" && getCapacity(state.mode, state.totalRounds) <= CLASSIC_FLOOR;
+}
+
 // Reaching the floor is the only way a Classic run ends other than a loss, so a
 // Classic game over at the floor is the win (§1.8).
 export function isClassicWin(state: Pick<GameState, "phase" | "mode" | "totalRounds">): boolean {
-  return (
-    state.phase === "gameOver" &&
-    state.mode === "classic" &&
-    getCapacity(state.mode, state.totalRounds) <= CLASSIC_FLOOR
-  );
+  return state.phase === "gameOver" && isAtClassicFloor(state);
 }
 
 export function isSubmissionReady(state: GameState): boolean {

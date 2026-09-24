@@ -230,6 +230,34 @@ describe("App", () => {
     expect(hudField("Capacity")).toBe("19");
   });
 
+  it("completes a Classic run at the floor without drawing an equation for it", async () => {
+    const user = userEvent.setup();
+    // Every round is 1 × 2, a one-digit answer. Rounds 1–18 spend each non-2
+    // tile incorrectly (20 → 2 tiles); rounds 19–28 alternate a correct 2,
+    // rewarded with a 2 and a 0, and an incorrect 0, so the hand never exceeds
+    // the closing capacity. The values are exactly what 28 rounds draw: the
+    // winning advance draws none (§1.8 step 0), and sequenceRandom throws if it
+    // tries.
+    const spend = [0, 0, 1, 1, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9];
+    const rounds = [...spend, ...[2, 0, 2, 0, 2, 0, 2, 0, 2, 0]];
+    const randomValues = [...equationSamples(1, 2)];
+    rounds.forEach((digit, index) => {
+      if (digit === 2) randomValues.push(rewardSample(2), rewardSample(0));
+      if (index < rounds.length - 1) randomValues.push(...equationSamples(1, 2));
+    });
+    renderApp(randomValues, { initialLanguage: "en" });
+
+    await user.click(screen.getByRole("button", { name: /^Classic/ }));
+    await user.click(screen.getByRole("button", { name: "Start Run" }));
+    for (const digit of rounds) {
+      await user.click(screen.getAllByRole("button", { name: `Digit ${digit}` })[0]!);
+      await user.click(screen.getByRole("button", { name: "Submit" }));
+      await user.click(screen.getByRole("button", { name: "Next Round" }));
+    }
+
+    expect(screen.getByRole("heading", { name: "Run Complete" })).toBeInTheDocument();
+  });
+
   it("grants no reward and resets the streak on an incorrect answer, then advances via Next Round", async () => {
     const user = userEvent.setup();
     const randomValues = [

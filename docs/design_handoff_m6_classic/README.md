@@ -57,6 +57,8 @@ Felt #14342a / #0b211b / deeper #081a14 · clay #fdf8ec → #e6d7ba, edge #b3a18
 None. Tiles, sockets and plugs are CSS only.
 
 ## Files
+`TileInventory.jsx` / `.d.ts` / `.prompt.md` and `keyframes.css` shipped in M6b and were pruned by T74: the frames live in `src/styles/tokens/keyframes.css`, the rack in `src/components/TileInventory/`. The list below is the package as delivered.
+
 - `Playable Run.dc.html`: both modes, playable end to end. Tweaks: stepped rack on/off, thresholds, plugs on/off.
 - `Motion Lab.dc.html`: every moment on its own, scrubbable.
 - `TileInventory.jsx` / `.d.ts` / `.prompt.md`: the rack component, with the `stepped`, `capacity`, `thresholds` and `reseatFrom` props.

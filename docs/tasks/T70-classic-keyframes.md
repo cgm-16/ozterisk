@@ -1,6 +1,6 @@
 ---
 reads:
-  - docs/design_handoff_m6_classic/keyframes.css  # the five frames to port
+  - src/styles/tokens/keyframes.css  # the five frames, ported from the handoff (pruned by T74)
   - src/styles/tokens/keyframes.css
   - src/styles/global.css  # reduced-motion block
 ---

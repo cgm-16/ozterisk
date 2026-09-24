@@ -1,6 +1,6 @@
 ---
 reads:
-  - docs/design_handoff_m6_classic/keyframes.css  # oz-slide-off, oz-perch-drop
+  - src/styles/tokens/keyframes.css  # oz-slide-off, oz-perch-drop
   - src/components/TileInventory/TileInventory.tsx
 ---
 

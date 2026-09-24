@@ -38,8 +38,8 @@ this codebase's non-reflowing rack.
 | `7a` | Streak tier 1: one jade ring | storyboard (frame); **gating inferred** | **built** — `oz-ring`, gated at streak 3 | `AnswerSlots`, streak ≥ 3 |
 | `7b` | Streak tier 2: second gold ring + gold rim on answer tiles | storyboard | **built** — `oz-ring` at 70ms | `AnswerSlots`, streak ≥ 5 |
 | `7c` | Streak tier 3: third ring, brightest rim | storyboard | **built** — `oz-ring` at 140ms | `AnswerSlots`, streak ≥ 8 |
-| `8a` | Overflow: the eleventh tile rim-rejects, perches on the rail | storyboard | specified | `TileInventory`, cell 10 — `oz-rim-reject`. **Positional**: no per-tile identity for the refused tile exists |
-| `8c` | Discard confirm: the marked tile tips off the end | storyboard | **built** — `oz-slide-off` (supersedes `oz-tip-off`) | `TileInventory`, held past the drop — `oz-tip-off`; `oz-slide-off` from `T72` |
+| `8a` | Overflow: the eleventh tile rim-rejects, perches on the rail | storyboard | specified | `TileInventory` `.rail` — `oz-rim-reject` on every tile past capacity: the newest arrivals, in arrival order (M6a) |
+| `8c` | Discard confirm: the marked tile tips off the end | storyboard | **built** — `oz-slide-off` (supersedes `oz-tip-off`) | `TileInventory` `.cellDeparting`, held past the drop — `oz-slide-off`, `--dx 46px --drop 88px --rot 18deg` |
 | `9b` | Tile to slot: flat slide, 130ms | storyboard | **built** — transition, not a keyframe | `AnswerSlots` `.arriving` — `oz-slot-arrive`. **A keyframe here**: our slot tile mounts rather than travels |
 | `9f` | Wrong answer: crack and dust | storyboard (shape); **duration inferred** | **built** — `oz-crack` + `oz-dust` | `AnswerSlots` `.crack` + `.dust` |
 | `9i` | Reward tiles fire in place, in sorted position | storyboard (shape); **fire/halo split inferred** | **built** — `oz-fire` | `TileInventory`, `isNew` cells. Measured firing in both `overflow` and `feedback` |
@@ -50,11 +50,11 @@ this codebase's non-reflowing rack.
 | `11d` | An action becomes available and rises to meet the hand | **inferred** — from "disabled is flat, not dim" | **built** — `oz-rise-ready` | `ActionButton`, a resting offset on `:disabled`. A transition, so `oz-rise-ready` stays unused |
 | `11C` | Title entrance (240ms) and share chop (900ms) | storyboard | specified | `TitleScreen` `.markTile` — `oz-title-settle`; `GameOverScreen` `.chop` — `oz-chop` |
 | `10d` | Persistent streak rings on the counter | storyboard | **struck** — see below | — |
-| `M6` | Classic: a socket seals as the tray descends | **inferred** — from the descending-capacity system | **built** — `oz-seal` + `oz-seal-rim`, `--dur-seal` 180ms | `T73` |
-| `8a·2` | The perched tile takes the seat a discard freed | **inferred** — 8a leaves a tile on the rail and nothing collected it | **built** — `oz-perch-drop`, 220ms | `T72` |
-| `M6·0` | House takes a seat: the 21st socket seals at run start | **inferred** | **built** — `oz-seal`, 240ms delay | `T73` |
-| `M6·1` | Rack re-seats at a size change (FLIP) | **inferred** | **built** — `oz-reseat`, 300ms, `--ease-settle` | `T73` |
-| `M6·2` | New plugs close after the re-seat | **inferred** | **built** — `oz-seal`, 300 + 40·k ms | `T73` |
+| `M6` | Classic: a socket seals as the tray descends | **inferred** — from the descending-capacity system | **built** — `oz-seal` + `oz-seal-rim`, `--dur-seal` 180ms | `TileInventory` `.sealing` on the socket a submission closed |
+| `8a·2` | The perched tile takes the seat a discard freed | **inferred** — 8a leaves a tile on the rail and nothing collected it | **built** — `oz-perch-drop`, 220ms | `TileInventory` `.cellPerchDrop`, offsets measured from layout when the exits end |
+| `M6·0` | House takes a seat: the 21st socket seals at run start | **inferred** | **built** — `oz-seal`, 240ms delay | `TileInventory` `.sealing`, plugs past twenty on the rack's first render |
+| `M6·1` | Rack re-seats at a size change (FLIP) | **inferred** | **built** — `oz-reseat`, 300ms, `--ease-settle` | `TileInventory` layout effect, written onto each cell at a size change |
+| `M6·2` | New plugs close after the re-seat | **inferred** | **built** — `oz-seal`, 300 + 40·k ms | `TileInventory` `.sealing`, plugs past a new size's top |
 
 ### Inferred, and therefore open to challenge
 

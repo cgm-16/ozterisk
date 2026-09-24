@@ -1,6 +1,6 @@
 ---
 reads:
-  - docs/design_handoff_m6_classic/TileInventory.jsx  # the FLIP arithmetic
+  - src/components/TileInventory/TileInventory.tsx  # the FLIP, measured rather than computed
   - docs/design_handoff_m6_classic/README.md  # motion table: delays and durations
   - src/components/TileInventory/TileInventory.tsx
 ---

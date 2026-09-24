@@ -33,7 +33,7 @@ import { START_LABEL } from "./labels.js";
    the three #85 attempts that reported `clean` and counted for nothing. */
 const CONTENT_WIDTHS = [305, 320, 407, 408] as const;
 const LOCALES = ["en", "ko"] as const;
-const STATE_COUNT = 22;
+const STATE_COUNT = 24;
 
 /* `spacing.css` — the narrow tier's tile, the middle tier's, and the boundary
    between them. The 48rem tier is out of range for every width swept here. */
@@ -366,3 +366,73 @@ test("the rack holds the target minimum below the 320px gate", async ({
     "rendered tile width against the target minimum",
   ).toBeGreaterThanOrEqual(reading.targetMin);
 });
+
+/* Classic's stepped rack in the app itself, not the gallery: its first size is
+   7 x 44 in a tray, capped at 6 x 44 where the arena cannot hold it (§1.12).
+   305 is the 320px gate with a scrollbar, where the narrow size must fit with
+   a pixel to spare; 402 is the phone the handoff drew; 1280 is desktop. The
+   answer slots keep the arena's tile size in every rack size, and the rack's
+   rows are the footprint's, never one more.
+ *
+ * Layout only: which size the rack chose is the reading, not a rule under test.
+ */
+const CLASSIC_WIDTHS = [
+  { width: 305, cols: 6 },
+  { width: 402, cols: 7 },
+  { width: 1280, cols: 7 },
+] as const;
+
+for (const locale of LOCALES) {
+  for (const { width, cols } of CLASSIC_WIDTHS) {
+    test(`Classic's rack fits a ${width}px content box in ${locale}`, async ({
+      page,
+    }) => {
+      await page.addInitScript(
+        (lang) => window.localStorage.setItem("one-zero.language", lang),
+        locale,
+      );
+      await page.goto("/");
+      await setContentWidth(page, width);
+      await page.evaluate(() => document.fonts.ready);
+      await page.getByRole("button", { name: /^(Classic|클래식)/ }).click();
+      await page
+        .getByRole("button", { name: START_LABEL[locale], exact: true })
+        .click();
+      await expect(page.locator('[class*="tray"]')).toBeVisible();
+      // The rack sizes itself from a ResizeObserver; read the painted frame.
+      await page.evaluate(
+        () => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done))),
+      );
+
+      const reading = await page.evaluate(() => {
+        const de = document.documentElement;
+        const tray = document.querySelector('[class*="tray"]')!;
+        const style = getComputedStyle(tray);
+        const tile = tray.querySelector('[data-tile]')!;
+        const slot = document.querySelector('[aria-label^="Answer slot"], [aria-label^="정답 칸"]');
+        return {
+          viewport: de.clientWidth,
+          scrollWidth: de.scrollWidth,
+          trayRight: tray.getBoundingClientRect().right,
+          columns: style.gridTemplateColumns.split(" ").length,
+          rows: style.gridTemplateRows.split(" ").length,
+          cells: tray.children.length,
+          tileW: tile.getBoundingClientRect().width,
+          slotW: slot ? slot.getBoundingClientRect().width : 0,
+          targetMin: parseFloat(getComputedStyle(de).getPropertyValue("--target-min")),
+        };
+      });
+
+      // Guards on the conditions, before the result.
+      expect(reading.viewport, "content width the harness produced").toBe(width);
+      expect(reading.columns, `rack size chosen at ${width}`).toBe(cols);
+      expect(reading.slotW, "an answer slot was found").toBeGreaterThan(0);
+
+      expect(reading.scrollWidth, "document scroll width").toBeLessThanOrEqual(reading.viewport);
+      expect(reading.trayRight, "tray right edge").toBeLessThanOrEqual(reading.viewport);
+      expect(reading.tileW, "tile against the target minimum").toBeGreaterThanOrEqual(reading.targetMin);
+      expect(reading.rows * reading.columns, "rows are the footprint's, never one more").toBe(reading.cells);
+      expect(reading.slotW, "answer slots are not drawn at the rack's size").toBeGreaterThan(reading.tileW);
+    });
+  }
+}

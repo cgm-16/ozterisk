@@ -1,7 +1,7 @@
 ---
 reads:
-  - docs/design_handoff_m6_classic/TileInventory.jsx  # rackTier and the plug cells to merge
-  - docs/design_handoff_m6_classic/TileInventory.prompt.md
+  - src/components/TileInventory/rackTier.ts  # merged from the handoff TileInventory.jsx (pruned by T74)
+  - docs/design_handoff_m6_classic/README.md
   - docs/spec/ui-i18n.md  # §1.12 Classic rack, plugs, rail, narrow cap
   - src/components/TileInventory/TileInventory.tsx
 ---

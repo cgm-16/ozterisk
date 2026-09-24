@@ -250,6 +250,21 @@ const ANSWERING_CLASSIC_STATE = makeAnsweringState(makeEquation(3, 4), {
   inventory: createInitialInventory(sequentialIds(), CLASSIC_START_CAPACITY),
 });
 
+// Classic's other two sizes (§1.12): 6 x 48 from fifteen sockets, and the
+// Endless rack, in its tray, from ten. Each is the first round drawn at that
+// capacity, with the hand dealt to fill it.
+const classicAt = (capacity: number) => {
+  const submissions = (CLASSIC_START_CAPACITY - capacity) * CLASSIC_SEAL_EVERY;
+  return makeAnsweringState(makeEquation(3, 4), {
+    mode: "classic",
+    inventory: createInitialInventory(sequentialIds(), capacity),
+    totalRounds: submissions,
+    round: submissions + 1,
+  });
+};
+const ANSWERING_CLASSIC_15_STATE = classicAt(15);
+const ANSWERING_CLASSIC_10_STATE = classicAt(10);
+
 // The feedback a discard leaves behind: no Next Round, because the round
 // advances on its own once the departing tile has played (§1.7). In the
 // gallery nothing departs, so this is the resting frame of that moment.
@@ -325,6 +340,16 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
       id: "answering-classic",
       label: "Answering — Classic at twenty",
       render: () => renderGameScreen(ANSWERING_CLASSIC_STATE),
+    },
+    {
+      id: "answering-classic-15",
+      label: "Answering — Classic at fifteen (6 x 48)",
+      render: () => renderGameScreen(ANSWERING_CLASSIC_15_STATE),
+    },
+    {
+      id: "answering-classic-10",
+      label: "Answering — Classic at ten (the Endless rack, in its tray)",
+      render: () => renderGameScreen(ANSWERING_CLASSIC_10_STATE),
     },
     {
       id: "answering-depleted",

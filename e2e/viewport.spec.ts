@@ -392,9 +392,9 @@ for (const locale of LOCALES) {
       await page
         .getByRole("button", { name: START_LABEL[locale], exact: true })
         .click();
-      // Read straight after the click, with no frame awaited: the rack's size
-      // is a container query, resolved in style, so this is already the frame
-      // a player first sees.
+      // Read once the tray is visible. The rack's size is a container query,
+      // resolved in style, so no later frame differs from this one; this
+      // reading cannot itself tell a first frame from a later one.
       await expect(page.locator('[class*="tray"]')).toBeVisible();
 
       const reading = await page.evaluate(() => {

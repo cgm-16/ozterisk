@@ -6,6 +6,31 @@ import { TitleScreen } from "./TitleScreen";
 import styles from "./TitleScreen.module.css";
 
 describe("TitleScreen", () => {
+  it("offers Endless and Classic, with Endless chosen by default", () => {
+    render(
+      <I18nProvider initialLanguage="en">
+        <TitleScreen onStart={vi.fn()} />
+      </I18nProvider>,
+    );
+    const group = screen.getByRole("group", { name: "Mode" });
+    expect(group).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Endless/ })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: /^Classic/ })).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("starts the run in the chosen mode", async () => {
+    const onStart = vi.fn();
+    render(
+      <I18nProvider initialLanguage="en">
+        <TitleScreen onStart={onStart} />
+      </I18nProvider>,
+    );
+    await userEvent.click(screen.getByRole("button", { name: /^Classic/ }));
+    expect(screen.getByRole("button", { name: /^Classic/ })).toHaveAttribute("aria-pressed", "true");
+    await userEvent.click(screen.getByRole("button", { name: "Start Run" }));
+    expect(onStart).toHaveBeenCalledWith("classic");
+  });
+
   it("starts only from the explicit action", async () => {
     const onStart = vi.fn();
     render(
@@ -80,6 +105,10 @@ describe("TitleScreen", () => {
     // keyboard controls
     expect(
       screen.getByText(/Press a digit key to select a matching tile/),
+    ).toBeInTheDocument();
+    // Classic's twenty closing to six, and that the floor is the win (§1.14)
+    expect(
+      screen.getByText(/Classic starts with twenty sockets .* reach six sockets and the run is complete/),
     ).toBeInTheDocument();
   });
 

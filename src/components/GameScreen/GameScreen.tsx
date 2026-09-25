@@ -1,9 +1,10 @@
+import { useEffect, useRef, useState } from "react";
 import { sortTiles } from "../../game/factories";
 import type { GameAction, GameState } from "../../game/types";
 import {
   getAnswerLength,
+  getCapacity,
   getOverflowCount,
-  isDiscardReady,
   isSubmissionReady,
 } from "../../game/selectors";
 import { useGameKeyboard } from "../../hooks/useGameKeyboard";
@@ -29,6 +30,27 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
   const { t } = useI18n();
   useGameKeyboard({ state, dispatch, onSubmit, onNextRound });
 
+  // After a discard the round advances on its own (§1.7), once both halves of
+  // the moment have played: the rack's exit and the verdict's celebration on
+  // the answer slots. The celebration mounts with feedback, when the discard
+  // completes, so a streak-8 burst (720ms) outlasts a 420ms exit, and
+  // advancing on the exit alone unmounted it midway. Each half reports the
+  // submission it settled, so a report from one round never counts for the
+  // next.
+  const [rackSettled, setRackSettled] = useState<number | null>(null);
+  const [slotsSettled, setSlotsSettled] = useState<number | null>(null);
+  const advancesAlone =
+    state.phase === "feedback" && state.lastResult?.discarded === true;
+  const readyToAdvance =
+    advancesAlone && rackSettled === state.totalRounds && slotsSettled === state.totalRounds;
+  const onNextRoundRef = useRef(onNextRound);
+  useEffect(() => {
+    onNextRoundRef.current = onNextRound;
+  });
+  useEffect(() => {
+    if (readyToAdvance) onNextRoundRef.current();
+  }, [readyToAdvance]);
+
   // Reducer invariant (§2.5): equation === null only in `title`. GameScreen
   // never renders `title` (TitleScreen owns it), so this only guards the type.
   if (state.equation === null) return null;
@@ -41,12 +63,21 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
 
   return (
     <main className={styles.screen}>
-      <GameHud score={state.score} currentStreak={state.currentStreak} round={state.round} />
+      <GameHud
+        score={state.score}
+        currentStreak={state.currentStreak}
+        round={state.round}
+        // Classic states its live capacity as a number; its rack's plugs show
+        // the descent, and twenty pips would be a second account of it (§1.10).
+        capacity={state.mode === "classic" ? getCapacity(state.mode, state.totalRounds) : undefined}
+      />
       {/* Capacity is what you hold, and a tile in an answer slot is still
           yours — you can return it. Reading state.inventory alone would drop
           by one per selection and disagree with the rack beside it, which
           keeps a socket for every tile in the same union. */}
-      <CapacityMeter held={state.inventory.length + state.selectedTiles.length} />
+      {state.mode === "endless" && (
+        <CapacityMeter held={state.inventory.length + state.selectedTiles.length} />
+      )}
       <EquationBoard equation={state.equation} />
 
       {state.phase === "answering" && (
@@ -70,6 +101,7 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
           verdict={lastResult.kind}
           streak={state.currentStreak}
           disabled={false}
+          onSettled={() => setSlotsSettled(state.totalRounds)}
         />
       )}
 
@@ -91,33 +123,42 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         </div>
       )}
 
-      {state.phase === "feedback" && (
+      {/* After a discard the round advances on its own once the rack has
+          settled (§1.7), so there is nothing to press. */}
+      {state.phase === "feedback" && !lastResult?.discarded && (
         <ActionButton onClick={onNextRound}>{t("action.next")}</ActionButton>
       )}
 
       {state.phase === "overflow" && (
-        <OverflowControls
-          requiredCount={getOverflowCount(state.inventory)}
-          onConfirm={() => dispatch({ type: "CONFIRM_DISCARD" })}
-          disabled={!isDiscardReady(state)}
-        />
+        <OverflowControls requiredCount={getOverflowCount(state)} />
       )}
 
       <TileInventory
-        tiles={sortTiles([...state.inventory, ...state.selectedTiles])}
+        // Only answering re-sorts, to keep lifted tiles in their sockets; every
+        // other phase draws the reducer's order, which perches the newest
+        // arrivals past capacity (§1.5 step 7).
+        tiles={
+          state.phase === "answering"
+            ? sortTiles([...state.inventory, ...state.selectedTiles])
+            : state.inventory
+        }
         liftedIds={state.selectedTiles.map((tile) => tile.id)}
+        capacity={getCapacity(state.mode, state.totalRounds)}
+        // Classic's rack is drawn at the displayed round's capacity, which
+        // moves only at the round change; the live capacity above says which
+        // tiles are seated (§1.7a).
+        stepped={state.mode === "classic"}
+        drawnCapacity={getCapacity(state.mode, state.round - 1)}
         mode={state.phase === "answering" ? "select" : state.phase === "overflow" ? "discard" : "readOnly"}
         pendingDiscards={state.pendingDiscards}
+        onSettled={() => {
+          if (advancesAlone) setRackSettled(state.totalRounds);
+        }}
         onTile={(tileId) => {
           if (state.phase === "answering") dispatch({ type: "SELECT_TILE", tileId });
-          if (state.phase === "overflow") {
-            dispatch({ type: "TOGGLE_DISCARD", tileId });
-            // A forced single-tile discard needs no confirmation step: marking the
-            // only tile that can go is the whole decision. Dispatched from the click
-            // handler and never from an effect, so rendering an already-marked state
-            // still requires user action.
-            if (getOverflowCount(state.inventory) === 1) dispatch({ type: "CONFIRM_DISCARD" });
-          }
+          // The mark that reaches the required count completes the discard in the
+          // reducer, so rendering an already-marked state still requires user action.
+          if (state.phase === "overflow") dispatch({ type: "TOGGLE_DISCARD", tileId });
         }}
       />
     </main>

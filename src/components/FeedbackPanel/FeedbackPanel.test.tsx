@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import type { Language, RoundResult, Tile as TileModel } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
@@ -51,9 +51,12 @@ describe("FeedbackPanel", () => {
     expect(screen.getByText("Correct answer: 12")).toBeInTheDocument();
   });
 
-  it("captions each reward tile, because unlabelled arrivals read as a restatement", () => {
+  // result.rewards already states the count; a caption under each tile said
+  // the same thing a second time (#142).
+  it("shows each reward tile without a caption of its own", () => {
     renderPanel(correct, [tile(4, "r1"), tile(7, "r2")]);
-    expect(screen.getAllByText("New tile")).toHaveLength(2);
+    expect(screen.getByRole("status").querySelectorAll("li")).toHaveLength(2);
+    expect(screen.queryByText("New tile")).not.toBeInTheDocument();
   });
 
   // On a correct answer the answer slots carry no accessible name (§95 —
@@ -67,6 +70,39 @@ describe("FeedbackPanel", () => {
 
     renderPanel(correct, [tile(4, "r1"), tile(7, "r2")], "ko");
     expect(screen.getByText("제출한 답: 12")).toBeInTheDocument();
+  });
+
+  // §1.14 requires `result.rewards`, and the panel is role="status" with
+  // aria-live="polite": one badge per tile announced "New tile" once per
+  // arrival, where the specified string states the count once.
+  it("summarises the arrivals once, inside the live region, in both locales", () => {
+    const { unmount } = renderPanel(correct, [tile(4, "r1"), tile(7, "r2")]);
+    // A CSS Modules key that does not exist renders class="undefined" and
+    // reports no error, so the line's own class is asserted alongside its text.
+    expect(within(screen.getByRole("status")).getByText("Received 2 tiles")).toHaveClass(
+      styles.rewardSummary,
+    );
+    unmount();
+
+    renderPanel(correct, [tile(4, "r1"), tile(7, "r2")], "ko");
+    expect(screen.getByText("타일 2개 획득")).toBeInTheDocument();
+  });
+
+  // The tiles stay on screen and leave the accessibility tree: the summary
+  // above states the count, and TileInventory renders the same arrivals in
+  // every phase with "Digit N, New tile" as their accessible names, so the
+  // digits are still reachable rather than dropped.
+  it("leaves the reward list out of the live region", () => {
+    renderPanel(correct, [tile(4, "r1"), tile(7, "r2")]);
+    expect(within(screen.getByRole("status")).queryByRole("list")).not.toBeInTheDocument();
+    expect(screen.getByRole("status").querySelectorAll("li")).toHaveLength(2);
+  });
+
+  // A correct result rather than an incorrect one: the incorrect branch renders
+  // no rewards block at all, so it exercises the branch and not the count.
+  it("states no summary when a correct round granted nothing", () => {
+    renderPanel(correct, []);
+    expect(screen.queryByText(/^Received/)).not.toBeInTheDocument();
   });
 
   // The verdict's color comes from a class derived from the same `kind` the

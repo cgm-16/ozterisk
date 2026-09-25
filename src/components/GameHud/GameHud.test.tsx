@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { I18nProvider } from "../../i18n/I18nContext";
 import { GameHud, type GameHudProps } from "./GameHud";
@@ -28,6 +28,17 @@ const fallen = (container: HTMLElement) => container.querySelector(`.${styles.co
 const zero = (container: HTMLElement) => container.querySelector(`.${styles.counterZero}`);
 
 describe("GameHud", () => {
+  it("states a capacity only when given one, after the three figures", () => {
+    renderHud({ capacity: 19 });
+    const terms = screen.getAllByRole("term").map((term) => term.textContent);
+    expect(terms).toEqual(["Round", "Score", "Streak", "Capacity"]);
+    expect(screen.getByText("Capacity").nextElementSibling).toHaveTextContent("19");
+    cleanup();
+
+    renderHud();
+    expect(screen.queryByText("Capacity")).not.toBeInTheDocument();
+  });
+
   it("labels round, score and streak with their values", () => {
     renderHud({ score: 12, currentStreak: 3, round: 4 });
     expect(screen.getByText("Round").nextElementSibling).toHaveTextContent("4");

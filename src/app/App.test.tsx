@@ -60,6 +60,20 @@ function renderApp(
 // GameHud and GameOverScreen both render <dt>label</dt><dd>value</dd> pairs;
 // only one of those screens is ever mounted at a time, so the label text is
 // unambiguous. Digit tiles show plain digit text, never these labels.
+// Plays out a discard: the 8c exits, then the 8a·2 drops of any rail tile the
+// discard spared, and the verdict's moments on the answer slots, which mount
+// with the feedback the discard completes. jsdom runs no animations, so each
+// is ended by hand, on both event names React may bind (see
+// TileInventory.test's endAnimation).
+function finishDeparture(): void {
+  for (const stage of ["[data-departing]", "[data-seating]", "[data-moment]"]) {
+    for (const cell of document.querySelectorAll(stage)) {
+      fireEvent.animationEnd(cell);
+      fireEvent(cell, new Event("webkitAnimationEnd", { bubbles: true }));
+    }
+  }
+}
+
 function hudField(label: string): string | null {
   return screen.getByText(label).nextElementSibling?.textContent ?? null;
 }
@@ -92,6 +106,39 @@ async function driveToGameOver(user: ReturnType<typeof userEvent.setup>) {
     }
     await user.click(screen.getByRole("button", { name: "Submit" }));
     await user.click(screen.getByRole("button", { name: "Next Round" }));
+  }
+}
+
+// A Classic run won at the floor. Every round is 1 × 2, a one-digit answer.
+// Rounds 1–18 spend each non-2 tile incorrectly (20 → 2 tiles); rounds 19–28
+// alternate a correct 2, rewarded with a 2 and a 0, and an incorrect 0, so the
+// hand never exceeds the closing capacity. The values are exactly what 28
+// rounds draw: the winning advance draws none (§1.8 step 0), and
+// sequenceRandom throws if it tries.
+const CLASSIC_WIN_ROUNDS = [0, 0, 1, 1, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0];
+
+function classicWinRandomValues(): number[] {
+  const values = [...equationSamples(1, 2)];
+  CLASSIC_WIN_ROUNDS.forEach((digit, index) => {
+    if (digit === 2) values.push(rewardSample(2), rewardSample(0));
+    if (index < CLASSIC_WIN_ROUNDS.length - 1) values.push(...equationSamples(1, 2));
+  });
+  return values;
+}
+
+async function playClassicToFloor(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole("button", { name: /^Classic/ }));
+  await user.click(screen.getByRole("button", { name: "Start Run" }));
+  // 84 presses over a 20-tile rack took this run to ~4.3s against Vitest's 5s
+  // default, and it timed out on a loaded run. Nearly all of it was the
+  // presses: userEvent's pointer sequence, and *ByRole computing every
+  // button's accessible name on each query. The rounds only need the clicks,
+  // so fireEvent plays them against the tiles' aria-label and the buttons'
+  // text; the role queries around the run still hold the names.
+  for (const digit of CLASSIC_WIN_ROUNDS) {
+    fireEvent.click(screen.getAllByLabelText(new RegExp(`^Digit ${digit}`))[0]!);
+    fireEvent.click(screen.getByText("Submit"));
+    fireEvent.click(screen.getByText("Next Round"));
   }
 }
 
@@ -151,7 +198,7 @@ describe("App", () => {
     expect(roundFontSize).toBeGreaterThan(scoreFontSize);
   });
 
-  it("resolves a correct answer through reward, overflow, exact discard, and Next Round", async () => {
+  it("resolves a correct answer through reward, overflow, and an exact discard that advances the round on its own", async () => {
     const user = userEvent.setup();
     const randomValues = [
       ...equationSamples(2, 3), // round 1: product 6, one answer slot
@@ -168,23 +215,25 @@ describe("App", () => {
     expect(hudField("Score")).toBe("1");
     expect(hudField("Streak")).toBe("1");
     expect(screen.getByRole("status")).toHaveTextContent("Correct");
-    expect(screen.getByText("Choose 1 tile(s) to discard.")).toBeInTheDocument();
+    expect(screen.getByText("Choose a tile to discard.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Confirm Discard" })).not.toBeInTheDocument();
 
     // A forced single-tile excess collapses to one tap: marking an old
     // (non-reward) tile completes the discard immediately, no Confirm needed.
     await user.click(screen.getByRole("button", { name: "Digit 9" }));
 
-    // Confirm's absence at requiredCount 1 doesn't by itself prove the discard
-    // completed (it's also hidden while still overflowing at count 1), so
-    // check the overflow instruction itself is gone: that only happens once
-    // CONFIRM_DISCARD has actually advanced the phase past "overflow".
-    expect(screen.queryByText("Choose 1 tile(s) to discard.")).not.toBeInTheDocument();
+    // No Confirm is ever rendered, so its absence proves nothing; check the
+    // overflow instruction itself is gone: that only happens once the marking
+    // TOGGLE_DISCARD has actually advanced the phase past "overflow".
+    expect(screen.queryByText("Choose a tile to discard.")).not.toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Correct");
     expect(screen.getByRole("button", { name: "Digit 0, New tile" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Digit 1, New tile" })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    // No Next Round after a discard (§1.7): the round advances once the
+    // departing tile has played.
+    expect(screen.queryByRole("button", { name: "Next Round" })).not.toBeInTheDocument();
+    finishDeparture();
 
     expect(screen.getByText("4 × 5 =")).toBeInTheDocument();
     expect(hudField("Round")).toBe("2");
@@ -192,6 +241,53 @@ describe("App", () => {
 
     // §1.16 / AGENTS.md: no game field ever enters storage, even after a full round.
     expect(localStorage.length).toBe(0);
+  });
+
+  it("deals Classic twenty tiles, two of each digit, and states its live capacity", async () => {
+    const user = userEvent.setup();
+    const randomValues = [
+      ...equationSamples(2, 3), // round 1: product 6; submit a 5, incorrect
+      ...equationSamples(2, 3), // round 2: again incorrect, the sealing submission
+    ];
+    renderApp(randomValues, { initialLanguage: "en" });
+
+    await user.click(screen.getByRole("button", { name: /^Classic/ }));
+    await user.click(screen.getByRole("button", { name: "Start Run" }));
+
+    const digits = screen.getAllByRole("button", { name: /^Digit \d$/ }).map((tile) => tile.textContent);
+    expect(digits).toEqual(["0","0","1","1","2","2","3","3","4","4","5","5","6","6","7","7","8","8","9","9"]);
+    expect(hudField("Capacity")).toBe("20");
+    // The figure replaces the pip meter; ten pips would contradict twenty.
+    expect(screen.queryByRole("img", { name: /^Capacity/ })).not.toBeInTheDocument();
+
+    await user.click(screen.getAllByRole("button", { name: "Digit 5" })[0]!);
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    await user.click(screen.getAllByRole("button", { name: "Digit 5" })[0]!);
+    await user.click(screen.getByRole("button", { name: "Submit" }));
+
+    expect(hudField("Capacity")).toBe("19");
+  });
+
+  it("completes a Classic run at the floor without drawing an equation for it", async () => {
+    const user = userEvent.setup();
+    renderApp(classicWinRandomValues(), { initialLanguage: "en" });
+
+    await playClassicToFloor(user);
+
+    expect(screen.getByRole("heading", { name: "Run Complete" })).toBeInTheDocument();
+  });
+
+  it("keeps Classic through Play Again, dealing twenty tiles at capacity 20", async () => {
+    const user = userEvent.setup();
+    renderApp([...classicWinRandomValues(), ...equationSamples(2, 3)], { initialLanguage: "en" });
+
+    await playClassicToFloor(user);
+    await user.click(screen.getByRole("button", { name: "Play Again" }));
+
+    expect(screen.getByText("2 × 3 =")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /^Digit \d$/ })).toHaveLength(20);
+    expect(hudField("Capacity")).toBe("20");
   });
 
   it("grants no reward and resets the streak on an incorrect answer, then advances via Next Round", async () => {
@@ -209,7 +305,7 @@ describe("App", () => {
     await user.click(screen.getByRole("button", { name: "Digit 6" }));
     await user.click(screen.getByRole("button", { name: "Submit" }));
     await user.click(screen.getByRole("button", { name: "Digit 9" })); // completes the forced single discard
-    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    finishDeparture(); // and the round advances on its own
 
     expect(hudField("Streak")).toBe("1");
 
@@ -417,9 +513,9 @@ describe("App", () => {
     expect(calls).toBe(5); // SUBMIT_CORRECT: two reward tiles
 
     await user.click(screen.getByRole("button", { name: "Digit 9" })); // completes the forced single discard
-    expect(calls).toBe(5); // CONFIRM_DISCARD draws no randomness
+    expect(calls).toBe(5); // completing the discard draws no randomness
 
-    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    finishDeparture(); // the discard settles and the round advances on its own
     expect(calls).toBe(8); // NEXT_ROUND: one more equation draw (gate + pair + order)
   });
 });

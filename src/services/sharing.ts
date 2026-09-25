@@ -1,16 +1,30 @@
-import type { Language } from "../game/types";
+import type { GameMode, Language } from "../game/types";
+import { messages } from "../i18n/messages";
 
 export interface ShareStats {
+  mode: GameMode;
+  /** A Classic run that reached the floor. Always false in Endless. */
+  won: boolean;
   score: number;
   totalRounds: number;
   longestStreak: number;
 }
 
+// §1.15: Classic names its mode and outcome ahead of the rounds; Endless's
+// first line is unchanged. The words are the dictionary's, so the shared text
+// and the screen cannot drift apart.
+function shareHeading(stats: ShareStats, language: Language): string {
+  if (stats.mode === "endless") return "ozterisk";
+  const { mode, gameOver } = messages[language];
+  return `ozterisk ${mode.classic} — ${stats.won ? gameOver.winTitle : gameOver.title}`;
+}
+
 export function formatShareText(stats: ShareStats, language: Language, url: string): string {
+  const heading = shareHeading(stats, language);
   if (language === "ko") {
-    return `ozterisk — 라운드: ${stats.totalRounds}\n점수: ${stats.score}\n최장 연속 정답: ${stats.longestStreak}\n\n이 기록을 넘을 수 있나요?\n${url}`;
+    return `${heading} — 라운드: ${stats.totalRounds}\n점수: ${stats.score}\n최장 연속 정답: ${stats.longestStreak}\n\n이 기록을 넘을 수 있나요?\n${url}`;
   }
-  return `ozterisk — Rounds: ${stats.totalRounds}\nScore: ${stats.score}\nLongest streak: ${stats.longestStreak}\n\nCan you beat it?\n${url}`;
+  return `${heading} — Rounds: ${stats.totalRounds}\nScore: ${stats.score}\nLongest streak: ${stats.longestStreak}\n\nCan you beat it?\n${url}`;
 }
 
 export interface ShareDependencies {

@@ -6,8 +6,8 @@ import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { createInitialInventory, createTitleState } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
 import { generateKindEquation, generateRewardTiles } from "../game/generators";
-import { constructAnswer, getRewardCount } from "../game/selectors";
-import type { RandomSource, TileIdFactory } from "../game/types";
+import { constructAnswer, getCapacity, getRewardCount, isAtClassicFloor, isClassicWin } from "../game/selectors";
+import type { GameMode, RandomSource, TileIdFactory } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
 import styles from "./App.module.css";
 
@@ -25,17 +25,22 @@ export interface AppProps {
 export function App({ dependencies, shareDependencies }: AppProps) {
   const [state, dispatch] = useReducer(gameReducer, undefined, createTitleState);
 
-  const handleStart = useCallback(() => {
-    const inventory = createInitialInventory(dependencies.nextTileId);
-    const equation = generateKindEquation(dependencies.random, inventory);
-    dispatch({ type: "START_RUN", equation, inventory });
-  }, [dependencies]);
+  // The opening hand fills the mode's starting capacity (§1.3).
+  const handleStart = useCallback(
+    (mode: GameMode) => {
+      const inventory = createInitialInventory(dependencies.nextTileId, getCapacity(mode, 0));
+      const equation = generateKindEquation(dependencies.random, inventory);
+      dispatch({ type: "START_RUN", mode, equation, inventory });
+    },
+    [dependencies],
+  );
 
+  // RESTART_RUN keeps the run's mode, so the hand is dealt for it too.
   const handleRestart = useCallback(() => {
-    const inventory = createInitialInventory(dependencies.nextTileId);
+    const inventory = createInitialInventory(dependencies.nextTileId, getCapacity(state.mode, 0));
     const equation = generateKindEquation(dependencies.random, inventory);
     dispatch({ type: "RESTART_RUN", equation, inventory });
-  }, [dependencies]);
+  }, [dependencies, state.mode]);
 
   const handleSubmit = useCallback(() => {
     // Reducer invariant (§2.5): equation === null only in `title`, and Submit
@@ -55,11 +60,18 @@ export function App({ dependencies, shareDependencies }: AppProps) {
   }, [state.equation, state.selectedTiles, dependencies]);
 
   const handleNextRound = useCallback(() => {
+    // At the floor the advance ends the run (§1.8 step 0): no equation is drawn,
+    // and the current one, never shown again, keeps the reducer's invariant.
+    if (isAtClassicFloor(state)) {
+      if (state.equation === null) return;
+      dispatch({ type: "NEXT_ROUND", equation: state.equation });
+      return;
+    }
     // state.inventory is already final (post-discard) at `feedback`; a stale
     // capture here would silently bias equations against the previous round's hand.
     const equation = generateKindEquation(dependencies.random, state.inventory);
     dispatch({ type: "NEXT_ROUND", equation });
-  }, [dependencies, state.inventory]);
+  }, [dependencies, state]);
 
   // §1.11: gameOver restarts the run on R, equivalent to Play Again. Enter has
   // no global shortcut in this phase — it destroyed the score screen with the
@@ -111,6 +123,8 @@ export function App({ dependencies, shareDependencies }: AppProps) {
         <GameOverScreen
           equation={state.equation}
           stats={{
+            mode: state.mode,
+            won: isClassicWin(state),
             score: state.score,
             totalRounds: state.totalRounds,
             longestStreak: state.longestStreak,

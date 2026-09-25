@@ -1,8 +1,13 @@
 import { useEffect } from "react";
 import type { Digit, GameAction, GameState } from "../game/types";
-import { getAnswerLength, getOverflowCount, isDiscardReady, isSubmissionReady } from "../game/selectors";
+import { getAnswerLength, getOverflowCount, isSubmissionReady } from "../game/selectors";
 
 const DIGIT_KEY_PATTERN = /^[0-9]$/;
+
+// Controls the browser activates on Enter by itself. This is a property of
+// HTML rather than of this screen's current markup, so it names the whole set
+// and not only the buttons that happen to be mounted today.
+const ENTER_ACTIVATES = "a[href], button, input, select, textarea";
 
 export interface UseGameKeyboardArgs {
   state: GameState;
@@ -21,6 +26,16 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
     function handleKeyDown(event: KeyboardEvent) {
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       if (event.key === "Enter" && event.repeat) return;
+      // §1.11 already states this rule for gameOver and title: a focused
+      // button keeps normal browser behavior and the global shortcut stands
+      // aside. `answering` is where leaving it unstated cost the player
+      // tiles — Enter on a focused Clear reached this listener, and
+      // preventDefault() below suppressed the button's own activation, so
+      // CLEAR_SELECTION never dispatched and the answer submitted instead.
+      // Standing aside changes the mechanism, not the outcome: every control
+      // this defers to reaches the same callback through its own onClick.
+      if (event.key === "Enter" && event.target instanceof Element && event.target.matches(ENTER_ACTIVATES))
+        return;
 
       if (state.phase === "answering") {
         if (DIGIT_KEY_PATTERN.test(event.key)) {
@@ -59,7 +74,7 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
 
       if (state.phase === "overflow") {
         if (DIGIT_KEY_PATTERN.test(event.key)) {
-          const required = getOverflowCount(state.inventory);
+          const required = getOverflowCount(state);
           if (state.pendingDiscards.length >= required) return;
           const digit = Number(event.key) as Digit;
           // Skip tiles already marked, so repeated presses walk through duplicates
@@ -70,20 +85,13 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
           if (!tile) return;
           event.preventDefault();
           dispatch({ type: "TOGGLE_DISCARD", tileId: tile.id });
-          if (required === 1) dispatch({ type: "CONFIRM_DISCARD" });
-          return;
-        }
-
-        if (event.key === "Enter") {
-          if (!isDiscardReady(state)) return;
-          event.preventDefault();
-          dispatch({ type: "CONFIRM_DISCARD" });
         }
         return;
       }
 
       if (state.phase === "feedback") {
-        if (event.key === "Enter") {
+        // After a discard the round advances on its own (§1.11).
+        if (event.key === "Enter" && !state.lastResult?.discarded) {
           event.preventDefault();
           onNextRound();
         }

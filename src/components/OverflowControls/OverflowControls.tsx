@@ -1,27 +1,20 @@
 import { useI18n } from "../../i18n/I18nContext";
-import { ActionButton } from "../ActionButton/ActionButton";
 import styles from "./OverflowControls.module.css";
 
 export interface OverflowControlsProps {
   requiredCount: number;
-  onConfirm(): void;
-  disabled: boolean;
 }
 
-export function OverflowControls({ requiredCount, onConfirm, disabled }: OverflowControlsProps) {
+export function OverflowControls({ requiredCount }: OverflowControlsProps) {
   const { t } = useI18n();
 
   return (
     <div className={styles.controls}>
-      <p className={styles.instruction}>{t("overflow.instruction", { count: requiredCount })}</p>
-      {/* A forced single-tile discard completes on the marking tap alone (see
-          GameScreen's onTile handler); Confirm only has a decision to make
-          when more than one tile must go, which only Classic mode produces. */}
-      {requiredCount > 1 && (
-        <ActionButton onClick={onConfirm} disabled={disabled}>
-          {t("action.confirmDiscard")}
-        </ActionButton>
-      )}
+      {/* No Confirm at any count: the mark that reaches the required count
+          completes the discard in the reducer (§1.7). */}
+      <p className={styles.instruction}>{requiredCount === 1
+          ? t("overflow.instructionOne")
+          : t("overflow.instruction", { count: requiredCount })}</p>
     </div>
   );
 }

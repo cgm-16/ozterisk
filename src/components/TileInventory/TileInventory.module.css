@@ -1,7 +1,45 @@
-/* Five columns, rows that grow: ten sockets fit exactly the --rack-rows two
-   rows, and the one state that exceeds ten (an eleventh tile mid-overflow,
-   R5) lands alone on a third row (grid-auto-rows) rather than forcing a
-   sixth column.
+/* The rack and its rail. It takes the arena's full content width and is the
+   container the stepped rack's size queries read (§1.12): narrow is a
+   property of the container, not the viewport. */
+.rack {
+  /* The offset parent the perch drop (8a·2) measures rail and seat against. */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  container: rack / inline-size;
+}
+
+/* Tiles past capacity perch here, above the rack, never in a new row of it
+   (§1.12): the newest arrivals, right-aligned, at the tier's tile size. Its
+   one row is a tile high whether or not a tile is in it, so the rail left
+   empty while a perch drops (8a·2) holds the tray where it was measured.
+
+   8a leaves the perched tile turned 11 degrees on its lower-left edge and
+   nudged 3px right, so its top-right corner reaches past its own cell by
+   3px + h·sin 11° − w·(1 − cos 11°) — about 14px at 52 x 64. Right-aligned
+   against the rack's edge, that reach took the page past a 305px content
+   box, so the rail keeps it as inline-end padding: the perch lands inside
+   the rack at every size. */
+.rail {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: var(--tile-w);
+  justify-content: end;
+  gap: var(--rack-gap);
+  width: 100%;
+  max-width: var(--rack-width);
+  grid-template-rows: var(--tile-h);
+  margin-bottom: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--border-accent);
+  padding-right: calc(3px + var(--tile-h) * sin(11deg) - var(--tile-w) * (1 - cos(11deg)));
+}
+
+/* Columns and rows come from --rack-columns and --rack-rows: ten sockets in
+   5 x 2 for Endless, or the stepped footprint TileInventory sets for Classic.
+   Tiles past capacity go to the rail, so no row is ever added.
 
    The tracks are `minmax(0, --tile-w)` rather than a flat `--tile-w`, and that
    is what fixes #85. Fixed tracks gave the rack a min-content width the arena
@@ -37,9 +75,36 @@
   gap: var(--rack-gap);
   justify-content: center;
   width: 100%;
-  max-width: calc(
-    var(--rack-columns) * var(--tile-w) + (var(--rack-columns) - 1) * var(--rack-gap)
-  );
+  max-width: var(--rack-width);
+}
+
+/* Classic's tray: the panel the stepped rack sits in (§1.12). Its side
+   padding is --rack-pad, which the narrow size tightens to 2px — the width
+   budget is the only one that binds, so the top and bottom keep room for the
+   tiles' hard bottom edge. max-width grows by the side padding and the 1px
+   border so the tracks keep their full size. */
+.tray {
+  padding: var(--space-2) var(--rack-pad, var(--space-2));
+  border: 1px solid var(--border-hairline);
+  border-radius: var(--radius-lg);
+  background: var(--surface-panel);
+  max-width: calc(var(--rack-width) + 2 * var(--rack-pad, var(--space-2)) + 2px);
+}
+
+/* Over a tray, the rail spans the tray, not just its tracks. */
+.railOverTray {
+  max-width: calc(var(--rack-width) + 2 * var(--rack-pad, var(--space-2)) + 2px);
+}
+
+/* A sealed plug: the rest state of oz-seal, flush with the felt, a rim, and
+   no well. It is not an empty socket — an empty socket is a debt the run can
+   repay, a plug is gone (§1.12). */
+.plug {
+  width: 100%;
+  height: var(--tile-h);
+  border-radius: var(--radius-md);
+  background: var(--surface-table);
+  box-shadow: var(--rim-socket), inset 0 -1px 0 var(--hair-100);
 }
 
 /* An empty or lifted socket is its own grid item, sized like a tile, with no
@@ -111,7 +176,7 @@
   animation-timing-function: var(--ease-snap);
 }
 
-/* 8a — the eleventh cell, which exists only while the rack overflows: the
+/* 8a — a tile past capacity, which exists only while the rack overflows: the
    tile is refused entry, drops onto the rail and stays perched there. The
    frame's last keyframe is that perch, not a rest, so without a fill mode the
    tile snaps back into the grid the instant it lands.
@@ -119,9 +184,7 @@
    transform-origin carries the shape's pivot, which lives on the element in
    the storyboard rather than in the frame: the rotation reads as a tile
    catching on its lower-left edge, and around the default centre it reads as
-   a swivel instead. The rack is five columns at every tier, so the eleventh
-   cell sits alone in the leftmost column of a third row and the wider
-   rightward reach the pivot gives it lands in empty track. */
+   a swivel instead. */
 .cellRimReject {
   animation-name: global(oz-rim-reject);
   animation-duration: var(--dur-select);
@@ -134,7 +197,129 @@
    it by however long React takes to commit the removal, so without it the tile
    flashes back into its cell for a frame on the way out. */
 .cellDeparting {
-  animation-name: global(oz-tip-off);
-  animation-duration: var(--dur-select);
+  /* 8c: the tile tips off its edge and gravity takes it (oz-slide-off). The
+     frame is distance-agnostic; the discard's own distances are these. */
+  --dx: 46px;
+  --drop: 88px;
+  --rot: 18deg;
+
+  animation-name: global(oz-slide-off);
+  animation-duration: var(--dur-discard);
+  animation-timing-function: var(--ease-fall);
   animation-fill-mode: forwards;
+}
+
+/* 8a·2 — the perched tile takes the seat a discard freed. Mounted in the seat,
+   it falls from the rail: --dx / --dy are the rail position less the seat's,
+   measured by TileInventory, and the frame starts exactly where 8a's perch
+   left it, pivoting on the same lower-left edge. */
+.cellPerchDrop {
+  animation-name: global(oz-perch-drop);
+  animation-duration: var(--dur-perch);
+  animation-timing-function: var(--ease-fall);
+  transform-origin: 0 100%;
+}
+
+/* M6 — a socket closes as the tray descends: the well collapses to a hairline
+   from the bottom and the rim seals across where it was, both on --dur-seal.
+   The cell is a plug from the start, so the frame's end is the plug's rest
+   state and fill-mode both holds frame 0 through a positive delay. */
+.sealing {
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--rim-socket);
+}
+
+.sealWell,
+.sealRim {
+  position: absolute;
+  animation-duration: var(--dur-seal);
+  animation-timing-function: var(--ease-settle);
+  animation-fill-mode: both;
+}
+
+.sealWell {
+  inset: 0;
+  border-radius: var(--radius-md);
+  background: var(--surface-socket);
+  box-shadow: var(--shadow-socket);
+  transform-origin: 50% 100%;
+  animation-name: global(oz-seal);
+}
+
+.sealRim {
+  right: var(--space-1);
+  bottom: 0;
+  left: var(--space-1);
+  height: 1px;
+  background: var(--hair-100);
+  animation-name: global(oz-seal-rim);
+}
+
+/* The tracks' natural width, shared by the grid, the tray and the rail. */
+.rail,
+.inventory {
+  --rack-width: calc(var(--rack-columns) * var(--tile-w) + (var(--rack-columns) - 1) * var(--rack-gap));
+}
+
+/* Classic's sizes (§1.12). Every one holds about 180px of height, and the tiles
+   grow as the table empties. At ten sockets and below the rack is Endless's,
+   so "home" sets nothing. Set on the rack's children rather than the rack, so
+   the container queries below can restyle them. */
+.rack[data-size="small"] > .rail,
+.rack[data-size="small"] > .inventory {
+  --rack-columns: 7;
+  --rack-rows: 3;
+  --tile-w: 44px;
+  --tile-h: 55px;
+  --size-tile: 25px;
+  --rack-gap: 4px;
+  --rack-pad: var(--space-2);
+  --radius-md: var(--radius-sm);
+}
+
+.rack[data-size="mid"] > .rail,
+.rack[data-size="mid"] > .inventory {
+  --rack-columns: 6;
+  --rack-rows: 3;
+  --tile-w: 48px;
+  --tile-h: 60px;
+  --size-tile: 28px;
+  --rack-gap: 6px;
+  --rack-pad: var(--space-2);
+}
+
+/* Where the arena cannot hold a size's tray, both upper sizes fall back to
+   6 x 44 (§1.12). 350px is 7 x 44's tray (tiles, gaps, 8px padding a side, the
+   1px border); 336px is 6 x 48's. The fallback needs 280px: the 281px the
+   320px gate leaves with a scrollbar has room for 2px gaps and 2px of side
+   padding, and no more. */
+@container rack (width < 350px) {
+  .rack[data-size="small"] > .rail,
+  .rack[data-size="small"] > .inventory {
+    --rack-columns: 6;
+    --rack-rows: 4;
+    --rack-gap: 2px;
+    --rack-pad: 2px;
+  }
+}
+
+@container rack (width < 336px) {
+  .rack[data-size="mid"] > .rail,
+  .rack[data-size="mid"] > .inventory {
+    --tile-w: 44px;
+    --tile-h: 55px;
+    --size-tile: 25px;
+    --rack-gap: 2px;
+    --rack-pad: 2px;
+    --radius-md: var(--radius-sm);
+  }
+}
+
+/* The rack draws the fallback's whole rows (twenty in 6 x 4 is 24 cells);
+   wide, twenty in 7 x 3 is 21, and the rest are not drawn. */
+@container rack (width >= 350px) {
+  .rack[data-size="small"] > .inventory > :nth-child(n + 22) {
+    display: none;
+  }
 }

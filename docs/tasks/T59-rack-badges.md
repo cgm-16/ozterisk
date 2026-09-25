@@ -104,6 +104,12 @@ Two assertions are about the visible text and go with it:
 (`getAllByText("New tile")).toHaveLength(2)`). That is a different component,
 in a panel with room for the text, and #84 is about the rack. Leave it alone.
 
+> **Reversed by #142.** The ruling above answered whether the badge fits, and
+> was made before §1.14 had `result.rewards`. Once #140 added that summary the
+> badge restated it once per tile, so the panel's badge and `.rewardBadge` are
+> deleted. `tile.newLabel` stays: the rack's reward tiles carry it in their
+> accessible names.
+
 - [ ] **Step 3: No spec amendment — verify, do not assume**
 
 The badge copy is **not** in §1.14's required-copy table (`tile.newLabel` and

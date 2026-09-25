@@ -51,9 +51,12 @@ describe("FeedbackPanel", () => {
     expect(screen.getByText("Correct answer: 12")).toBeInTheDocument();
   });
 
-  it("captions each reward tile, because unlabelled arrivals read as a restatement", () => {
+  // result.rewards already states the count; a caption under each tile said
+  // the same thing a second time (#142).
+  it("shows each reward tile without a caption of its own", () => {
     renderPanel(correct, [tile(4, "r1"), tile(7, "r2")]);
-    expect(screen.getAllByText("New tile")).toHaveLength(2);
+    expect(screen.getByRole("status").querySelectorAll("li")).toHaveLength(2);
+    expect(screen.queryByText("New tile")).not.toBeInTheDocument();
   });
 
   // On a correct answer the answer slots carry no accessible name (§95 —
@@ -92,7 +95,7 @@ describe("FeedbackPanel", () => {
   it("leaves the reward list out of the live region", () => {
     renderPanel(correct, [tile(4, "r1"), tile(7, "r2")]);
     expect(within(screen.getByRole("status")).queryByRole("list")).not.toBeInTheDocument();
-    expect(screen.getAllByText("New tile")).toHaveLength(2);
+    expect(screen.getByRole("status").querySelectorAll("li")).toHaveLength(2);
   });
 
   // A correct result rather than an incorrect one: the incorrect branch renders

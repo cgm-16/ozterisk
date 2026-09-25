@@ -360,7 +360,7 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
   feedback: [
     {
       id: "feedback-correct",
-      label: "Feedback — correct, with reward badges",
+      label: "Feedback — correct, with rewards",
       render: () => renderGameScreen(FEEDBACK_CORRECT_STATE),
     },
     {

@@ -6,9 +6,11 @@ The game rules live in `docs/spec/product.md`.
 ### 1.12 Responsive and visual contract
 
 The visual and motion language is the **Tile House** system in
-`docs/design-system/`. That directory is the normative source for token values,
-material rules, and the motion inventory; this section states the contract those
-values must satisfy. Where a design document and this section disagree, this
+`docs/design-system/`. That directory is the normative source for material rules
+and the motion inventory. Token values live in `src/styles/tokens/`;
+`docs/design-system/tokens/` is a frozen M5.5b snapshot that the design
+references load, and it is not kept in step. This section states the contract
+those values must satisfy. Where a design document and this section disagree, this
 section wins.
 
 **Layout and information architecture**
@@ -126,7 +128,7 @@ section wins.
   `oz-perch-drop`), `M6·0` (the house takes a seat), `M6·1` (the rack re-seats,
   `oz-reseat`) and `M6·2` (new plugs close). `8c` is drawn with `oz-slide-off`, which
   supersedes `oz-tip-off`. A moment whose duration and easing are
-  not yet assigned in `docs/design-system/tokens/motion.css` gets them assigned by
+  not yet assigned in `src/styles/tokens/motion.css` gets them assigned by
   the milestone that implements it, and that assignment is not an amendment. Motion
   outside that inventory is not permitted; extending the inventory amends this
   section.
@@ -176,7 +178,8 @@ The implementation may improve punctuation but may not change rule meaning.
 | `result.submitted` | `Your answer: {value}` | `제출한 답: {value}` |
 | `result.answer` | `Correct answer: {value}` | `정답: {value}` |
 | `result.rewards` | `Received {count} tiles` | `타일 {count}개 획득` |
-| `overflow.instruction` | `Choose {count} tile(s) to discard.` | `버릴 타일 {count}개를 선택하세요.` |
+| `overflow.instructionOne` | `Choose a tile to discard.` | `버릴 타일 1개를 선택하세요.` |
+| `overflow.instruction` | `Choose {count} tiles to discard.` | `버릴 타일 {count}개를 선택하세요.` |
 | `gameOver.title` | `Game Over` | `게임 종료` |
 | `gameOver.reason` | `Not enough tiles left to answer.` | `답을 만들 타일이 부족합니다.` |
 | `gameOver.winTitle` | `Run Complete` | `완주` |

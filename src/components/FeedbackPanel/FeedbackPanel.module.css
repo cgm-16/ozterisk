@@ -56,29 +56,14 @@
   padding: 0;
 }
 
-/* The ceramic face belongs to the Tile primitive; this list item only stacks
-   that tile above its badge. */
+/* The ceramic face belongs to the Tile primitive; this list item only
+   centres it. */
 .reward {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: var(--space-1);
-}
-
-/* Gold on --surface-surround measures 7.87:1. This caption is 11px body text,
-   so it owes 4.5:1 rather than 3:1 — it clears with room. It sits below the
-   tile, not over the ceramic. The rack draws no badge at all — its text
-   labels overlapped the engraved digit and were deleted (#84), leaving the
-   tile's own reward state to carry the cue. This panel keeps its badge
-   because a panel has room for the words a 52px cell does not. It is read by
-   eye only: .rewardSummary states the count for the live region, and the list
-   is aria-hidden so the badge is not announced once per arrival. */
-.rewardBadge {
-  font-size: var(--size-label);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  color: var(--state-reward);
 }
 
 .comparison {

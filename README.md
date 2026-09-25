@@ -1,6 +1,8 @@
 # ozterisk
 
-`ozterisk` is a browser-based, fully client-side endless multiplication game. A
+`ozterisk` is a browser-based, fully client-side multiplication game with two
+modes: **Endless**, at a fixed capacity until the tiles run out, and
+**Classic**, whose capacity closes one socket at a time down to a floor. A
 digit tile is simultaneously an answer input, a consumable spent on every
 submission, and an inventory-management choice: correct play returns one net
 tile before capacity resolution. The game validates whether that loop is
@@ -10,27 +12,41 @@ online services.
 ## Product rules
 
 - Equations draw one unordered operand pair `(a, b)`, `1 <= a <= b <= 9`,
-  uniformly with replacement, then randomize display order (`3 × 7` and
-  `7 × 3` are the same sampling entry). Products range `1`–`81`, so an
-  answer has one or two digits.
-- A run starts with inventory capacity `10`, one tile of each digit
-  `0`–`9`, score `0`, current/longest streak `0`, and round `1`.
+  then randomize display order (`3 × 7` and `7 × 3` are the same sampling
+  entry). Below a fixed kind-equation rate (`KIND_EQUATION_RATE` in
+  `src/game/balance.ts`) the pair is drawn only from those whose product the
+  inventory can spell (falling back to the full pool if it can spell none);
+  otherwise, uniformly with replacement from all 45.
+  Products range `1`–`81`, so an answer has one or two digits.
+- A run starts with score `0`, current/longest streak `0`, round `1`, and an
+  inventory that fills its capacity, dealt round-robin: capacity `10` and one
+  tile of each digit `0`–`9` in Endless; capacity `20` and two of each in
+  Classic.
+- **Classic capacity**: one socket seals every `2` submissions, correct or
+  not, down to a floor of `6` — `max(6, 20 − ⌊submissions / 2⌋)`. Capacity is
+  derived from the mode and the submission count, never stored.
 - Selecting tiles (click, tap, or a digit key) fills the answer slots in
-  order; `Backspace` returns the most recently selected tile; **Submit** and
-  `Enter` are enabled only once every slot is filled.
+  order; `Backspace` returns the most recently selected tile and `Escape`
+  returns them all; **Submit** and `Enter` are enabled only once every slot
+  is filled.
 - **Correct**: the submitted tiles are removed permanently, score and streak
   increase, and `N + 1` reward tiles (where `N` is the number of tiles
-  submitted) are drawn and inserted into the sorted inventory.
+  submitted) are added. Only the tiles that fit the capacity are sorted; the
+  newest arrivals past it wait on a rail above the rack.
 - **Incorrect**: the submitted tiles are removed permanently with no reward,
   the streak resets to `0`, and the submitted and correct answers are shown.
   There is no exact-answer-constructibility check, so an intentional wrong
   answer is a legal (costly) way to shed tiles.
-- **Overflow**: if inventory exceeds `10` tiles after rewards are inserted,
-  the player must mark exactly the excess count for discard before the next
-  equation can be drawn.
+- **Overflow**: if inventory exceeds the capacity after rewards are added
+  (checked against the capacity after this submission's seal, so Classic can
+  overflow by two), the player marks tiles to discard, seated or on the rail.
+  The mark that reaches the excess completes the discard — there is no
+  confirm control — and the round advances on its own once the motion ends.
+- **Win (Classic)**: when capacity reaches the floor, the run ends as **Run
+  Complete** if the player holds at least one tile; no equation is shown.
 - **Loss**: after a round, if the inventory has fewer tiles than the next
   equation's answer-slot count, the run ends in **Game Over**; the terminal
-  equation stays visible to explain why.
+  equation stays visible, with its product, to explain why.
 - **Sharing**: **Share** and **Copy Result** exist only on `gameOver`. Both
   always include the normal, unmodified game URL — result state (score,
   streak, rounds) is never encoded into the URL, and a shared result is
@@ -46,8 +62,9 @@ answering --SELECT_TILE / RETURN_TILE--> answering
 answering --SUBMIT_CORRECT (no overflow)--> feedback
 answering --SUBMIT_CORRECT (overflow)--> overflow
 answering --SUBMIT_INCORRECT--> feedback
-overflow --TOGGLE_DISCARD--> overflow
-overflow --CONFIRM_DISCARD--> feedback
+overflow --TOGGLE_DISCARD (below the excess)--> overflow
+overflow --TOGGLE_DISCARD (reaches the excess)--> feedback
+feedback --NEXT_ROUND (Classic at the floor)--> gameOver
 feedback --NEXT_ROUND (inventory can attempt next equation)--> answering
 feedback --NEXT_ROUND (inventory cannot attempt next equation)--> gameOver
 gameOver --RESTART_RUN--> answering
@@ -59,14 +76,17 @@ gameOver --RESTART_RUN--> answering
 |---|---|---|
 | `answering` | `0`–`9` | Select first available matching tile if a slot is empty |
 | `answering` | `Backspace` | Return most recently selected answer tile |
+| `answering` | `Escape` | Return every selected tile |
 | `answering` | `Enter` | Submit only if all answer slots are filled |
-| `overflow` | `Enter` | Confirm only if exactly the excess number is selected |
-| `feedback` | `Enter` | Draw and advance to the next equation |
-| `gameOver` | `Enter` | Start a fresh run, equivalent to **Play Again** |
+| `overflow` | `0`–`9` | Mark the first matching unmarked tile; the mark that reaches the excess completes the discard |
+| `feedback` | `Enter` | Draw and advance to the next equation; inert after a discard, which advances on its own |
+| `gameOver` | `R` | Start a fresh run in the same mode, equivalent to **Play Again** |
+| `gameOver` | `Enter` | No global shortcut; a focused button retains normal browser behavior |
 | `title` | `Enter` | No global shortcut; the focused **Start Run** button retains normal browser behavior |
 
-Mouse, touch, and keyboard all drive the same actions. Language changes are
-available in every phase and never reset game state.
+In every phase a focused button keeps `Enter` for itself and the shortcut
+stands aside. Mouse, touch, and keyboard all drive the same actions.
+Language changes are available in every phase and never reset game state.
 
 ## Local commands
 
@@ -88,9 +108,10 @@ phases above; it is the only state container in the app (no Zustand, Redux,
 or other state library).
 
 - **Pure domain layer** (`src/game/`): `types.ts` (domain types and the
-  `GameAction` union), `constants.ts`, `factories.ts` (initial state and
+  `GameAction` union), `constants.ts`, `balance.ts` (the tuning dials,
+  including Classic's start, floor and step), `factories.ts` (initial state and
   inventory), `generators.ts` (equation and reward generation), `selectors.ts`
-  (derived queries such as `getAnswerLength`, `isSubmissionReady`,
+  (derived queries such as `getCapacity`, `getAnswerLength`, `isSubmissionReady`,
   `getOverflowCount`), and `gameReducer.ts`. The reducer never calls
   `Math.random()`, `crypto.randomUUID()`, or any browser/storage API — all
   randomness and tile IDs are generated at the boundary (`src/app/App.tsx`)
@@ -150,9 +171,9 @@ builds as a preview; a release is a merge commit from `main` to **`prod`**,
 which Vercel builds as production. `prod` is a pointer to the live commit.
 GitHub Actions (`.github/workflows/ci.yml`) runs lint, typecheck, test, the
 viewport sweep, and build on every pull request and on every push to either
-branch. That reports, it does not block: `prod` carries no required status
-checks, so a green run before a release is the convention rather than an
-enforced gate.
+branch. Rulesets enforce the merge methods and the gate: a pull request into
+`main` can only squash, and one into `prod` can only merge with a merge
+commit and requires the `build` check to pass.
 
 ## Fonts
 
@@ -198,7 +219,9 @@ preference survives a refresh — a refresh always returns to `title`.
 
 Per the product specification, this PoC does not include: wildcard or
 special tiles; operand `0`; division, addition, or subtraction modes;
-difficulty curves or weighted equations; timers; multiple attempts per
+difficulty curves, meaning any weighting that adapts to the player or
+escalates over a run (Classic's capacity descent and the fixed kind-equation
+rate are the two exceptions); timers; multiple attempts per
 equation; skip buttons or a separate manual-discard action during
 answering; exact-answer-constructibility loss detection; saved best score
 or history; seeded or replayable runs; result pages or result parameters;

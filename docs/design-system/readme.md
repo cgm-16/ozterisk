@@ -394,8 +394,9 @@ what the port had absorbed (#58).
 The rule applied: **keep what the spec calls normative and what a future phase
 would have to re-derive; drop what `src/` now implements better and what only
 the design tool reads.** §1.12 names this directory the normative source for
-token values, material rules and the motion inventory, so `tokens/`,
-`guidelines/` and `decisions.md` are spec-bound and stay. The two surviving
+material rules and the motion inventory, so `guidelines/` and `decisions.md`
+are spec-bound and stay. `tokens/` stays as the frozen snapshot the `.dc.html`
+references load; the shipped values are in `src/styles/tokens/`. The two surviving
 canvases stay because nothing in `src/` re-derives them: one presents the
 system whole, the other is the provenance for every motion shape.
 

@@ -1,13 +1,23 @@
-import type { GameMode, Language } from "../game/types";
+import { isClassicWin } from "../game/selectors";
+import type { GameState, Language } from "../game/types";
 import { messages } from "../i18n/messages";
 
-export interface ShareStats {
-  mode: GameMode;
-  /** A Classic run that reached the floor. Always false in Endless. */
-  won: boolean;
+export type ShareStats = {
   score: number;
   totalRounds: number;
   longestStreak: number;
+} & (
+  | { mode: "endless"; won: false }
+  /** `won`: a Classic run that reached the floor with tiles in hand. */
+  | { mode: "classic"; won: boolean }
+);
+
+/** The statistics a finished run shows and shares. */
+export function getShareStats(state: GameState): ShareStats {
+  const figures = { score: state.score, totalRounds: state.totalRounds, longestStreak: state.longestStreak };
+  return state.mode === "classic"
+    ? { mode: "classic", won: isClassicWin(state), ...figures }
+    : { mode: "endless", won: false, ...figures };
 }
 
 // §1.15: Classic names its mode and outcome ahead of the rounds; Endless's

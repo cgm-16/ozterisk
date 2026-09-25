@@ -6,9 +6,8 @@ import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { CLASSIC_FLOOR, CLASSIC_SEAL_EVERY, CLASSIC_START_CAPACITY } from "../game/balance";
 import { createInitialInventory, sortTiles } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
-import { isClassicWin } from "../game/selectors";
 import type { GamePhase, GameState, Tile } from "../game/types";
-import type { ShareDependencies } from "../services/sharing";
+import { getShareStats, type ShareDependencies } from "../services/sharing";
 import {
   makeAnsweringState,
   makeEquation,
@@ -45,13 +44,7 @@ function renderGameOverScreen(state: GameState, dependencies: ShareDependencies)
   return (
     <GameOverScreen
       equation={state.equation}
-      stats={{
-        mode: state.mode,
-        won: isClassicWin(state),
-        score: state.score,
-        totalRounds: state.totalRounds,
-        longestStreak: state.longestStreak,
-      }}
+      stats={getShareStats(state)}
       url="https://example.test/"
       dependencies={dependencies}
       onPlayAgain={noop}

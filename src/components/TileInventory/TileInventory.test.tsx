@@ -491,6 +491,28 @@ describe("TileInventory", () => {
     expect(animationOn(cells(container)[4])).not.toBe("oz-fire");
   });
 
+  // Classic's two-tile discard can take one seated tile and one rail tile:
+  // the rail tile slides off where it perched, while the other rail tile
+  // drops into the freed seat. The discard settles once, when that one lands.
+  it("settles once for a seated and a rail tile discarded together, when the survivor lands", () => {
+    const before = [...railedRack(), tile(8, "rail-2", true)];
+    const after = [...before.slice(0, 10)];
+    after[2] = before[11]!;
+    const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
+    rerender({ tiles: after, mode: "readOnly" });
+
+    endAnimation(railCells(container)[0]);
+    expect(onSettled).not.toHaveBeenCalled();
+    endAnimation(cells(container)[2]);
+    expect(onSettled).not.toHaveBeenCalled();
+    expect(cells(container)[2].textContent).toBe("8");
+    expect(animationOn(cells(container)[2])).toBe("oz-perch-drop");
+
+    endAnimation(cells(container)[2]);
+    expect(onSettled).toHaveBeenCalledTimes(1);
+    expect(cellCount(container)).toBe(10);
+  });
+
   it("settles when the rail tile itself is the one discarded", () => {
     const before = railedRack();
     const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });

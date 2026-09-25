@@ -290,6 +290,18 @@ describe("App", () => {
     expect(hudField("Capacity")).toBe("20");
   });
 
+  it("keeps Classic through R as well, dealing twenty tiles at capacity 20", async () => {
+    const user = userEvent.setup();
+    renderApp([...classicWinRandomValues(), ...equationSamples(2, 3)], { initialLanguage: "en" });
+
+    await playClassicToFloor(user);
+    await user.keyboard("r");
+
+    expect(screen.getByText("2 × 3 =")).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /^Digit \d$/ })).toHaveLength(20);
+    expect(hudField("Capacity")).toBe("20");
+  });
+
   it("grants no reward and resets the streak on an incorrect answer, then advances via Next Round", async () => {
     const user = userEvent.setup();
     const randomValues = [

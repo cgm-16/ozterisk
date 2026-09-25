@@ -658,6 +658,30 @@ describe("GameScreen after a discard", () => {
     expect(onNextRound).toHaveBeenCalledTimes(1);
   });
 
+  // Classic can require two: the round waits for both departures, not the first.
+  it("advances once after a two-tile discard, when the second departure has played", () => {
+    const overflow = makeOverflowState(makeEquation(3, 3), { inventory: TWELVE_TILE_INVENTORY });
+    const onNextRound = vi.fn();
+    const screenFor = (state: GameState) => (
+      <I18nProvider initialLanguage="en">
+        <GameScreen state={state} dispatch={vi.fn()} onSubmit={vi.fn()} onNextRound={onNextRound} />
+      </I18nProvider>
+    );
+    const { container, rerender } = render(screenFor(overflow));
+    const gone = overflow.inventory.slice(10);
+    rerender(screenFor(discardedFeedback(overflow.inventory.slice(0, 10))));
+
+    const end = (tileId: string) => {
+      const departing = container.querySelector(`[data-departing="${tileId}"]`)!;
+      fireEvent.animationEnd(departing);
+      fireEvent(departing, new Event("webkitAnimationEnd", { bubbles: true }));
+    };
+    end(gone[0]!.id);
+    expect(onNextRound).not.toHaveBeenCalled();
+    end(gone[1]!.id);
+    expect(onNextRound).toHaveBeenCalledTimes(1);
+  });
+
   it("waits for the verdict's celebration as well as the departure before advancing", () => {
     // A correct answer at streak 8 plays the bloom, three rings and the burst
     // on its slot. Those mount with feedback, after the discard completes, so

@@ -99,7 +99,7 @@ describe("SELECT_TILE", () => {
   });
 
   it("is a no-op outside the answering phase", () => {
-    const state = makeAnsweringState(makeEquation(3, 3), { phase: "feedback" });
+    const state = makeFeedbackState(makeEquation(3, 3));
     const tile = state.inventory[0]!;
 
     const next = gameReducer(state, { type: "SELECT_TILE", tileId: tile.id });
@@ -140,10 +140,7 @@ describe("RETURN_TILE", () => {
 
   it("is a no-op outside the answering phase", () => {
     const selectedTile = makeTile(4, "tile-selected");
-    const state = makeAnsweringState(makeEquation(3, 3), {
-      phase: "feedback",
-      selectedTiles: [selectedTile],
-    });
+    const state = makeFeedbackState(makeEquation(3, 3), { selectedTiles: [selectedTile] });
 
     const next = gameReducer(state, { type: "RETURN_TILE", tileId: selectedTile.id });
 
@@ -779,7 +776,8 @@ describe("CLEAR_SELECTION", () => {
   });
 
   it("is a no-op outside answering", () => {
-    const state = { ...makeAnsweringState(makeEquation(4, 5)), phase: "feedback" as const };
+    // A selection, so the empty-selection guard cannot be what rejects it.
+    const state = makeFeedbackState(makeEquation(4, 5), { selectedTiles: [makeTile(4, "tile-selected")] });
     expect(gameReducer(state, { type: "CLEAR_SELECTION" })).toBe(state);
   });
 });

@@ -15,7 +15,8 @@ online services.
   then randomize display order (`3 × 7` and `7 × 3` are the same sampling
   entry). Below a fixed kind-equation rate (`KIND_EQUATION_RATE` in
   `src/game/balance.ts`) the pair is drawn only from those whose product the
-  inventory can spell; otherwise, uniformly with replacement from all 45.
+  inventory can spell (falling back to the full pool if it can spell none);
+  otherwise, uniformly with replacement from all 45.
   Products range `1`–`81`, so an answer has one or two digits.
 - A run starts with score `0`, current/longest streak `0`, round `1`, and an
   inventory that fills its capacity, dealt round-robin: capacity `10` and one
@@ -218,8 +219,9 @@ preference survives a refresh — a refresh always returns to `title`.
 
 Per the product specification, this PoC does not include: wildcard or
 special tiles; operand `0`; division, addition, or subtraction modes;
-difficulty curves that adapt to the player (Classic's descent is a fixed
-schedule, and the kind-equation rate a fixed dial); timers; multiple attempts per
+difficulty curves, meaning any weighting that adapts to the player or
+escalates over a run (Classic's capacity descent and the fixed kind-equation
+rate are the two exceptions); timers; multiple attempts per
 equation; skip buttons or a separate manual-discard action during
 answering; exact-answer-constructibility loss detection; saved best score
 or history; seeded or replayable runs; result pages or result parameters;

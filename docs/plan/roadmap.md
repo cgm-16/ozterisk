@@ -30,7 +30,8 @@ hoc at branch time.
 | `M5.5f — Motion` | The sixteen named moments | Every moment in the §1.12 inventory implemented; `prefers-reduced-motion` neutralises all of them |
 | `M5.5g — Visual Verification` | The gallery proves it | Gallery covers hover, focus-visible, disabled and reduced-motion, and every state renders what its name claims; §8.5 walked with measured evidence at 320px in a real top-level viewport; reduced motion read per moment in both directions; no rack badge overlaps the engraved digit in either locale or either font face; `docs/design-system/` holds only what the product still reads |
 | `M6a — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(mode, totalRounds)` merged; both modes' economy invariants green; the shared overflow rules (sort only what fits, the last mark completes the discard, no Next Round after a discard) hold in both modes; one Classic win and one loss played end to end |
-| `M6b — Classic Rack and Motion` | Classic's rack steps its tile size, keeps closed sockets as plugs, perches overflow on a rail, and shows every change; a late correction (`T75`) sets a win's verdict in gold with its final hand | Stepped rack, plugs and rail merged; `M6`, `8a·2`, `M6·0`, `M6·1`, `M6·2` and `oz-slide-off` wired; no horizontal scroll at `320px` for any rack size; reduced motion jumps straight to each end state; `T75`: Run Complete in `--gold-500` with the final hand in its floor's sockets, merged in its own PR |
+| `M6b — Classic Rack and Motion` | Classic's rack steps its tile size, keeps closed sockets as plugs, perches overflow on a rail, and shows every change| Stepped rack, plugs and rail merged; `M6`, `8a·2`, `M6·0`, `M6·1`, `M6·2` and `oz-slide-off` wired; no horizontal scroll at `320px` for any rack size; reduced motion jumps straight to each end state|
+| `M6c — Run Complete Correction` | A Classic win's verdict is gold, with its final hand, not the loss's vermilion (`T75`) | Run Complete in `--gold-500`; the floor's sockets show the tiles still in hand, named by `gameOver.finalHand` in en and ko |
 | `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
 
 `M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d`, `M5.5e`, `M5.5f` and `M5.5g` are
@@ -202,11 +203,15 @@ phone), M6b gives it the rack it was designed for. The exit gate's
 `getCapacity(round)` is corrected to `getCapacity(mode, totalRounds)`: the tray
 counts submissions, not displayed rounds.
 
-**Why the Run Complete fix is M6b, not M7.** The M7 design handoff
+**Why M6 was split a third time, into M6c.** The M7 design handoff
 (`docs/design_handoff_m7_face_tiles/`, 26 Sep 2026) also corrected M6's win
 screen: a win set in vermilion read as a loss. That correction depends on
-nothing in the face tiles, so it ships ahead of them as a late M6b task (`T75`)
-rather than splitting M7. M7 remains one milestone and one PR, `T76`–`T81`.
+nothing in the face tiles, so Ori ruled it ships ahead of them in its own PR.
+M6b had already merged, so filing it there would have merged M6b twice, and
+filing it in M7 would have split M7 across two PRs; either breaks §4.4. It is
+therefore its own milestone, `M6c`, holding `T75` alone. **This split is
+recorded late**: `T75` was committed before this paragraph existed, which is
+the order §4.4 forbids. M7 remains one milestone and one PR, `T76`–`T81`.
 
 **Why M6 was split.** As originally scoped, `M6 — Classic Mode` bundled
 shrinking capacity, mode select, *and* the face-set tile mechanism. The

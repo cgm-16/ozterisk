@@ -67,4 +67,9 @@ M6b — Classic Rack and Motion:
 | R-41 discard motion: slide-off and perch-drop | T72 | component tests on the animation names and `onSettled` ordering |
 | R-42 tray motion: seal, house seat, re-seat, new plugs | T73 | component tests on the FLIP custom properties and seal delays |
 | R-43 every Classic rack size fits `320px` | T74 | `e2e/viewport.spec.ts` geometry at 320, 402 and desktop |
+
+M6c — Run Complete Correction:
+
+| Requirement | Owning task(s) | Required evidence |
+|---|---|---|
 | R-44 a Classic win is gold and shows its final hand | T75 | game-over tests on the win heading class and the final-hand strip |

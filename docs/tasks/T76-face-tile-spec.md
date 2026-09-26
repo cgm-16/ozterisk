@@ -60,7 +60,8 @@ moves first.
 
 - [ ] `product.md`: a new §1.4a covering face tiles (sets, placement,
       Classic-only arrival), plus §1.5 rewards, §1.7a floor 5, §1.11 keyboard,
-      and §1.17 (the picker is out of scope).
+      and §1.17 (replace the "Wildcard or special tiles" bullet with the
+      picker: the picker is out of scope).
 - [ ] `architecture.md`: §2.2 `Tile` and `LastResult`; §2.3 `tileDigits`,
       `canConstruct`, `answerMatches` and `generateRewardTiles(…, faceRate)`;
       Tuning surface `FACE_RATE`.
@@ -73,4 +74,5 @@ moves first.
 ## Acceptance
 
 - `grep -rni "picker" docs/spec docs/plan/roadmap.md` finds only the §1.17 rejection.
+- `grep -rn "Wildcard or special" docs/spec` finds nothing.
 - Every ruling above can be found in the spec text it governs.

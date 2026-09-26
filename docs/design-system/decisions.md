@@ -572,12 +572,44 @@ landed. A resize round runs about 560ms, twice a run.
 - Floor moves 6 → 5 when M7 ships.
 - Stepped rack and plugs are promoted into `TileInventory` (`stepped`, `drawnCapacity`, `capacity`; `rackTier` and its 15/10 thresholds in `rackTier.ts`; the re-seat reads the previous render, so there is no `reseatFrom` prop — T71, T73).
 
+## M7 — Face-set tiles, merged from the M7 handoff (26 Sep 2026)
+
+Merged from `docs/design_handoff_m7_face_tiles/decisions.md`: the three sections
+after *M7 opening calls*. The rest of that file is an upstream copy of this one.
+
 ### M7 opening calls, 24 Sep 2026
 
 - **No digit picker.** A face-set tile placed in a slot counts as the right digit if that digit is in its set; if not, the answer is wrong and is paid for like any wrong digit. Misplacing a special is a legitimate way to lose, and removing the picker removes the game's only would-be modal.
 - **Faces are not Hangul.** 홀 / 짝 are rejected as tile faces; they don't read as engraved objects and they tie a numeral game to one locale.
 - **Sets under study:** Wildcard, Odd, Even, Low 0–4, High 5–9, plus **Neighbours** (three consecutive digits, no wrap: 0·1·2 … 7·8·9). Face notation for Neighbours is open between `4–6` (joins the range family) and `5±1`.
 - **Material:** clay like a digit tile, set apart by an edge or inlay, not a new material.
+
+### M7 interaction calls, 26 Sep 2026
+
+- **Keyboard:** a digit key takes a digit tile first; with none, the **narrowest face** that holds the digit; ties go to the **leftmost in rack order**.
+- **"Your answer" text:** a wrong answer prints faces as engraved, slots joined by a middle dot when a face is present — `O·3`, `0–4·3`; `0–43` was rejected because it reads as "zero to forty-three". Same engraving in Korean. A **correct** answer prints the product it counted as: `43`.
+- **Face tiles ship in Classic only.** Endless was not simulated with them and they push it toward the 63% cliff.
+- **Share text unchanged** — no face count.
+- **Face rate dial:** 8%, documented safe range **5–10%**.
+- **Handoff:** same shape as M6 (`design_handoff_m7_face_tiles/`).
+
+### Run Complete themed, 26 Sep 2026
+
+- **A Classic win is gold, with its final hand** (`Run Complete Theming.dc.html` 1c). Upstream set both verdicts in `--verm-400`; vermilion means a tile is leaving, so a win in it read as a loss. The win's verdict is `--gold-500` (8.7:1 on the surround), and the slot the loss gives its terminal equation holds the floor's sockets with the tiles still in them. Gold-only (1a) and jade (1b) were drawn; jade was rejected because it belongs to the moment of an answer, on the tile concerned.
+
+### M7 research accepted, 25 Sep 2026
+
+See `M7 Face-Set Research.dc.html`.
+
+- **Even is `0·2·4·6·8`.** Odd and Even are both five; 0 cannot be in Low and missing from its parity.
+- **Face rate 8% of reward draws — a new dial, separate from the 20% kind draw** (which is the equation retry toward spellable products; the first research draft conflated the two). Within faces, weight by 1 / set size: Wildcard 0.65%, each five-set 1.3%, Neighbours 2.16% of reward draws.
+- **Simulated (start 20, floor 5, N 2, kind 20%, 3,000 runs):** face rate 0 / 5 / 8 / 10 / 20% → 47 / 56 / 62 / 65 / 81% wins at skill 95%; 36 / 44 / 50 / 54 / 72% at 85%. Inverse vs flat weighting moves wins ≤1.6 pts — it is a feel choice. Floor 6 with 10% faces is 81%, so floor 5 is confirmed.
+  *Provenance (26 Sep 2026):* `m7_sim_results.json` holds face rates 5 / 10 / 15 / 20 / 25 / 30% at skill 95% and 0 / 10 / 20% at skill 85%. The 8% column at both skills, and 5% at skill 85%, are not in it: they read as interpolated, not simulated. The measured bracket around 8% is 56–65% wins at skill 95%. `FACE_RATE` 0.08 sits inside the measured 5–10% range, so the ruling stands.
+- **Two notation grammars:** ranges (Low, High, Neighbours) as `a–b`; parities as a set. Wildcard keeps ✳. `4–6` vs `5±1` is decided in `M7 Face Tile Directions.dc.html`.
+- **Neighbours reads `4–6`.** `5±1` rejected: a second operator, with a tolerance connotation.
+- **Direction: Cartouche (1a)** — gold inlay rule — with Garamond capitals O / E for parity instead of the engraved set. **Letter alone (2a) chosen, 25 Sep 2026** — O / E at digit scale, no set line. 2b (letter over set) rejected as busier. Known risk: a Garamond O sits close to 0; the inlay is the only separator, and the spoken label carries the full set.
+- **No face-specific feedback line, 26 Sep 2026.** The cracked face still shows its set above the correct answer; a wrong digit gets no reason line either, so faces are not special-cased. `feedback.faceMiss` was drafted and cut.
+- **Reward on a face tile** uses the digit's exact treatment (1px gold outline + `--glow-reward`, `oz-fire` in place). Reviewed in `Motion Lab.dc.html` → "Face tile fires" (9i·M7), where a digit and a face fire in the same resolve. **Accepted 26 Sep 2026:** the glow is identical by design — reward means *new*, the inlay means *special*. A longer fire for faces was offered and not taken.
 
 ## M6 + M7 — Classic mode, settled 21 Sep 2026
 

@@ -123,6 +123,7 @@ export function App({ dependencies, shareDependencies }: AppProps) {
         <GameOverScreen
           equation={state.equation}
           stats={getShareStats(state)}
+          hand={state.inventory}
           url={dependencies.gameUrl}
           dependencies={shareDependencies}
           onPlayAgain={handleRestart}

@@ -3,7 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "../../i18n/I18nContext";
 import type { ShareDependencies } from "../../services/sharing";
-import { makeEquation } from "../../test/fixtures";
+import { CLASSIC_FLOOR } from "../../game/balance";
+import { makeEquation, makeTile } from "../../test/fixtures";
 import { LanguageToggle } from "../LanguageToggle/LanguageToggle";
 import { GameOverScreen, type GameOverScreenProps } from "./GameOverScreen";
 import styles from "./GameOverScreen.module.css";
@@ -26,6 +27,7 @@ function renderScreen(overrides: Partial<GameOverScreenProps> = {}) {
       <GameOverScreen
         equation={EQUATION}
         stats={STATS}
+        hand={[]}
         url={URL}
         dependencies={dependencies}
         onPlayAgain={onPlayAgain}
@@ -45,6 +47,27 @@ describe("GameOverScreen", () => {
     expect(screen.getByText("You reached the floor with tiles in hand.")).toBeInTheDocument();
     expect(screen.queryByText("Game Over")).not.toBeInTheDocument();
     expect(screen.queryByText("2 × 3 =", { exact: false })).not.toBeInTheDocument();
+  });
+
+  // §1.12: a win's verdict is gold, not the loss's vermilion, and the slot
+  // the loss gives its terminal equation holds the floor's sockets with the
+  // tiles still in them.
+  it("sets a Classic win in gold and shows its final hand in the floor's sockets", () => {
+    const hand = [makeTile(1, "a"), makeTile(4, "b"), makeTile(4, "c"), makeTile(9, "d")];
+    renderScreen({ stats: { ...STATS, mode: "classic", won: true }, hand });
+
+    const strip = screen.getByRole("img", {
+      name: `Finished with 4 tiles in ${CLASSIC_FLOOR} sockets`,
+    });
+    expect(strip.children).toHaveLength(CLASSIC_FLOOR);
+    expect(within(strip).getAllByText(/^\d$/)).toHaveLength(4);
+    expect(screen.getByRole("heading", { name: "Run Complete" })).toHaveClass(styles.won);
+  });
+
+  it("keeps the loss's heading out of gold and shows no final hand", () => {
+    renderScreen({ stats: { ...STATS, mode: "classic", won: false }, hand: [makeTile(3, "a")] });
+    expect(screen.getByRole("heading", { name: "Game Over" })).not.toHaveClass(styles.won);
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
   });
 
   it("renders a Classic loss like an Endless one", () => {
@@ -123,6 +146,7 @@ describe("GameOverScreen", () => {
         <GameOverScreen
           equation={EQUATION}
           stats={STATS}
+          hand={[]}
           url={URL}
           dependencies={{ writeClipboard: vi.fn().mockResolvedValue(undefined) }}
           onPlayAgain={vi.fn()}
@@ -237,6 +261,7 @@ describe("GameOverScreen", () => {
         <GameOverScreen
           equation={EQUATION}
           stats={STATS}
+          hand={[]}
           url={URL}
           dependencies={{ nativeShare, writeClipboard }}
           onPlayAgain={vi.fn()}

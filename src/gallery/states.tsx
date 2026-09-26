@@ -45,6 +45,7 @@ function renderGameOverScreen(state: GameState, dependencies: ShareDependencies)
     <GameOverScreen
       equation={state.equation}
       stats={getShareStats(state)}
+      hand={state.inventory}
       url="https://example.test/"
       dependencies={dependencies}
       onPlayAgain={noop}
@@ -266,14 +267,16 @@ const FEEDBACK_AFTER_DISCARD_STATE = gameReducer(OVERFLOW_REQUIRED_1_STATE, {
   tileId: "tile-5",
 });
 
-// A Classic game over at the floor with tiles in hand is the win (§1.8): Run Complete, no
-// equation. Above the floor it is a loss, which renders exactly as
+// A Classic game over at the floor with tiles in hand is the win (§1.8): Run Complete, and
+// the final hand where a loss shows its equation. Above the floor it is a loss, which renders exactly as
 // game-over-idle does — so it has no entry of its own.
 const CLASSIC_TO_FLOOR = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY;
 const GAME_OVER_CLASSIC_WIN_STATE = makeGameOverState(makeEquation(7, 8), {
   mode: "classic",
   totalRounds: CLASSIC_TO_FLOOR,
   round: CLASSIC_TO_FLOOR + 1,
+  // Fewer tiles than sockets, so the final hand shows both.
+  inventory: [makeTile(1, "win-a"), makeTile(4, "win-b"), makeTile(4, "win-c"), makeTile(9, "win-d")],
 });
 
 

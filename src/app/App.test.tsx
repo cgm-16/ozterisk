@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "../i18n/I18nContext";
 import { LANGUAGE_STORAGE_KEY } from "../i18n/storage";
+import { FACE_RATE } from "../game/balance";
 import type { Language } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
 import { sequenceRandom, sequentialIds } from "../test/fixtures";
@@ -32,6 +33,12 @@ function equationSamples(left: number, right: number): [number, number, number] 
 
 function rewardSample(digit: number): number {
   return digit / 10;
+}
+
+// A Classic reward first samples the face gate (§1.2); FACE_RATE itself misses
+// it, so the tile is the digit.
+function classicRewardSamples(digit: number): [number, number] {
+  return [FACE_RATE, rewardSample(digit)];
 }
 
 function makeShareDependencies(): ShareDependencies {
@@ -120,7 +127,7 @@ const CLASSIC_WIN_ROUNDS = [0, 0, 1, 1, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9
 function classicWinRandomValues(): number[] {
   const values = [...equationSamples(1, 2)];
   CLASSIC_WIN_ROUNDS.forEach((digit, index) => {
-    if (digit === 2) values.push(rewardSample(2), rewardSample(0));
+    if (digit === 2) values.push(...classicRewardSamples(2), ...classicRewardSamples(0));
     if (index < CLASSIC_WIN_ROUNDS.length - 1) values.push(...equationSamples(1, 2));
   });
   return values;

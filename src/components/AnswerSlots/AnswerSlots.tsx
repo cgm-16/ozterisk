@@ -1,5 +1,6 @@
 import { useEffect, useRef, type AnimationEvent, type CSSProperties } from "react";
 import type { RoundResult, Tile as TileModel } from "../../game/types";
+import { tileDigits } from "../../game/selectors";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
 import styles from "./AnswerSlots.module.css";
@@ -179,9 +180,9 @@ export function AnswerSlots({
               data-moment={verdict === undefined ? undefined : ""}
             >
               <Tile
-                digit={tile.digit}
+                digit={tileDigits(tile)[0] ?? 0}
                 state={disabled ? "disabled" : "resting"}
-                label={t("answerSlot.filled", { position, digit: tile.digit })}
+                label={t("answerSlot.filled", { position, digit: tileDigits(tile)[0] ?? 0 })}
                 onClick={onReturn && (() => onReturn(tile.id))}
               />
             </span>

@@ -42,7 +42,7 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
           if (state.equation === null) return;
           if (state.selectedTiles.length >= getAnswerLength(state.equation)) return;
           const digit = Number(event.key) as Digit;
-          const tile = state.inventory.find((item) => item.digit === digit);
+          const tile = state.inventory.find((item) => "digit" in item && item.digit === digit);
           if (!tile) return;
           event.preventDefault();
           dispatch({ type: "SELECT_TILE", tileId: tile.id });
@@ -80,7 +80,7 @@ export function useGameKeyboard({ state, dispatch, onSubmit, onNextRound }: UseG
           // Skip tiles already marked, so repeated presses walk through duplicates
           // instead of toggling one tile on and off.
           const tile = state.inventory.find(
-            (item) => item.digit === digit && !state.pendingDiscards.includes(item.id),
+            (item) => "digit" in item && item.digit === digit && !state.pendingDiscards.includes(item.id),
           );
           if (!tile) return;
           event.preventDefault();

@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import type { Tile as TileModel } from "../../game/types";
+import { tileDigits } from "../../game/selectors";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
 import { CLASSIC_START_CAPACITY } from "../../game/balance";
@@ -273,7 +274,7 @@ export function TileInventory({
           data-departing={tile.id}
           onAnimationEnd={() => retire(tile.id)}
         >
-          <Tile digit={tile.digit} state="marked" />
+          <Tile digit={tileDigits(tile)[0] ?? 0} state="marked" />
         </div>
       );
     }
@@ -286,7 +287,7 @@ export function TileInventory({
     }
 
     const isMarkedForDiscard = mode === "discard" && pendingDiscards.includes(tile.id);
-    const labelParts = [t("tile.digitLabel", { digit: tile.digit })];
+    const labelParts = [t("tile.digitLabel", { digit: tileDigits(tile)[0] ?? 0 })];
     if (tile.isNew) labelParts.push(t("tile.newLabel"));
     if (isMarkedForDiscard) labelParts.push(t("tile.discardLabel"));
 
@@ -315,7 +316,7 @@ export function TileInventory({
           data-seating={tile.id}
           onAnimationEnd={() => land(tile.id)}
         >
-          <Tile digit={tile.digit} state="disabled" label={labelParts.join(", ")} />
+          <Tile digit={tileDigits(tile)[0] ?? 0} state="disabled" label={labelParts.join(", ")} />
         </div>
       );
     }
@@ -323,7 +324,7 @@ export function TileInventory({
     return (
       <div key={tile.id} className={`${styles.cell}${moment}`} {...place}>
         <Tile
-          digit={tile.digit}
+          digit={tileDigits(tile)[0] ?? 0}
           state={
             isMarkedForDiscard
               ? "marked"

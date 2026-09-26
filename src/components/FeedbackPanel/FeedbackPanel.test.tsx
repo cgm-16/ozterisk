@@ -1,11 +1,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { Language, RoundResult, Tile as TileModel } from "../../game/types";
+import type { Digit, Language, RoundResult, Tile as TileModel } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
 import { FeedbackPanel } from "./FeedbackPanel";
 import styles from "./FeedbackPanel.module.css";
 
-const tile = (digit: TileModel["digit"], id: string): TileModel => ({
+const tile = (digit: Digit, id: string): TileModel => ({
   id,
   digit,
   isNew: false,

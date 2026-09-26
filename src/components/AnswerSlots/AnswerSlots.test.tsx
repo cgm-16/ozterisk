@@ -1,12 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import type { Tile } from "../../game/types";
+import type { Digit, Tile } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
 import { AnswerSlots, type AnswerSlotsProps } from "./AnswerSlots";
 import styles from "./AnswerSlots.module.css";
 
-const tile = (digit: Tile["digit"], id: string): Tile => ({ id, digit, isNew: false });
+const tile = (digit: Digit, id: string): Tile => ({ id, digit, isNew: false });
 
 function slotsTree(onReturn: () => void, overrides: Partial<AnswerSlotsProps>) {
   return (

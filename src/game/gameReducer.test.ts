@@ -2,11 +2,19 @@ import { describe, expect, it } from "vitest";
 import type { Digit, GameAction, GameState } from "./types";
 import { gameReducer } from "./gameReducer";
 import { createInitialInventory, createTitleState, sortTiles } from "./factories";
-import { getAnswerLength, getCapacity, getOverflowCount, getRewardCount, isClassicWin } from "./selectors";
+import {
+  getAnswerLength,
+  getCapacity,
+  getOverflowCount,
+  getRewardCount,
+  isClassicWin,
+  tileDigits,
+} from "./selectors";
 import { CLASSIC_FLOOR, CLASSIC_SEAL_EVERY, CLASSIC_START_CAPACITY } from "./balance";
 import {
   makeAnsweringState,
   makeEquation,
+  makeFaceTile,
   makeFeedbackState,
   makeOverflowState,
   makeTile,
@@ -56,7 +64,7 @@ describe("START_RUN", () => {
 describe("SELECT_TILE", () => {
   it("moves an exact tile into the next ordered answer slot", () => {
     const state = makeAnsweringState(makeEquation(7, 8));
-    const tile = state.inventory.find((item) => item.digit === 5)!;
+    const tile = state.inventory.find((item) => tileDigits(item)[0] === 5)!;
     const next = gameReducer(state, { type: "SELECT_TILE", tileId: tile.id });
     expect(next.selectedTiles).toEqual([tile]);
     expect(next.inventory).not.toContainEqual(tile);
@@ -596,7 +604,7 @@ describe("NEXT_ROUND", () => {
 
     const next = gameReducer(withMarker, { type: "NEXT_ROUND", equation: makeEquation(2, 3) });
 
-    expect(next.inventory.map((tile) => tile.digit)).toEqual([2, 5, 7]);
+    expect(next.inventory.flatMap(tileDigits)).toEqual([2, 5, 7]);
     expect(next.lastResult).toBeNull();
   });
 
@@ -767,7 +775,7 @@ describe("CLEAR_SELECTION", () => {
     const next = gameReducer(state, { type: "CLEAR_SELECTION" });
 
     expect(next.selectedTiles).toEqual([]);
-    expect(next.inventory.map((tile) => tile.digit)).toEqual([0, 1, 3]);
+    expect(next.inventory.flatMap(tileDigits)).toEqual([0, 1, 3]);
   });
 
   it("is a no-op when nothing is selected", () => {
@@ -815,8 +823,8 @@ describe("Classic", () => {
     // Submission 2 seals a socket: capacity 20 -> 19. A full rack spending two
     // tiles on 4 x 5 = 20 gets three back, 21 tiles against 19 sockets.
     const inventory = classicInventory();
-    const two = inventory.find((tile) => tile.digit === 2)!;
-    const zero = inventory.find((tile) => tile.digit === 0)!;
+    const two = inventory.find((tile) => tileDigits(tile)[0] === 2)!;
+    const zero = inventory.find((tile) => tileDigits(tile)[0] === 0)!;
     const state = makeAnsweringState(makeEquation(4, 5), {
       mode: "classic",
       totalRounds: CLASSIC_SEAL_EVERY - 1,
@@ -837,7 +845,7 @@ describe("Classic", () => {
 
   it("never overflows on an incorrect answer, even on a sealing submission", () => {
     const inventory = classicInventory();
-    const nine = inventory.find((tile) => tile.digit === 9)!;
+    const nine = inventory.find((tile) => tileDigits(tile)[0] === 9)!;
     const state = makeAnsweringState(makeEquation(2, 3), {
       mode: "classic",
       totalRounds: CLASSIC_SEAL_EVERY - 1,
@@ -919,7 +927,7 @@ describe("reducer lifecycle invariants (§2.5)", () => {
         label: "select the tile that constructs the correct answer",
         getAction: (s) => ({
           type: "SELECT_TILE",
-          tileId: s.inventory.find((tile) => tile.digit === 9)!.id,
+          tileId: s.inventory.find((tile) => tileDigits(tile)[0] === 9)!.id,
         }),
         expectedPhase: "answering",
       },
@@ -1018,8 +1026,8 @@ describe("Classic lifecycle", () => {
     const ids = sequentialIds("reward");
     const rewardDigits: Digit[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     const nextEquation = (s: GameState) => {
-      const tile = s.inventory.find((candidate) => candidate.digit > 0);
-      return makeEquation(1, tile?.digit ?? 9);
+      const tile = s.inventory.find((candidate) => (tileDigits(candidate)[0] ?? 0) > 0);
+      return makeEquation(1, (tile && tileDigits(tile)[0]) || 9);
     };
     const step = (s: GameState, action: GameAction): GameState => {
       const next = gameReducer(s, action);
@@ -1038,7 +1046,7 @@ describe("Classic lifecycle", () => {
     while (state.phase === "answering") {
       const product = state.equation!.product;
       const miss = state.round % 3 === 0;
-      const tile = state.inventory.find((candidate) => (candidate.digit === product) !== miss)!;
+      const tile = state.inventory.find((candidate) => (tileDigits(candidate)[0] === product) !== miss)!;
       state = step(state, { type: "SELECT_TILE", tileId: tile.id });
       if (miss) {
         state = step(state, { type: "SUBMIT_INCORRECT" });
@@ -1058,5 +1066,38 @@ describe("Classic lifecycle", () => {
 
     expect(sawDoubleDiscard).toBe(true);
     expect(isClassicWin(state)).toBe(true);
+  });
+});
+
+describe("face tiles in a submission", () => {
+  const equation = makeEquation(7, 9); // product 63
+  const classic = { mode: "classic" as const, inventory: [makeTile(1, "tile-spare")] };
+
+  it("accepts SUBMIT_CORRECT when each face holds its slot's digit, recording the product", () => {
+    const state = makeAnsweringState(equation, {
+      ...classic,
+      selectedTiles: [makeFaceTile("even"), makeTile(3)],
+    });
+    const rewardTiles = [makeTile(2, "r1"), makeTile(4, "r2"), makeTile(6, "r3")];
+
+    const next = gameReducer(state, { type: "SUBMIT_CORRECT", rewardTiles });
+
+    expect(next.phase).toBe("feedback");
+    expect(next.lastResult).toMatchObject({ kind: "correct", submittedValue: 63 });
+    expect(gameReducer(state, { type: "SUBMIT_INCORRECT" })).toBe(state);
+  });
+
+  it("takes SUBMIT_INCORRECT when a face misses its slot, with no submitted value", () => {
+    const state = makeAnsweringState(equation, {
+      ...classic,
+      selectedTiles: [makeFaceTile("odd"), makeTile(3)],
+    });
+
+    const next = gameReducer(state, { type: "SUBMIT_INCORRECT" });
+
+    expect(next.lastResult).toMatchObject({ kind: "incorrect", submittedValue: null, correctValue: 63 });
+    expect(
+      gameReducer(state, { type: "SUBMIT_CORRECT", rewardTiles: [makeTile(2, "r1"), makeTile(4, "r2"), makeTile(6, "r3")] }),
+    ).toBe(state);
   });
 });

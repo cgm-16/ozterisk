@@ -71,3 +71,18 @@ export const CLASSIC_FLOOR = 6;
  * Range: integer >= 1.
  */
 export const CLASSIC_SEAL_EVERY = 2;
+
+/**
+ * Share of Classic reward tiles that are face tiles (product.md §1.4a); Endless
+ * draws none. Within faces, each kind is weighted 1 / set size: Wildcard 8.1%,
+ * each five-digit set 16.2%, Neighbours 27.0%, split evenly over its centres.
+ * Separate from KIND_EQUATION_RATE, which biases the equation, not the reward.
+ * Economy: a face spells more products than a digit, so it raises b' late in
+ * the descent, where runs are lost. Measured Classic wins at CLASSIC_FLOOR 5
+ * (M7 handoff, m7_sim_results.json; 3,000 runs each, 2 submissions per seal):
+ * skill 95% — rate 0 -> 47%, 0.05 -> 56%, 0.10 -> 65%, 0.20 -> 81%;
+ * skill 85% — rate 0 -> 37%, 0.10 -> 54%, 0.20 -> 72%.
+ * 0.08 was not simulated; it sits inside the measured 56–65% bracket.
+ * Range: 0.05–0.10. At floor 6, 0.10 already wins 81% of runs.
+ */
+export const FACE_RATE = 0.08;

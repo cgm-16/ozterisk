@@ -6,7 +6,7 @@ import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { createInitialInventory, createTitleState } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
 import { generateKindEquation, generateRewardTiles } from "../game/generators";
-import { constructAnswer, getCapacity, getRewardCount, isAtClassicFloor } from "../game/selectors";
+import { answerMatches, getCapacity, getRewardCount, isAtClassicFloor } from "../game/selectors";
 import type { GameMode, RandomSource, TileIdFactory } from "../game/types";
 import { getShareStats, type ShareDependencies } from "../services/sharing";
 import styles from "./App.module.css";
@@ -46,18 +46,18 @@ export function App({ dependencies, shareDependencies }: AppProps) {
     // Reducer invariant (§2.5): equation === null only in `title`, and Submit
     // only renders in `answering`, so this only guards the type.
     if (state.equation === null) return;
-    const submittedValue = constructAnswer(state.selectedTiles);
-    if (submittedValue === state.equation.product) {
+    if (answerMatches(state.selectedTiles, state.equation.product)) {
       const rewardTiles = generateRewardTiles(
         getRewardCount(state.selectedTiles.length),
         dependencies.random,
         dependencies.nextTileId,
+        state.mode,
       );
       dispatch({ type: "SUBMIT_CORRECT", rewardTiles });
     } else {
       dispatch({ type: "SUBMIT_INCORRECT" });
     }
-  }, [state.equation, state.selectedTiles, dependencies]);
+  }, [state.equation, state.selectedTiles, state.mode, dependencies]);
 
   const handleNextRound = useCallback(() => {
     // At the floor the advance ends the run (§1.8 step 0): no equation is drawn,

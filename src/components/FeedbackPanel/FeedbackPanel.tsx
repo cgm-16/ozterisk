@@ -1,4 +1,5 @@
 import type { RoundResult, Tile as TileModel } from "../../game/types";
+import { tileDigits } from "../../game/selectors";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
 import styles from "./FeedbackPanel.module.css";
@@ -26,7 +27,7 @@ export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
       <p className={styles.headline}>{isCorrect ? t("result.correct") : t("result.incorrect")}</p>
       {isCorrect ? (
         <>
-          <p className={styles.submitted}>{t("result.submitted", { value: result.submittedValue })}</p>
+          <p className={styles.submitted}>{t("result.submitted", { value: result.submittedValue ?? "" })}</p>
           {rewardTiles.length > 0 && (
             <p className={styles.rewardSummary}>
               {t("result.rewards", { count: rewardTiles.length })}
@@ -40,14 +41,14 @@ export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
           <ul className={styles.rewards} aria-hidden="true">
             {rewardTiles.map((tile) => (
               <li key={tile.id} className={styles.reward}>
-                <Tile digit={tile.digit} size="sm" state="reward" />
+                <Tile digit={tileDigits(tile)[0] ?? 0} size="sm" state="reward" />
               </li>
             ))}
           </ul>
         </>
       ) : (
         <div className={styles.comparison}>
-          <p>{t("result.submitted", { value: result.submittedValue })}</p>
+          <p>{t("result.submitted", { value: result.submittedValue ?? "" })}</p>
           <p>{t("result.answer", { value: result.correctValue })}</p>
         </div>
       )}

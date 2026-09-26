@@ -125,11 +125,8 @@ export type FaceKind = "wild" | "odd" | "even" | "low" | "high";
 
 // A digit tile, or a face tile standing for a set of digits (product.md §1.4a).
 // Face tiles exist in Classic only.
-export type Tile = { id: string; isNew: boolean } & (
-  | { digit: Digit }
-  | { face: FaceKind }
-  | { face: "nbr"; centre: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 }
-);
+export type FaceSet = { face: FaceKind } | { face: "nbr"; centre: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 };
+export type Tile = { id: string; isNew: boolean } & ({ digit: Digit } | FaceSet);
 
 export interface Equation {
   left: number;

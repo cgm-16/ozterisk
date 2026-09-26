@@ -1,6 +1,7 @@
 import type { RoundResult, Tile as TileModel } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
+import { tileGlyph } from "../Tile/tileFace";
 import styles from "./FeedbackPanel.module.css";
 
 export interface FeedbackPanelProps {
@@ -26,7 +27,7 @@ export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
       <p className={styles.headline}>{isCorrect ? t("result.correct") : t("result.incorrect")}</p>
       {isCorrect ? (
         <>
-          <p className={styles.submitted}>{t("result.submitted", { value: result.submittedValue ?? "" })}</p>
+          <p className={styles.submitted}>{t("result.submitted", { value: result.correctValue })}</p>
           {rewardTiles.length > 0 && (
             <p className={styles.rewardSummary}>
               {t("result.rewards", { count: rewardTiles.length })}
@@ -47,7 +48,13 @@ export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
         </>
       ) : (
         <div className={styles.comparison}>
-          <p>{t("result.submitted", { value: result.submittedValue ?? "" })}</p>
+          {/* A missed face spells no number, so each slot prints as engraved and a
+              middle dot keeps "0–4" and "3" from reading as "0–43" (§1.14). */}
+          <p>
+            {t("result.submitted", {
+              value: result.submittedValue ?? result.submittedTiles.map(tileGlyph).join("·"),
+            })}
+          </p>
           <p>{t("result.answer", { value: result.correctValue })}</p>
         </div>
       )}

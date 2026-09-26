@@ -623,8 +623,8 @@ describe("GameScreen capacity meter", () => {
 });
 
 describe("GameScreen after a discard", () => {
-  const discardedFeedback = (inventory = makeOverflowInventory(10)) => {
-    const state = makeFeedbackState(makeEquation(3, 3), { inventory });
+  const discardedFeedback = (inventory = makeOverflowInventory(10), overrides: Partial<GameState> = {}) => {
+    const state = makeFeedbackState(makeEquation(3, 3), { inventory, ...overrides });
     return { ...state, lastResult: { ...state.lastResult!, discarded: true } };
   };
 
@@ -659,8 +659,10 @@ describe("GameScreen after a discard", () => {
   });
 
   // Classic can require two: the round waits for both departures, not the first.
+  // The twentieth submission seals capacity 11 to 10, so twelve tiles is an excess of two.
   it("advances once after a two-tile discard, when the second departure has played", () => {
-    const overflow = makeOverflowState(makeEquation(3, 3), { inventory: TWELVE_TILE_INVENTORY });
+    const sealRound = { mode: "classic", round: 20, totalRounds: 20 } as const;
+    const overflow = makeOverflowState(makeEquation(3, 3), { inventory: TWELVE_TILE_INVENTORY, ...sealRound });
     const onNextRound = vi.fn();
     const screenFor = (state: GameState) => (
       <I18nProvider initialLanguage="en">
@@ -669,7 +671,7 @@ describe("GameScreen after a discard", () => {
     );
     const { container, rerender } = render(screenFor(overflow));
     const gone = overflow.inventory.slice(10);
-    rerender(screenFor(discardedFeedback(overflow.inventory.slice(0, 10))));
+    rerender(screenFor(discardedFeedback(overflow.inventory.slice(0, 10), sealRound)));
 
     const end = (tileId: string) => {
       const departing = container.querySelector(`[data-departing="${tileId}"]`)!;

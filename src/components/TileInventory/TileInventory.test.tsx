@@ -498,7 +498,9 @@ describe("TileInventory", () => {
     const before = [...railedRack(), tile(8, "rail-2", true)];
     const after = [...before.slice(0, 10)];
     after[2] = before[11]!;
-    const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
+    // Classic's twentieth submission seals capacity to 10; the rack stays drawn at 11 until the round changes.
+    const classic = { capacity: 10, stepped: true, drawnCapacity: 11 };
+    const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard", ...classic });
     rerender({ tiles: after, mode: "readOnly" });
 
     endAnimation(railCells(container)[0]);
@@ -510,7 +512,7 @@ describe("TileInventory", () => {
 
     endAnimation(cells(container)[2]);
     expect(onSettled).toHaveBeenCalledTimes(1);
-    expect(cellCount(container)).toBe(10);
+    expect(cellCount(container)).toBe(rackTier(classic.drawnCapacity).footprint);
   });
 
   it("settles when the rail tile itself is the one discarded", () => {

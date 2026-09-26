@@ -80,11 +80,11 @@ gameOver --RESTART_RUN--> answering
 
 | Phase | Key | Effect |
 |---|---|---|
-| `answering` | `0`–`9` | Select first available matching tile if a slot is empty |
+| `answering` | `0`–`9` | If a slot is empty, select the first matching digit tile, else the narrowest face holding that digit (leftmost on a tie) |
 | `answering` | `Backspace` | Return most recently selected answer tile |
 | `answering` | `Escape` | Return every selected tile |
 | `answering` | `Enter` | Submit only if all answer slots are filled |
-| `overflow` | `0`–`9` | Mark the first matching unmarked tile; the mark that reaches the excess completes the discard |
+| `overflow` | `0`–`9` | Mark the first matching unmarked digit tile (never a face); the mark that reaches the excess completes the discard |
 | `feedback` | `Enter` | Draw and advance to the next equation; inert after a discard, which advances on its own |
 | `gameOver` | `R` | Start a fresh run in the same mode, equivalent to **Play Again** |
 | `gameOver` | `Enter` | No global shortcut; a focused button retains normal browser behavior |

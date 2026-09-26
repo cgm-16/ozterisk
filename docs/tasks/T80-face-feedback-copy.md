@@ -29,8 +29,8 @@ paths:
   - Korean uses the same engraving.
 - [ ] Implement it from `lastResult.submittedTiles`. There is no reason line.
 - [ ] The floor's copy follows `CLASSIC_FLOOR` 5: `mode.classicHint` ("Twenty
-      closing to five" / "스물에서 다섯까지") and `howToPlay.classic` ("six sockets"
-      / "여섯 칸") in en and ko.
+      closing to five" / "스물에서 다섯까지") and `howToPlay.classic` ("five sockets"
+      / "다섯 칸") in en and ko.
 
 ## Acceptance
 

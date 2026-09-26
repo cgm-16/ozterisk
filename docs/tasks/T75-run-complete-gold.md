@@ -12,7 +12,7 @@ reads:
 ```yaml
 task_id: T75
 title: Run Complete in gold, with the final hand
-milestone: M7 — Special Tiles
+milestone: M6b — Classic Rack and Motion
 priority: P1
 estimate: S
 wave: W0
@@ -44,7 +44,8 @@ because it depends on nothing in them.
 
 ## Rulings (Ori, 26 Sep 2026)
 
-- It ships as its own PR, before M7's face tiles.
+- It is an M6b correction, not an M7 task: it ships as its own PR, ahead of
+  M7's face tiles, and M7 stays one milestone and one PR (roadmap §4.1).
 - `hand` is a prop fed from `state.inventory`. It is not added to `ShareStats`.
 - The handoff's switch to callback share props (`onShare`, `onCopy`, `copied`)
   is not taken.

@@ -202,6 +202,12 @@ phone), M6b gives it the rack it was designed for. The exit gate's
 `getCapacity(round)` is corrected to `getCapacity(mode, totalRounds)`: the tray
 counts submissions, not displayed rounds.
 
+**Why the Run Complete fix is M6b, not M7.** The M7 design handoff
+(`docs/design_handoff_m7_face_tiles/`, 26 Sep 2026) also corrected M6's win
+screen: a win set in vermilion read as a loss. That correction depends on
+nothing in the face tiles, so it ships ahead of them as a late M6b task (`T75`)
+rather than splitting M7. M7 remains one milestone and one PR, `T76`–`T81`.
+
 **Why M6 was split.** As originally scoped, `M6 — Classic Mode` bundled
 shrinking capacity, mode select, *and* the face-set tile mechanism. The
 face-set change alone spreads across `constructAnswer`, the closed `Digit`

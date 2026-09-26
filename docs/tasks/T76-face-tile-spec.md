@@ -21,6 +21,7 @@ parallel_safe: false
 paths:
   - docs/spec/
   - docs/plan/
+  - AGENTS.md
 ```
 
 **Interfaces**
@@ -70,6 +71,8 @@ moves first.
       ranges; compact 18px / 11px semibold; ✳ in `--gold-500`). §1.14: the six
       spoken labels in en/ko, and the incorrect engraving joined by `·`.
 - [ ] `roadmap.md` M7 row, and `traceability.md` rows for each rule.
+- [ ] `AGENTS.md` Global Constraints: drop "future wildcards" from the
+      exclusion list; the picker's exclusion lives in `product.md` §1.17.
 
 ## Acceptance
 

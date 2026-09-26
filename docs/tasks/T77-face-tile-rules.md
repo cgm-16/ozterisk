@@ -48,7 +48,8 @@ paths:
 - [ ] Implement. `canConstruct` tries each pair of tiles (answers are at most 2
       digits).
 - [ ] `balance.ts`: `FACE_RATE = 0.08`, documented with its 5–10% range, the
-      sim table and `m7_sim_results.json`. `CLASSIC_FLOOR = 5`, with the `b'`
+      measured runs from `m7_sim_results.json` (the 8% figures are interpolated;
+      see decisions.md § M7 research accepted). `CLASSIC_FLOOR = 5`, with the `b'`
       note updated. No other dial changes.
 
 ## Acceptance

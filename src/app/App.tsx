@@ -6,9 +6,9 @@ import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { createInitialInventory, createTitleState } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
 import { generateKindEquation, generateRewardTiles } from "../game/generators";
-import { constructAnswer, getCapacity, getRewardCount, isAtClassicFloor, isClassicWin } from "../game/selectors";
+import { constructAnswer, getCapacity, getRewardCount, isAtClassicFloor } from "../game/selectors";
 import type { GameMode, RandomSource, TileIdFactory } from "../game/types";
-import type { ShareDependencies } from "../services/sharing";
+import { getShareStats, type ShareDependencies } from "../services/sharing";
 import styles from "./App.module.css";
 
 export interface AppDependencies {
@@ -122,13 +122,7 @@ export function App({ dependencies, shareDependencies }: AppProps) {
       {state.phase === "gameOver" && state.equation !== null && (
         <GameOverScreen
           equation={state.equation}
-          stats={{
-            mode: state.mode,
-            won: isClassicWin(state),
-            score: state.score,
-            totalRounds: state.totalRounds,
-            longestStreak: state.longestStreak,
-          }}
+          stats={getShareStats(state)}
           url={dependencies.gameUrl}
           dependencies={shareDependencies}
           onPlayAgain={handleRestart}

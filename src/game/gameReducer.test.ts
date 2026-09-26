@@ -276,6 +276,28 @@ describe("SUBMIT_CORRECT", () => {
     expect(second).toBe(first);
   });
 
+  it("is a no-op when an Endless run is offered a face reward (§2.5)", () => {
+    const equation = makeEquation(3, 3); // product 9
+    const selected = makeTile(9, "tile-selected");
+    const state = makeAnsweringState(equation, { mode: "endless", inventory: [], selectedTiles: [selected] });
+    const rewardTiles = [makeTile(1, "reward-0", true), makeFaceTile("wild", "reward-1", true)];
+
+    const next = gameReducer(state, { type: "SUBMIT_CORRECT", rewardTiles });
+
+    expect(next).toBe(state);
+  });
+
+  it("accepts a face reward in Classic", () => {
+    const equation = makeEquation(3, 3); // product 9
+    const selected = makeTile(9, "tile-selected");
+    const state = makeAnsweringState(equation, { mode: "classic", inventory: [], selectedTiles: [selected] });
+    const rewardTiles = [makeTile(1, "reward-0", true), makeFaceTile("wild", "reward-1", true)];
+
+    const next = gameReducer(state, { type: "SUBMIT_CORRECT", rewardTiles });
+
+    expect(next.inventory.map((tile) => tile.id)).toContain("reward-1");
+  });
+
   it("is a no-op outside the answering phase", () => {
     const equation = makeEquation(3, 3);
     const state = makeFeedbackState(equation);

@@ -65,6 +65,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (state.selectedTiles.length !== getAnswerLength(state.equation)) return state;
       if (!answerMatches(state.selectedTiles, state.equation.product)) return state;
       if (action.rewardTiles.length !== getRewardCount(state.selectedTiles.length)) return state;
+      if (state.mode !== "classic" && action.rewardTiles.some((tile) => !("digit" in tile))) return state;
       const inventoryIds = new Set(state.inventory.map((tile) => tile.id));
       if (action.rewardTiles.some((tile) => inventoryIds.has(tile.id))) return state;
 

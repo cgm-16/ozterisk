@@ -68,6 +68,8 @@ Upstream sets both end-screen headings in `--verm-400`. Vermilion means a tile i
 - `GameOverScreen` needs the inventory: pass `hand` (the digits) and `floor`, or add them to `ShareStats`.
 
 ## Files
+`GameOverScreen.jsx` / `.d.ts` shipped in M6c and M7 and were pruned by T81: the win screen lives in `src/components/GameOverScreen/`, the face tile in `src/components/Tile/`. The `.dc.html` references stay, as M6's did, because `docs/design-system/decisions.md` cites them. The list below is the package as delivered.
+
 - `FaceTile.dc.html`: the face tile component. Props `kind`, `centre`, `size`, `state`, `label`.
 - `M7 Face Tile States.dc.html`: the five states, the answer frames, rack order and spoken labels.
 - `M7 Face Tile Directions.dc.html`: the directions considered. 2a was chosen.

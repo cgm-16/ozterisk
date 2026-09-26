@@ -121,11 +121,15 @@ export type GamePhase =
   | "overflow"
   | "gameOver";
 
-export interface Tile {
-  id: string;
-  digit: Digit;
-  isNew: boolean;
-}
+export type FaceKind = "wild" | "odd" | "even" | "low" | "high";
+
+// A digit tile, or a face tile standing for a set of digits (product.md §1.4a).
+// Face tiles exist in Classic only.
+export type Tile = { id: string; isNew: boolean } & (
+  | { digit: Digit }
+  | { face: FaceKind }
+  | { face: "nbr"; centre: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 }
+);
 
 export interface Equation {
   left: number;
@@ -135,7 +139,8 @@ export interface Equation {
 
 export interface RoundResult {
   kind: "correct" | "incorrect";
-  submittedValue: number;
+  /** The product on a correct answer; the spelled number on an incorrect all-digit answer; null when an incorrect answer holds a face tile. */
+  submittedValue: number | null;
   correctValue: number;
   submittedTiles: Tile[];
   rewardTileIds: string[];
@@ -183,8 +188,9 @@ export const INVENTORY_CAPACITY = 10;
 export const REWARD_BONUS = 1;
 export const KIND_EQUATION_RATE = 0.2;
 export const CLASSIC_START_CAPACITY = 20;
-export const CLASSIC_FLOOR = 6;
+export const CLASSIC_FLOOR = 5;
 export const CLASSIC_SEAL_EVERY = 2;
+export const FACE_RATE = 0.08;
 
 // game/constants.ts — domain definitions
 export const OPERAND_MIN = 1;
@@ -193,7 +199,8 @@ export const REWARD_DIGIT_COUNT = 10;
 
 export function createTitleState(): GameState;
 export function createInitialInventory(idFactory: TileIdFactory, count?: number): Tile[]; // round-robin i % 10
-export function sortTiles(tiles: readonly Tile[]): Tile[];
+export function sortTiles(tiles: readonly Tile[]): Tile[]; // digits, then ✳ O E, then ranges (product.md §1.4a)
+export function tileDigits(tile: Tile): readonly Digit[]; // [digit] for a digit tile, its set for a face
 
 export function generateEquation(random: RandomSource): Equation;
 export function generateKindEquation(
@@ -204,10 +211,12 @@ export function generateRewardTiles(
   count: number,
   random: RandomSource,
   idFactory: TileIdFactory,
+  mode: GameMode, // Classic draws faces at FACE_RATE; Endless draws no face and consumes no face-gate sample
 ): Tile[];
 
 export function getAnswerLength(equation: Equation): 1 | 2;
-export function constructAnswer(selectedTiles: readonly Tile[]): number | null;
+export function constructAnswer(selectedTiles: readonly Tile[]): number | null; // null if unfilled or any face tile
+export function answerMatches(selectedTiles: readonly Tile[], product: number): boolean; // every slot's tile holds its digit
 export function canAttemptEquation(
   inventory: readonly Tile[],
   equation: Equation,
@@ -217,7 +226,7 @@ export function getOverflowCount(state: GameState): number;
 export function isAtClassicFloor(state: GameState): boolean; // Classic, at the floor's capacity
 export function isClassicWin(state: GameState): boolean; // gameOver at the floor with tiles in hand
 export function getRewardCount(spentCount: number): number;
-export function canConstruct(inventory: readonly Tile[], product: number): boolean;
+export function canConstruct(inventory: readonly Tile[], product: number): boolean; // a search over tile assignments, never greedy
 export function isSubmissionReady(state: GameState): boolean;
 
 export function gameReducer(state: GameState, action: GameAction): GameState;
@@ -306,6 +315,8 @@ The reducer returns the unchanged `state` object for invalid known actions. Unkn
 - `lastResult === null` in `title` and `answering`.
 - `lastResult !== null` in `feedback` and `overflow`.
 - `score <= totalRounds`.
+- Face tiles appear only when `mode === "classic"`.
+- `SUBMIT_CORRECT` is accepted only when every slot is filled and `answerMatches(selectedTiles, product)`; `SUBMIT_INCORRECT` only when every slot is filled and it does not.
 - `currentStreak <= longestStreak <= score`.
 - In `answering` and `gameOver`, `round === totalRounds + 1`.
 - In `feedback` and `overflow`, the displayed equation has just been submitted, so `round === totalRounds`.
@@ -341,6 +352,18 @@ export const makeTile = (
   id = `tile-${digit}`,
   isNew = false,
 ): Tile => ({ id, digit, isNew });
+
+export const makeFaceTile = (
+  face: FaceKind,
+  id = `face-${face}`,
+  isNew = false,
+): Tile => ({ id, face, isNew });
+
+export const makeNbrTile = (
+  centre: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8,
+  id = `nbr-${centre}`,
+  isNew = false,
+): Tile => ({ id, face: "nbr", centre, isNew });
 
 export const makeAnsweringState = (
   equation: Equation,

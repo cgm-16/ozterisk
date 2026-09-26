@@ -32,7 +32,7 @@ hoc at branch time.
 | `M6a — Classic Core` | Classic playable: shrinking capacity and a definite run arc | Mode select and `getCapacity(mode, totalRounds)` merged; both modes' economy invariants green; the shared overflow rules (sort only what fits, the last mark completes the discard, no Next Round after a discard) hold in both modes; one Classic win and one loss played end to end |
 | `M6b — Classic Rack and Motion` | Classic's rack steps its tile size, keeps closed sockets as plugs, perches overflow on a rail, and shows every change| Stepped rack, plugs and rail merged; `M6`, `8a·2`, `M6·0`, `M6·1`, `M6·2` and `oz-slide-off` wired; no horizontal scroll at `320px` for any rack size; reduced motion jumps straight to each end state|
 | `M6c — Run Complete Correction` | A Classic win's verdict is gold, with its final hand, not the loss's vermilion (`T75`) | Run Complete in `--gold-500`; the floor's sockets show the tiles still in hand, named by `gameOver.finalHand` in en and ko |
-| `M7 — Special Tiles` | Wildcard and restricted-face tiles, giving Classic its density-hoarding verb | Face-set tile mechanism and its digit picker merged; spawn rates tuned against Classic's descending ceiling |
+| `M7 — Special Tiles` | Face-set tiles in Classic — Wildcard, Odd, Even, Low, High and Neighbours — each counting as its slot's digit when the digit is in its set (`T76`–`T81`) | Faces arrive as Classic rewards at `FACE_RATE` 0.08 and never in Endless; `canConstruct` searches assignments; the floor is 5; one Classic run in en and ko places a face right and one wrong |
 
 `M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d`, `M5.5e`, `M5.5f` and `M5.5g` are
 closed, merged as `16f2ff6`, `ecd76a1`, `f30929e`, `b933ca7`, `29708b8`,
@@ -218,7 +218,8 @@ shrinking capacity, mode select, *and* the face-set tile mechanism. The
 face-set change alone spreads across `constructAnswer`, the closed `Digit`
 union, `factories.ts`, `generators.ts`, `TileInventory.tsx`, and the
 `tile.digitLabel` i18n key, plus a digit-picker UI — on its own comparable
-in size to all of M4. Bundled, it failed the PR-sized bar.
+in size to all of M4. Bundled, it failed the PR-sized bar. (The M7 handoff
+later cut the picker; `product.md` §1.17.)
 
 The seam is principled rather than convenient: **M6 delivers a playable
 mode, M7 adds content to it.** Shrinking capacity is what makes Classic a

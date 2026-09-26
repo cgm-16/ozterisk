@@ -12,6 +12,11 @@
   text-align: center;
 }
 
+/* The empty region is out of flow, so the arena's gap does not count it. */
+.idle {
+  position: absolute;
+}
+
 /* The headline text ("Correct"/"Incorrect") already carries the state without
    color; the branch class adds color as reinforcement only (§1.12). The class
    comes from the same `kind` the headline is rendered from, so the two cannot

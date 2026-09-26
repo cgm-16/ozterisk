@@ -1,6 +1,7 @@
 import type { Equation, GameAction, GameMode, GameState, Tile } from "./types";
 import { sortTiles } from "./factories";
 import {
+  answerMatches,
   canAttemptEquation,
   constructAnswer,
   getAnswerLength,
@@ -30,6 +31,9 @@ function freshRunState(mode: GameMode, equation: Equation, inventory: Tile[]): G
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
+    // Unguarded by phase, unlike RESTART_RUN: only TitleScreen dispatches it,
+    // so title is the only phase it arrives from, and a fresh run owes
+    // nothing to the state it replaces.
     case "START_RUN":
       return freshRunState(action.mode, action.equation, action.inventory);
 
@@ -59,9 +63,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case "SUBMIT_CORRECT": {
       if (state.phase !== "answering" || state.equation === null) return state;
       if (state.selectedTiles.length !== getAnswerLength(state.equation)) return state;
-      const submittedValue = constructAnswer(state.selectedTiles);
-      if (submittedValue === null || submittedValue !== state.equation.product) return state;
+      if (!answerMatches(state.selectedTiles, state.equation.product)) return state;
       if (action.rewardTiles.length !== getRewardCount(state.selectedTiles.length)) return state;
+      if (state.mode !== "classic" && action.rewardTiles.some((tile) => !("digit" in tile))) return state;
       const inventoryIds = new Set(state.inventory.map((tile) => tile.id));
       if (action.rewardTiles.some((tile) => inventoryIds.has(tile.id))) return state;
 
@@ -93,7 +97,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         totalRounds: nextTotalRounds,
         lastResult: {
           kind: "correct",
-          submittedValue,
+          submittedValue: state.equation.product,
           correctValue: state.equation.product,
           submittedTiles: state.selectedTiles,
           rewardTileIds: action.rewardTiles.map((tile) => tile.id),
@@ -104,8 +108,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     case "SUBMIT_INCORRECT": {
       if (state.phase !== "answering" || state.equation === null) return state;
       if (state.selectedTiles.length !== getAnswerLength(state.equation)) return state;
+      if (answerMatches(state.selectedTiles, state.equation.product)) return state;
       const submittedValue = constructAnswer(state.selectedTiles);
-      if (submittedValue === null || submittedValue === state.equation.product) return state;
 
       return {
         ...state,

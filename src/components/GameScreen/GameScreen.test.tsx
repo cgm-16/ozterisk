@@ -7,7 +7,9 @@ import { I18nProvider } from "../../i18n/I18nContext";
 import {
   makeAnsweringState,
   makeEquation,
+  makeFaceTile,
   makeFeedbackState,
+  makeNbrTile,
   makeOverflowInventory,
   makeOverflowState,
   makeTile,
@@ -71,6 +73,43 @@ describe("GameScreen interactions", () => {
     await userEvent.keyboard("4");
 
     expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  describe("digit keys and face tiles (§1.4a)", () => {
+    const equation = makeEquation(2, 2); // product 4, one slot
+    const answering = (inventory: GameState["inventory"]) =>
+      makeAnsweringState(equation, { mode: "classic", inventory, selectedTiles: [] });
+
+    it("takes a digit tile over any face holding the digit", async () => {
+      const { dispatch } = renderScreen(answering([makeTile(4, "four"), makeFaceTile("wild")]));
+      await userEvent.keyboard("4");
+      expect(dispatch).toHaveBeenCalledWith({ type: "SELECT_TILE", tileId: "four" });
+    });
+
+    it("takes the narrowest face when no digit tile holds it", async () => {
+      const { dispatch } = renderScreen(answering([makeFaceTile("low"), makeNbrTile(4)]));
+      await userEvent.keyboard("4");
+      expect(dispatch).toHaveBeenCalledWith({ type: "SELECT_TILE", tileId: "nbr-4" });
+    });
+
+    it("breaks a tie between equally narrow faces by rack order", async () => {
+      const { dispatch } = renderScreen(answering([makeFaceTile("even"), makeFaceTile("low")]));
+      await userEvent.keyboard("4");
+      expect(dispatch).toHaveBeenCalledWith({ type: "SELECT_TILE", tileId: "face-even" });
+    });
+
+    it("never marks a face in overflow", async () => {
+      // Only the wildcard holds a 7: makeOverflowInventory's lone 7 is dropped.
+      const inventory = [
+        makeFaceTile("wild"),
+        ...makeOverflowInventory(10).filter((tile) => !("digit" in tile) || tile.digit !== 7),
+      ];
+      const { dispatch } = renderScreen(
+        makeOverflowState(equation, { mode: "classic", inventory, totalRounds: 30 }),
+      );
+      await userEvent.keyboard("7");
+      expect(dispatch).not.toHaveBeenCalled();
+    });
   });
 
   // 4. Backspace returns the most recent selected tile
@@ -351,7 +390,7 @@ describe("GameScreen phase composition", () => {
 
     expect(screen.getByRole("button", { name: "Answer slot 1: empty" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Digit 1" })).toBeEnabled();
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 
   it("keeps the submitted tiles on screen in feedback with no answer-slot button", () => {
@@ -433,6 +472,26 @@ describe("GameScreen phase composition", () => {
     // HUD -> equation/feedback context -> phase action -> inventory (§1.10).
     expect(status.compareDocumentPosition(instruction) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(instruction.compareDocumentPosition(discardTile) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  // Some screen readers do not announce what a live region already holds when
+  // it is inserted, so the region has to exist, empty, before the verdict
+  // arrives in it (#31).
+  it("keeps the feedback status region mounted, empty, from answering into feedback", () => {
+    const equation = makeEquation(3, 3);
+    const screenFor = (state: GameState) => (
+      <I18nProvider initialLanguage="en">
+        <GameScreen state={state} dispatch={vi.fn()} onSubmit={vi.fn()} onNextRound={vi.fn()} />
+      </I18nProvider>
+    );
+    const { rerender } = render(screenFor(makeAnsweringState(equation)));
+    const status = screen.getByRole("status");
+    expect(status).toBeEmptyDOMElement();
+
+    rerender(screenFor(makeFeedbackState(equation)));
+
+    expect(screen.getByRole("status")).toBe(status);
+    expect(status).toHaveTextContent("Incorrect");
   });
 
   it("keeps the feedback status region mounted across the overflow-to-feedback transition", () => {
@@ -623,8 +682,8 @@ describe("GameScreen capacity meter", () => {
 });
 
 describe("GameScreen after a discard", () => {
-  const discardedFeedback = (inventory = makeOverflowInventory(10)) => {
-    const state = makeFeedbackState(makeEquation(3, 3), { inventory });
+  const discardedFeedback = (inventory = makeOverflowInventory(10), overrides: Partial<GameState> = {}) => {
+    const state = makeFeedbackState(makeEquation(3, 3), { inventory, ...overrides });
     return { ...state, lastResult: { ...state.lastResult!, discarded: true } };
   };
 
@@ -655,6 +714,32 @@ describe("GameScreen after a discard", () => {
     expect(onNextRound).not.toHaveBeenCalled();
     fireEvent.animationEnd(departing);
     fireEvent(departing, new Event("webkitAnimationEnd", { bubbles: true }));
+    expect(onNextRound).toHaveBeenCalledTimes(1);
+  });
+
+  // Classic can require two: the round waits for both departures, not the first.
+  // The twentieth submission seals capacity 11 to 10, so twelve tiles is an excess of two.
+  it("advances once after a two-tile discard, when the second departure has played", () => {
+    const sealRound = { mode: "classic", round: 20, totalRounds: 20 } as const;
+    const overflow = makeOverflowState(makeEquation(3, 3), { inventory: TWELVE_TILE_INVENTORY, ...sealRound });
+    const onNextRound = vi.fn();
+    const screenFor = (state: GameState) => (
+      <I18nProvider initialLanguage="en">
+        <GameScreen state={state} dispatch={vi.fn()} onSubmit={vi.fn()} onNextRound={onNextRound} />
+      </I18nProvider>
+    );
+    const { container, rerender } = render(screenFor(overflow));
+    const gone = overflow.inventory.slice(10);
+    rerender(screenFor(discardedFeedback(overflow.inventory.slice(0, 10), sealRound)));
+
+    const end = (tileId: string) => {
+      const departing = container.querySelector(`[data-departing="${tileId}"]`)!;
+      fireEvent.animationEnd(departing);
+      fireEvent(departing, new Event("webkitAnimationEnd", { bubbles: true }));
+    };
+    end(gone[0]!.id);
+    expect(onNextRound).not.toHaveBeenCalled();
+    end(gone[1]!.id);
     expect(onNextRound).toHaveBeenCalledTimes(1);
   });
 

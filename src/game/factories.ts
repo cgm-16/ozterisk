@@ -1,4 +1,5 @@
 import type { Digit, GameState, Tile, TileIdFactory } from "./types";
+import { tileDigits } from "./selectors";
 
 const ALL_DIGITS: readonly Digit[] = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -29,9 +30,25 @@ export function createInitialInventory(
   return sortTiles(digits.map((digit) => ({ id: idFactory(), digit, isNew: false })));
 }
 
+// Rack order (§1.4a): digits ascending, then ✳, O, E, then the ranges by their
+// lowest digit, then their highest.
+function rackKey(tile: Tile): readonly number[] {
+  if ("digit" in tile) return [0, tile.digit];
+  if (tile.face === "wild") return [1];
+  if (tile.face === "odd") return [2];
+  if (tile.face === "even") return [3];
+  const digits = tileDigits(tile);
+  return [4, digits[0] ?? 0, digits[digits.length - 1] ?? 0];
+}
+
 export function sortTiles(tiles: readonly Tile[]): Tile[] {
   return [...tiles].sort((a, b) => {
-    if (a.digit !== b.digit) return a.digit - b.digit;
+    const keyA = rackKey(a);
+    const keyB = rackKey(b);
+    for (let index = 0; index < keyA.length; index++) {
+      const difference = (keyA[index] ?? 0) - (keyB[index] ?? 0);
+      if (difference !== 0) return difference;
+    }
     if (a.id < b.id) return -1;
     if (a.id > b.id) return 1;
     return 0;

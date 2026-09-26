@@ -63,7 +63,7 @@ plan, so cross-references resolve across files.
 - Use ordinary browser randomness in production; do not generate, display, encode, or share run seeds.
 - Do not add sound, music, mute, or volume controls.
 - Deploy the static Vite build to Vercel.
-- Do not implement future wildcards, a leaderboard, result URLs, saved records, accounts, tutorials, or backend validation.
+- Do not implement a leaderboard, result URLs, saved records, accounts, tutorials, or backend validation.
 - Every task is implemented test-first, produces one independently reviewable result, and ends in a focused commit.
 - Do not start an issue until every `depends_on` issue has passed its completion gate.
 

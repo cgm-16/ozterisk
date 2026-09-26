@@ -94,6 +94,19 @@ section wins.
 - Tiles resemble simple physical pieces.
 - One meaning per hue. Gold marks brand, capacity, and reward; jade means correct;
   vermilion means a tile is leaving — incorrect, discard, or overflow.
+- The game-over verdict follows the hue rule. A loss is `--verm-400`; a Classic win
+  (**Run Complete**) is `--gold-500`, because the run kept its tiles. In place of the
+  loss's terminal equation, a win shows its **final hand**: `CLASSIC_FLOOR` sockets at
+  the compact tile size on a `--surface-panel` strip, holding the tiles still in hand,
+  with the accessible name `gameOver.finalHand`.
+- **Face tiles** (`product.md` §1.4a) are clay like a digit tile, with one addition: a
+  gold inlay rule, `1px` `--gold-700`, inset `5px` with a `4px` radius (`3px` and `3px`
+  at the compact size). Size, gradient, edge, shadow and radius are the digit tile's.
+  The face is set in the digit's serif in `--clay-900`: ✳ (in `--gold-500`), `O` and
+  `E` at `36px`; the ranges, with an en dash, at `25px`. At the compact size, letters are
+  `18px` and ranges `11px` semibold. Resting, lifted, marked, reward and disabled states
+  are the digit tile's exactly: reward means *new*, the inlay means *special*. The tile
+  clips its contents, so a crack stays inside it.
 - Semantic colour appears only at the moment of the event and only on the object
   concerned. There is no full-screen colour wash.
 - Transparency is used only for ink and hairlines. No backdrop blur.
@@ -172,10 +185,16 @@ The implementation may improve punctuation but may not change rule meaning.
 | `mode.endless` | `Endless` | `엔드리스` |
 | `mode.endlessHint` | `Ten sockets, no end` | `열 칸, 끝없이` |
 | `mode.classic` | `Classic` | `클래식` |
-| `mode.classicHint` | `Twenty closing to six` | `스물에서 여섯까지` |
+| `mode.classicHint` | `Twenty closing to five` | `스물에서 다섯까지` |
 | `result.correct` | `Correct` | `정답` |
 | `result.incorrect` | `Incorrect` | `오답` |
 | `result.submitted` | `Your answer: {value}` | `제출한 답: {value}` |
+| `tile.face.wild` | `Wildcard: any digit` | `와일드카드: 모든 숫자` |
+| `tile.face.odd` | `Odd tile: 1, 3, 5, 7, or 9` | `홀수 타일: 1, 3, 5, 7, 9` |
+| `tile.face.even` | `Even tile: 0, 2, 4, 6, or 8` | `짝수 타일: 0, 2, 4, 6, 8` |
+| `tile.face.low` | `Digits 0 to 4` | `숫자 0–4` |
+| `tile.face.high` | `Digits 5 to 9` | `숫자 5–9` |
+| `tile.face.nbr` | `Digits {low} to {high}` | `숫자 {low}–{high}` |
 | `result.answer` | `Correct answer: {value}` | `정답: {value}` |
 | `result.rewards` | `Received {count} tiles` | `타일 {count}개 획득` |
 | `overflow.instructionOne` | `Choose a tile to discard.` | `버릴 타일 1개를 선택하세요.` |
@@ -184,11 +203,19 @@ The implementation may improve punctuation but may not change rule meaning.
 | `gameOver.reason` | `Not enough tiles left to answer.` | `답을 만들 타일이 부족합니다.` |
 | `gameOver.winTitle` | `Run Complete` | `완주` |
 | `gameOver.winReason` | `You reached the floor with tiles in hand.` | `타일을 남긴 채 바닥에 도달했습니다.` |
+| `gameOver.finalHand` | `Finished with {held} tiles in {floor} sockets` | `{floor}칸 중 타일 {held}개로 완주` |
 | `gameOver.rounds` | `Rounds played` | `진행한 라운드` |
 | `gameOver.longestStreak` | `Longest streak` | `최장 연속 정답` |
 | `gameOver.restartHint` | `Press R to play again` | `R 키를 눌러 다시 하기` |
 | `share.copied` | `Result copied.` | `결과를 복사했습니다.` |
 | `share.failed` | `Could not share or copy the result.` | `결과를 공유하거나 복사하지 못했습니다.` |
+
+`result.submitted` prints a correct answer's product. An incorrect answer holding a
+face tile prints each slot as engraved — ✳, `O`, `E`, or its range — with the slots
+joined by a middle dot: `O·3`, `0–4·3`, never `0–43`. An incorrect all-digit answer
+prints its number. There is no line explaining why a face missed. A face tile's
+spoken label, wherever a digit tile's `Digit {digit}` would be read, including a
+filled answer slot, is its `tile.face.*` key.
 
 The title screen shows **four material rules** on the felt, always visible. They
 cover **three** of these topics — capacity, outcomes, overflow — because outcomes
@@ -201,7 +228,7 @@ The expanded rules must explain:
 - selecting and returning tiles;
 - ordered answer slots;
 - correct and incorrect outcomes;
-- the ten-tile capacity, and Classic's twenty closing to six;
+- the ten-tile capacity, and Classic's twenty closing to five;
 - overflow discarding;
 - score, streak, round, and loss rules;
 - keyboard controls.

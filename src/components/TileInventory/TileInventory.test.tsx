@@ -2,14 +2,14 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { INVENTORY_CAPACITY } from "../../game/balance";
-import type { Tile } from "../../game/types";
+import type { Digit, Tile } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
 import tileStyles from "../Tile/Tile.module.css";
 import { rackTier } from "./rackTier";
 import { TileInventory, type TileInventoryProps } from "./TileInventory";
 import rackStyles from "./TileInventory.module.css";
 
-const tile = (digit: Tile["digit"], id: string, isNew = false): Tile => ({ id, digit, isNew });
+const tile = (digit: Digit, id: string, isNew = false): Tile => ({ id, digit, isNew });
 
 /** Renders the rack with stable callbacks and exposes a same-tree rerender helper. */
 function renderInventory(overrides: Partial<TileInventoryProps> = {}) {
@@ -89,7 +89,7 @@ function cancelEvent(animationName: string): Event {
 // overflow: sorted seats, the newest arrival past capacity.
 function railedRack(): Tile[] {
   return [
-    ...Array.from({ length: 10 }, (_, index) => tile((index % 10) as Tile["digit"], `s${index}`)),
+    ...Array.from({ length: 10 }, (_, index) => tile((index % 10) as Digit, `s${index}`)),
     tile(7, "rail", true),
   ];
 }
@@ -177,7 +177,7 @@ describe("TileInventory", () => {
     cleanup();
 
     const tenHeld = Array.from({ length: 10 }, (_, index) =>
-      tile((index % 10) as Tile["digit"], `t${index}`),
+      tile((index % 10) as Digit, `t${index}`),
     );
     const { container: allHeld } = renderInventory({ tiles: tenHeld });
     expect(cellCount(allHeld)).toBe(INVENTORY_CAPACITY);
@@ -369,7 +369,7 @@ describe("TileInventory", () => {
   });
 
   it("sizes the rack by the capacity it is given, and rim-rejects the first cell past it", () => {
-    const twenty = Array.from({ length: 20 }, (_, index) => tile((index % 10) as Tile["digit"], `t${index}`));
+    const twenty = Array.from({ length: 20 }, (_, index) => tile((index % 10) as Digit, `t${index}`));
     const { container } = renderInventory({ tiles: twenty, capacity: 19 });
     expect(cellCount(container)).toBe(19);
     expect(railCells(container).map(animationOn)).toEqual(["oz-rim-reject"]);
@@ -491,6 +491,30 @@ describe("TileInventory", () => {
     expect(animationOn(cells(container)[4])).not.toBe("oz-fire");
   });
 
+  // Classic's two-tile discard can take one seated tile and one rail tile:
+  // the rail tile slides off where it perched, while the other rail tile
+  // drops into the freed seat. The discard settles once, when that one lands.
+  it("settles once for a seated and a rail tile discarded together, when the survivor lands", () => {
+    const before = [...railedRack(), tile(8, "rail-2", true)];
+    const after = [...before.slice(0, 10)];
+    after[2] = before[11]!;
+    // Classic's twentieth submission seals capacity to 10; the rack stays drawn at 11 until the round changes.
+    const classic = { capacity: 10, stepped: true, drawnCapacity: 11 };
+    const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard", ...classic });
+    rerender({ tiles: after, mode: "readOnly" });
+
+    endAnimation(railCells(container)[0]);
+    expect(onSettled).not.toHaveBeenCalled();
+    endAnimation(cells(container)[2]);
+    expect(onSettled).not.toHaveBeenCalled();
+    expect(cells(container)[2].textContent).toBe("8");
+    expect(animationOn(cells(container)[2])).toBe("oz-perch-drop");
+
+    endAnimation(cells(container)[2]);
+    expect(onSettled).toHaveBeenCalledTimes(1);
+    expect(cellCount(container)).toBe(rackTier(classic.drawnCapacity).footprint);
+  });
+
   it("settles when the rail tile itself is the one discarded", () => {
     const before = railedRack();
     const { container, rerender, onSettled } = renderInventory({ tiles: before, mode: "discard" });
@@ -534,7 +558,7 @@ describe("TileInventory", () => {
 
   describe("the stepped Classic rack", () => {
     const hand = (count: number) =>
-      Array.from({ length: count }, (_, index) => tile((index % 10) as Tile["digit"], `h${index}`));
+      Array.from({ length: count }, (_, index) => tile((index % 10) as Digit, `h${index}`));
 
     // The sizes' figures, and the narrow 6 x 44 fallback, are CSS: a container
     // query jsdom cannot evaluate. What the component owns is which size, and

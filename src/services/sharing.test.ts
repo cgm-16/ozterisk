@@ -1,6 +1,34 @@
 import { describe, expect, it, vi } from "vitest";
-import { copyResult, formatShareText, shareResult } from "./sharing";
-import type { ShareDependencies } from "./sharing";
+import { CLASSIC_FLOOR, CLASSIC_SEAL_EVERY, CLASSIC_START_CAPACITY } from "../game/balance";
+import { makeEquation, makeGameOverState } from "../test/fixtures";
+import { copyResult, formatShareText, getShareStats, shareResult } from "./sharing";
+import type { ShareDependencies, ShareStats } from "./sharing";
+
+describe("getShareStats", () => {
+  const atFloor = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY;
+
+  it("reports a Classic run at the floor with tiles in hand as won", () => {
+    const state = makeGameOverState(makeEquation(3, 3), { mode: "classic", totalRounds: atFloor });
+    expect(getShareStats(state)).toEqual({
+      mode: "classic",
+      won: true,
+      score: 7,
+      totalRounds: atFloor,
+      longestStreak: 4,
+    });
+  });
+
+  it("never reports an Endless run as won", () => {
+    const state = makeGameOverState(makeEquation(3, 3), { mode: "endless", totalRounds: atFloor });
+    expect(getShareStats(state).won).toBe(false);
+  });
+
+  it("does not let an Endless run be typed as won", () => {
+    // @ts-expect-error — only Classic can win (§1.8).
+    const endlessWin: ShareStats = { mode: "endless", won: true, score: 0, totalRounds: 0, longestStreak: 0 };
+    expect(endlessWin.mode).toBe("endless");
+  });
+});
 
 describe("formatShareText", () => {
   // §1.15: Classic prefixes the first line with the mode and outcome, and

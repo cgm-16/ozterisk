@@ -6,18 +6,19 @@ import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { CLASSIC_FLOOR, CLASSIC_SEAL_EVERY, CLASSIC_START_CAPACITY } from "../game/balance";
 import { createInitialInventory, sortTiles } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
-import { isClassicWin } from "../game/selectors";
 import type { GamePhase, GameState, Tile } from "../game/types";
-import type { ShareDependencies } from "../services/sharing";
+import { getShareStats, type ShareDependencies } from "../services/sharing";
 import {
   makeAnsweringState,
   makeEquation,
   makeFeedbackState,
+  makeFaceTile,
   makeGameOverState,
+  makeNbrTile,
   makeTile,
   sequentialIds,
 } from "../test/fixtures";
-import { ControlBoard, CopyPressedOnMount, ReducedMotionBoard } from "./harness";
+import { ControlBoard, CopyPressedOnMount, FaceBoard, ReducedMotionBoard } from "./harness";
 
 export interface GalleryEntry {
   /** Stable across renders; used as the picker's React key. */
@@ -45,13 +46,8 @@ function renderGameOverScreen(state: GameState, dependencies: ShareDependencies)
   return (
     <GameOverScreen
       equation={state.equation}
-      stats={{
-        mode: state.mode,
-        won: isClassicWin(state),
-        score: state.score,
-        totalRounds: state.totalRounds,
-        longestStreak: state.longestStreak,
-      }}
+      stats={getShareStats(state)}
+      hand={state.inventory}
       url="https://example.test/"
       dependencies={dependencies}
       onPlayAgain={noop}
@@ -273,15 +269,64 @@ const FEEDBACK_AFTER_DISCARD_STATE = gameReducer(OVERFLOW_REQUIRED_1_STATE, {
   tileId: "tile-5",
 });
 
-// A Classic game over at the floor with tiles in hand is the win (§1.8): Run Complete, no
-// equation. Above the floor it is a loss, which renders exactly as
+// A Classic game over at the floor with tiles in hand is the win (§1.8): Run Complete, and
+// the final hand where a loss shows its equation. Above the floor it is a loss, which renders exactly as
 // game-over-idle does — so it has no entry of its own.
 const CLASSIC_TO_FLOOR = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY;
 const GAME_OVER_CLASSIC_WIN_STATE = makeGameOverState(makeEquation(7, 8), {
   mode: "classic",
   totalRounds: CLASSIC_TO_FLOOR,
   round: CLASSIC_TO_FLOOR + 1,
+  // Fewer tiles than sockets, so the final hand shows both.
+  inventory: [makeTile(1, "win-a"), makeTile(4, "win-b"), makeTile(4, "win-c"), makeFaceTile("wild", "win-d")],
 });
+
+// Face tiles (§1.4a) are Classic's. A rack at fifteen, the 6 x 48 size that
+// narrows to 6 x 44 at 320px, holds all six kinds after nine digits, in rack
+// order: the widest glyphs in the smallest tiles the rack draws.
+const ANSWERING_CLASSIC_FACES_STATE = makeAnsweringState(makeEquation(3, 4), {
+  mode: "classic",
+  inventory: sortTiles([
+    ...createInitialInventory(sequentialIds(), 9),
+    makeFaceTile("high"),
+    makeNbrTile(4),
+    makeFaceTile("low"),
+    makeFaceTile("even"),
+    makeFaceTile("odd"),
+    makeFaceTile("wild"),
+  ]),
+  totalRounds: (CLASSIC_START_CAPACITY - 15) * CLASSIC_SEAL_EVERY,
+  round: (CLASSIC_START_CAPACITY - 15) * CLASSIC_SEAL_EVERY + 1,
+});
+
+// Built through the reducer, as the other feedback states are. High counts as
+// the 5 of 56, and the rewards include two faces, so the fire is read on them.
+const faceHand = (...extra: Tile[]) =>
+  sortTiles([makeTile(1, "tile-1"), makeTile(2, "tile-2"), makeTile(8, "tile-8"), ...extra]);
+const FEEDBACK_CORRECT_FACE_STATE = submitCorrectly(
+  makeAnsweringState(makeEquation(7, 8), {
+    mode: "classic",
+    inventory: faceHand(makeFaceTile("high"), makeTile(6, "tile-6")),
+  }),
+  ["face-high", "tile-6"],
+  [makeFaceTile("odd", "reward-0"), makeTile(3, "reward-1"), makeNbrTile(7, "reward-2")],
+);
+
+// Odd in the slot that needs the 6 of 63: the face cracks, and the feedback
+// prints it engraved, "O·3" (§1.14).
+const FEEDBACK_INCORRECT_FACE_STATE = gameReducer(
+  ["face-odd", "tile-3"].reduce(
+    (state, tileId) => gameReducer(state, { type: "SELECT_TILE", tileId }),
+    makeAnsweringState(makeEquation(7, 9), {
+      mode: "classic",
+      inventory: faceHand(makeFaceTile("odd"), makeTile(3, "tile-3")),
+    }),
+  ),
+  { type: "SUBMIT_INCORRECT" },
+);
+
+const FACE_BOARD_NOTE =
+  "Every face kind in every Tile state, the digit tile first for comparison, then the compact size. A face's states are the digit's exactly (§1.12); the gold inlay alone marks it as special. Check that no glyph touches the inlay.";
 
 
 const GAME_OVER_STATE = makeGameOverState(makeEquation(7, 8));
@@ -352,6 +397,11 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
       render: () => renderGameScreen(ANSWERING_CLASSIC_10_STATE),
     },
     {
+      id: "answering-classic-faces",
+      label: "Answering — Classic at fifteen, every face kind in the rack",
+      render: () => renderGameScreen(ANSWERING_CLASSIC_FACES_STATE),
+    },
+    {
       id: "answering-depleted",
       label: "Answering — a depleted rack",
       render: () => renderGameScreen(ANSWERING_DEPLETED_STATE),
@@ -367,6 +417,16 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
       id: "feedback-incorrect",
       label: "Feedback — incorrect, with the answer comparison",
       render: () => renderGameScreen(FEEDBACK_INCORRECT_STATE),
+    },
+    {
+      id: "feedback-correct-face",
+      label: "Feedback — correct with a face, face rewards firing",
+      render: () => renderGameScreen(FEEDBACK_CORRECT_FACE_STATE),
+    },
+    {
+      id: "feedback-incorrect-face",
+      label: "Feedback — a face placed wrong, engraved",
+      render: () => renderGameScreen(FEEDBACK_INCORRECT_FACE_STATE),
     },
     {
       id: "feedback-after-discard",
@@ -459,6 +519,11 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
       id: "interaction-reduced-motion",
       label: "Interaction — reduced motion",
       render: () => <ReducedMotionBoard note={REDUCED_MOTION_NOTE} />,
+    },
+    {
+      id: "interaction-face-tiles",
+      label: "Interaction — face tiles, every kind and state",
+      render: () => <FaceBoard note={FACE_BOARD_NOTE} />,
     },
   ],
 };

@@ -2,6 +2,7 @@ import { createInitialInventory, createTitleState } from "../game/factories";
 import type {
   Digit,
   Equation,
+  FaceKind,
   GameState,
   RandomSource,
   Tile,
@@ -34,6 +35,18 @@ export const makeTile = (
   id = `tile-${digit}`,
   isNew = false,
 ): Tile => ({ id, digit, isNew });
+
+export const makeFaceTile = (
+  face: FaceKind,
+  id = `face-${face}`,
+  isNew = false,
+): Tile => ({ id, face, isNew });
+
+export const makeNbrTile = (
+  centre: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8,
+  id = `nbr-${centre}`,
+  isNew = false,
+): Tile => ({ id, face: "nbr", centre, isNew });
 
 export const makeAnsweringState = (
   equation: Equation,

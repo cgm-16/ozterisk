@@ -17,14 +17,14 @@ The PoC validates whether this loop is understandable and engaging. It does not 
 
 - Operands are integers `1` through `9`, inclusive.
 - The sampling pool contains the 45 unordered pairs `(a, b)` where `1 <= a <= b <= 9`.
-- Every new equation draws a gate sample first. At or above the kind-equation rate (a tuning dial; see § Tuning surface in the technical contract) the pair is drawn uniformly with replacement from the full pool; below it, the pair is drawn uniformly from only those pairs whose product the current inventory can spell.
+- Every new equation draws a gate sample first. At or above the kind-equation rate (a tuning dial; see § Tuning surface in the technical contract) the pair is drawn uniformly with replacement from the full pool; below it, the pair is drawn uniformly from only those pairs whose product the current inventory can spell. A face tile spells any digit in its set (§1.4a).
 - If the inventory can spell no product at all, the kind draw falls back to the uniform draw.
 - The bias is a generosity dial, not a difficulty curve: it never adapts to player skill, and its rate is fixed for the run. `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` §1.1 derives why the rate must stay below the economy cliff.
 - Immediate repetition is legal.
 - After drawing the unordered pair, independently randomize display order.
 - `3 × 7` and `7 × 3` are presentations of one sampling entry, not two entries.
 - Products range from `1` through `81`; an answer therefore has exactly one or two decimal digits.
-- Rewards are independent uniformly distributed digits `0` through `9`; each digit has probability `10%`.
+- Rewards are independent uniformly distributed digits `0` through `9`; each digit has probability `10%`. In Classic, each reward is first a face tile with probability `FACE_RATE` (a tuning dial), drawn as §1.4a sets out; otherwise it is a digit as above. Endless rewards are digits only.
 - Production uses `Math.random()`.
 - Tests provide deterministic `RandomSource` functions.
 
@@ -32,8 +32,8 @@ The PoC validates whether this loop is understandable and engaging. It does not 
 
 - The player chooses the mode on the title screen. Endless is the default; the choice is not persisted.
 - Initial inventory capacity: `10` in Endless; `20` in Classic (tuning dials; see § Tuning surface).
-- Initial inventory: fills the capacity, dealing digits round-robin (`i % 10`): one of each digit `[0…9]` in Endless, two of each in Classic.
-- Inventory display order: ascending digit; duplicates are ordered deterministically by tile ID.
+- Initial inventory: fills the capacity, dealing digits round-robin (`i % 10`): one of each digit `[0…9]` in Endless, two of each in Classic. The opening deal holds no face tiles.
+- Inventory display order: digit tiles in ascending digit, then face tiles in the order §1.4a gives; duplicates are ordered deterministically by tile ID.
 - Score: `0`.
 - Current streak: `0`.
 - Longest streak: `0`.
@@ -47,7 +47,7 @@ The PoC validates whether this loop is understandable and engaging. It does not 
 - One-digit products show one answer slot.
 - Two-digit products show two ordered answer slots.
 - Clicking or tapping an inventory tile moves that exact tile into the leftmost empty slot.
-- Pressing a digit key selects the first available matching tile in sorted inventory order.
+- Pressing a digit key selects a tile that holds the digit: a digit tile first, in sorted inventory order; with none, the narrowest face tile holding it (§1.4a).
 - Duplicate digit tiles have no strategic distinction.
 - A selected tile leaves the inventory row and appears in its answer slot.
 - Clicking or tapping a filled slot returns that tile to the inventory.
@@ -57,6 +57,29 @@ The PoC validates whether this loop is understandable and engaging. It does not 
 - **Submit** and `Enter` are enabled only when all slots are filled.
 - Slot order is answer order: selecting `5` then `6` constructs `56`; selecting `6` then `5` constructs `65`.
 - Every equation allows exactly one submission.
+- An answer is correct when every slot's tile holds the digit that slot needs: a digit tile holds its own digit, a face tile every digit in its set.
+
+### 1.4a Face tiles
+
+Face tiles exist in Classic only. A face tile stands for a set of digits:
+
+| Kind | Set | Face |
+|---|---|---|
+| `wild` | `0`–`9` | ✳ |
+| `odd` | `1 3 5 7 9` | `O` |
+| `even` | `0 2 4 6 8` | `E` |
+| `low` | `0`–`4` | `0–4` |
+| `high` | `5`–`9` | `5–9` |
+| `nbr` | `c − 1`, `c`, `c + 1`, for a centre `c` in `1`–`8` | e.g. `3–5` |
+
+- Even includes `0`. Neighbours never wraps: its centre is `1`–`8`, so its set is three consecutive digits within `0`–`9`.
+- **Placement.** A face tile in an answer slot counts as the digit that slot needs if that digit is in its set. Otherwise the answer is incorrect and costs its tiles like any incorrect answer (§1.6). The player never chooses which digit a face stands for, and nothing asks them to.
+- **Constructibility.** A product is constructible when some assignment of distinct inventory tiles to its slots puts, in each slot, a tile holding that slot's digit. A greedy pass is not enough: with the product `34` and the hand {`nbr` 2–4, `odd`}, handing the `3` to Neighbours leaves nothing for the `4`, yet `odd` as `3` and Neighbours as `4` spells it.
+- **Arrival.** Face tiles arrive only as correct-answer rewards (§1.2), each kind weighted by `1 / set size`: Wildcard `1/10`, each five-digit set `1/5`, Neighbours `1/3`, with its centre uniform over `1`–`8`.
+- **Order.** Face tiles sort after every digit tile: ✳, then `O`, then `E`, then the ranges by their lowest digit, then their highest.
+- **Narrowest.** A face is narrower than another when its set is smaller. Among equally narrow faces, the leftmost in inventory order counts as narrowest.
+- **Discard.** A face tile is marked and discarded like any tile.
+- Share text (§1.15) does not mention face tiles.
 
 ### 1.5 Correct submission
 
@@ -85,7 +108,7 @@ Given `N` submitted tiles:
 4. Preserve longest streak.
 5. Increment submitted rounds by `1`.
 6. Generate no rewards.
-7. Show the submitted answer and correct answer.
+7. Show the submitted answer and correct answer. A submitted face tile is printed as its face (`ui-i18n.md` §1.14).
 8. Enter feedback with **Next Round** enabled.
 
 An incorrect answer is legal even when the correct answer cannot be constructed from current tiles. The game never performs an exact-answer-constructibility loss check. Intentional incorrect submissions are therefore a costly survival mechanism.
@@ -107,7 +130,7 @@ An incorrect answer is legal even when the correct answer cannot be constructed 
 - Capacity is a function of mode and submissions, never stored:
   `getCapacity(endless, n) = 10`;
   `getCapacity(classic, n) = max(floor, 20 − ⌊n / 2⌋)`, where `n` is `totalRounds`
-  and the start (`20`), the floor (`6`) and the step (`2` submissions) are tuning dials.
+  and the start (`20`), the floor (`5`) and the step (`2` submissions) are tuning dials.
 - A socket seals on the submission that crosses a step, **correct or not**. The descent is positional: it never watches how well the player is doing.
 - An incorrect submission cannot overflow: it spends at least one tile and a seal takes at most one socket.
 - The rack is *drawn* at the capacity of the displayed round, `getCapacity(mode, round − 1)`, so its size changes only at the round change, never during feedback.
@@ -193,7 +216,7 @@ as a submitted round.
 
 #### `gameOver`
 
-- A Classic win states **Run Complete** and its reason, and shows no equation. Everything else below applies to a loss in either mode.
+- A Classic win states **Run Complete** and its reason. In place of the equation it shows the final hand: the floor's sockets, holding the tiles still in hand. Everything else below applies to a loss in either mode.
 - Keep the terminal equation visible.
 - Print the product on the board. `gameOver` is the only phase that does: during
   play the answer slots complete the equation, and the feedback text is the only
@@ -207,11 +230,11 @@ as a submitted round.
 
 | Phase | Key | Effect |
 |---|---|---|
-| `answering` | `0`–`9` | Select first available matching tile if a slot is empty |
+| `answering` | `0`–`9` | If a slot is empty, select a tile holding the digit: the first matching digit tile; with none, the narrowest face tile holding it (§1.4a) |
 | `answering` | `Backspace` | Return most recently selected answer tile |
 | `answering` | `Escape` | Return every selected tile at once; no-op at zero selection |
 | `answering` | `Enter` | Submit only if all answer slots are filled; a focused button retains normal browser behavior |
-| `overflow` | `0`–`9` | Mark the first matching tile not already marked; the mark that reaches the required count completes the discard |
+| `overflow` | `0`–`9` | Mark the first matching digit tile not already marked; face tiles are never marked by a digit key. The mark that reaches the required count completes the discard |
 | `feedback` | `Enter` | Draw and advance to the next equation. Inert after a discard, which advances on its own |
 | `gameOver` | `R` | Start a fresh run, equivalent to **Play Again**. Accepts the key by either its value or its physical position, so neither a Korean IME nor a Dvorak layout can make it unreachable |
 | `gameOver` | `Enter` | No global shortcut; a focused button retains normal browser behavior |
@@ -244,7 +267,7 @@ back.
 
 ### 1.17 Explicitly out of scope
 
-- Wildcard or special tiles.
+- A digit picker: any control that asks the player which digit a face tile stands for (§1.4a).
 - Operand `0`.
 - Division, addition, or subtraction modes.
 - Difficulty curves — any weighting that adapts to player skill or escalates over a run. The fixed-rate constructibility bias in §1.2 is in scope and shipped; it is a generosity dial, not a curve. Classic's descent (§1.7a) is in scope: it is a fixed schedule counted in submissions, identical for every player and blind to their play, and it is the mode's definite arc rather than a weighting.

@@ -18,7 +18,7 @@ const en = {
     endless: "Endless",
     endlessHint: "Ten sockets, no end",
     classic: "Classic",
-    classicHint: "Twenty closing to six",
+    classicHint: "Twenty closing to five",
   },
   language: {
     groupLabel: "Language",
@@ -38,7 +38,7 @@ const en = {
     progress:
       "Round shows which equation is currently on screen, score counts correct answers, and streak counts consecutive correct answers. Rounds played counts every equation you have submitted, correct or incorrect. The run ends once you hold fewer tiles than the next answer requires.",
     classic:
-      "Classic starts with twenty sockets and closes one every second submission, correct or not. Keep enough tiles to reach six sockets and the run is complete.",
+      "Classic starts with twenty sockets and closes one every second submission, correct or not. Keep enough tiles to reach five sockets and the run is complete.",
     keyboard:
       "Press a digit key to select a matching tile or, during a discard, to mark it and complete the discard, Backspace to return the most recently selected tile, Escape to clear your selection, Enter to submit or continue, and R to play again once the run ends.",
   },
@@ -79,6 +79,7 @@ const en = {
     reason: "Not enough tiles left to answer.",
     winTitle: "Run Complete",
     winReason: "You reached the floor with tiles in hand.",
+    finalHand: "Finished with {held} tiles in {floor} sockets",
     rounds: "Rounds played",
     longestStreak: "Longest streak",
     restartHint: "Press R to play again",
@@ -95,6 +96,14 @@ const en = {
     digitLabel: "Digit {digit}",
     newLabel: "New tile",
     discardLabel: "Marked for discard",
+    face: {
+      wild: "Wildcard: any digit",
+      odd: "Odd tile: 1, 3, 5, 7, or 9",
+      even: "Even tile: 0, 2, 4, 6, or 8",
+      low: "Digits 0 to 4",
+      high: "Digits 5 to 9",
+      nbr: "Digits {low} to {high}",
+    },
   },
 } as const;
 
@@ -110,7 +119,7 @@ const ko = {
     endless: "엔드리스",
     endlessHint: "열 칸, 끝없이",
     classic: "클래식",
-    classicHint: "스물에서 여섯까지",
+    classicHint: "스물에서 다섯까지",
   },
   language: {
     groupLabel: "언어",
@@ -127,7 +136,7 @@ const ko = {
     progress:
       "라운드는 현재 화면에 표시된 문제의 번호이며, 점수는 정답 횟수를, 연속 정답은 이어지는 정답 횟수를 나타냅니다. 진행한 라운드는 정답과 오답을 포함해 지금까지 제출한 문제 수를 나타냅니다. 다음 정답에 필요한 타일보다 보유한 타일이 적어지면 게임이 종료됩니다.",
     classic:
-      "클래식은 스무 칸으로 시작해 정답 여부와 관계없이 두 번 제출할 때마다 한 칸씩 닫힙니다. 여섯 칸에 도달할 때까지 타일을 지키면 완주합니다.",
+      "클래식은 스무 칸으로 시작해 정답 여부와 관계없이 두 번 제출할 때마다 한 칸씩 닫힙니다. 다섯 칸에 도달할 때까지 타일을 지키면 완주합니다.",
     keyboard:
       "숫자 키를 누르면 일치하는 타일을 선택하거나, 버리기 중에는 타일을 표시해 바로 버리기를 완료하며, Backspace 키로 가장 최근에 선택한 타일을 되돌리고, Escape 키로 선택을 지우며, Enter 키로 제출하거나 다음으로 진행하고, 게임이 끝나면 R 키로 다시 시작합니다.",
   },
@@ -163,6 +172,7 @@ const ko = {
     reason: "답을 만들 타일이 부족합니다.",
     winTitle: "완주",
     winReason: "타일을 남긴 채 바닥에 도달했습니다.",
+    finalHand: "{floor}칸 중 타일 {held}개로 완주",
     rounds: "진행한 라운드",
     longestStreak: "최장 연속 정답",
     restartHint: "R 키를 눌러 다시 하기",
@@ -179,6 +189,14 @@ const ko = {
     digitLabel: "숫자 {digit}",
     newLabel: "새 타일",
     discardLabel: "버릴 타일로 표시됨",
+    face: {
+      wild: "와일드카드: 모든 숫자",
+      odd: "홀수 타일: 1, 3, 5, 7, 9",
+      even: "짝수 타일: 0, 2, 4, 6, 8",
+      low: "숫자 0–4",
+      high: "숫자 5–9",
+      nbr: "숫자 {low}–{high}",
+    },
   },
 } as const satisfies MessageShape<typeof en>;
 

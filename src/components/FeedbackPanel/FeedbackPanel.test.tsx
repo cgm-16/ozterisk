@@ -1,11 +1,11 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { Language, RoundResult, Tile as TileModel } from "../../game/types";
+import type { Digit, Language, RoundResult, Tile as TileModel } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
 import { FeedbackPanel } from "./FeedbackPanel";
 import styles from "./FeedbackPanel.module.css";
 
-const tile = (digit: TileModel["digit"], id: string): TileModel => ({
+const tile = (digit: Digit, id: string): TileModel => ({
   id,
   digit,
   isNew: false,
@@ -40,6 +40,46 @@ function renderPanel(
 }
 
 describe("FeedbackPanel", () => {
+  describe("face tiles in the submitted answer (§1.14)", () => {
+    const withFace = (
+      face: "odd" | "low" | "high",
+      kind: RoundResult["kind"],
+      correctValue: number,
+      submittedValue: number | null,
+    ): RoundResult => ({
+      kind,
+      submittedValue,
+      correctValue,
+      submittedTiles: [{ id: "f", face, isNew: false }, tile(3, "b")],
+      rewardTileIds: [],
+    });
+
+    it("states the product a correct face answer counted as", () => {
+      renderPanel(withFace("high", "correct", 53, 53));
+      expect(screen.getByText("Your answer: 53")).toBeInTheDocument();
+    });
+
+    it.each([
+      ["odd", "O·3"],
+      ["low", "0–4·3"],
+    ] as const)("engraves a missed %s face, joining the slots with a middle dot", (face, engraved) => {
+      renderPanel(withFace(face, "incorrect", 63, null));
+      expect(screen.getByText(`Your answer: ${engraved}`)).toBeInTheDocument();
+      expect(screen.getByText("Correct answer: 63")).toBeInTheDocument();
+    });
+
+    it("engraves the same way in Korean", () => {
+      renderPanel(withFace("odd", "incorrect", 63, null), [], "ko");
+      expect(screen.getByText("제출한 답: O·3")).toBeInTheDocument();
+    });
+
+    it("prints an all-digit miss as its number, with no dot", () => {
+      renderPanel(incorrect);
+      expect(screen.getByText("Your answer: 21")).toBeInTheDocument();
+      expect(screen.getByRole("status")).not.toHaveTextContent("·");
+    });
+  });
+
   it("states the outcome in words, not only in color", () => {
     renderPanel(incorrect);
     expect(screen.getByRole("status")).toHaveTextContent("Incorrect");

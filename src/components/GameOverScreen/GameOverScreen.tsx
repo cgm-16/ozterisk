@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { Equation } from "../../game/types";
+import { CLASSIC_FLOOR } from "../../game/balance";
+import type { Equation, Tile as GameTile } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import {
   copyResult,
@@ -11,11 +12,14 @@ import {
 } from "../../services/sharing";
 import { ActionButton } from "../ActionButton/ActionButton";
 import { EquationBoard } from "../EquationBoard/EquationBoard";
+import { Tile } from "../Tile/Tile";
 import styles from "./GameOverScreen.module.css";
 
 export interface GameOverScreenProps {
   equation: Equation;
   stats: ShareStats;
+  /** The tiles still held. Only a Classic win shows them. */
+  hand: readonly GameTile[];
   url: string;
   dependencies: ShareDependencies;
   onPlayAgain(): void;
@@ -24,6 +28,7 @@ export interface GameOverScreenProps {
 export function GameOverScreen({
   equation,
   stats,
+  hand,
   url,
   dependencies,
   onPlayAgain,
@@ -49,15 +54,35 @@ export function GameOverScreen({
     <main className={styles.screen}>
       <div className={styles.terminal}>
         {/* A Classic win shows no equation: the run is complete, and there is
-            nothing left to explain. */}
-        {!stats.won && <EquationBoard equation={equation} showProduct />}
+            nothing left to explain. Its evidence takes the equation's slot
+            instead: the floor's sockets and the tiles still in them. */}
+        {stats.won ? (
+          <div
+            className={styles.finalHand}
+            role="img"
+            aria-label={t("gameOver.finalHand", { held: hand.length, floor: CLASSIC_FLOOR })}
+          >
+            {Array.from({ length: Math.max(CLASSIC_FLOOR, hand.length) }, (_, index) => {
+              const tile = hand[index];
+              return tile ? (
+                <Tile key={tile.id} value={tile} size="sm" />
+              ) : (
+                <span key={`socket-${index}`} className={styles.socket} />
+              );
+            })}
+          </div>
+        ) : (
+          <EquationBoard equation={equation} showProduct />
+        )}
         {/* §1.8 keeps the terminal equation on screen to explain the loss, but
             the equation alone reads as a live prompt. The reason sits with the
             equation rather than inside the results block, so it defuses the
             thing it explains. */}
         <p className={styles.reason}>{t(stats.won ? "gameOver.winReason" : "gameOver.reason")}</p>
       </div>
-      <h1 className={styles.title}>{t(stats.won ? "gameOver.winTitle" : "gameOver.title")}</h1>
+      <h1 className={`${styles.title} ${stats.won ? styles.won : ""}`}>
+        {t(stats.won ? "gameOver.winTitle" : "gameOver.title")}
+      </h1>
       <dl className={styles.stats}>
         <div className={styles.entry}>
           <dt>{t("gameOver.rounds")}</dt>

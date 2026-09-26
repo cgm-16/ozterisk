@@ -1,4 +1,4 @@
-import type { Digit, Equation, FaceKind, GameMode, GameState, Tile } from "./types";
+import type { Digit, Equation, FaceKind, GameMode, GameState, Tile, TileValue } from "./types";
 import {
   CLASSIC_FLOOR,
   CLASSIC_SEAL_EVERY,
@@ -27,7 +27,7 @@ const FACE_SETS: Record<FaceKind, readonly Digit[]> = {
 };
 
 // The digits a tile can stand for: its own digit, or a face's set (§1.4a).
-export function tileDigits(tile: Tile): readonly Digit[] {
+export function tileDigits(tile: TileValue): readonly Digit[] {
   if ("digit" in tile) return [tile.digit];
   if (tile.face === "nbr") return [tile.centre - 1, tile.centre, tile.centre + 1] as Digit[];
   return FACE_SETS[tile.face];

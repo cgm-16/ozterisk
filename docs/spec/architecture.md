@@ -126,7 +126,9 @@ export type FaceKind = "wild" | "odd" | "even" | "low" | "high";
 // A digit tile, or a face tile standing for a set of digits (product.md §1.4a).
 // Face tiles exist in Classic only.
 export type FaceSet = { face: FaceKind } | { face: "nbr"; centre: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 };
-export type Tile = { id: string; isNew: boolean } & ({ digit: Digit } | FaceSet);
+// What a tile shows and stands for, apart from its identity.
+export type TileValue = { digit: Digit } | FaceSet;
+export type Tile = { id: string; isNew: boolean } & TileValue;
 
 export interface Equation {
   left: number;
@@ -197,7 +199,7 @@ export const REWARD_DIGIT_COUNT = 10;
 export function createTitleState(): GameState;
 export function createInitialInventory(idFactory: TileIdFactory, count?: number): Tile[]; // round-robin i % 10
 export function sortTiles(tiles: readonly Tile[]): Tile[]; // digits, then ✳ O E, then ranges (product.md §1.4a)
-export function tileDigits(tile: Tile): readonly Digit[]; // [digit] for a digit tile, its set for a face
+export function tileDigits(tile: TileValue): readonly Digit[]; // [digit] for a digit tile, its set for a face
 
 export function generateEquation(random: RandomSource): Equation;
 export function generateKindEquation(

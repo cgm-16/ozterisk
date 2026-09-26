@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { CLASSIC_FLOOR } from "../../game/balance";
-import { tileDigits } from "../../game/selectors";
 import type { Equation, Tile as GameTile } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import {
@@ -66,7 +65,7 @@ export function GameOverScreen({
             {Array.from({ length: Math.max(CLASSIC_FLOOR, hand.length) }, (_, index) => {
               const tile = hand[index];
               return tile ? (
-                <Tile key={tile.id} digit={tileDigits(tile)[0] ?? 0} size="sm" />
+                <Tile key={tile.id} value={tile} size="sm" />
               ) : (
                 <span key={`socket-${index}`} className={styles.socket} />
               );

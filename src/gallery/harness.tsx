@@ -73,8 +73,8 @@ export function ControlBoard({
         </ActionButton>
       </div>
       <div className={styles.boardRow}>
-        <Tile digit={4} state={disabled ? "disabled" : "resting"} onClick={noop} />
-        <Tile digit={7} state={disabled ? "disabled" : "marked"} onClick={noop} />
+        <Tile value={{ digit: 4 }} state={disabled ? "disabled" : "resting"} onClick={noop} />
+        <Tile value={{ digit: 7 }} state={disabled ? "disabled" : "marked"} onClick={noop} />
       </div>
       {children}
     </div>
@@ -108,7 +108,7 @@ export function ReducedMotionBoard({ note }: { note: string }) {
       />
       <div className={styles.boardRow}>
         <ActionButton onClick={noop}>{t("action.next")}</ActionButton>
-        <Tile digit={4} onClick={noop} />
+        <Tile value={{ digit: 4 }} onClick={noop} />
       </div>
     </div>
   );

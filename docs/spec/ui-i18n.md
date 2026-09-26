@@ -94,6 +94,11 @@ section wins.
 - Tiles resemble simple physical pieces.
 - One meaning per hue. Gold marks brand, capacity, and reward; jade means correct;
   vermilion means a tile is leaving — incorrect, discard, or overflow.
+- The game-over verdict follows the hue rule. A loss is `--verm-400`; a Classic win
+  (**Run Complete**) is `--gold-500`, because the run kept its tiles. In place of the
+  loss's terminal equation, a win shows its **final hand**: `CLASSIC_FLOOR` sockets at
+  the compact tile size on a `--surface-panel` strip, holding the tiles still in hand,
+  with the accessible name `gameOver.finalHand`.
 - Semantic colour appears only at the moment of the event and only on the object
   concerned. There is no full-screen colour wash.
 - Transparency is used only for ink and hairlines. No backdrop blur.
@@ -184,6 +189,7 @@ The implementation may improve punctuation but may not change rule meaning.
 | `gameOver.reason` | `Not enough tiles left to answer.` | `답을 만들 타일이 부족합니다.` |
 | `gameOver.winTitle` | `Run Complete` | `완주` |
 | `gameOver.winReason` | `You reached the floor with tiles in hand.` | `타일을 남긴 채 바닥에 도달했습니다.` |
+| `gameOver.finalHand` | `Finished with {held} tiles in {floor} sockets` | `{floor}칸 중 타일 {held}개로 완주` |
 | `gameOver.rounds` | `Rounds played` | `진행한 라운드` |
 | `gameOver.longestStreak` | `Longest streak` | `최장 연속 정답` |
 | `gameOver.restartHint` | `Press R to play again` | `R 키를 눌러 다시 하기` |

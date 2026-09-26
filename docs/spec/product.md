@@ -193,7 +193,7 @@ as a submitted round.
 
 #### `gameOver`
 
-- A Classic win states **Run Complete** and its reason, and shows no equation. Everything else below applies to a loss in either mode.
+- A Classic win states **Run Complete** and its reason. In place of the equation it shows the final hand: the floor's sockets, holding the tiles still in hand. Everything else below applies to a loss in either mode.
 - Keep the terminal equation visible.
 - Print the product on the board. `gameOver` is the only phase that does: during
   play the answer slots complete the equation, and the feedback text is the only

@@ -78,4 +78,5 @@ moves first.
 
 - `grep -rni "picker" docs/spec docs/plan/roadmap.md` finds only the §1.17 rejection.
 - `grep -rn "Wildcard or special" docs/spec` finds nothing.
+- `grep -rni "future wildcards" AGENTS.md` finds nothing.
 - Every ruling above can be found in the spec text it governs.

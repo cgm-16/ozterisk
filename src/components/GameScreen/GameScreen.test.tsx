@@ -351,7 +351,7 @@ describe("GameScreen phase composition", () => {
 
     expect(screen.getByRole("button", { name: "Answer slot 1: empty" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Digit 1" })).toBeEnabled();
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toBeEmptyDOMElement();
   });
 
   it("keeps the submitted tiles on screen in feedback with no answer-slot button", () => {
@@ -433,6 +433,26 @@ describe("GameScreen phase composition", () => {
     // HUD -> equation/feedback context -> phase action -> inventory (§1.10).
     expect(status.compareDocumentPosition(instruction) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(instruction.compareDocumentPosition(discardTile) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  // Some screen readers do not announce what a live region already holds when
+  // it is inserted, so the region has to exist, empty, before the verdict
+  // arrives in it (#31).
+  it("keeps the feedback status region mounted, empty, from answering into feedback", () => {
+    const equation = makeEquation(3, 3);
+    const screenFor = (state: GameState) => (
+      <I18nProvider initialLanguage="en">
+        <GameScreen state={state} dispatch={vi.fn()} onSubmit={vi.fn()} onNextRound={vi.fn()} />
+      </I18nProvider>
+    );
+    const { rerender } = render(screenFor(makeAnsweringState(equation)));
+    const status = screen.getByRole("status");
+    expect(status).toBeEmptyDOMElement();
+
+    rerender(screenFor(makeFeedbackState(equation)));
+
+    expect(screen.getByRole("status")).toBe(status);
+    expect(status).toHaveTextContent("Incorrect");
   });
 
   it("keeps the feedback status region mounted across the overflow-to-feedback transition", () => {

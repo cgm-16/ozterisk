@@ -4,13 +4,17 @@ import { Tile } from "../Tile/Tile";
 import styles from "./FeedbackPanel.module.css";
 
 export interface FeedbackPanelProps {
-  result: RoundResult;
+  /** Null while answering: the live region renders empty, so the verdict
+   * arrives in a region that already exists. Some screen readers do not
+   * announce what a region holds when it is inserted (#31). */
+  result: RoundResult | null;
   rewardTiles: readonly TileModel[];
 }
 
 /** Renders the announced outcome, submitted answer, and any earned tiles. */
 export function FeedbackPanel({ result, rewardTiles }: FeedbackPanelProps) {
   const { t } = useI18n();
+  if (result === null) return <div className={styles.idle} role="status" aria-live="polite" />;
   const isCorrect = result.kind === "correct";
 
   return (

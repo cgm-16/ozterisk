@@ -18,7 +18,7 @@ import {
   REWARD_BONUS,
 } from "./balance";
 import { createTitleState } from "./factories";
-import { makeAnsweringState, makeEquation, makeTile } from "../test/fixtures";
+import { makeAnsweringState, makeEquation, makeFeedbackState, makeTile } from "../test/fixtures";
 
 describe("getRewardCount", () => {
   it("returns one more tile than was spent", () => {
@@ -192,10 +192,7 @@ describe("isSubmissionReady", () => {
   });
 
   it("is false outside the answering phase even with a full selection", () => {
-    const state = makeAnsweringState(makeEquation(3, 3), {
-      phase: "feedback",
-      selectedTiles: [makeTile(9)],
-    });
+    const state = makeFeedbackState(makeEquation(3, 3), { selectedTiles: [makeTile(9)] });
     expect(isSubmissionReady(state)).toBe(false);
   });
 });

@@ -105,7 +105,7 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         />
       )}
 
-      {lastResult !== null && <FeedbackPanel result={lastResult} rewardTiles={rewardTiles} />}
+      <FeedbackPanel result={lastResult} rewardTiles={rewardTiles} />
 
       {state.phase === "answering" && (
         <div className={styles.actions}>

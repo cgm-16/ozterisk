@@ -30,6 +30,9 @@ function freshRunState(mode: GameMode, equation: Equation, inventory: Tile[]): G
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
+    // Unguarded by phase, unlike RESTART_RUN: only TitleScreen dispatches it,
+    // so title is the only phase it arrives from, and a fresh run owes
+    // nothing to the state it replaces.
     case "START_RUN":
       return freshRunState(action.mode, action.equation, action.inventory);
 

@@ -253,13 +253,17 @@ Rules that keep the surface durable:
 ### 2.4 Browser-bound interfaces
 
 ```ts
-export interface ShareStats {
-  mode: GameMode;
-  won: boolean;
+// Only Classic can be won, so an Endless `won: true` is unrepresentable.
+export type ShareStats = {
   score: number;
   totalRounds: number;
   longestStreak: number;
-}
+} & (
+  | { mode: "endless"; won: false }
+  | { mode: "classic"; won: boolean } // isClassicWin(state)
+);
+
+export function getShareStats(state: GameState): ShareStats;
 
 export function formatShareText(
   stats: ShareStats,

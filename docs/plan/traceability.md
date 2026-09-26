@@ -73,3 +73,17 @@ M6c — Run Complete Correction:
 | Requirement | Owning task(s) | Required evidence |
 |---|---|---|
 | R-44 a Classic win is gold and shows its final hand | T75 | game-over tests on the win heading class and the final-hand strip |
+
+M7 — Special Tiles:
+
+| Requirement | Owning task(s) | Required evidence |
+|---|---|---|
+| R-45 face tile rules are canonical in the spec | T76 | `product.md` §1.4a; the T76 acceptance greps |
+| R-46 a face counts as its slot's digit by membership, with no picker | T77 | `answerMatches` and reducer tests: a hit is correct, a miss is incorrect with `submittedValue` null |
+| R-47 constructibility searches assignments | T77 | `canConstruct([nbr(3), odd], 34)` is true |
+| R-48 faces arrive as Classic rewards only, weighted 1/set size, in rack order | T77 | `generateRewardTiles` tests in both modes; Endless output unchanged; `sortTiles` tests |
+| R-49 Classic's floor is 5 | T77 | `getCapacity` and `balance.test.ts` at the new floor |
+| R-50 digit keys take a digit, then the narrowest face; never a face in overflow | T78 | keyboard hook tests |
+| R-51 face tiles render their inlay, glyph and spoken label | T79 | Tile component tests in en and ko |
+| R-52 an incorrect face answer is printed engraved and dot-joined | T80 | FeedbackPanel tests: `O·3` |
+| R-53 every face state is in the gallery and a real run places faces | T81 | gallery entries; the manual run in en and ko |

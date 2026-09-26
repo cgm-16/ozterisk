@@ -1,4 +1,4 @@
-import type { Equation, GameMode, GameState, Tile } from "./types";
+import type { Digit, Equation, FaceKind, GameMode, GameState, Tile, TileValue } from "./types";
 import {
   CLASSIC_FLOOR,
   CLASSIC_SEAL_EVERY,
@@ -18,9 +18,40 @@ export function getRewardCount(spentCount: number): number {
   return spentCount + REWARD_BONUS;
 }
 
+const FACE_SETS: Record<FaceKind, readonly Digit[]> = {
+  wild: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+  odd: [1, 3, 5, 7, 9],
+  even: [0, 2, 4, 6, 8],
+  low: [0, 1, 2, 3, 4],
+  high: [5, 6, 7, 8, 9],
+};
+
+// The digits a tile can stand for: its own digit, or a face's set (§1.4a).
+export function tileDigits(tile: TileValue): readonly Digit[] {
+  if ("digit" in tile) return [tile.digit];
+  if (tile.face === "nbr") return [tile.centre - 1, tile.centre, tile.centre + 1] as Digit[];
+  return FACE_SETS[tile.face];
+}
+
+// The number an all-digit selection spells; null when empty or holding a face,
+// which spells no number of its own.
 export function constructAnswer(selectedTiles: readonly Tile[]): number | null {
   if (selectedTiles.length === 0) return null;
-  return Number(selectedTiles.map((tile) => tile.digit).join(""));
+  const digits: Digit[] = [];
+  for (const tile of selectedTiles) {
+    if (!("digit" in tile)) return null;
+    digits.push(tile.digit);
+  }
+  return Number(digits.join(""));
+}
+
+// Correct when each slot's tile holds the digit that slot needs (§1.4).
+export function answerMatches(selectedTiles: readonly Tile[], product: number): boolean {
+  const needed = String(product);
+  return (
+    selectedTiles.length === needed.length &&
+    selectedTiles.every((tile, slot) => tileDigits(tile).includes(Number(needed[slot]) as Digit))
+  );
 }
 
 export function canAttemptEquation(
@@ -30,19 +61,14 @@ export function canAttemptEquation(
   return inventory.length >= getAnswerLength(equation);
 }
 
-// Multiset check: a product needing two of a digit requires two tiles.
+// Tries every ordered pair of distinct tiles (every tile, for one digit):
+// answers are at most two digits, and a greedy pass misses assignments a
+// face makes possible (§1.4a).
 export function canConstruct(inventory: readonly Tile[], product: number): boolean {
-  const available = new Map<number, number>();
-  for (const tile of inventory) {
-    available.set(tile.digit, (available.get(tile.digit) ?? 0) + 1);
-  }
-  for (const character of String(product)) {
-    const digit = Number(character);
-    const remaining = available.get(digit) ?? 0;
-    if (remaining === 0) return false;
-    available.set(digit, remaining - 1);
-  }
-  return true;
+  if (product < 10) return inventory.some((tile) => answerMatches([tile], product));
+  return inventory.some((first, i) =>
+    inventory.some((second, j) => i !== j && answerMatches([first, second], product)),
+  );
 }
 
 // Live capacity after `totalRounds` submissions. Classic seals one socket every

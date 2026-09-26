@@ -23,8 +23,14 @@ online services.
   tile of each digit `0`–`9` in Endless; capacity `20` and two of each in
   Classic.
 - **Classic capacity**: one socket seals every `2` submissions, correct or
-  not, down to a floor of `6` — `max(6, 20 − ⌊submissions / 2⌋)`. Capacity is
+  not, down to a floor of `5` — `max(5, 20 − ⌊submissions / 2⌋)`. Capacity is
   derived from the mode and the submission count, never stored.
+- **Face tiles (Classic)**: a reward is sometimes a face tile (`FACE_RATE`,
+  8%) standing for a set of digits — Wildcard ✳ (any), Odd `O`, Even `E`
+  (with `0`), Low `0–4`, High `5–9`, or Neighbours such as `3–5`. In an answer
+  slot a face counts as the digit that slot needs if its set holds it;
+  otherwise the answer is wrong. The player never picks the digit. Endless
+  has no face tiles.
 - Selecting tiles (click, tap, or a digit key) fills the answer slots in
   order; `Backspace` returns the most recently selected tile and `Escape`
   returns them all; **Submit** and `Enter` are enabled only once every slot
@@ -74,11 +80,11 @@ gameOver --RESTART_RUN--> answering
 
 | Phase | Key | Effect |
 |---|---|---|
-| `answering` | `0`–`9` | Select first available matching tile if a slot is empty |
+| `answering` | `0`–`9` | If a slot is empty, select the first matching digit tile, else the narrowest face holding that digit (leftmost on a tie) |
 | `answering` | `Backspace` | Return most recently selected answer tile |
 | `answering` | `Escape` | Return every selected tile |
 | `answering` | `Enter` | Submit only if all answer slots are filled |
-| `overflow` | `0`–`9` | Mark the first matching unmarked tile; the mark that reaches the excess completes the discard |
+| `overflow` | `0`–`9` | Mark the first matching unmarked digit tile (never a face); the mark that reaches the excess completes the discard |
 | `feedback` | `Enter` | Draw and advance to the next equation; inert after a discard, which advances on its own |
 | `gameOver` | `R` | Start a fresh run in the same mode, equivalent to **Play Again** |
 | `gameOver` | `Enter` | No global shortcut; a focused button retains normal browser behavior |

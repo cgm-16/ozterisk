@@ -65,7 +65,7 @@ export function GameOverScreen({
             {Array.from({ length: Math.max(CLASSIC_FLOOR, hand.length) }, (_, index) => {
               const tile = hand[index];
               return tile ? (
-                <Tile key={tile.id} digit={tile.digit} size="sm" />
+                <Tile key={tile.id} value={tile} size="sm" />
               ) : (
                 <span key={`socket-${index}`} className={styles.socket} />
               );

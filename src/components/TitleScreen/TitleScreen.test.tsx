@@ -108,7 +108,7 @@ describe("TitleScreen", () => {
     ).toBeInTheDocument();
     // Classic's twenty closing to six, and that the floor is the win (§1.14)
     expect(
-      screen.getByText(/Classic starts with twenty sockets .* reach six sockets and the run is complete/),
+      screen.getByText(/Classic starts with twenty sockets .* reach five sockets and the run is complete/),
     ).toBeInTheDocument();
   });
 

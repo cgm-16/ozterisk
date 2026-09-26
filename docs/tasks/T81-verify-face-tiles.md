@@ -19,6 +19,7 @@ paths:
   - src/gallery/
   - docs/journal/
   - docs/design_handoff_m7_face_tiles/
+  - README.md
 ```
 
 ## Steps
@@ -27,7 +28,9 @@ paths:
   - each kind in resting, lifted, reward, marked and disabled
   - correct feedback and wrong feedback with a face
   - a win whose final hand holds a face
-- [ ] Prune the handoff's `.jsx`, `.d.ts` and `.dc.html` files once shipped.
+- [ ] `README.md`: the floor is 5, and Classic has face tiles.
+- [ ] Prune the handoff's `.jsx` and `.d.ts` files once shipped. The `.dc.html`
+      references stay, as M6's did, because `decisions.md` cites them.
 - [ ] Write a journal entry. The known risk: a Garamond O sits close to 0.
 
 ## Acceptance

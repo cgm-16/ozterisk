@@ -1,12 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import type { Tile } from "../../game/types";
+import type { Digit, Tile } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
 import { AnswerSlots, type AnswerSlotsProps } from "./AnswerSlots";
 import styles from "./AnswerSlots.module.css";
 
-const tile = (digit: Tile["digit"], id: string): Tile => ({ id, digit, isNew: false });
+const tile = (digit: Digit, id: string): Tile => ({ id, digit, isNew: false });
 
 function slotsTree(onReturn: () => void, overrides: Partial<AnswerSlotsProps>) {
   return (
@@ -50,6 +50,16 @@ describe("AnswerSlots", () => {
     });
     expect(screen.getByRole("button", { name: "Answer slot 1: 5" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Answer slot 2: 6" })).toBeInTheDocument();
+  });
+
+  it("names a filled slot holding a face by the face's label", () => {
+    renderSlots({
+      slotCount: 2,
+      selectedTiles: [{ id: "f", face: "odd", isNew: false }, tile(3, "b")],
+    });
+    expect(
+      screen.getByRole("button", { name: "Answer slot 1: Odd tile: 1, 3, 5, 7, or 9" }),
+    ).toBeInTheDocument();
   });
 
   it("labels an empty slot by its position", () => {

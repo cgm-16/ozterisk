@@ -2,14 +2,14 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { INVENTORY_CAPACITY } from "../../game/balance";
-import type { Tile } from "../../game/types";
+import type { Digit, Tile } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
 import tileStyles from "../Tile/Tile.module.css";
 import { rackTier } from "./rackTier";
 import { TileInventory, type TileInventoryProps } from "./TileInventory";
 import rackStyles from "./TileInventory.module.css";
 
-const tile = (digit: Tile["digit"], id: string, isNew = false): Tile => ({ id, digit, isNew });
+const tile = (digit: Digit, id: string, isNew = false): Tile => ({ id, digit, isNew });
 
 /** Renders the rack with stable callbacks and exposes a same-tree rerender helper. */
 function renderInventory(overrides: Partial<TileInventoryProps> = {}) {
@@ -89,7 +89,7 @@ function cancelEvent(animationName: string): Event {
 // overflow: sorted seats, the newest arrival past capacity.
 function railedRack(): Tile[] {
   return [
-    ...Array.from({ length: 10 }, (_, index) => tile((index % 10) as Tile["digit"], `s${index}`)),
+    ...Array.from({ length: 10 }, (_, index) => tile((index % 10) as Digit, `s${index}`)),
     tile(7, "rail", true),
   ];
 }
@@ -177,7 +177,7 @@ describe("TileInventory", () => {
     cleanup();
 
     const tenHeld = Array.from({ length: 10 }, (_, index) =>
-      tile((index % 10) as Tile["digit"], `t${index}`),
+      tile((index % 10) as Digit, `t${index}`),
     );
     const { container: allHeld } = renderInventory({ tiles: tenHeld });
     expect(cellCount(allHeld)).toBe(INVENTORY_CAPACITY);
@@ -369,7 +369,7 @@ describe("TileInventory", () => {
   });
 
   it("sizes the rack by the capacity it is given, and rim-rejects the first cell past it", () => {
-    const twenty = Array.from({ length: 20 }, (_, index) => tile((index % 10) as Tile["digit"], `t${index}`));
+    const twenty = Array.from({ length: 20 }, (_, index) => tile((index % 10) as Digit, `t${index}`));
     const { container } = renderInventory({ tiles: twenty, capacity: 19 });
     expect(cellCount(container)).toBe(19);
     expect(railCells(container).map(animationOn)).toEqual(["oz-rim-reject"]);
@@ -558,7 +558,7 @@ describe("TileInventory", () => {
 
   describe("the stepped Classic rack", () => {
     const hand = (count: number) =>
-      Array.from({ length: count }, (_, index) => tile((index % 10) as Tile["digit"], `h${index}`));
+      Array.from({ length: count }, (_, index) => tile((index % 10) as Digit, `h${index}`));
 
     // The sizes' figures, and the narrow 6 x 44 fallback, are CSS: a container
     // query jsdom cannot evaluate. What the component owns is which size, and

@@ -117,12 +117,14 @@ async function driveToGameOver(user: ReturnType<typeof userEvent.setup>) {
 }
 
 // A Classic run won at the floor. Every round is 1 × 2, a one-digit answer.
-// Rounds 1–18 spend each non-2 tile incorrectly (20 → 2 tiles); rounds 19–28
+// Rounds 1–18 spend each non-2 tile incorrectly (20 → 2 tiles); rounds 19–30
 // alternate a correct 2, rewarded with a 2 and a 0, and an incorrect 0, so the
-// hand never exceeds the closing capacity. The values are exactly what 28
+// hand never exceeds the closing capacity. The values are exactly what 30
 // rounds draw: the winning advance draws none (§1.8 step 0), and
 // sequenceRandom throws if it tries.
-const CLASSIC_WIN_ROUNDS = [0, 0, 1, 1, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0];
+const CLASSIC_WIN_ROUNDS = [
+  0, 0, 1, 1, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0,
+];
 
 function classicWinRandomValues(): number[] {
   const values = [...equationSamples(1, 2)];

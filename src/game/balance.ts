@@ -57,11 +57,13 @@ export const CLASSIC_START_CAPACITY = 20;
 
 /**
  * The capacity at which a Classic run is complete (the win).
- * Economy: b'(6) ~= 0.42, well below the cliff, so the late tray is where
- * runs are lost. Lower floors make the finish harder and the run longer.
- * Range: >= 2, the longest answer. Moves to 5 when M7's face-set tiles ship.
+ * Economy: b'(5) ~= 0.38 before face tiles, well below the cliff, so the late
+ * tray is where runs are lost. Lower floors make the finish harder and the run
+ * longer. At 6, FACE_RATE 0.10 wins 81% of simulated runs; 5 is the floor that
+ * ships with face tiles.
+ * Range: >= 2, the longest answer.
  */
-export const CLASSIC_FLOOR = 6;
+export const CLASSIC_FLOOR = 5;
 
 /**
  * Submissions, correct or not, between two Classic seals.

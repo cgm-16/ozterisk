@@ -151,6 +151,23 @@ describe("TileInventory", () => {
     expect(screen.getByRole("button", { name: "Digit 4" })).toHaveAttribute("aria-pressed", "false");
   });
 
+  // Whether the rack ends up on screen is layout, which only a browser can
+  // measure; jsdom can hold the call, its options, and that it happens once.
+  it("scrolls the rack into view once, instantly, when a discard starts", () => {
+    const scroll = vi.spyOn(Element.prototype, "scrollIntoView");
+    const { container, rerender } = renderInventory({ tiles: railedRack() });
+    expect(scroll).not.toHaveBeenCalled();
+
+    rerender({ mode: "discard" });
+    expect(scroll).toHaveBeenCalledTimes(1);
+    expect(scroll).toHaveBeenCalledWith({ block: "nearest", behavior: "instant" });
+    expect(scroll.mock.contexts[0]).toBe(container.querySelector(`.${rackStyles.rack}`));
+
+    rerender({ mode: "discard", pendingDiscards: ["s0"] });
+    expect(scroll).toHaveBeenCalledTimes(1);
+    scroll.mockRestore();
+  });
+
   it("does not mark a tile as pending discard outside discard mode", () => {
     renderInventory({
       mode: "select",

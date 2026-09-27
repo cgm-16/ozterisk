@@ -4,7 +4,7 @@ import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
 import { tileLabel } from "../Tile/tileFace";
 import { CLASSIC_START_CAPACITY } from "../../game/balance";
-import { rackTier } from "./rackTier";
+import { RACK_SCHEME, rackTier } from "./rackTier";
 import styles from "./TileInventory.module.css";
 
 /** A discard the rack is still drawing (8c): the hand as it stood before the
@@ -251,7 +251,20 @@ export function TileInventory({
   // scrollbar takes layout width. Resolved in style, the first frame is
   // already the right size.
   const tier = stepped ? rackTier(drawnCapacity) : null;
-  const footprint = tier ? tier.footprint : capacity;
+  // EXPERIMENT scheme C: draw only the drawn capacity's whole rows, at the
+  // column count CSS actually resolved (the narrow fallback changes it).
+  const inventoryRef = useRef<HTMLDivElement>(null);
+  const [drawnColumns, setDrawnColumns] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    if (RACK_SCHEME !== "C" || tier === null || inventoryRef.current === null) return;
+    const columns = Number(getComputedStyle(inventoryRef.current).getPropertyValue("--rack-columns"));
+    if (columns > 0 && columns !== drawnColumns) setDrawnColumns(columns);
+  }, [tier, drawnColumns]);
+  const wholeRows =
+    RACK_SCHEME === "C" && tier !== null && drawnColumns !== null
+      ? Math.ceil(drawnCapacity / drawnColumns) * drawnColumns
+      : null;
+  const footprint = wholeRows ?? (tier ? tier.footprint : capacity);
   const perched = rackTiles.slice(capacity);
 
   const renderTile = (tile: TileModel, cell: number | null) => {
@@ -375,7 +388,11 @@ export function TileInventory({
           {perched.map((tile) => renderTile(tile, null))}
         </div>
       )}
-      <div className={`${styles.inventory}${tier ? ` ${styles.tray}` : ""}`}>
+      <div
+        ref={inventoryRef}
+        className={`${styles.inventory}${tier ? ` ${styles.tray}` : ""}`}
+        style={wholeRows !== null && drawnColumns !== null ? ({ "--rack-rows": wholeRows / drawnColumns } as CSSProperties) : undefined}
+      >
         {Array.from({ length: footprint }, (_, index) => {
           if (index >= capacity) return renderClosed(index);
           const tile = rackTiles[index];

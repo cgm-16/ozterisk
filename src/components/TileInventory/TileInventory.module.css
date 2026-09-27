@@ -289,6 +289,18 @@
   --rack-pad: var(--space-2);
 }
 
+/* EXPERIMENT scheme B: a five-column mid size, so 15 and 10 are whole rows. */
+.rack[data-size="mid5"] > .rail,
+.rack[data-size="mid5"] > .inventory {
+  --rack-columns: 5;
+  --rack-rows: 3;
+  --tile-w: 48px;
+  --tile-h: 60px;
+  --size-tile: 28px;
+  --rack-gap: 6px;
+  --rack-pad: var(--space-2);
+}
+
 /* Where the arena cannot hold a size's tray, both upper sizes fall back to
    6 x 44 (§1.12). 350px is 7 x 44's tray (tiles, gaps, 8px padding a side, the
    1px border); 336px is 6 x 48's. The fallback needs 280px: the 281px the

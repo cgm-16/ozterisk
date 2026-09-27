@@ -2,7 +2,11 @@ import { CLASSIC_START_CAPACITY } from "../../game/balance";
 
 /** Classic's rack sizes (§1.12). Their figures — tile, gap, padding, and the
  * narrow 6 x 44 fallback — live in TileInventory.module.css, keyed by name. */
-export type RackSize = "small" | "mid" | "home";
+export type RackSize = "small" | "mid" | "mid5" | "home";
+
+// EXPERIMENT (exp/rack-steps, never merges): ?rack=A|B|C picks the scheme (#159).
+export const RACK_SCHEME: string =
+  typeof location === "undefined" ? "A" : (new URLSearchParams(location.search).get("rack") ?? "A").toUpperCase();
 
 export interface RackTier {
   size: RackSize;
@@ -26,6 +30,7 @@ export function rackTier(drawnCapacity: number): RackTier {
     return { size: "small", top, footprint: Math.ceil(top / NARROW_COLUMNS) * NARROW_COLUMNS };
   }
   if (drawnCapacity > HOME_ABOVE) {
+    if (RACK_SCHEME === "B") return { size: "mid5", top: MID_ABOVE, footprint: MID_ABOVE };
     return { size: "mid", top: MID_ABOVE, footprint: Math.ceil(MID_ABOVE / NARROW_COLUMNS) * NARROW_COLUMNS };
   }
   return { size: "home", top: HOME_ABOVE, footprint: HOME_ABOVE };

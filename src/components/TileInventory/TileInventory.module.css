@@ -280,7 +280,7 @@
 
 .rack[data-size="mid"] > .rail,
 .rack[data-size="mid"] > .inventory {
-  --rack-columns: 6;
+  --rack-columns: 5;
   --rack-rows: 3;
   --tile-w: 48px;
   --tile-h: 60px;
@@ -289,11 +289,12 @@
   --rack-pad: var(--space-2);
 }
 
-/* Where the arena cannot hold a size's tray, both upper sizes fall back to
-   6 x 44 (§1.12). 350px is 7 x 44's tray (tiles, gaps, 8px padding a side, the
-   1px border); 336px is 6 x 48's. The fallback needs 280px: the 281px the
-   320px gate leaves with a scrollbar has room for 2px gaps and 2px of side
-   padding, and no more. */
+/* Where the arena cannot hold the small size's tray, it falls back to 6 x 44
+   (§1.12). 350px is 7 x 44's tray (tiles, gaps, 8px padding a side, the 1px
+   border). The fallback needs 280px: the 281px the 320px gate leaves with a
+   scrollbar has room for 2px gaps and 2px of side padding, and no more. The
+   mid size needs no fallback: 5 x 48's tray is 282px, and the tracks' minmax
+   floor takes the missing pixel. */
 @container rack (width < 350px) {
   .rack[data-size="small"] > .rail,
   .rack[data-size="small"] > .inventory {
@@ -301,18 +302,6 @@
     --rack-rows: 4;
     --rack-gap: 2px;
     --rack-pad: 2px;
-  }
-}
-
-@container rack (width < 336px) {
-  .rack[data-size="mid"] > .rail,
-  .rack[data-size="mid"] > .inventory {
-    --tile-w: 44px;
-    --tile-h: 55px;
-    --size-tile: 25px;
-    --rack-gap: 2px;
-    --rack-pad: 2px;
-    --radius-md: var(--radius-sm);
   }
 }
 

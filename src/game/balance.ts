@@ -59,7 +59,7 @@ export const CLASSIC_START_CAPACITY = 20;
  * The capacity at which a Classic run is complete (the win).
  * Economy: b'(5) ~= 0.38 before face tiles, well below the cliff, so the late
  * tray is where runs are lost. Lower floors make the finish harder and the run
- * longer. At 6, FACE_RATE 0.10 wins 81% of simulated runs; 5 is the floor that
+ * longer. At 6, a flat face rate of 0.10 wins 81% of simulated runs; 5 is the floor that
  * ships with face tiles.
  * Range: >= 2, the longest answer.
  */
@@ -76,15 +76,22 @@ export const CLASSIC_SEAL_EVERY = 2;
 
 /**
  * Share of Classic reward tiles that are face tiles (product.md §1.4a); Endless
- * draws none. Within faces, each kind is weighted 1 / set size: Wildcard 8.1%,
- * each five-digit set 16.2%, Neighbours 27.0%, split evenly over its centres.
- * Separate from KIND_EQUATION_RATE, which biases the equation, not the reward.
- * Economy: a face spells more products than a digit, so it raises b' late in
- * the descent, where runs are lost. Measured Classic wins at CLASSIC_FLOOR 5
- * (M7 handoff, m7_sim_results.json; 3,000 runs each, 2 submissions per seal):
- * skill 95% — rate 0 -> 47%, 0.05 -> 56%, 0.10 -> 65%, 0.20 -> 81%;
- * skill 85% — rate 0 -> 37%, 0.10 -> 54%, 0.20 -> 72%.
- * 0.08 was not simulated; it sits inside the measured 56–65% bracket.
- * Range: 0.05–0.10. At floor 6, 0.10 already wins 81% of runs.
+ * draws none. The share ramps linearly, one equal step per submission, from
+ * FACE_RATE_START on a run's first submission to FACE_RATE_END on its last
+ * (getClassicFaceRate), so faces are scarce early and plentiful in the late
+ * descent, where runs are lost. Within faces, each kind is weighted 1 / set
+ * size: Wildcard 8.1%, each five-digit set 16.2%, Neighbours 27.0%, split
+ * evenly over its centres. Separate from KIND_EQUATION_RATE, which biases the
+ * equation, not the reward.
+ * Economy: a face spells more products than a digit, so it raises b' where
+ * the tray is small. Simulated on the real reducer and generator (T84; 3,000
+ * runs a schedule, same seeds; docs/journal/journal-2026-09-27.md), wins and
+ * faces earned per run, skill 95% / 85%:
+ * flat 0.08 (the shipped rate before T84) -> 52% / 42%, 4.1 faces, 0.8 of them
+ * once capacity is <= 10; ramp 0.05 -> 0.20 -> 61% / 49%, 6.1 faces, 2.2 late;
+ * flat 0.16 -> 71% / 60%. That simulator's bot plays below the M7 handoff's,
+ * so read the differences between schedules, not the absolute rates.
+ * Range: START 0.02–0.08, END 0.16–0.24. A steeper end pushes wins toward 70%.
  */
-export const FACE_RATE = 0.08;
+export const FACE_RATE_START = 0.05;
+export const FACE_RATE_END = 0.2;

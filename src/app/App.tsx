@@ -52,12 +52,13 @@ export function App({ dependencies, shareDependencies }: AppProps) {
         dependencies.random,
         dependencies.nextTileId,
         state.mode,
+        state.totalRounds,
       );
       dispatch({ type: "SUBMIT_CORRECT", rewardTiles });
     } else {
       dispatch({ type: "SUBMIT_INCORRECT" });
     }
-  }, [state.equation, state.selectedTiles, state.mode, dependencies]);
+  }, [state.equation, state.selectedTiles, state.mode, state.totalRounds, dependencies]);
 
   const handleNextRound = useCallback(() => {
     // At the floor the advance ends the run (§1.8 step 0): no equation is drawn,

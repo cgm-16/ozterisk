@@ -1,7 +1,7 @@
 import type { Digit, Equation, FaceSet, GameMode, RandomSource, Tile, TileIdFactory } from "./types";
-import { FACE_RATE, KIND_EQUATION_RATE } from "./balance";
+import { KIND_EQUATION_RATE } from "./balance";
 import { OPERAND_MAX, OPERAND_MIN, REWARD_DIGIT_COUNT } from "./constants";
-import { canConstruct } from "./selectors";
+import { canConstruct, getClassicFaceRate } from "./selectors";
 
 // The canonical 45-entry pool of unordered operand pairs (1 <= left <= right <= 9).
 const EQUATION_PAIRS: ReadonlyArray<readonly [number, number]> = (() => {
@@ -92,20 +92,22 @@ function drawFace(sample: number): FaceSet {
   throw new RangeError(`No face at sample ${sample}`);
 }
 
-// Classic draws a face gate sample per tile; Endless draws none, so its reward
-// sequence is exactly the digit draw.
+// Classic draws a face gate sample per tile, against the rate for the run's
+// submission count; Endless draws none, so its reward sequence is exactly the
+// digit draw.
 export function generateRewardTiles(
   count: number,
   random: RandomSource,
   idFactory: TileIdFactory,
   mode: GameMode,
+  totalRounds: number,
 ): Tile[] {
   if (!Number.isInteger(count) || count < 0) {
     throw new RangeError(`Reward count must be a non-negative integer; received ${count}`);
   }
 
   return Array.from({ length: count }, (): Tile => {
-    if (mode === "classic" && readRandomSample(random) < FACE_RATE) {
+    if (mode === "classic" && readRandomSample(random) < getClassicFaceRate(totalRounds)) {
       return { ...drawFace(readRandomSample(random)), id: idFactory(), isNew: true };
     }
     const sample = readRandomSample(random);

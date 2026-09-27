@@ -189,7 +189,8 @@ export const KIND_EQUATION_RATE = 0.2;
 export const CLASSIC_START_CAPACITY = 20;
 export const CLASSIC_FLOOR = 5;
 export const CLASSIC_SEAL_EVERY = 2;
-export const FACE_RATE = 0.08;
+export const FACE_RATE_START = 0.05;
+export const FACE_RATE_END = 0.2;
 
 // game/constants.ts — domain definitions
 export const OPERAND_MIN = 1;
@@ -210,9 +211,11 @@ export function generateRewardTiles(
   count: number,
   random: RandomSource,
   idFactory: TileIdFactory,
-  mode: GameMode, // Classic draws faces at FACE_RATE; Endless draws no face and consumes no face-gate sample
+  mode: GameMode, // Classic draws faces at getClassicFaceRate(totalRounds); Endless draws no face and consumes no face-gate sample
+  totalRounds: number, // submissions before this one
 ): Tile[];
 
+export function getClassicFaceRate(totalRounds: number): number; // FACE_RATE_START -> FACE_RATE_END over the run's submissions
 export function getAnswerLength(equation: Equation): 1 | 2;
 export function constructAnswer(selectedTiles: readonly Tile[]): number | null; // null if unfilled or any face tile
 export function answerMatches(selectedTiles: readonly Tile[], product: number): boolean; // every slot's tile holds its digit

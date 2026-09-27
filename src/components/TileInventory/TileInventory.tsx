@@ -36,6 +36,9 @@ export interface TileInventoryProps {
    * change. Defaults to capacity. */
   drawnCapacity?: number;
   onTile(tileId: string): void;
+  /** EXPERIMENT ?overflow=box: when set, the rail is drawn as the discard
+   * prompt, holding its tiles beside this text (empty while a tile drops). */
+  railPrompt?: string;
   /** Called once a discard's departing tiles have all finished leaving. */
   onSettled?(): void;
 }
@@ -58,6 +61,7 @@ export function TileInventory({
   drawnCapacity = capacity,
   onTile,
   onSettled,
+  railPrompt,
 }: TileInventoryProps) {
   const { t } = useI18n();
   const [departure, setDeparture] = useState<Departure | null>(null);
@@ -384,8 +388,11 @@ export function TileInventory({
           dropping tile lands: gone with the fall, it would lift every seat by
           its height mid-drop and start the tile that far above its perch. */}
       {(perched.length > 0 || dropping.size > 0) && (
-        <div className={`${styles.rail}${tier ? ` ${styles.railOverTray}` : ""}`}>
+        <div
+          className={`${styles.rail}${tier ? ` ${styles.railOverTray}` : ""}${railPrompt !== undefined ? ` ${styles.railPrompt}` : ""}`}
+        >
           {perched.map((tile) => renderTile(tile, null))}
+          {railPrompt && <p className={styles.railText}>{railPrompt}</p>}
         </div>
       )}
       <div

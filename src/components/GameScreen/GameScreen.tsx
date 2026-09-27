@@ -16,6 +16,7 @@ import { EquationBoard } from "../EquationBoard/EquationBoard";
 import { FeedbackPanel } from "../FeedbackPanel/FeedbackPanel";
 import { GameHud } from "../GameHud/GameHud";
 import { OverflowControls } from "../OverflowControls/OverflowControls";
+import { OVERFLOW_STYLE } from "../TileInventory/rackTier";
 import { TileInventory } from "../TileInventory/TileInventory";
 import styles from "./GameScreen.module.css";
 
@@ -129,7 +130,7 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         <ActionButton onClick={onNextRound}>{t("action.next")}</ActionButton>
       )}
 
-      {state.phase === "overflow" && (
+      {state.phase === "overflow" && OVERFLOW_STYLE !== "box" && (
         <OverflowControls requiredCount={getOverflowCount(state)} />
       )}
 
@@ -151,6 +152,15 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         drawnCapacity={getCapacity(state.mode, state.round - 1)}
         mode={state.phase === "answering" ? "select" : state.phase === "overflow" ? "discard" : "readOnly"}
         pendingDiscards={state.pendingDiscards}
+        railPrompt={
+          OVERFLOW_STYLE !== "box"
+            ? undefined
+            : state.phase !== "overflow"
+              ? ""
+              : getOverflowCount(state) === 1
+                ? t("overflow.instructionOne")
+                : t("overflow.instruction", { count: getOverflowCount(state) })
+        }
         onSettled={() => {
           if (advancesAlone) setRackSettled(state.totalRounds);
         }}

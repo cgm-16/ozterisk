@@ -335,3 +335,29 @@
     display: none;
   }
 }
+
+/* EXPERIMENT ?overflow=box: the rail is the discard prompt. Its tiles sit
+   beside the instruction in the prompt's vermilion-edged panel, so the
+   overflow moment adds no row of its own above the rack. */
+.railPrompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: calc(var(--tile-h) + 2 * var(--space-2));
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--state-discard);
+  border-radius: var(--radius-lg);
+  background: var(--surface-panel);
+}
+
+.railPrompt > .cell {
+  flex: none;
+  width: var(--tile-w);
+}
+
+.railText {
+  font: var(--weight-regular) var(--size-body-sm) / var(--leading-snug) var(--font-ui);
+  color: var(--text-primary);
+  text-align: start;
+}

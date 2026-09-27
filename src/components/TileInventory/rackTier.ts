@@ -4,9 +4,13 @@ import { CLASSIC_START_CAPACITY } from "../../game/balance";
  * narrow 6 x 44 fallback — live in TileInventory.module.css, keyed by name. */
 export type RackSize = "small" | "mid" | "mid5" | "home";
 
-// EXPERIMENT (exp/rack-steps, never merges): ?rack=A|B|C picks the scheme (#159).
-export const RACK_SCHEME: string =
-  typeof location === "undefined" ? "A" : (new URLSearchParams(location.search).get("rack") ?? "A").toUpperCase();
+// EXPERIMENT (exp/rack-steps, never merges): ?rack=A|B|C picks the scheme
+// (#159; B is picked, so it is the default), and ?overflow=rail|box whether
+// the tiles past capacity wait on the rail or inside the discard prompt.
+const experimentParam = (name: string, fallback: string): string =>
+  typeof location === "undefined" ? fallback : (new URLSearchParams(location.search).get(name) ?? fallback);
+export const RACK_SCHEME: string = experimentParam("rack", "B").toUpperCase();
+export const OVERFLOW_STYLE: string = experimentParam("overflow", "rail").toLowerCase();
 
 export interface RackTier {
   size: RackSize;

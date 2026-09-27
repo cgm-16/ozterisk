@@ -25,8 +25,8 @@ online services.
 - **Classic capacity**: one socket seals every `2` submissions, correct or
   not, down to a floor of `5` — `max(5, 20 − ⌊submissions / 2⌋)`. Capacity is
   derived from the mode and the submission count, never stored.
-- **Face tiles (Classic)**: a reward is sometimes a face tile (`FACE_RATE`,
-  8%) standing for a set of digits — Wildcard ✳ (any), Odd `O`, Even `E`
+- **Face tiles (Classic)**: a reward is sometimes a face tile, 5% of the time
+  at the start of a run and rising to 20% by its end, standing for a set of digits — Wildcard ✳ (any), Odd `O`, Even `E`
   (with `0`), Low `0–4`, High `5–9`, or Neighbours such as `3–5`. In an answer
   slot a face counts as the digit that slot needs if its set holds it;
   otherwise the answer is wrong. The player never picks the digit. Endless

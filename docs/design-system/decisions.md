@@ -617,6 +617,30 @@ on a phone as much better (#180).
   removing about 300px, which is a redesign. Answering still scrolls late in a
   run; that stays open on #180.
 
+### Classic's face rate ramps from 5% to 20% (locked 27 Sep 2026)
+
+At a flat 8%, a Classic run earned about four faces, and fewer than one of
+them came once the rack was down to ten sockets. That's the stretch where runs
+are lost. Ori found it too few for a game-changing boon: "there aren't enough
+fun tiles."
+
+The rate now ramps linearly, one equal step per submission, from **5%** on a
+run's first submission to **20%** on its last. Simulated on the real reducer and
+generator (3,000 runs a schedule, same seeds):
+
+| Rate | Win at skill 95% | Win at skill 85% | Faces per run | Faces at ≤ 10 sockets |
+|---|---|---|---|---|
+| Flat 8% (before) | 52% | 42% | 4.1 | 0.8 |
+| **Ramp 5% → 20%** | **61%** | **49%** | **6.1** | **2.2** |
+
+- **A ramp, not a flat rise.** A flat 16% would also double the late faces, but
+  it floods the early rack and pushes wins to 71%.
+- **Win rate up about 9 points.** Ori chose this over a 4% → 16% ramp, which
+  keeps win rate within 4 points but gives only 1.6 late faces.
+- The simulator's bot plays below the M7 handoff's (33% wins without faces
+  against its 47%), so the win rates are for comparing schedules, not a
+  forecast of real play.
+
 ## M7 — Face-set tiles, merged from the M7 handoff (26 Sep 2026)
 
 Merged from `docs/design_handoff_m7_face_tiles/decisions.md`: the three sections

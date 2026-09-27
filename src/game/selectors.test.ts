@@ -6,6 +6,7 @@ import {
   constructAnswer,
   getAnswerLength,
   getCapacity,
+  getClassicFaceRate,
   getOverflowCount,
   getRewardCount,
   isClassicWin,
@@ -16,6 +17,8 @@ import {
   CLASSIC_FLOOR,
   CLASSIC_SEAL_EVERY,
   CLASSIC_START_CAPACITY,
+  FACE_RATE_END,
+  FACE_RATE_START,
   INVENTORY_CAPACITY,
   REWARD_BONUS,
 } from "./balance";
@@ -181,6 +184,27 @@ describe("answerMatches", () => {
   it("rejects a selection that does not fill the product's slots", () => {
     expect(answerMatches([makeTile(0), makeTile(9)], 9)).toBe(false);
     expect(answerMatches([makeTile(5)], 56)).toBe(false);
+  });
+});
+
+describe("getClassicFaceRate", () => {
+  // The last submission of a run is the one that seals the floor's socket.
+  const lastSubmission = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY - 1;
+
+  it("starts at the start rate and reaches the end rate on the run's last submission", () => {
+    expect(getClassicFaceRate(0)).toBe(FACE_RATE_START);
+    expect(getClassicFaceRate(lastSubmission)).toBeCloseTo(FACE_RATE_END, 12);
+  });
+
+  it("rises by the same step every submission", () => {
+    const step = (FACE_RATE_END - FACE_RATE_START) / lastSubmission;
+    for (let submission = 1; submission <= lastSubmission; submission++) {
+      expect(getClassicFaceRate(submission) - getClassicFaceRate(submission - 1)).toBeCloseTo(step, 12);
+    }
+  });
+
+  it("holds the end rate past the last submission", () => {
+    expect(getClassicFaceRate(lastSubmission + 5)).toBeCloseTo(FACE_RATE_END, 12);
   });
 });
 

@@ -61,6 +61,13 @@ section wins.
   it, a dropping tile narrows by a few pixels as it lands). The rail exists while tiles
   are past capacity, and until a tile it held has landed in a freed socket (8a·2), in
   both modes. It never adds a row to the rack.
+- **Discard scroll.** When a discard starts, the rack scrolls into view once, with
+  `scrollIntoView({ block: "nearest", behavior: "instant" })`. That is the smallest
+  jump that puts the rack's bottom on screen. The prompt and the rail sit directly
+  above the rack, and the three together (≤ `379px`) fit a `548px` viewport, so they
+  come with it. If the rack is already in view, it does nothing. It is a jump, not a
+  motion moment, so it adds nothing to the inventory and has nothing for reduced
+  motion to neutralise.
 - Answer slots stay `64 × 80` (at the arena's tier) in every Classic rack size.
 - Rack sizing has three tiers: below `408px`, tiles are `52 × 64` with an `8px` gap;
   from `408px`, `66 × 64` with a `12px` gap; from `48rem`, `64 × 80` with a `12px`

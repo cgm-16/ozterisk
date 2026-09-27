@@ -598,6 +598,25 @@ Considered and not taken, in the same experiment: the tile past capacity waiting
 inside the discard prompt instead of on the rail. It removed overflow's extra
 ~80px of height, but isn't needed yet.
 
+### A discard scrolls the rack into view (locked 27 Sep 2026)
+
+The game screen is taller than most phones' visible area. At 360–430px wide, a
+discard screen is 776–853px tall and answering reaches 790–845px late in a run.
+A discard used to start below the fold, with the rack's bottom at 776 against a
+660px viewport (393 wide, Safari's bars shown). Experiment #182 tried **one
+instant scroll** when the discard starts. At 393 × 660 it moves 116px, and the
+equation, feedback, prompt, rail and whole rack are all on screen. Ori judged it
+on a phone as much better (#180).
+
+- **Instant, not smooth.** A smooth scroll would be a new motion moment, needing an
+  inventory entry and a reduced-motion rule. A jump needs neither.
+- **`nearest`, not `start`.** It moves the page only as far as the rack needs, so
+  as much of the equation stays on screen as fits.
+- **An iPhone SE is still an exception.** At 375 × 548 the equation leaves the top.
+- **Not attempted:** tightening the layout to fit. On an SE that would mean
+  removing about 300px, which is a redesign. Answering still scrolls late in a
+  run; that stays open on #180.
+
 ## M7 — Face-set tiles, merged from the M7 handoff (26 Sep 2026)
 
 Merged from `docs/design_handoff_m7_face_tiles/decisions.md`: the three sections

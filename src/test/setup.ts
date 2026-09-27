@@ -28,6 +28,11 @@ for (const [name, value] of [
   });
 }
 
+/* jsdom does no layout, so it has no scrollIntoView to call. A no-op is the
+   honest stand-in: there is nothing for it to scroll. Tests that care about
+   the call spy on it. */
+Element.prototype.scrollIntoView = () => {};
+
 afterEach(() => {
   cleanup();
 });

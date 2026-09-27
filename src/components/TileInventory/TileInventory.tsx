@@ -148,6 +148,13 @@ export function TileInventory({
     if (settled) onSettledRef.current?.();
   }, [settled]);
   const rackRef = useRef<HTMLDivElement>(null);
+  // EXPERIMENT (#180): one instant scroll when a discard starts, just far enough
+  // to bring the rack's bottom on screen. The prompt sits above the rack and the
+  // two together fit a 548px viewport, so the prompt comes with it.
+  const discarding = mode === "discard";
+  useEffect(() => {
+    if (discarding) rackRef.current?.scrollIntoView?.({ block: "nearest", behavior: "instant" });
+  }, [discarding]);
   // The native cancel listener below is bound once; these carry it the
   // current render's handlers, whose measurement reads the current hand.
   const retireRef = useRef(retire);

@@ -25,21 +25,26 @@ section wins.
   (`product.md` §1.7a), so every size holds about `180px` of height and the rack never
   scrolls vertically:
   - capacity `16–20`: `7` columns, tiles `44 × 55`, gap `4px`, radius `--radius-sm`; footprint `21` cells;
-  - capacity `11–15`: `6` columns, tiles `48 × 60`, gap `6px`; footprint `18` cells;
+  - capacity `11–15`: `5` columns, tiles `48 × 60`, gap `6px`; footprint `15` cells;
   - capacity `≤ 10`: the Endless rack itself — `5` columns at Endless's tiers above, scaling
     with its container; footprint `10` cells. From ten sockets on, Classic's rack is Endless's.
-  The thresholds (`15`, `10`) await a device playtest. **Narrow cap:** where the
-  rack's container cannot hold a size's natural width, both upper sizes draw at
-  `6` columns of `44 × 55` (`44px` is the target minimum and may not be undercut).
+  The thresholds (`15`, `10`) are whole rows of five, so neither the mid size nor the
+  home rack starts with a plug, and from a `350px` container up no row is ever all
+  plugs (played on an iPhone 13 mini, #159). **Narrow cap:** where the rack's
+  container cannot hold the small size's natural width, it draws at `6` columns of
+  `44 × 55` (`44px` is the target minimum and may not be undercut), and its footprint
+  is `24` cells, so it holds a row of plugs at `18`–`16` sockets; that is accepted.
+  The mid size needs no fallback: its tray is `282px`, and its tracks absorb the
+  missing pixel within the target minimum.
   The budget is the `320px` gate *with* a `15px` scrollbar, as above: a `305px`
   content box less the arena's `24px` padding leaves `281px`. `7 × 44` needs `332px`
-  of tiles and `6 × 48` needs `318px`, so neither fits; `6 × 44` needs `264px`, which
+  of tiles, so it does not fit; `6 × 44` needs `264px`, which
   leaves `17px` for five gaps, the panel's side padding and its `1px` border on both
   sides — so the narrow size uses a `2px` gap and `2px` of side padding (`280px`). Only
   the width binds, so the panel keeps its `8px` top and bottom.
   "Narrow" is a property of the container, not the viewport: a `min-width` query
   fires about `15px` early wherever scrollbars take layout width (see above), so it
-  cannot choose the column count. The narrow footprint is whole rows of `6`.
+  cannot choose the column count. The small size's footprint is whole rows of `6`.
 - **Two capacities.** The rack is *drawn* at the displayed round's capacity
   (`product.md` §1.7a), which picks the size and the footprint. The *live* capacity
   decides which tiles are seated and which are on the rail. Between a seal and the
@@ -136,10 +141,11 @@ section wins.
 - Motion is budgeted by frequency: what happens every round is fastest and quietest;
   what happens once a run may be theatrical.
 - Permitted motion is the **named inventory** in `docs/design-system/decisions.md`
-  — the fifteen named storyboard moments, plus Classic's five: `M6` (a socket seals,
+  — the fifteen named storyboard moments, plus Classic's four: `M6` (a socket seals,
   `oz-seal` + `oz-seal-rim`), `8a·2` (the perched tile takes the freed seat,
-  `oz-perch-drop`), `M6·0` (the house takes a seat), `M6·1` (the rack re-seats,
-  `oz-reseat`) and `M6·2` (new plugs close). `8c` is drawn with `oz-slide-off`, which
+  `oz-perch-drop`), `M6·0` (the house takes a seat) and `M6·1` (the rack re-seats,
+  `oz-reseat`). `M6·2` (new plugs close) is retired: no size below twenty starts
+  with a plug. `8c` is drawn with `oz-slide-off`, which
   supersedes `oz-tip-off`. A moment whose duration and easing are
   not yet assigned in `src/styles/tokens/motion.css` gets them assigned by
   the milestone that implements it, and that assignment is not an amendment. Motion

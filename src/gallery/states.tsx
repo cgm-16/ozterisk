@@ -246,7 +246,7 @@ const ANSWERING_CLASSIC_STATE = makeAnsweringState(makeEquation(3, 4), {
   inventory: createInitialInventory(sequentialIds(), CLASSIC_START_CAPACITY),
 });
 
-// Classic's other two sizes (§1.12): 6 x 48 from fifteen sockets, and the
+// Classic's other two sizes (§1.12): 5 x 48 from fifteen sockets, and the
 // Endless rack, in its tray, from ten. Each is the first round drawn at that
 // capacity, with the hand dealt to fill it.
 const classicAt = (capacity: number) => {
@@ -281,13 +281,13 @@ const GAME_OVER_CLASSIC_WIN_STATE = makeGameOverState(makeEquation(7, 8), {
   inventory: [makeTile(1, "win-a"), makeTile(4, "win-b"), makeTile(4, "win-c"), makeFaceTile("wild", "win-d")],
 });
 
-// Face tiles (§1.4a) are Classic's. A rack at fifteen, the 6 x 48 size that
-// narrows to 6 x 44 at 320px, holds all six kinds after nine digits, in rack
+// Face tiles (§1.4a) are Classic's. A rack at sixteen, the 7 x 44 size that
+// narrows to 6 x 44 at 320px, holds all six kinds after ten digits, in rack
 // order: the widest glyphs in the smallest tiles the rack draws.
 const ANSWERING_CLASSIC_FACES_STATE = makeAnsweringState(makeEquation(3, 4), {
   mode: "classic",
   inventory: sortTiles([
-    ...createInitialInventory(sequentialIds(), 9),
+    ...createInitialInventory(sequentialIds(), 10),
     makeFaceTile("high"),
     makeNbrTile(4),
     makeFaceTile("low"),
@@ -295,8 +295,8 @@ const ANSWERING_CLASSIC_FACES_STATE = makeAnsweringState(makeEquation(3, 4), {
     makeFaceTile("odd"),
     makeFaceTile("wild"),
   ]),
-  totalRounds: (CLASSIC_START_CAPACITY - 15) * CLASSIC_SEAL_EVERY,
-  round: (CLASSIC_START_CAPACITY - 15) * CLASSIC_SEAL_EVERY + 1,
+  totalRounds: (CLASSIC_START_CAPACITY - 16) * CLASSIC_SEAL_EVERY,
+  round: (CLASSIC_START_CAPACITY - 16) * CLASSIC_SEAL_EVERY + 1,
 });
 
 // Built through the reducer, as the other feedback states are. High counts as
@@ -388,7 +388,7 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
     },
     {
       id: "answering-classic-15",
-      label: "Answering — Classic at fifteen (6 x 48)",
+      label: "Answering — Classic at fifteen (5 x 48)",
       render: () => renderGameScreen(ANSWERING_CLASSIC_15_STATE),
     },
     {
@@ -398,7 +398,7 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
     },
     {
       id: "answering-classic-faces",
-      label: "Answering — Classic at fifteen, every face kind in the rack",
+      label: "Answering — Classic at sixteen, every face kind in the rack",
       render: () => renderGameScreen(ANSWERING_CLASSIC_FACES_STATE),
     },
     {

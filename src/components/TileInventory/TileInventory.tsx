@@ -3,7 +3,6 @@ import type { Tile as TileModel } from "../../game/types";
 import { useI18n } from "../../i18n/I18nContext";
 import { Tile } from "../Tile/Tile";
 import { tileLabel } from "../Tile/tileFace";
-import { CLASSIC_START_CAPACITY } from "../../game/balance";
 import { rackTier } from "./rackTier";
 import styles from "./TileInventory.module.css";
 
@@ -343,12 +342,10 @@ export function TileInventory({
   };
 
   // A plug past its size's top capacity appears only when that size is first
-  // drawn, so it seals in front of the player: the house plug 240ms into the
-  // run (M6·0), a new size's plugs 40ms apart once the re-seat has landed
-  // (M6·2). The socket a seal took this submission closes at once (M6). Keyed
-  // by kind and size, each seals on mount and rests sealed after: the socket
-  // that closed at a size change's submission is a new size's first plug, and
-  // remounts to seal again rather than rewind.
+  // drawn, so it seals in front of the player. Only the small size has any,
+  // because 15 and 10 are whole rows of five: the house plug, 240ms into the
+  // run (M6·0). The socket a seal took this submission closes at once (M6).
+  // Keyed by kind and size, each seals on mount and rests sealed after.
   const renderSeal = (index: number, delay: string | undefined) => (
     <div key={`seal-${tier?.top}-${index}`} className={`${styles.plug} ${styles.sealing}`} aria-hidden="true" data-cell={index}>
       <span className={styles.sealWell} style={{ animationDelay: delay }} />
@@ -360,8 +357,7 @@ export function TileInventory({
     if (tier === null || index < tier.top) {
       return <div key={`plug-${index}`} className={styles.plug} aria-hidden="true" data-cell={index} />;
     }
-    const delay = tier.top === CLASSIC_START_CAPACITY ? 240 : 300 + (index - tier.top) * 40;
-    return renderSeal(index, `${delay}ms`);
+    return renderSeal(index, "240ms");
   };
 
   return (

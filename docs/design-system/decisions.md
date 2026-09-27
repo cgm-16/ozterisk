@@ -54,7 +54,7 @@ this codebase's non-reflowing rack.
 | `8a·2` | The perched tile takes the seat a discard freed | **inferred** — 8a leaves a tile on the rail and nothing collected it | **built** — `oz-perch-drop`, 220ms | `TileInventory` `.cellPerchDrop`, offsets measured from layout when the exits end |
 | `M6·0` | House takes a seat: the 21st socket seals at run start | **inferred** | **built** — `oz-seal`, 240ms delay | `TileInventory` `.sealing`, plugs past twenty on the rack's first render |
 | `M6·1` | Rack re-seats at a size change (FLIP) | **inferred** | **built** — `oz-reseat`, 300ms, `--ease-settle` | `TileInventory` layout effect, written onto each cell at a size change |
-| `M6·2` | New plugs close after the re-seat | **inferred** | **built** — `oz-seal`, 300 + 40·k ms | `TileInventory` `.sealing`, plugs past a new size's top |
+| `M6·2` | New plugs close after the re-seat | **inferred** | **retired** — five-column mid rack, below | — |
 
 ### Inferred, and therefore open to challenge
 
@@ -523,7 +523,7 @@ freed, and the rack re-sorts at the next round under the round rise (10b), which
 keeps the one-sort-per-round rule. Unsorting Classic was rejected: it breaks
 that rule and makes reading the hand a chore that says nothing about skill.
 
-### Classic's rack steps its tile size with capacity (locked 24 Sep 2026; 15/10 thresholds pending device playtest)
+### Classic's rack steps its tile size with capacity (locked 24 Sep 2026; the mid size is superseded by *The mid rack is five columns*, 27 Sep 2026)
 
 At 64×80 in 5 columns, twenty sockets take four rows (~356px) and won't fit a
 667px-tall phone. Rather than shrinking tiles everywhere or making the rack
@@ -571,6 +571,32 @@ landed. A resize round runs about 560ms, twice a run.
 - "House takes a seat" is kept.
 - Floor moves 6 → 5 when M7 ships.
 - Stepped rack and plugs are promoted into `TileInventory` (`stepped`, `drawnCapacity`, `capacity`; `rackTier` and its 15/10 thresholds in `rackTier.ts`; the re-seat reads the previous render, so there is no `reseatFrom` prop — T71, T73).
+
+### The mid rack is five columns (locked 27 Sep 2026)
+
+The 15 and 10 thresholds are whole rows only at five columns, but the mid size
+was six columns wide with a fixed 18 cells. So from 12 sockets down, its whole
+third row was plugs, until the rack stepped to 10. On an iPhone 13 mini, Ori
+found that dead row awkward (#159). Experiment #177 measured three schemes in
+real Classic runs at 320–430px:
+- **A:** today's rack.
+- **B:** a five-column mid size.
+- **C:** only the capacity's whole rows, with the rack's height changing as rows go.
+
+**B is taken.** The mid size is **5 × 48×60**, gap 6px, footprint 15. 15 and 10
+are whole rows, so the mid size never holds more than four plugs, and no row is
+all plugs from a 350px container up. It needs no narrow fallback: its tray is
+282px, and the tracks absorb the one pixel the 320px gate lacks. The small size's
+6 × 4 fallback still holds a row of plugs at 18–16. That's accepted, because
+320px phones are rare. C was rejected: it adds a step at 12 (and at 18 when
+narrow), and its rack shrinks, then grows again at 10.
+
+**M6·2 is retired.** No size below twenty starts with a plug, so there is
+nothing to close after a re-seat. M6·0 is unchanged.
+
+Considered and not taken, in the same experiment: the tile past capacity waiting
+inside the discard prompt instead of on the rail. It removed overflow's extra
+~80px of height, but isn't needed yet.
 
 ## M7 — Face-set tiles, merged from the M7 handoff (26 Sep 2026)
 

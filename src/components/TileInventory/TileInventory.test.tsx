@@ -560,14 +560,15 @@ describe("TileInventory", () => {
     const hand = (count: number) =>
       Array.from({ length: count }, (_, index) => tile((index % 10) as Digit, `h${index}`));
 
-    // The sizes' figures, and the narrow 6 x 44 fallback, are CSS: a container
-    // query jsdom cannot evaluate. What the component owns is which size, and
-    // enough cells for the fallback's whole rows.
+    // The sizes' figures, and the small size's narrow 6 x 44 fallback, are CSS:
+    // a container query jsdom cannot evaluate. What the component owns is which
+    // size, and enough cells for its whole rows: the small size's fallback rows
+    // of six, and the mid size's rows of five.
     it("steps its size with the drawn capacity: small above 15, mid above 10, home at 10 and below", () => {
       expect(rackTier(20)).toEqual({ size: "small", top: 20, footprint: 24 });
       expect(rackTier(16)).toEqual({ size: "small", top: 20, footprint: 24 });
-      expect(rackTier(15)).toEqual({ size: "mid", top: 15, footprint: 18 });
-      expect(rackTier(11)).toEqual({ size: "mid", top: 15, footprint: 18 });
+      expect(rackTier(15)).toEqual({ size: "mid", top: 15, footprint: 15 });
+      expect(rackTier(11)).toEqual({ size: "mid", top: 15, footprint: 15 });
       expect(rackTier(10)).toEqual({ size: "home", top: 10, footprint: 10 });
       expect(rackTier(6)).toEqual({ size: "home", top: 10, footprint: 10 });
     });
@@ -601,10 +602,11 @@ describe("TileInventory", () => {
       expect(railCells(container)).toHaveLength(2);
     });
 
-    it("draws 18 cells with three plugs at fifteen", () => {
+    // 15 is three whole rows of five, so the mid size starts with no plug.
+    it("draws 15 cells and no plug at fifteen", () => {
       const { container } = renderInventory({ tiles: hand(15), capacity: 15, drawnCapacity: 15, stepped: true });
-      expect(cellCount(container)).toBe(18);
-      expect(plugCount(container)).toBe(3);
+      expect(cellCount(container)).toBe(15);
+      expect(plugCount(container)).toBe(0);
     });
 
     it("draws the ten-socket rack from ten down, where only a closed socket is a plug", () => {
@@ -632,9 +634,9 @@ describe("TileInventory", () => {
       expect(well.style.animationDelay).toBe("240ms");
     });
 
-    // M6·1 and M6·2: at a size change the tiles fly from their old seats, and
-    // the new size's plugs close 40ms apart once they have landed.
-    it("re-seats every tile and closes the new plugs at a size change", () => {
+    // M6·1: at a size change the tiles fly from their old seats. Every size
+    // below twenty starts on whole rows, so no plug arrives with it.
+    it("re-seats every tile at a size change, and adds no plug", () => {
       const tiles = hand(15);
       // jsdom lays nothing out, so give each seat a layout per size: 44px
       // tiles on a 46px pitch at the top, then 48px tiles on a 50px pitch 10px
@@ -650,12 +652,9 @@ describe("TileInventory", () => {
       ];
       try {
         const { container, rerender } = renderInventory({ tiles, capacity: 15, drawnCapacity: 16, stepped: true });
-        // Cell 15 sealed at the submission; at the new size it is a new plug,
-        // and only a fresh element plays the seal again rather than rewinding.
-        const closedAtSubmission = cells(container)[15];
         layout = { pitch: 50, top: 10, width: 48 };
         rerender({ tiles, capacity: 15, drawnCapacity: 15, stepped: true });
-        expect(cells(container)[15]).not.toBe(closedAtSubmission);
+        expect(cellCount(container)).toBe(15);
 
         const seated = cells(container).slice(0, 15);
         seated.forEach((cell, index) => {
@@ -665,10 +664,6 @@ describe("TileInventory", () => {
           expect(Number(cell.style.getPropertyValue("--fs"))).toBeCloseTo(44 / 48, 5);
           expect(cell.style.transformOrigin).toBe("0 0");
         });
-        const delays = cells(container)
-          .slice(15)
-          .map((plug) => (plug.children[0] as HTMLElement).style.animationDelay);
-        expect(delays).toEqual(["300ms", "340ms", "380ms"]);
       } finally {
         for (const spy of spies) spy.mockRestore();
       }

@@ -598,6 +598,49 @@ Considered and not taken, in the same experiment: the tile past capacity waiting
 inside the discard prompt instead of on the rail. It removed overflow's extra
 ~80px of height, but isn't needed yet.
 
+### A discard scrolls the rack into view (locked 27 Sep 2026)
+
+The game screen is taller than most phones' visible area. At 360–430px wide, a
+discard screen is 776–853px tall and answering reaches 790–845px late in a run.
+A discard used to start below the fold, with the rack's bottom at 776 against a
+660px viewport (393 wide, Safari's bars shown). Experiment #182 tried **one
+instant scroll** when the discard starts. At 393 × 660 it moves 116px, and the
+equation, feedback, prompt, rail and whole rack are all on screen. Ori judged it
+on a phone as much better (#180).
+
+- **Instant, not smooth.** A smooth scroll would be a new motion moment, needing an
+  inventory entry and a reduced-motion rule. A jump needs neither.
+- **`nearest`, not `start`.** It moves the page only as far as the rack needs, so
+  as much of the equation stays on screen as fits.
+- **An iPhone SE is still an exception.** At 375 × 548 the equation leaves the top.
+- **Not attempted:** tightening the layout to fit. On an SE that would mean
+  removing about 300px, which is a redesign. Answering still scrolls late in a
+  run; that stays open on #180.
+
+### Classic's face rate ramps from 5% to 20% (locked 27 Sep 2026)
+
+At a flat 8%, a Classic run earned about four faces, and fewer than one of
+them came once the rack was down to ten sockets. That's the stretch where runs
+are lost. Ori found it too few for a game-changing boon: "there aren't enough
+fun tiles."
+
+The rate now ramps linearly, one equal step per submission, from **5%** on a
+run's first submission to **20%** on its last. Simulated on the real reducer and
+generator (3,000 runs a schedule, same seeds):
+
+| Rate | Win at skill 95% | Win at skill 85% | Faces per run | Faces at ≤ 10 sockets |
+|---|---|---|---|---|
+| Flat 8% (before) | 52% | 42% | 4.1 | 0.8 |
+| **Ramp 5% → 20%** | **61%** | **49%** | **6.1** | **2.2** |
+
+- **A ramp, not a flat rise.** A flat 16% would also double the late faces, but
+  it floods the early rack and pushes wins to 71%.
+- **Win rate up about 9 points.** Ori chose this over a 4% → 16% ramp, which
+  keeps win rate within 4 points but gives only 1.6 late faces.
+- The simulator's bot plays below the M7 handoff's (33% wins without faces
+  against its 47%), so the win rates are for comparing schedules, not a
+  forecast of real play.
+
 ## M7 — Face-set tiles, merged from the M7 handoff (26 Sep 2026)
 
 Merged from `docs/design_handoff_m7_face_tiles/decisions.md`: the three sections

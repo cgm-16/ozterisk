@@ -33,7 +33,9 @@ hoc at branch time.
 | `M6b — Classic Rack and Motion` | Classic's rack steps its tile size, keeps closed sockets as plugs, perches overflow on a rail, and shows every change| Stepped rack, plugs and rail merged; `M6`, `8a·2`, `M6·0`, `M6·1`, `M6·2` and `oz-slide-off` wired; no horizontal scroll at `320px` for any rack size; reduced motion jumps straight to each end state|
 | `M6c — Run Complete Correction` | A Classic win's verdict is gold, with its final hand, not the loss's vermilion (`T75`) | Run Complete in `--gold-500`; the floor's sockets show the tiles still in hand, named by `gameOver.finalHand` in en and ko |
 | `M6d — Rack Steps` | Classic's mid rack is `5 × 3`, so its `15` and `10` steps fall on whole rows (`T82`) | No rack row is all plugs from a `350px` container up; `M6·2` retired; no horizontal scroll at `320px` |
+| `M6e — Discard Scroll` | A discard brings the rack on screen with one instant scroll (`T83`) | At 393 × 660 the prompt, rail and whole rack are on screen at every discard; nothing scrolls when the rack is already in view; no new motion moment |
 | `M7 — Special Tiles` | Face-set tiles in Classic — Wildcard, Odd, Even, Low, High and Neighbours — each counting as its slot's digit when the digit is in its set (`T76`–`T81`) | Faces arrive as Classic rewards at `FACE_RATE` 0.08 and never in Endless; `canConstruct` searches assignments; the floor is 5; one Classic run in en and ko places a face right and one wrong |
+| `M7b — Face Rate Ramp` | Classic's face rate ramps from `5%` to `20%` across the run (`T84`) | `getClassicFaceRate` rises one equal step per submission, first to last; Endless still draws no face; the simulated win rate and faces per run recorded against the flat `8%` |
 
 `M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d`, `M5.5e`, `M5.5f` and `M5.5g` are
 closed, merged as `16f2ff6`, `ecd76a1`, `f30929e`, `b933ca7`, `29708b8`,

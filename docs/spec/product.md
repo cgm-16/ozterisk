@@ -24,7 +24,7 @@ The PoC validates whether this loop is understandable and engaging. It does not 
 - After drawing the unordered pair, independently randomize display order.
 - `3 × 7` and `7 × 3` are presentations of one sampling entry, not two entries.
 - Products range from `1` through `81`; an answer therefore has exactly one or two decimal digits.
-- Rewards are independent uniformly distributed digits `0` through `9`; each digit has probability `10%`. In Classic, each reward is first a face tile with probability `FACE_RATE` (a tuning dial), drawn as §1.4a sets out; otherwise it is a digit as above. Endless rewards are digits only.
+- Rewards are independent uniformly distributed digits `0` through `9`; each digit has probability `10%`. In Classic, each reward is first a face tile with a probability that ramps linearly with the run's submissions, from `FACE_RATE_START` on the first submission to `FACE_RATE_END` on the last, one equal step per submission (both tuning dials; `getClassicFaceRate`). The face is drawn as §1.4a sets out; otherwise it is a digit as above. Endless rewards are digits only.
 - Production uses `Math.random()`.
 - Tests provide deterministic `RandomSource` functions.
 

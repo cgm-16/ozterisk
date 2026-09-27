@@ -3,6 +3,8 @@ import {
   CLASSIC_FLOOR,
   CLASSIC_SEAL_EVERY,
   CLASSIC_START_CAPACITY,
+  FACE_RATE_END,
+  FACE_RATE_START,
   INVENTORY_CAPACITY,
   REWARD_BONUS,
 } from "./balance";
@@ -77,6 +79,15 @@ export function getCapacity(mode: GameMode, totalRounds: number): number {
   if (mode === "endless") return INVENTORY_CAPACITY;
   const sealed = Math.floor(totalRounds / CLASSIC_SEAL_EVERY);
   return Math.max(CLASSIC_FLOOR, CLASSIC_START_CAPACITY - sealed);
+}
+
+// The share of a Classic reward that is a face, given the submissions before
+// this one: FACE_RATE_START on a run's first submission, rising one equal step
+// per submission to FACE_RATE_END on the one that seals the floor (§1.2).
+const LAST_CLASSIC_SUBMISSION = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY - 1;
+export function getClassicFaceRate(totalRounds: number): number {
+  const progress = Math.min(1, totalRounds / LAST_CLASSIC_SUBMISSION);
+  return FACE_RATE_START + (FACE_RATE_END - FACE_RATE_START) * progress;
 }
 
 type CapacityState = Pick<GameState, "inventory" | "mode" | "totalRounds">;

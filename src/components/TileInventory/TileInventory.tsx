@@ -148,6 +148,13 @@ export function TileInventory({
     if (settled) onSettledRef.current?.();
   }, [settled]);
   const rackRef = useRef<HTMLDivElement>(null);
+  // A discard starts below the fold on most phones. One instant scroll brings
+  // the rack's bottom on screen, and the prompt and rail above it come too;
+  // it does nothing when the rack is already in view (§1.12).
+  const discarding = mode === "discard";
+  useEffect(() => {
+    if (discarding) rackRef.current?.scrollIntoView({ block: "nearest", behavior: "instant" });
+  }, [discarding]);
   // The native cancel listener below is bound once; these carry it the
   // current render's handlers, whose measurement reads the current hand.
   const retireRef = useRef(retire);

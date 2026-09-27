@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "../i18n/I18nContext";
 import { LANGUAGE_STORAGE_KEY } from "../i18n/storage";
-import { FACE_RATE } from "../game/balance";
+import { FACE_RATE_END } from "../game/balance";
 import type { Language } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
 import { sequenceRandom, sequentialIds } from "../test/fixtures";
@@ -35,10 +35,10 @@ function rewardSample(digit: number): number {
   return digit / 10;
 }
 
-// A Classic reward first samples the face gate (§1.2); FACE_RATE itself misses
-// it, so the tile is the digit.
+// A Classic reward first samples the face gate (§1.2); FACE_RATE_END misses it
+// at every submission, so the tile is the digit.
 function classicRewardSamples(digit: number): [number, number] {
-  return [FACE_RATE, rewardSample(digit)];
+  return [FACE_RATE_END, rewardSample(digit)];
 }
 
 function makeShareDependencies(): ShareDependencies {

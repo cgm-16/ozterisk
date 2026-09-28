@@ -9,8 +9,9 @@
 - **No Storybook** (package shape). The dev-only `gallery.html` holds the canonical states;
   the previews in `previews/` were ported from it and from the component tests.
 - **Props contracts are hand-written in `cfg.dtsPropsFor`**, with no `.d.ts` to extract from.
-  Types are inlined structurally (tile, equation, round result). GameScreen and GameOverScreen
-  have none (their props are the whole game state); they ship `[key: string]: unknown`.
+  Types are inlined structurally (tile, equation, round result, and for GameScreen the whole
+  `GameState` and `GameAction`). Every exported component needs an entry: one without it ships
+  `[key: string]: unknown`, and `<GameScreen />` would then type-check and crash (#188 review).
 - **`cfg.provider` is `I18nProvider` (`initialLanguage: "en"`).** Every component reads copy
   from it and throws without it.
 - **Previews wrap each story in a felt `div`** (`background: var(--surface-table)`). Tile House

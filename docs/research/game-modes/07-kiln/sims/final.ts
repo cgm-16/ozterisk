@@ -3,7 +3,7 @@ const N = 3000;
 const bot = (skill: number): Policy => ({ kind: "smart", skill, evalMode: "myopic", fire: "best" });
 const cells: Array<[string, Kiln | null]> = [["Endless (no kiln)", null], ["Kiln k=2 (chosen)", { recipes: "gapNbr", turns: 2, faceCap: 99 }], ["Kiln k=0 (no cost)", { recipes: "gapNbr", turns: 0, faceCap: 99 }]];
 for (const skill of [1, 0.95]) for (const [label, kiln] of cells) for (const roundCap of [500, 1000]) {
-  Object.keys(STATS).forEach((k) => ((STATS as any)[k] = 0));
+  Object.keys(STATS).forEach((k) => ((STATS as Record<string, number>)[k] = 0));
   const res = Array.from({ length: N }, (_, i) => playRun({ mode: "endless", faceRewards: false, kiln, roundCap } as Rules, bot(skill), i + 1));
   const s = summarize(res);
   const max = Math.max(...res.map((r) => r.rounds));

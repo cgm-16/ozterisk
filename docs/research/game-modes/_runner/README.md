@@ -7,4 +7,6 @@ Tools behind the game-mode drafts. Research code, not product code.
 - `check-draft.mjs <draft folder>` is the mechanical gate each draft passed. `selftest/bad` must fail it and `selftest/good` must pass.
 - `make_matrix.py <out.svg>` writes `../spec-fit.svg`.
 
+The scripts pass the repo's `npm run lint`; keep them that way rather than ignoring the folder.
+
 Each draft's `sims/` folder holds its scripts and the outputs its text cites. The scripts ran at 4d1259e and import the live `src/game`, so later changes to the game can change or break them.

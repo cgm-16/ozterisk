@@ -11,7 +11,7 @@ export const base = (winds: Wind[], bot: "naive" | "aware" = "naive"): Config =>
 });
 const odd = (x: number) => x % 2 === 1;
 export const TWISTS: Record<string, Omit<Wind, "name">> = {
-  "Small tables (1-6)": { pool: ALL.filter(([a, b]) => b <= 6) },
+  "Small tables (1-6)": { pool: ALL.filter(([, b]) => b <= 6) },
   "Large tables (4-9)": { pool: ALL.filter(([a]) => a >= 4) },
   "Odd tables": { pool: ALL.filter(([a, b]) => odd(a) && odd(b)) },
   "Even tables": { pool: ALL.filter(([a, b]) => !(odd(a) && odd(b))) },

@@ -170,7 +170,7 @@ export function runOnce(cfg: Config, rng: Rng): RunStats {
     trim(n % cfg.subsPerWind === 0 && n < cfg.totalSubs ? n - 1 : n);
     st.subs[w]++; st.dHand[w] += hand.length - before;
     const inWind = n - w * cfg.subsPerWind;
-    if (w < nW - 1 || true) { const alive = hand.filter((t) => windIds.has(t.id)).length; surv[inWind - 1] = alive / Math.max(1, windIds.size); }
+    { const alive = hand.filter((t) => windIds.has(t.id)).length; surv[inWind - 1] = alive / Math.max(1, windIds.size); }
     if (n % cfg.subsPerWind === 0) {
       st.endHand[w] = hand.length; st.survive.push(surv); surv = [];
       if (n < cfg.totalSubs) { // landing: boon, then pack to the next wind's capacity

@@ -382,7 +382,7 @@ export function playRun(rules: Rules, policy: Policy, seed: number): RunResult {
   for (;;) {
     if (inv.length < getAnswerLength(eq)) return done(false);
     drawn++;
-    (globalThis as any).__trace?.(inv, eq, totalRounds);
+    (globalThis as { __trace?: (inv: Tile[], eq: Equation, round: number) => void }).__trace?.(inv, eq, totalRounds);
     const can = canConstruct(inv, eq.product);
     if (can) buildable++;
     if (inv.length + (kiln.face ? 1 : 0) >= capOf(totalRounds)) { atCeil++; if (can) buildAtCeil++; }

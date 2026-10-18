@@ -223,7 +223,7 @@ function runOnce(cfg: Config, rng: () => number): RunStats {
     const full = h === C && s.subs >= cfg.burnIn;
     const ok = spells(c, t.product);
     const pickWasOldest = isOldest(pick);
-    let gain = 0;
+    let gain: number;
     row.splice(pick, 1);
     if (rule.kind === "fresh") row.length = 0;
     const visibleAfter = () => (rule.kind === "preview" ? queue : row);

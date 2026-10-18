@@ -1,6 +1,6 @@
 // Four Winds candidate content: two-sided twists (equation pool x face rate, never
 // capacity) and run-long boons, measured on the plateau base 20/15/10/7 x8.
-import { ALL, mulberry32, prod, type Boon, type Config, type FaceSet, type Wind } from "./fw-lib.ts";
+import { ALL, type Boon, type FaceSet, type Wind } from "./fw-lib.ts";
 import { R, line, summarize } from "./report.ts";
 import { base, demand, missCost, plain, tv } from "./twists.ts";
 

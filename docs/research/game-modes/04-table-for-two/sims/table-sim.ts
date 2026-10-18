@@ -1,6 +1,5 @@
 // Shared Table two-seat simulator. Real generators/selectors; table rules re-implemented.
 // Usage: node run.mjs table-sim.ts   (config via env SIM=<mode>, GAMES=<n>)
-import { canConstruct } from "../../../../../src/game/selectors.ts";
 import { generateEquation, generateKindEquation, generateRewardTiles } from "../../../../../src/game/generators.ts";
 import type { Digit, RandomSource, Tile } from "../../../../../src/game/types.ts";
 
@@ -9,7 +8,7 @@ function xmur3(s: string) {
   let h = 1779033703 ^ s.length;
   for (let i = 0; i < s.length; i++) { h = Math.imul(h ^ s.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
   h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909);
-  return (h ^= h >>> 16) >>> 0;
+  return (h ^ (h >>> 16)) >>> 0;
 }
 function mulberry32(a: number): RandomSource {
   return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a);
@@ -83,7 +82,7 @@ export type GameResult = { winner: 0 | 1 | -1 | -2; rounds: number; leaderAt8: -
 export function playGame(cfg: Cfg, g: number): GameResult {
   const deal = () => Array.from({ length: 10 }, (_, d) => Math.floor((cfg.start ?? 10) / 10) + (d < (cfg.start ?? 10) % 10 ? 1 : 0));
   const hands: number[][] = [deal(), deal()];
-  let live: number[][] = [[], []];     // live[s] = tiles seat s may call (opponent's throw)
+  const live: number[][] = [[], []];     // live[s] = tiles seat s may call (opponent's throw)
   const stats: [SeatStats, SeatStats] = [0, 1].map(() => ({ turns: 0, ownOk: 0, liveOk: 0, calls: 0, atCap: 0, atCapOk: 0, correct: 0, takes: 0, fed: 0 })) as [SeatStats, SeatStats];
   let leaderAt8: -1 | 0 | 1 = -1;
   const seats = cfg.solo ? [0] : [0, 1];

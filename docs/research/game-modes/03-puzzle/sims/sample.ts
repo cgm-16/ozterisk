@@ -1,6 +1,6 @@
 // The showcase table (planted deal, seed 16641) and the no-0 negative control,
 // solved and replayed on the real gameReducer at capacity 5.
-import { makeSolver, mulberry32, plantedTable, type Table } from "./solver.ts";
+import { makeSolver, mulberry32, plantedTable } from "./solver.ts";
 import { replay } from "./replay.ts";
 import { show } from "./find-sample.ts";
 const t = plantedTable(mulberry32(16641), 5, 8, 0.6, true);

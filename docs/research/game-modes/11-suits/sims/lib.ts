@@ -86,7 +86,7 @@ export function run(seed: number, c: Cfg): RunOut {
   };
   while (o.rounds < capR) {
     // Draw: gate, then pair (kind: from answerable pairs), then the equation's suit (suitEq only).
-    const m = masks(hand); let i: number, eqSuit = 0;
+    const m = masks(hand); let i: number, eqSuit: number;
     if (g() < c.kind) {
       const ok: [number, number][] = [];
       for (let q = 0; q < 45; q++) for (const s of R === "suitEq" ? [0, 1, 2] : [0]) if (buildable(m, q, R, s)) ok.push([q, s]);

@@ -6,7 +6,7 @@ for (const turns of [2, 0]) for (const [label, p] of [
   ["fire only if it adds a missing digit", { fire: "best", fireRule: "middleAbsent" }],
   ["fire if better, kiln face not counted (pessimistic)", { fire: "best", fireRule: "pessimistic" }],
 ] as Array<[string, Partial<Policy>]>) {
-  Object.keys(STATS).forEach((k) => ((STATS as any)[k] = 0));
+  Object.keys(STATS).forEach((k) => ((STATS as Record<string, number>)[k] = 0));
   const policy = { kind: "smart", skill: 1, evalMode: "myopic", ...p } as Policy;
   const res = Array.from({ length: N }, (_, i) => playRun({ mode: "endless", faceRewards: false, kiln: { recipes: "gapNbr", turns, faceCap: 99 }, roundCap: 1000 } as Rules, policy, i + 1));
   const s = summarize(res);

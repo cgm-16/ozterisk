@@ -139,7 +139,7 @@ This is my judgment, not a finding.
   - I trimmed Riichi by 11 words to meet the 2,500-word cap.
   - Card's own agent trimmed it from 2,613 words, and I confirmed that its figures survived.
   - References to the agents' scratch folders now point at each draft's `sims/` folder.
-  - In the archived scripts, absolute session paths became repo-relative ones, and the checker now accepts a draft's `sims/` folder. Nothing else in them changed.
+  - In the archived scripts, absolute session paths became repo-relative ones, and the checker now accepts a draft's `sims/` folder. To pass the repo's lint, unused imports and dead assignments were removed and `any` casts typed. Re-running nine of the edited sims gave byte-identical outputs. Nothing else in them changed.
   - Nothing else was changed.
 - **A correction to the brief.** The brief described Classic as a two-wind half-game. [09](09-four-winds/) §1 corrects this from the 24 Sep design calls, which dropped the wind tile and withdrew the East/South acts.
 - **Re-run from the committed copies** (worktree at 4d1259e plus docs, Node through `_runner/run.mjs`):

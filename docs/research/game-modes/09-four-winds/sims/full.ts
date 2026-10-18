@@ -2,7 +2,7 @@
 // distinct boons not yet taken. Pairs runs by seed: the course and the offers come
 // from a separate stream, so both bots and both pickers face the same table.
 import { mulberry32, runOnce, type Boon, type Config } from "./fw-lib.ts";
-import { R, line, summarize } from "./report.ts";
+import { R, summarize } from "./report.ts";
 import { base, plain } from "./twists.ts";
 import { BOONS, PREF, TW } from "./mode.ts";
 

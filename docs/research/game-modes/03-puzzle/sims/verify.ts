@@ -1,10 +1,9 @@
 // Instrument checks for solver.ts. Run with run-cap.mjs (CAP=5 patches the real
 // INVENTORY_CAPACITY so the real gameReducer plays at capacity 5).
-import { gameReducer } from "../../../../../src/game/gameReducer.ts";
 import { sortTiles } from "../../../../../src/game/factories.ts";
 import { canConstruct, getCapacity } from "../../../../../src/game/selectors.ts";
 import { createTitleState } from "../../../../../src/game/factories.ts";
-import type { Digit, GameAction, GameState, Tile } from "../../../../../src/game/types.ts";
+import type { Digit, Tile } from "../../../../../src/game/types.ts";
 import { makeSolver, mulberry32, randomTable, type Move, type Table } from "./solver.ts";
 import { dispatch, replay } from "./replay.ts";
 

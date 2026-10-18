@@ -12,7 +12,8 @@ function mulberry32(seed: number) {
 const rng = mulberry32(42);
 const digitsOf = (p: number) => String(p).split("").map(Number);
 const cover = (c: number[], pool: number[]) => pool.filter((p) => digitsOf(p).every((d) => c[d] > 0)).length;
-let BLIND = false, PLAUSIBLE = false, KIND_EXTRA = false, PAY_ONE = false;
+let BLIND = false, PLAUSIBLE = false, PAY_ONE = false;
+const KIND_EXTRA = false;
 function leastValuable(c: number[], pool: number[]): number {
   if (BLIND) { let best = -1, bc = -1, br = 2; for (let d = 0; d < 10; d++) { if (!c[d]) continue; const r = rng(); if (c[d] > bc || (c[d] === bc && r < br)) { best = d; bc = c[d]; br = r; } } return best; }
   const base = cover(c, pool);

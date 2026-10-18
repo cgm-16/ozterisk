@@ -5,7 +5,7 @@
 import { gameReducer } from "../../../../../src/game/gameReducer.ts";
 import { createInitialInventory, createTitleState } from "../../../../../src/game/factories.ts";
 import { generateKindEquation, generateRewardTiles } from "../../../../../src/game/generators.ts";
-import { canConstruct, getAnswerLength, getRewardCount } from "../../../../../src/game/selectors.ts";
+import { canConstruct, getRewardCount } from "../../../../../src/game/selectors.ts";
 import type { Digit, Equation, GameState, Tile } from "../../../../../src/game/types.ts";
 
 // ---------- deterministic PRNG for the sim (the product would use Math.random) ----------

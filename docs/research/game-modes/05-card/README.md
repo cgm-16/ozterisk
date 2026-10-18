@@ -290,4 +290,4 @@ Deal, card, end at 45 and share grid; table rules and motion later.
 - `src/game/balance.ts`, `selectors.ts`, `generators.ts`, `gameReducer.ts`, `factories.ts`
 - `src/services/sharing.ts`
 
-**Sim files** (session scratchpad, not committed; outputs in `out-*.txt`): `analytic.ts`, `common.ts`, `harness.ts`, `engine.ts`, `runs.ts`, `engine-runs.ts`, `engine-runs2.ts`, `cal-classic.ts`, `final-runs.ts`, `lever.ts`, `tableA.ts`, `markers.ts`, `examples.ts`.
+**Sim files** ([`sims/`](sims/); outputs in `out-*.txt`): `analytic.ts`, `common.ts`, `harness.ts`, `engine.ts`, `runs.ts`, `engine-runs.ts`, `engine-runs2.ts`, `cal-classic.ts`, `final-runs.ts`, `lever.ts`, `tableA.ts`, `markers.ts`, `examples.ts`.

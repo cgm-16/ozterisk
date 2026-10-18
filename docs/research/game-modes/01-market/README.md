@@ -96,7 +96,7 @@ Every open market either keeps untaken items in play or charges for passing them
 
 **Where it sits.** The naive model says choice is fatal: always answering the spellable one of three gives `b` ≈ 1 − (1 − b)³, far past 0.631. That holds only if unchosen orders vanish, which is a free skip. If they stay, they **clog**, because the orders you could not spell are exactly the ones left behind. By submission 11 about two of three are dead, and late in a run Market's drift matches Endless's. The counterweight is conservation (an order leaves only when submitted); no other dial is needed.
 
-**Instrument and conditions.** `market-sim.ts` (session scratchpad, not committed; the brief's runner).
+**Instrument and conditions.** `market-sim.ts` ([`sims/`](sims/); the brief's runner).
 - **From the repo:** the real `generateEquation`, `generateKindEquation` (shipped 0.2) and `generateRewardTiles`; only the round loop is re-implemented, since the reducer holds one equation.
 - **Spell check:** a digit-count predicate that agrees with the real `canConstruct` on all 92,160 (hand, product) cases tried; a deliberately wrong one disagrees on 8,192, so the check can fail.
 - **Bot, fixed across variants:** answer a spellable order (prefer the one leaving others spellable, then the oldest); with none, miss the cheapest with the least useful tiles; on overflow, keep open orders spellable, then digit spread, shedding the most-copied digit.
@@ -203,4 +203,4 @@ Keep it if players deliberately strand or clear orders and can say why.
 7. Overcooked 2 review, GameRevolution — https://www.gamerevolution.com/review/414995-overcooked-2-review-cooking-with-gas
 8. Slay the Spire, Wikipedia — https://en.wikipedia.org/wiki/Slay_the_Spire
 
-Repo files: `docs/spec/product.md` (§1.1–§1.3, §1.8, §1.10, §1.11, §1.17); `docs/spec/ui-i18n.md` (§1.12, §1.14, §1.15); `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` (§1.1–§1.2, §2); `docs/design-system/decisions.md` (§ Classic, § Layout and interaction); `src/game/balance.ts`, `balance.test.ts`, `selectors.ts`, `generators.ts`, `gameReducer.ts`, `factories.ts`, `types.ts`; `src/test/economy.ts`. Sim and chart scripts (session scratchpad, not committed): `market-sim.ts`, `make-chart.py`.
+Repo files: `docs/spec/product.md` (§1.1–§1.3, §1.8, §1.10, §1.11, §1.17); `docs/spec/ui-i18n.md` (§1.12, §1.14, §1.15); `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` (§1.1–§1.2, §2); `docs/design-system/decisions.md` (§ Classic, § Layout and interaction); `src/game/balance.ts`, `balance.test.ts`, `selectors.ts`, `generators.ts`, `gameReducer.ts`, `factories.ts`, `types.ts`; `src/test/economy.ts`. Sim and chart scripts ([`sims/`](sims/)): `market-sim.ts`, `make-chart.py`.

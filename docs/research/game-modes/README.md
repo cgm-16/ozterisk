@@ -54,7 +54,7 @@ Each draft owns one design axis: who picks the challenge, which way the arithmet
 
 ## What the pool found across drafts
 
-Each finding is reported by the drafts named, on their own instruments. I spot-checked the arithmetic but did not re-run the sims.
+Each finding is reported by the drafts named, on their own instruments. I spot-checked the arithmetic and re-ran a sample of the sims (see [How this was made](#how-this-was-made)).
 
 1. **The 0.631 cliff is a guard, not a forecast.**
    - A miss costs more at a full hand. Misses there skew to two-digit products and cost about 1.81 tiles, so drift crosses zero near 0.644 ([01](01-market/), analytic and engine; I recomputed 1.806 by hand). [04](04-table-for-two/) reads about 0.68 off its own tables.
@@ -127,14 +127,21 @@ This is my judgment, not a finding.
   - provenance rules (a URL or an "unverified recall" label for every precedent; instrument, calibration and a negative control for every number).
   Each agent also got its own axis and the list of the other nine.
 - **Agents.** Ten Opus agents wrote only to a session scratch folder; none touched the repo. The account's usage limit interrupted them four times, and each resumed from its saved transcript.
-- **Simulations.** TypeScript ran on the real `src/game` modules through Vite's module runner (`vite-node` is not installed). Every draft reproduces `b(10) ≈ 0.48` before trusting its own numbers. Scripts stayed in the scratchpad and are not committed, following the T84 precedent (`docs/journal/journal-2026-09-27.md`).
+- **Simulations.** TypeScript ran on the real `src/game` modules through Vite's module runner (`vite-node` is not installed). Every draft reproduces `b(10) ≈ 0.48` before trusting its own numbers. Each draft's scripts and outputs are in its `sims/` folder. The shared runner, the checker and the matrix generator are in [`_runner/`](_runner/). Committing them departs from the T84 precedent (`docs/journal/journal-2026-09-27.md`), at Ori's call.
 - **Review.** A mechanical checker tested every draft before I read it: template, SVG well-formedness, embedded images, word cap and sources. The checker was itself tested against a draft built to fail.
   - I read every draft and re-derived the claims I could check by hand, among them the 21 digit pairs, the nine two-pair products, Puzzle's par line, Dojo's per-table miss costs and Riichi's ride-or-call EV.
   - I looked at every SVG rendered. QuickLook crops tall SVGs to a square, so I rendered square-padded copies.
 - **Edits on integration.**
   - I trimmed Riichi by 11 words to meet the 2,500-word cap.
   - Card's own agent trimmed it from 2,613 words, and I confirmed that its figures survived.
-  - References to the agents' scratch folders now read "session scratchpad, not committed", because those paths do not exist in the repo.
+  - References to the agents' scratch folders now point at each draft's `sims/` folder.
+  - In the archived scripts, absolute session paths became repo-relative ones, and the checker now accepts a draft's `sims/` folder. Nothing else in them changed.
   - Nothing else was changed.
 - **A correction to the brief.** The brief described Classic as a two-wind half-game. [09](09-four-winds/) §1 corrects this from the 24 Sep design calls, which dropped the wind tile and withdrew the East/South acts.
-- **Not verified here.** I did not re-run the agents' sims. Precedent claims rest on each draft's cited sources; claims the agents could not open are labelled in place.
+- **Re-run from the committed copies** (worktree at 4d1259e plus docs, Node through `_runner/run.mjs`):
+  - Byte-identical to the archived output: Puzzle's `verify.ts` at capacity 5, Factor's `bn.ts`, Kiln's `kan.ts` and `last.ts`, Card's `tableA.ts`, and Market's `static` section. `smoke.ts` gave b(10) = 0.480, b(20) = 0.802 and b(0) = 0.
+  - Within Monte Carlo noise (±0.005; these three use unseeded `Math.random`): Table for Two's `calib.ts`, and Well's `static-sweep.ts` and `opening-search.ts`. The opening search found different layouts with the same coverage, 34/45 and 44/45.
+  - Negative control: the same Puzzle verify at capacity 10 differs from the capacity-5 log, so the capacity patch is what the log measures.
+  - Not re-run: the long sweeps and Four Winds, which printed to the console and saved no output.
+  - The scripts import the live `src/game`, so they describe 4d1259e and will drift as the game changes.
+- **Not verified here.** Beyond that sample, I did not re-run the agents' sims. Precedent claims rest on each draft's cited sources; claims the agents could not open are labelled in place.

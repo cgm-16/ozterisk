@@ -108,7 +108,7 @@ Factor's only memory is the rack, and the next draw is random, so its choice car
 
 **Where it sits.** Every answer costs exactly 2 tiles. A correct answer nets +1 and a miss costs 2, so drift is `3b − 2` and **the cliff moves from 0.631 to b = 2/3 ≈ 0.667** (analytic). What holds Factor under the cliff is that the higher cliff absorbs the extra b that a 1–9 tile set and multiplicity add. On uniform hands with the kind formula `b' = 0.2 + 0.8b` (analytic), b'(10) is 0.634, a 0.033 margin, against Endless's 0.584 and 0.047 margin. Capacity 11 gives b'(11) = 0.674, analytically over the cliff (the run sim still ends C11 runs, because the ceiling leaks; see below). So **capacity 10 is Factor's ceiling, the same one `balance.ts` sets for Endless**.
 
-**Instrument 1: b(n) on uniform random hands** (`bn.ts`, session scratchpad, not committed). This is an exact multinomial enumeration over digit multisets.
+**Instrument 1: b(n) on uniform random hands** (`bn.ts`, [`sims/`](sims/)). This is an exact multinomial enumeration over digit multisets.
 
 - *Calibration:* the repo's real `canConstruct` by Monte Carlo (20,000 hands) gives b(10) = 0.480 and b(20) = 0.800, matching the spec. My enumerator gives 0.480 and 0.800.
 - *Controls:*
@@ -226,7 +226,7 @@ A second kill is a "no" on §1.17. A third, before any build: Ori judges that th
 - `src/game/{balance,constants,selectors,generators,factories,gameReducer,types}.ts` and `src/app/App.tsx`
 - `docs/archive/complete-plan.md` §1.17, and commits `16f2ff6`, `facdfbb`
 
-**Instruments** (session scratchpad, not committed):
+**Instruments** ([`sims/`](sims/)):
 
 - scripts: `model.ts`, `bn.ts`, `runs.ts`, `mock.ts`
 - outputs: `bn.out`, `calib.out`, `main.out`, `levers-decision.out`, `instrument.out`, `paired.out`, `split.out`, `splitpolicy.out`

@@ -134,7 +134,7 @@ The bag is drawn blind to the hand and to position, so twists add variety, not e
 
 **Where it sits.** The plateaus schedule the cliff. With no twists and no boons, b′ at draw time is 0.91 / 0.75 / 0.65 / 0.51 by wind. Runs are lost in West (8.8%) and North (66.8%), never earlier. North's 5-socket ceiling holds the run under: even when boons lift North's b′ over 0.631, a hand of 5–8 tiles cannot bank a buffer before the run ends. The stable loop exists locally but cannot be ridden: Classic's resolution. A pool twist also **moves the cliff** through the miss cost: *Large tables* asks only two-digit answers, so its cliff is 0.667.
 
-**Instrument.** `fw-lib.ts` (session scratchpad, not committed) re-implements only the round loop, so capacity, pool and face rate can vary. It imports the real `createInitialInventory`, `tileDigits` and `canConstruct`, and for calibration `gameReducer`, `generateKindEquation` and `generateRewardTiles`. Two bots:
+**Instrument.** `fw-lib.ts` ([`sims/`](sims/)) re-implements only the round loop, so capacity, pool and face rate can vary. It imports the real `createInitialInventory`, `tileDigits` and `canConstruct`, and for calibration `gameReducer`, `generateKindEquation` and `generateRewardTiles`. Two bots:
 - Both answer correctly at 0.95 whenever the hand can spell the product, spending exact digits before the narrowest face. On a miss or a discard they drop the tile whose loss costs the least coverage.
 - The **naive** bot measures coverage over all 45 pairs.
 - The **aware** bot measures it over the current wind's pool, plus the next wind's weighted as 4 submissions.
@@ -267,4 +267,4 @@ If fewer than half can name the wind's rule and North discards ignore the sleepi
 
 **Repo:** `docs/spec/product.md`; `docs/spec/ui-i18n.md`; `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` §1–2; `docs/design-system/decisions.md` (§ M6, § M7, § M6 + M7); `docs/journal/journal-2026-08-09.md`; `docs/journal/journal-2026-09-27.md`; `src/game/{balance,selectors,generators,gameReducer,factories}.ts`; `src/app/App.tsx`.
 
-**Sims** (session scratchpad, not committed): `fw-lib.ts`, `calib.ts`, `report.ts`, `structure.ts`, `twists.ts`, `mode.ts`, `full.ts`, `gap.ts`, `gap2.ts`, `gap3.ts`, `budget.py`, `make_svg.py`.
+**Sims** ([`sims/`](sims/)): `fw-lib.ts`, `calib.ts`, `report.ts`, `structure.ts`, `twists.ts`, `mode.ts`, `full.ts`, `gap.ts`, `gap2.ts`, `gap3.ts`, `budget.py`, `make_svg.py`.

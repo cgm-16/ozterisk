@@ -147,7 +147,7 @@ The **hoarding loop** has a structural bound and a measured tail:
 
 **Instrument and conditions.**
 
-- **Loop:** `lib.ts` (session scratchpad, not committed) plays runs on the repo's real `generateKindEquation`, `generateRewardTiles`, `canConstruct`, `answerMatches`, `getCapacity` and `createInitialInventory` (`main` at 4d1259e). Only the kiln and the bots are new. A seeded PRNG drives the simulation only.
+- **Loop:** `lib.ts` ([`sims/`](sims/)) plays runs on the repo's real `generateKindEquation`, `generateRewardTiles`, `canConstruct`, `answerMatches`, `getCapacity` and `createInitialInventory` (`main` at 4d1259e). Only the kiln and the bots are new. A seeded PRNG drives the simulation only.
 - **Bot:** answers whenever the hand can spell the product (perfect arithmetic unless stated). It picks tiles, discards and firings that maximise the next hand's b′, counting a tile in the kiln as present, and breaks ties toward spare copies of the digits products need.
 - **Runs:** 3,000 per cell, round cap 1,000.
 
@@ -235,4 +235,4 @@ Also watch whether the two-round dip reads as a chosen bet or as "the kiln ate m
 8. Balatro Wiki, Tarot Cards — https://balatrowiki.org/w/Tarot_Cards
 9. Scrabble (blank tiles) — https://en.wikipedia.org/wiki/Scrabble
 
-Repo: `docs/spec/product.md`, `docs/spec/ui-i18n.md` (§1.12, §1.14, §1.15), `docs/design-system/decisions.md` (motion inventory; Classic and M7 sections), `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` §1–2, `docs/journal/journal-2026-09-27.md` (T84), `src/game/{balance,types,selectors,generators,gameReducer,factories}.ts`, `src/game/balance.test.ts`, `src/test/economy.ts`, `src/app/App.tsx`. Sim scripts and outputs: session scratchpad, not committed.
+Repo: `docs/spec/product.md`, `docs/spec/ui-i18n.md` (§1.12, §1.14, §1.15), `docs/design-system/decisions.md` (motion inventory; Classic and M7 sections), `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` §1–2, `docs/journal/journal-2026-09-27.md` (T84), `src/game/{balance,types,selectors,generators,gameReducer,factories}.ts`, `src/game/balance.test.ts`, `src/test/economy.ts`, `src/app/App.tsx`. Sim scripts and outputs: [`sims/`](sims/).

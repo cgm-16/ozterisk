@@ -1,9 +1,9 @@
 # Game-mode research pool
 
 > **Status:** research — not canonical. Nothing here amends `docs/spec/`; on any conflict the spec wins. Every draft carries the same line.
-> Ten directions for a third mode, 2026-10-17/18. Each was researched by its own Opus agent from one shared brief, then reviewed, checked and committed by Claude for Ori.
+> Eleven directions for a third mode, 2026-10-17/19. Each was researched by its own Opus agent from one shared brief, then reviewed, checked and committed by Claude for Ori.
 
-Each draft owns one design axis: who picks the challenge, which way the arithmetic runs, randomness, other players, goals, risk, transformation, space, structure, audience. Each was measured by simulation against the real game modules, and every precedent claim is sourced. This page is the map. Each draft's own first screen is the summary: pitch, verb, what only it contributes, and a mockup.
+Each draft owns one design axis: who picks the challenge, which way the arithmetic runs, randomness, other players, goals, risk, transformation, space, structure, audience, and what tells two copies of a digit apart. Each was measured by simulation against the real game modules, and every precedent claim is sourced. This page is the map. Each draft's own first screen is the summary: pitch, verb, what only it contributes, and a mockup.
 
 **Where the pool lands.** This is my read; the numbers are in each draft's §5.
 
@@ -13,7 +13,7 @@ Each draft owns one design axis: who picks the challenge, which way the arithmet
   - [09 Four Winds](09-four-winds/): build the run from boons.
 - **A live bet, modestly paid.** [06 Riichi](06-riichi/)'s declaration is a real decision by EV, but the prize is +17% points, the stake is a knife-edge, and declarations bunch early in a run.
 - **New audiences, light mechanics.** [04 Table for Two](04-table-for-two/) adds a second player. [10 Dojo](10-dojo/) is for learning the tables.
-- **Thin as decisions, useful as findings.** [01 Market](01-market/), [02 Factor](02-factor/), [05 Card](05-card/) and [07 Kiln](07-kiln/) each say so themselves, and each leaves a result the others can reuse.
+- **Thin as decisions, useful as findings.** [01 Market](01-market/), [02 Factor](02-factor/), [05 Card](05-card/) and [07 Kiln](07-kiln/) each say so themselves, and each leaves a result the others can reuse. [11 Suits](11-suits/) was briefed to test why, and confirms it.
 - **If one gets built next, build Puzzle.** See [Recommendation](#recommendation).
 
 <table>
@@ -31,9 +31,12 @@ Each draft owns one design axis: who picks the challenge, which way the arithmet
 <td align="center" width="20%"><a href="09-four-winds/"><img src="09-four-winds/landing.svg" width="140" alt="Four Winds: the landing between South and West, three boons offered"></a><br><b>09 Four Winds</b> · 네 바람<br><sub>a boon at every wind</sub></td>
 <td align="center" width="20%"><a href="10-dojo/"><img src="10-dojo/miss-toll.svg" width="140" alt="Dojo: a miss on 8 × 7 costs one chosen tile"></a><br><b>10 Dojo</b> · 도장<br><sub>learn one table</sub></td>
 </tr>
+<tr>
+<td align="center" width="20%"><a href="11-suits/"><img src="11-suits/suits-which-six.svg" width="140" alt="Suits: which 6 to spend, the one-suit 6 of dots or the 6 of bamboo"></a><br><b>11 Suits</b> · 무늬<br><sub>spend the matching copy</sub></td>
+</tr>
 </table>
 
-## The ten at a glance
+## The eleven at a glance
 
 | # | Mode | The verb | What only this draft contributes | Needs a scope ruling? | Economy | Build |
 |---|---|---|---|---|---|---|
@@ -47,6 +50,7 @@ Each draft owns one design axis: who picks the challenge, which way the arithmet
 | [08](08-well/) | Well · 우물 | Dig: spend a touching pair from a 5 × 3 well with gravity | Geometry as a resource: touching costs a third of b, two-digit facts need only 21 digit pairs, and a fixed opening spells 44 of 45 facts. Includes a keyboard and screen-reader grid design | `decisions.md` 9i and the flat rule | Under, thinly: b′ 0.61 at capacity | L |
 | [09](09-four-winds/) | Four Winds · 네 바람 | At each change of wind, keep one boon of three, then pack the hand for the next wind | A twist-and-boon framework, with a content budget and a pacing rule derived from hand turnover (half-life about 3 submissions, so winds of 8). Boon choice carries the mode: +19 points over random picks. Twists pay only when a readable rule sits in the last wind | The relics ruling (it argues both conditions are now met); extending §1.17's descent exception | Plateaus of 20/15/10/5: b′ runs 0.91 → 0.51 across the winds, and no boon stack makes a run unloseable | L |
 | [10](10-dojo/) | Dojo · 도장 | Recall one table's nine facts three times; a miss costs one tile you choose | The pedagogy lens, and proof that shipped rules can't carry it: on one table, a learner who knows every fact is marked Incorrect in 43–64% of rounds | No, as proposed. Its wishes (adaptivity, persistence, timers) would | No supply cliff: echo rewards and a one-tile toll | M |
+| [11](11-suits/) | Suits · 무늬 | Choose *which copy* of a digit to spend, keep or discard, so an answer can be spelled in one suit | A direct, paired-seed test of finding 3 across six suit rules. Suits make choices frequent (about 11 a run) but not deep: the whole suit layer is worth 6.4% of run length, about what the overflow discard is worth, and half of it is a dominance (take the flush when offered) | `decisions.md` "No icon set, deliberately"; it also crosses `product.md` §1.4 "Duplicate digit tiles have no strategic distinction" | Under: its cliff moves to ≈ 0.70; runs 19.1 rounds vs Endless's 19.3 | M |
 
 "Needs a scope ruling" means the draft crosses a line the project drew on purpose: a §1.17 exclusion, an AGENTS.md constraint, a definition with a stated prohibition, or a recorded ruling. Every draft also rewrites rules for itself, the way Classic did. The matrix shows both.
 
@@ -73,6 +77,7 @@ Each finding is reported by the drafts named, on their own instruments. I spot-c
    - [04](04-table-for-two/)'s mahjong call rescues 2.8% of turns.
    - Whether to fire at all doesn't matter in [07](07-kiln/); only which gap does.
    - [06](06-riichi/)'s prize is +17% points.
+   - [11](11-suits/) tested the finding head-on by making two copies of a digit differ by suit. Every suit choice randomised costs 1.22 ± 0.15 rounds (6.4%), close to randomising the whole overflow discard (5.1%). Suit only ever helped as a tie-break between copies; letting it outrank digit coverage never helped.
    The drafts with a new verb change what a tile *means* ([08](08-well/): its place; [10](10-dojo/): the table's digits) or what the player *sees* ([03](03-puzzle/): the whole future).
 4. **Paying in tiles hits the ceiling.** A tile prize is capped at capacity, while a tile stake is not ([06](06-riichi/)). Compressing tiles burns coverage ([07](07-kiln/)).
 5. **Rewards tied to completion arrive too late to matter.**
@@ -102,7 +107,8 @@ This is my judgment, not a finding.
    - [Market](01-market/)'s conservation;
    - [Factor](02-factor/)'s reversed economy;
    - [Kiln](07-kiln/)'s hold as a price;
-   - [Card](05-card/)'s coupon-collector sizing and share grid.
+   - [Card](05-card/)'s coupon-collector sizing and share grid;
+   - [Suits](11-suits/)' negative result on finding 3, and its keyboard rule for choosing between copies.
 
 **Rulings this pool asks of Ori,** whichever drafts go forward:
 - division modes (02);
@@ -111,11 +117,8 @@ This is my judgment, not a finding.
 - the relics ruling and extending the descent exception (09);
 - `decisions.md` 9i and the flat rule (08);
 - the late-deal skew and the "No emoji" spirit (05);
-- seeds, only for numbered or daily tables, and whether a par-line reveal is a tutorial (03).
-
-## A spare direction, not researched
-
-**Suits.** Give each tile a second attribute, such as the three mahjong suits, so two 7s stop being interchangeable. It aims straight at finding 3. Answers, discards and overflow would trade digit against suit. Nearest neighbours are [05](05-card/) (a goal) and [07](07-kiln/) (shaping the hand). It was held back because ten drafts were the brief and the session's usage budget was tight. It is ready to brief.
+- seeds, only for numbered or daily tables, and whether a par-line reveal is a tutorial (03);
+- duplicate tiles with a strategic distinction (§1.4) and drawn suit marks under "No icon set" (11).
 
 ## How this was made
 
@@ -125,8 +128,9 @@ This is my judgment, not a finding.
   - a fixed template;
   - graphics rules in the Tile House palette;
   - provenance rules (a URL or an "unverified recall" label for every precedent; instrument, calibration and a negative control for every number).
-  Each agent also got its own axis and the list of the other nine.
-- **Agents.** Ten Opus agents wrote only to a session scratch folder; none touched the repo. The account's usage limit interrupted them four times, and each resumed from its saved transcript.
+  Each agent also got its own axis and the list of the others.
+- **Agents.** Ten Opus agents wrote only to a session scratch folder; none touched the repo. The account's usage limit interrupted them five times, and each resumed from its saved transcript.
+- **Suits** was the spare direction. Ori asked for it on 2026-10-19, and an eleventh agent researched it from the same brief, with the pool's findings added and the Classic error corrected.
 - **Simulations.** TypeScript ran on the real `src/game` modules through Vite's module runner (`vite-node` is not installed). Every draft reproduces `b(10) ≈ 0.48` before trusting its own numbers. Each draft's scripts and outputs are in its `sims/` folder. The shared runner, the checker and the matrix generator are in [`_runner/`](_runner/). Committing them departs from the T84 precedent (`docs/journal/journal-2026-09-27.md`), at Ori's call.
 - **Review.** A mechanical checker tested every draft before I read it: template, SVG well-formedness, embedded images, word cap and sources. The checker was itself tested against a draft built to fail.
   - I read every draft and re-derived the claims I could check by hand, among them the 21 digit pairs, the nine two-pair products, Puzzle's par line, Dojo's per-table miss costs and Riichi's ride-or-call EV.

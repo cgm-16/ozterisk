@@ -1,8 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 618" width="800" height="618" role="img" aria-labelledby="t d">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 652" width="800" height="652" role="img" aria-labelledby="t d">
 <title id="t">Spec fit: which lines each draft would move</title>
-<desc id="d">01 Market: Draw needed, End needed, Keys needed; 02 Factor: ÷ modes needed, Draw needed, Answer needed, Keys needed; 03 Puzzle: Seeds variant or wish, Rulings variant or wish, Draw needed, Answer needed, End needed; 04 Table for Two: Rulings needed, Draw needed, Answer needed, Overflow needed, End needed, Keys needed; 05 Card: Curves needed, Rulings variant or wish, Draw needed, End needed; 06 Riichi: Score needed, Overflow needed, Keys needed; 07 Kiln: Answer needed, Overflow needed, End needed, Motion variant or wish, Keys needed; 08 Well: Rulings needed, Draw needed, Answer needed, Overflow needed, End needed, Motion needed, Keys needed; 09 Four Winds: Curves needed, Rulings needed, Draw needed, Answer needed, Overflow needed, End needed, Motion variant or wish, Keys needed; 10 Dojo: Saved variant or wish, Curves variant or wish, Draw needed, Answer needed, Overflow needed, End needed</desc>
-<rect width="800" height="618" fill="#071711"/>
-<rect x="8" y="8" width="784" height="602" rx="14" fill="#0b211b"/>
+<desc id="d">01 Market: Draw needed, End needed, Keys needed; 02 Factor: ÷ modes needed, Draw needed, Answer needed, Keys needed; 03 Puzzle: Seeds variant or wish, Rulings variant or wish, Draw needed, Answer needed, End needed; 04 Table for Two: Rulings needed, Draw needed, Answer needed, Overflow needed, End needed, Keys needed; 05 Card: Curves needed, Rulings variant or wish, Draw needed, End needed; 06 Riichi: Score needed, Overflow needed, Keys needed; 07 Kiln: Answer needed, Overflow needed, End needed, Motion variant or wish, Keys needed; 08 Well: Rulings needed, Draw needed, Answer needed, Overflow needed, End needed, Motion needed, Keys needed; 09 Four Winds: Curves needed, Rulings needed, Draw needed, Answer needed, Overflow needed, End needed, Motion variant or wish, Keys needed; 10 Dojo: Saved variant or wish, Curves variant or wish, Draw needed, Answer needed, Overflow needed, End needed; 11 Suits: Rulings needed, Draw needed, Answer needed, End needed, Motion needed, Keys needed</desc>
+<rect width="800" height="652" fill="#071711"/>
+<rect x="8" y="8" width="784" height="636" rx="14" fill="#0b211b"/>
 <text x="24" y="44" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="20" font-weight="600" fill="#f7f0e2">Which lines each draft would move</text>
 <text x="24" y="68" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="12.5" fill="#f7f0e2" fill-opacity="0.72">From each draft’s own §1. Every draft also needs the ordinary new-mode text: mode count, title select, copy, share.</text>
 <circle cx="31" cy="96" r="7" fill="#f7f0e2"/>
@@ -164,8 +164,22 @@
 <circle cx="636.0" cy="491.0" r="7" fill="#f7f0e2"/>
 <circle cx="694.0" cy="491.0" r="1.6" fill="#f7f0e2" fill-opacity="0.3"/>
 <circle cx="738.0" cy="491.0" r="1.6" fill="#f7f0e2" fill-opacity="0.3"/>
-<text x="24" y="536" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="10.5" fill="#f7f0e2" fill-opacity="0.55">÷ modes: product.md §1.17 division modes · Seeds: AGENTS.md seed line, §1.17 seeded/replayable runs ·</text>
-<text x="24" y="553" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="10.5" fill="#f7f0e2" fill-opacity="0.55">Saved: AGENTS.md persistence, §1.17 saved history · Curves: §1.17 difficulty curves · Score: §1.5 unweighted score ·</text>
-<text x="24" y="570" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="10.5" fill="#f7f0e2" fill-opacity="0.55">Rulings: §1.1 competition note, AGENTS.md tutorials, endless-polish §2, decisions.md locks · Draw §1.2–1.3 ·</text>
-<text x="24" y="587" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="10.5" fill="#f7f0e2" fill-opacity="0.55">Answer &amp; rewards §1.4–1.6 · Overflow §1.7 · End: capacity and end of run §1.7a–1.8 · Motion: ui-i18n §1.12 · Keys §1.11</text>
+<rect x="16" y="508.0" width="764" height="34" fill="#14342a" fill-opacity="0.45"/>
+<text x="24" y="529.5" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="13" fill="#f7f0e2">11  Suits · 무늬</text>
+<circle cx="226.0" cy="525.0" r="1.6" fill="#f7f0e2" fill-opacity="0.3"/>
+<circle cx="270.0" cy="525.0" r="1.6" fill="#f7f0e2" fill-opacity="0.3"/>
+<circle cx="314.0" cy="525.0" r="1.6" fill="#f7f0e2" fill-opacity="0.3"/>
+<circle cx="358.0" cy="525.0" r="1.6" fill="#f7f0e2" fill-opacity="0.3"/>
+<circle cx="402.0" cy="525.0" r="1.6" fill="#f7f0e2" fill-opacity="0.3"/>
+<circle cx="446.0" cy="525.0" r="7" fill="#e2795f"/>
+<circle cx="504.0" cy="525.0" r="7" fill="#f7f0e2"/>
+<circle cx="548.0" cy="525.0" r="7" fill="#f7f0e2"/>
+<circle cx="592.0" cy="525.0" r="1.6" fill="#f7f0e2" fill-opacity="0.3"/>
+<circle cx="636.0" cy="525.0" r="7" fill="#f7f0e2"/>
+<circle cx="694.0" cy="525.0" r="7" fill="#f7f0e2"/>
+<circle cx="738.0" cy="525.0" r="7" fill="#f7f0e2"/>
+<text x="24" y="570" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="10.5" fill="#f7f0e2" fill-opacity="0.55">÷ modes: product.md §1.17 division modes · Seeds: AGENTS.md seed line, §1.17 seeded/replayable runs ·</text>
+<text x="24" y="587" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="10.5" fill="#f7f0e2" fill-opacity="0.55">Saved: AGENTS.md persistence, §1.17 saved history · Curves: §1.17 difficulty curves · Score: §1.5 unweighted score ·</text>
+<text x="24" y="604" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="10.5" fill="#f7f0e2" fill-opacity="0.55">Rulings: §1.1 competition note, AGENTS.md tutorials, endless-polish §2, decisions.md locks · Draw §1.2–1.3 ·</text>
+<text x="24" y="621" font-family="'Zen Kaku Gothic New','Helvetica Neue',Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif" font-size="10.5" fill="#f7f0e2" fill-opacity="0.55">Answer &amp; rewards §1.4–1.6 · Overflow §1.7 · End: capacity and end of run §1.7a–1.8 · Motion: ui-i18n §1.12 · Keys §1.11</text>
 </svg>

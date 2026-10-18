@@ -140,7 +140,7 @@ At 15 sockets that question is low-stakes, which is the honest cost (§7). The s
 **Instruments**
 - `dojo-sim.ts` steps the real `gameReducer` with mode `endless` (capacity 10) and injects the deck and rewards at the boundary, as `App.tsx` does.
 - `echo-capacity.ts` and its variants are a count mirror for other capacities and for the pay-one rule, which the reducer does not have.
-- Both live in `/private/tmp/claude-501/-Users-ori-repos-ozterisk/324e52ee-d271-4ca6-8c6b-bdbb0acfddf8/scratchpad/game-modes/10-dojo/work/`.
+- Both live in the session scratchpad, not committed.
 - **Bot:** knows each fact with probability *acc*; spells exact digits when it can; discards and sheds by coverage loss over the table's facts, then by most copies. Variants: a table-blind discarder (most copies), and **plausible errors**, where a miss spells a neighbouring product such as 48 or 63 for 8 × 7.
 - **Runs:** sessions of 27, seed 42, 1,500–3,000 runs per cell. Bots are not players; compare rows with each other.
 

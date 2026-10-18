@@ -98,7 +98,7 @@ flowchart TD
 
 Classic + M7 draws faces free onto a shrinking rack. Kiln makes them, at a price, on the fixed rack where the cliff binds. What it adds beyond "faces you can make" is the which-gap trade below and the pricing result in §5.
 
-**Which gap, not whether.** Take the mockup's hand after 6 × 7 = 42: seated 0 1 2 4 6 7 7 9 9 9, with the 8 on the rail, and no 3 or 5. Scoring each option by the kind-biased buildable share b′ of the resulting hand (`work/mock.ts`):
+**Which gap, not whether.** Take the mockup's hand after 6 × 7 = 42: seated 0 1 2 4 6 7 7 9 9 9, with the 8 on the rail, and no 3 or 5. Scoring each option by the kind-biased buildable share b′ of the resulting hand (`mock.ts`):
 
 | Option | b′ while firing | b′ after |
 |---|---|---|
@@ -147,11 +147,11 @@ The **hoarding loop** has a structural bound and a measured tail:
 
 **Instrument and conditions.**
 
-- **Loop:** `work/lib.ts` plays runs on the repo's real `generateKindEquation`, `generateRewardTiles`, `canConstruct`, `answerMatches`, `getCapacity` and `createInitialInventory` (`main` at 4d1259e). Only the kiln and the bots are new. A seeded PRNG drives the simulation only.
+- **Loop:** `lib.ts` (session scratchpad, not committed) plays runs on the repo's real `generateKindEquation`, `generateRewardTiles`, `canConstruct`, `answerMatches`, `getCapacity` and `createInitialInventory` (`main` at 4d1259e). Only the kiln and the bots are new. A seeded PRNG drives the simulation only.
 - **Bot:** answers whenever the hand can spell the product (perfect arithmetic unless stated). It picks tiles, discards and firings that maximise the next hand's b′, counting a tile in the kiln as present, and breaks ties toward spare copies of the digits products need.
 - **Runs:** 3,000 per cell, round cap 1,000.
 
-**Checks** (`work/check.ts`, `work/calib.ts`):
+**Checks** (`check.ts`, `calib.ts`):
 
 - **Calibration.** b(10) = 0.480 against the repo's 0.48; drift(0.48) = −0.410 against −0.41. Run with journal 2026-09-27's T84 bot, my loop reproduces its Classic figures: 61.6% / 48.9% wins on the shipped ramp (journal 61.2 / 49.4) and 34.1% / 24.6% without faces (33.0 / 23.8).
 - **Equivalence.** The loop matches the real `gameReducer` run for run on 900 seeded runs (0 differ), and perturbing skill makes 99 of 300 differ, so the check can fail.
@@ -235,4 +235,4 @@ Also watch whether the two-round dip reads as a chosen bet or as "the kiln ate m
 8. Balatro Wiki, Tarot Cards — https://balatrowiki.org/w/Tarot_Cards
 9. Scrabble (blank tiles) — https://en.wikipedia.org/wiki/Scrabble
 
-Repo: `docs/spec/product.md`, `docs/spec/ui-i18n.md` (§1.12, §1.14, §1.15), `docs/design-system/decisions.md` (motion inventory; Classic and M7 sections), `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` §1–2, `docs/journal/journal-2026-09-27.md` (T84), `src/game/{balance,types,selectors,generators,gameReducer,factories}.ts`, `src/game/balance.test.ts`, `src/test/economy.ts`, `src/app/App.tsx`. Sim scripts and outputs: `../work/`.
+Repo: `docs/spec/product.md`, `docs/spec/ui-i18n.md` (§1.12, §1.14, §1.15), `docs/design-system/decisions.md` (motion inventory; Classic and M7 sections), `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` §1–2, `docs/journal/journal-2026-09-27.md` (T84), `src/game/{balance,types,selectors,generators,gameReducer,factories}.ts`, `src/game/balance.test.ts`, `src/test/economy.ts`, `src/app/App.tsx`. Sim scripts and outputs: session scratchpad, not committed.

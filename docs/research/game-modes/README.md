@@ -11,7 +11,7 @@ Each draft owns one design axis: who picks the challenge, which way the arithmet
   - [03 Puzzle](03-puzzle/): plan a face-up line against par.
   - [08 Well](08-well/): read geometry.
   - [09 Four Winds](09-four-winds/): build the run from boons.
-  - [06 Riichi](06-riichi/): a bet shown to be a live decision.
+- **A live bet, modestly paid.** [06 Riichi](06-riichi/)'s declaration is a real decision by EV, but the prize is +17% points, the stake is a knife-edge, and declarations bunch early in a run.
 - **New audiences, light mechanics.** [04 Table for Two](04-table-for-two/) adds a second player. [10 Dojo](10-dojo/) is for learning the tables.
 - **Thin as decisions, useful as findings.** [01 Market](01-market/), [02 Factor](02-factor/), [05 Card](05-card/) and [07 Kiln](07-kiln/) each say so themselves, and each leaves a result the others can reuse.
 - **If one gets built next, build Puzzle.** See [Recommendation](#recommendation).
@@ -134,6 +134,7 @@ This is my judgment, not a finding.
 - **Edits on integration.**
   - I trimmed Riichi by 11 words to meet the 2,500-word cap.
   - Card's own agent trimmed it from 2,613 words, and I confirmed that its figures survived.
+  - References to the agents' scratch folders now read "session scratchpad, not committed", because those paths do not exist in the repo.
   - Nothing else was changed.
 - **A correction to the brief.** The brief described Classic as a two-wind half-game. [09](09-four-winds/) §1 corrects this from the 24 Sep design calls, which dropped the wind tile and withdrew the East/South acts.
 - **Not verified here.** I did not re-run the agents' sims. Precedent claims rest on each draft's cited sources; claims the agents could not open are labelled in place.

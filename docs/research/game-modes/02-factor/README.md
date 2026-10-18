@@ -108,7 +108,7 @@ Factor's only memory is the rack, and the next draw is random, so its choice car
 
 **Where it sits.** Every answer costs exactly 2 tiles. A correct answer nets +1 and a miss costs 2, so drift is `3b − 2` and **the cliff moves from 0.631 to b = 2/3 ≈ 0.667** (analytic). What holds Factor under the cliff is that the higher cliff absorbs the extra b that a 1–9 tile set and multiplicity add. On uniform hands with the kind formula `b' = 0.2 + 0.8b` (analytic), b'(10) is 0.634, a 0.033 margin, against Endless's 0.584 and 0.047 margin. Capacity 11 gives b'(11) = 0.674, analytically over the cliff (the run sim still ends C11 runs, because the ceiling leaks; see below). So **capacity 10 is Factor's ceiling, the same one `balance.ts` sets for Endless**.
 
-**Instrument 1: b(n) on uniform random hands** (`work/bn.ts`). This is an exact multinomial enumeration over digit multisets.
+**Instrument 1: b(n) on uniform random hands** (`bn.ts`, session scratchpad, not committed). This is an exact multinomial enumeration over digit multisets.
 
 - *Calibration:* the repo's real `canConstruct` by Monte Carlo (20,000 hands) gives b(10) = 0.480 and b(20) = 0.800, matching the spec. My enumerator gives 0.480 and 0.800.
 - *Controls:*
@@ -126,7 +126,7 @@ Factor's only memory is the rack, and the next draw is random, so its choice car
 | 20 | 0.800 | 0.859 | 0.833 | — |
 | *cliff* | *0.631* | *0.667* | *0.667* | *0.667* |
 
-**Instrument 2: whole runs** (`work/runs.ts`, `mulberry32` seeds 1000+, a run capped at 1,000 rounds).
+**Instrument 2: whole runs** (`runs.ts`, `mulberry32` seeds 1000+, a run capped at 1,000 rounds).
 
 - *Bot:* answers whenever it can (skill 1.0 unless noted). Among valid pairs it takes the one that leaves the most of the 45 facts answerable. A miss spends the two tiles whose loss costs the least coverage, and a discard does the same.
 - *Calibration:* the same bot plays shipped Endless through the real `gameReducer`, `generateKindEquation` and `generateRewardTiles`. My multiset replica matched it **run length for run length on 2,000 of 2,000 seeds**, at skill 1.0 (mean 18.93) and at skill 0.95 (17.73).
@@ -159,7 +159,7 @@ Factor's only memory is the rack, and the next draw is random, so its choice car
 
 The instrument can see decision value: the miss-spend gap is 21% of run length. The discard gap of 8% falls short of the 10% I pre-registered for this check, and I report that as a miss. **The pair choice is real but small:** each instance is worth less than a discard, and it arrives about once a run, so over a whole run it is worth about 1%. The analytic 40% shrinks because the rack must hold *both* pairs. Even a perfect one-of-each hand offers a choice on only 10 of 45 draws.
 
-**One bounded rescue attempt: variable-length answers.** The rule allows 2 *or* 3 tiles (24 = 3·8, 4·6, 2·3·4 or 2·2·6), with 1s allowed and a miss spending the minimum of two. Before running it, I pre-registered a bar in `work/PREREGISTRATION.md`: at least 3 real choices per run, and at least 10% spread across fixed answer policies, at a capacity that runs 14–24 rounds under the cliff.
+**One bounded rescue attempt: variable-length answers.** The rule allows 2 *or* 3 tiles (24 = 3·8, 4·6, 2·3·4 or 2·2·6), with 1s allowed and a miss spending the minimum of two. Before running it, I pre-registered a bar in `PREREGISTRATION.md`: at least 3 real choices per run, and at least 10% spread across fixed answer policies, at a capacity that runs 14–24 rounds under the cliff.
 
 | 4,000 runs | Greedy | Fewest tiles | Random | Most tiles | Anti | Spread | Choices / run |
 |---|---|---|---|---|---|---|---|
@@ -226,7 +226,7 @@ A second kill is a "no" on §1.17. A third, before any build: Ori judges that th
 - `src/game/{balance,constants,selectors,generators,factories,gameReducer,types}.ts` and `src/app/App.tsx`
 - `docs/archive/complete-plan.md` §1.17, and commits `16f2ff6`, `facdfbb`
 
-**Instruments**, all in `/private/tmp/claude-501/-Users-ori-repos-ozterisk/324e52ee-d271-4ca6-8c6b-bdbb0acfddf8/scratchpad/game-modes/02-factor/work/`:
+**Instruments** (session scratchpad, not committed):
 
 - scripts: `model.ts`, `bn.ts`, `runs.ts`, `mock.ts`
 - outputs: `bn.out`, `calib.out`, `main.out`, `levers-decision.out`, `instrument.out`, `paired.out`, `split.out`, `splitpolicy.out`

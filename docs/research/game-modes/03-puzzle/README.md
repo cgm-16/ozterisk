@@ -121,7 +121,7 @@ The name is 묘수풀이, the baduk problem book ("묘수풀이집") [13]: the c
 - **only-moves**: par-line decisions where exactly one option keeps par;
 - **density**: par lines ÷ all lines.
 
-**Instrument** (work folder):
+**Instrument** (session scratchpad, not committed):
 
 - **Solver.** `solver.ts`, a memoized DFS over (row, hand counts). It gives par, the score histogram of every distinct line, the canonical par line, only-moves, and whether par needs a sacrifice.
 - **Bots.** Neither ever sacrifices.
@@ -260,7 +260,7 @@ Thesis: does face-up planning against par feel different from Classic?
 - `docs/tasks/T08-title-screen.md`
 - `src/game/{balance,types,selectors,generators,factories,gameReducer}.ts`
 
-**Work folder** (`…/03-puzzle/work/`):
+**Scripts** (session scratchpad, not committed):
 
 - `solver.ts`, `verify.ts`, `replay.ts`, `grid.ts`, `grid2.ts`, `find-sample.ts`, `sample.ts`, `run-cap.mjs`
 - logs: `verify-cap5.log`, `grid.log`, `grid2.log`, `sample.log`

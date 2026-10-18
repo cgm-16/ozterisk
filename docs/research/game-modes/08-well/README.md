@@ -112,7 +112,7 @@ Precedents, and what each one decided:
 
 **Against the cliff: under, with a thinner margin than Endless.** The greedy bot's steady-state *b'* is 0.61 at capacity (0.63 at skill 0.95) and 0.59 one tile below, against 0.631; Endless's are 0.57 and 0.53. At capacity a correct answer's +1 overflows, so drift there is negative whatever *b'* is; the cell below (drift −0.19 a round) decides whether a hand gets pinned. Touching removes about a third of *b*; the extra five sockets buy most of it back.
 
-**Instrument.** Two scripts live in the work folder (not the repo) and run through the shared Vite runner.
+**Instrument.** Two scripts live in the session scratchpad, not committed, and run through the shared Vite runner.
 - `static-sweep.ts`: iid uniform digits laid out by gravity, level fill (the lowest-stack rule's shape), 20,000 grids a row.
 - `runs.ts`: 2,000 runs a row, capped at 1,000 rounds, kind 0.2, skills 1.0 and 0.95. Endless runs on the **real** `gameReducer`, `generateKindEquation` and `generateRewardTiles`. The Well re-implements only what differs; its kind gate keeps `generateKindEquation`'s sample order with a touching-aware filter (the real one would silently overstate *b'*).
 - Bots, one family for both modes. **Naive** makes random legal choices. **Greedy** is 1-ply: it takes the choice that leaves the highest coverage after removal and gravity, not knowing the reward digits but knowing the rail tile. **Position-blind greedy** scores with loose coverage instead. Bots are not players; compare rows with each other.
@@ -201,4 +201,4 @@ Enough to test whether position reads as a decision.
 
 Repo files (read-only): `docs/spec/product.md`, `docs/spec/ui-i18n.md`, `docs/design-system/decisions.md`, `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md`, `docs/journal/journal-2026-09-27.md`, `src/game/{balance,selectors,generators,gameReducer,factories,types}.ts`, `src/hooks/useGameKeyboard.ts`, `src/components/TileInventory/TileInventory.tsx`.
 
-Work files (`08-gravity-well/work/`): `well-model.ts`, `static-sweep.ts` → `static-sweep.out`, `opening-search.ts` → `opening-search.out`, `runs.ts` → `runs-skill100.out`, `runs-skill095.out`, `negative-control.out`, `runs-pilot.out` (300-run pilot, including random-column), `make_svgs.py`.
+Work files (session scratchpad, not committed): `well-model.ts`, `static-sweep.ts` → `static-sweep.out`, `opening-search.ts` → `opening-search.out`, `runs.ts` → `runs-skill100.out`, `runs-skill095.out`, `negative-control.out`, `runs-pilot.out` (300-run pilot, including random-column), `make_svgs.py`.

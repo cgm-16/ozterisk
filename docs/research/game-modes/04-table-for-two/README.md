@@ -105,7 +105,7 @@ Precedents:
 
 **Where it sits.** Each seat is an Endless economy, below the cliff; the river adds kind-bias-like generosity. Two valves hold it under: a **one-turn** window and **one take per turn**. Remove the window and the cliff breaks; drop the take's price and every deliberate miss gets cheaper.
 
-**Instrument.** `work/table-sim.ts` is driven by `sweep.ts` and `focus.ts` and run through `_runner/run.mjs`.
+**Instrument.** `table-sim.ts` (session scratchpad, not committed) is driven by `sweep.ts` and `focus.ts` and run through the shared Vite runner.
 - It calls the real `generateKindEquation`, `generateEquation` and `generateRewardTiles` at the shipped kind rate 0.2.
 - Table rules and bots are re-implemented. Each (game, seat, round, purpose) has its own seeded stream, so variants share random numbers.
 - The bot answers correctly with probability 0.95 when it can spell the answer; an error spends the answer's own tiles.
@@ -208,4 +208,4 @@ Asking to "just play Endless and compare" is the same verdict.
 11. https://meadowparty.com/blog/2011/09/09/1846/ — "less than ideal for pass and play because you can see other players' routes too easily".
 
 Repo: `docs/spec/product.md`, `docs/spec/ui-i18n.md`, `docs/spec/architecture.md`, `docs/superpowers/specs/2026-08-09-endless-mode-polish-design.md` §1–2, `docs/design-system/decisions.md` (motion inventory; Classic theme), `src/game/{balance,selectors,generators,gameReducer}.ts`, `docs/journal/journal-2026-09-27.md` (sim-reporting precedent).
-Sim (work folder, not shipped): `04-shared-table/work/table-sim.ts`, `calib.ts`, `gonogo.ts`, `sweep.ts`, `focus.ts`, with outputs `*.out`.
+Sim (session scratchpad, not committed): `table-sim.ts`, `calib.ts`, `gonogo.ts`, `sweep.ts`, `focus.ts`, with outputs `*.out`.

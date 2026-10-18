@@ -111,7 +111,7 @@ Precedents, each opened:
 
 **Analytic estimate.** Hold q constant, with stake 1 and pot +k; this ignores rack decay and the lock. The side bet breaks even at **q = 0.50**. If the pot *replaced* the plain point instead, break-even would be 0.713. A pot that never grows is never worth declaring.
 
-**Instrument and conditions.** `riichi-sim.ts` (work folder) steps the real `gameReducer`, `generateKindEquation`, `generateRewardTiles` and `canConstruct` in Endless mode. Every policy shares the same mulberry32 seeds, so the comparisons are paired.
+**Instrument and conditions.** `riichi-sim.ts` (session scratchpad, not committed) steps the real `gameReducer`, `generateKindEquation`, `generateRewardTiles` and `canConstruct` in Endless mode. Every policy shares the same mulberry32 seeds, so the comparisons are paired.
 
 The bot:
 - answers correctly with probability *skill* (0.95, or 0.85) when the answer is buildable;

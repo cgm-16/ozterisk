@@ -60,5 +60,20 @@ export type GameAction =
   | { type: "RESTART_RUN"; equation: Equation; inventory: Tile[] } // keeps state.mode
   | { type: "CLEAR_SELECTION" };
 
+export interface PuzzleRow {
+  equation: Equation;
+  /** The digits a correct answer takes, in arrival order. */
+  pay: Digit[];
+}
+
+export interface PuzzleTable {
+  hand: Digit[];
+  rows: PuzzleRow[];
+  par: number;
+}
+
+/** A table before the solver has priced it. */
+export type PuzzleDeal = Omit<PuzzleTable, "par">;
+
 export type RandomSource = () => number; // Contract: 0 <= value < 1
 export type TileIdFactory = () => string;

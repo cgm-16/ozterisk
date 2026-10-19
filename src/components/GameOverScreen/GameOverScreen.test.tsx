@@ -318,3 +318,75 @@ describe("GameOverScreen", () => {
     expect(container.querySelector(`.${styles.chop}`)).toBeNull();
   });
 });
+
+describe("GameOverScreen, Puzzle", () => {
+  const PUZZLE_STATS = {
+    mode: "puzzle",
+    won: true,
+    par: 7,
+    rows: 8,
+    score: 7,
+    totalRounds: 8,
+    longestStreak: 4,
+  } as const;
+  const statValue = (label: string) => screen.getByText(label).nextElementSibling?.textContent;
+
+  // The table is finished and par is made: nothing is left to explain, so the
+  // slot a loss gives its equation carries only the reason.
+  it("sets made par in gold, with no equation, no final hand and no Rounds played", () => {
+    renderScreen({ stats: PUZZLE_STATS, hand: [makeTile(2, "a"), makeTile(7, "b")] });
+
+    expect(screen.getByRole("heading", { name: "Made par" })).toHaveClass(styles.won);
+    expect(screen.getByText("All eight rows played.")).toBeInTheDocument();
+    expect(screen.queryByText("2 × 3 =", { exact: false })).not.toBeInTheDocument();
+    expect(screen.queryByRole("img")).not.toBeInTheDocument();
+    expect(screen.queryByText("Rounds played")).not.toBeInTheDocument();
+    expect(statValue("Score")).toBe("7 / 8");
+    expect(statValue("Par")).toBe("7");
+    expect(statValue("Longest streak")).toBe("4");
+  });
+
+  // The terminal's first paragraph is styled as the stepped-down terminal
+  // equation. With no equation, the reason is that first paragraph and must
+  // not inherit the equation's treatment. Probed by computed style, since a
+  // `.reason` that keeps its own size reads back unset in jsdom, which
+  // substitutes no var().
+  it("keeps the reason a caption when no equation precedes it", () => {
+    renderScreen({ stats: PUZZLE_STATS });
+
+    const reason = screen.getByText("All eight rows played.");
+    expect(getComputedStyle(reason).fontSize).not.toBe("var(--size-title)");
+  });
+
+  it("names the shortfall in ink when par is missed on a finished table", () => {
+    renderScreen({ stats: { ...PUZZLE_STATS, won: false, score: 5 } });
+
+    expect(screen.getByRole("heading", { name: "2 short of par" })).not.toHaveClass(styles.won);
+    expect(screen.getByText("All eight rows played.")).toBeInTheDocument();
+    expect(statValue("Score")).toBe("5 / 8");
+  });
+
+  it("keeps the terminal equation and the loss reason when the run ended early", () => {
+    renderScreen({
+      equation: makeEquation(7, 8),
+      stats: { ...PUZZLE_STATS, won: false, score: 1, totalRounds: 3 },
+    });
+
+    expect(screen.getByText("7 × 8 =")).toBeInTheDocument();
+    expect(screen.getByText("56")).toBeInTheDocument();
+    expect(screen.getByText("Not enough tiles left to answer.")).toBeInTheDocument();
+    expect(screen.queryByText("All eight rows played.")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "6 short of par" })).toBeInTheDocument();
+  });
+
+  it("copies the Puzzle share text", async () => {
+    const { dependencies } = renderScreen({ stats: PUZZLE_STATS });
+
+    await userEvent.click(screen.getByRole("button", { name: "Copy Result" }));
+
+    await waitFor(() => expect(dependencies.writeClipboard).toHaveBeenCalledTimes(1));
+    expect(dependencies.writeClipboard).toHaveBeenCalledWith(
+      "ozterisk Puzzle — Made par — Score: 7/8 · par 7\nLongest streak: 4\n\nCan you make par?\nhttps://example.test/",
+    );
+  });
+});

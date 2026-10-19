@@ -307,6 +307,21 @@ const GAME_OVER_CLASSIC_WIN_STATE = makeGameOverState(makeEquation(7, 8), {
   inventory: [makeTile(1, "win-a"), makeTile(4, "win-b"), makeTile(4, "win-c"), makeFaceTile("wild", "win-d")],
 });
 
+// Puzzle's game over (spec §7) after the sample's par line: the table played to
+// its end with par made, so the heading is gold and no equation is shown. The
+// hand is what that line holds after row 8, and the streak is the seven
+// answers since the sacrifice.
+const GAME_OVER_PUZZLE_STATE = makeGameOverState(PUZZLE_SAMPLE.rows[7].equation, {
+  mode: "puzzle",
+  table: PUZZLE_SAMPLE,
+  rowResults: ["incorrect", "correct", "correct", "correct", "correct", "correct", "correct", "correct"],
+  inventory: sortTiles(createTiles([2, 2, 7, 8, 8], sequentialIds())),
+  score: 7,
+  totalRounds: 8,
+  round: 9,
+  longestStreak: 7,
+});
+
 // Face tiles (§1.4a) are Classic's. A rack at sixteen, the 7 x 44 size that
 // narrows to 6 x 44 at 320px, holds all six kinds after ten digits, in rack
 // order: the widest glyphs in the smallest tiles the rack draws.
@@ -507,6 +522,11 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
       id: "game-over-classic-win",
       label: "Game over — Classic, run complete",
       render: () => renderGameOverScreen(GAME_OVER_CLASSIC_WIN_STATE, RESOLVING_SHARE_DEPENDENCIES),
+    },
+    {
+      id: "game-over-puzzle",
+      label: "Game over — Puzzle, made par",
+      render: () => renderGameOverScreen(GAME_OVER_PUZZLE_STATE, RESOLVING_SHARE_DEPENDENCIES),
     },
     {
       id: "game-over-copy-succeeded",

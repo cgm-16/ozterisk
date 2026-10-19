@@ -23,8 +23,10 @@
    68px headline steps down to title size in meta ink, so the reason line below
    supports it instead of rescuing it from reading live. The selector reaches
    the board's own paragraph — .reason is the sibling that follows it — and at
-   (0,1,1) it beats EquationBoard's (0,1,0) rule whatever the sheet order. */
-.terminal > p:first-child {
+   (0,2,1) it beats EquationBoard's (0,1,0) rule whatever the sheet order.
+   A table played to its end has no board, so the reason is the first
+   paragraph: `:not(.reason)` keeps it a caption instead of a second headline. */
+.terminal > p:first-child:not(.reason) {
   font-size: var(--size-title);
   color: var(--text-meta);
 }

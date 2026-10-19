@@ -96,10 +96,14 @@ const en = {
     rounds: "Rounds played",
     longestStreak: "Longest streak",
     restartHint: "Press R to play again",
+    parTitle: "Made par",
+    shortTitle: "{short} short of par",
+    tableReason: "All eight rows played.",
   },
   share: {
     copied: "Result copied.",
     failed: "Could not share or copy the result.",
+    puzzleAsk: "Can you make par?",
   },
   answerSlot: {
     filled: "Answer slot {position}: {digit}",
@@ -200,10 +204,14 @@ const ko = {
     rounds: "진행한 라운드",
     longestStreak: "최장 연속 정답",
     restartHint: "R 키를 눌러 다시 하기",
+    parTitle: "목표 달성",
+    shortTitle: "목표까지 {short}점 부족",
+    tableReason: "여덟 줄을 모두 풀었습니다.",
   },
   share: {
     copied: "결과를 복사했습니다.",
     failed: "결과를 공유하거나 복사하지 못했습니다.",
+    puzzleAsk: "목표를 달성할 수 있나요?",
   },
   answerSlot: {
     filled: "정답 칸 {position}: {digit}",

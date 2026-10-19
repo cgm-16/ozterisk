@@ -7,7 +7,13 @@ import { LANGUAGE_STORAGE_KEY } from "../i18n/storage";
 import { FACE_RATE_END } from "../game/balance";
 import type { Language, PuzzleTable } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
-import { makePuzzleRow, PUZZLE_SAMPLE, sequenceRandom, sequentialIds } from "../test/fixtures";
+import {
+  makePuzzleRow,
+  PUZZLE_SAMPLE,
+  PUZZLE_SAMPLE_PAR_LINE,
+  sequenceRandom,
+  sequentialIds,
+} from "../test/fixtures";
 import { App, type AppDependencies } from "./App";
 
 // Mirrors the 45-entry unordered-pair pool generateEquation samples from
@@ -615,5 +621,38 @@ describe("Puzzle", () => {
     await user.click(screen.getByRole("button", { name: "Next Round" }));
     await user.click(screen.getByRole("button", { name: "Play Again" }));
     expect(dealPuzzle).toHaveBeenCalledTimes(2);
+  });
+
+  it("plays the sample's par line, sacrifice included, to Made par", async () => {
+    const user = userEvent.setup();
+    renderApp([]);
+    await startPuzzle(user);
+    for (const move of PUZZLE_SAMPLE_PAR_LINE) {
+      await press(user, move.spend);
+      if (move.discard === undefined) {
+        await user.click(screen.getByRole("button", { name: "Next Round" }));
+      } else {
+        // A reward tile is named "Digit 0, New tile", so the digit is matched as a prefix.
+        await user.click(screen.getAllByRole("button", { name: new RegExp(`^Digit ${move.discard}\\b`) })[0]!);
+        finishDeparture();
+      }
+    }
+    expect(await screen.findByRole("heading", { name: "Made par" })).toBeInTheDocument();
+    expect(hudField("Par")).toBe("7");
+  });
+
+  it("ends early when the hand cannot fill the next row, short of par", async () => {
+    const user = userEvent.setup();
+    const twoTiles: PuzzleTable = {
+      hand: [1, 2],
+      rows: [makePuzzleRow(3, 4, [1, 2, 3]), makePuzzleRow(5, 5, [1, 2, 3])],
+      par: 1,
+    };
+    renderApp([], { dealPuzzle: () => twoTiles });
+    await startPuzzle(user);
+    await press(user, [2, 1]); // 21 for 12: the hand is spent
+    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    expect(screen.getByRole("heading", { name: "1 short of par" })).toBeInTheDocument();
+    expect(screen.getByText("Not enough tiles left to answer.")).toBeInTheDocument();
   });
 });

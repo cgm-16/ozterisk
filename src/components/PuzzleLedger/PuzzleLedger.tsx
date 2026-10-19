@@ -25,7 +25,12 @@ export function PuzzleLedger({ table, round, rowResults }: PuzzleLedgerProps) {
   const payList = new Intl.ListFormat(language, { type: "conjunction" });
 
   return (
-    <ol className={styles.ledger} aria-label={t("ledger.label")}>
+    <ol
+      className={styles.ledger}
+      aria-label={t("ledger.label")}
+      // WebKit strips list semantics from unstyled lists, and the label with them.
+      role="list"
+    >
       {table.rows.map(({ equation, pay }, index) => {
         const result = index < rowResults.length ? rowResults[index] : undefined;
         const current = index === round - 1;

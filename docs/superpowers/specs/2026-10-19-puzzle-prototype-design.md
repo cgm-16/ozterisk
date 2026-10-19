@@ -198,7 +198,7 @@ Added to `src/game/balance.ts`, each with its economy effect documented there:
 |---|---|---|
 | `PUZZLE_CAPACITY` | 5 | Sockets in Puzzle. The draft's band figures are measured at 5. |
 | `PUZZLE_ROWS` | 8 | Rows per table, so the run's length. |
-| `PUZZLE_PLANT_RATE` | 0.6 | How often a row is drawn from what the hidden line can spell. 1.0 makes every table clearable even for the myopic bot. |
+| `PUZZLE_PLANT_RATE` | 0.6 | How often a row is drawn from what the hidden line can spell. 1.0 makes every table clearable, though the myopic bot still scores only about three rows in four. |
 | `PUZZLE_MIN_PAR` | 7 | The lowest par the band accepts. |
 | `PUZZLE_MIN_ONLY_MOVES` | 2 | The fewest only-moves on the par line the band accepts. |
 
@@ -262,6 +262,10 @@ Fixed before the first tester, so the result cannot move the bar.
 - **Tables.** Each tester plays four: Medium, Hard, the sample, then one live
   deal. The wiring above already deals live after the set, so the fourth table
   needs no code.
+- **Scrolling.** On a 660 px phone, Next Round sits just below the fold after a
+  miss, and a correct answer at a full hand scrolls the played rows off the top
+  while the rows still to play stay on screen. The observer expects both and
+  counts neither against planning (Ori, 2026-10-19; journal 2026-10-19).
 - **Recorded per table, by the observer** (the draft's §7): seconds before the
   first submission; whether they look at the ledger; after missing par, whether
   they can name the move they would change; score against par.
@@ -294,6 +298,9 @@ Fixed before the first tester, so the result cannot move the bar.
   - **the current row**: `aria-current="step"`, its equation rendered by
     `EquationBoard`, so it keeps the existing 10b rise, and its pay as small
     `Tile`s;
+  - **the row just submitted** is played and current at once, until the round
+    advances: it keeps the current row's frame, `aria-current` and
+    `EquationBoard`, and shows its ✓ or ✗ in place of its pay;
   - **later rows**: the equation and the pay as small `Tile`s.
 
   No motion is added. A row's change of state is instant, and rewards arrive in

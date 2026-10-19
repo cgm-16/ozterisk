@@ -612,8 +612,9 @@ describe("Puzzle", () => {
 
   it("deals once per run under StrictMode", async () => {
     const user = userEvent.setup();
-    const oneRow: PuzzleTable = { hand: [1, 2, 3, 4], rows: [makePuzzleRow(1, 2, [1, 2])], par: 1 };
-    const dealPuzzle = vi.fn(() => oneRow);
+    const firstTable: PuzzleTable = { hand: [1, 2, 3, 4], rows: [makePuzzleRow(1, 2, [1, 2])], par: 1 };
+    const secondTable: PuzzleTable = { hand: [1, 2, 3, 4], rows: [makePuzzleRow(3, 4, [1, 2])], par: 1 };
+    const dealPuzzle = vi.fn<() => PuzzleTable>().mockReturnValueOnce(firstTable).mockReturnValueOnce(secondTable);
     renderApp([], { strictMode: true, dealPuzzle });
     await startPuzzle(user);
     expect(dealPuzzle).toHaveBeenCalledTimes(1);
@@ -621,6 +622,8 @@ describe("Puzzle", () => {
     await user.click(screen.getByRole("button", { name: "Next Round" }));
     await user.click(screen.getByRole("button", { name: "Play Again" }));
     expect(dealPuzzle).toHaveBeenCalledTimes(2);
+    expect(screen.getByText("3 × 4 =")).toBeInTheDocument();
+    expect(screen.queryByText("1 × 2 =")).not.toBeInTheDocument();
   });
 
   it("plays the sample's par line, sacrifice included, to Made par", async () => {

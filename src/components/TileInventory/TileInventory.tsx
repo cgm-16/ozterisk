@@ -6,6 +6,9 @@ import { tileLabel } from "../Tile/tileFace";
 import { rackTier } from "./rackTier";
 import styles from "./TileInventory.module.css";
 
+/** Columns in the non-stepped rack's grid (`--rack-columns` in spacing.css): up to this many sockets fit one row. */
+const RACK_COLUMNS = 5;
+
 /** A discard the rack is still drawing (8c): the hand as it stood before the
  * discard, and the ids whose exit has not yet played. */
 interface Departure {
@@ -368,7 +371,7 @@ export function TileInventory({
   };
 
   return (
-    <div ref={rackRef} className={styles.rack} data-size={tier?.size ?? (capacity <= 5 ? "row" : undefined)}>
+    <div ref={rackRef} className={styles.rack} data-size={tier?.size ?? (capacity <= RACK_COLUMNS ? "row" : undefined)}>
       {/* The rail is in flow above the tray, and 8a·2's offsets were measured
           with it there. It stays, empty and one tile high, until the last
           dropping tile lands: gone with the fall, it would lift every seat by

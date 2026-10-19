@@ -114,9 +114,10 @@ export const PUZZLE_ROWS = 8;
 /**
  * Share of Puzzle rows drawn only from products the hidden line's hand can
  * spell, applied at deal time (plantTable).
- * Economy: 1.0 makes every table clearable even for the myopic bot; the
- * uniform deal (0) is 0.0% clearable. At 0.6, about one plant in seven lands in
- * the band set by PUZZLE_MIN_PAR and PUZZLE_MIN_ONLY_MOVES.
+ * Economy: 1.0 makes every table clearable, though the myopic bot still scores
+ * only about three rows in four; the uniform deal (0) is 0.0% clearable. At
+ * 0.6, about one plant in seven lands in the band set by PUZZLE_MIN_PAR and
+ * PUZZLE_MIN_ONLY_MOVES.
  */
 export const PUZZLE_PLANT_RATE = 0.6;
 

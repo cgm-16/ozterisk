@@ -266,8 +266,9 @@ describe("dealPuzzle", () => {
     measured at 5; at 6 the band moves (11–16% in band at 6 rows).
   - `PUZZLE_ROWS` (8): rows per table, and so the run's length.
   - `PUZZLE_PLANT_RATE` (0.6): how often a row comes from what the hidden line
-    can spell. 1.0 makes every table clearable even for the myopic bot; the
-    uniform deal (0) is 0.0% clearable.
+    can spell. 1.0 makes every table clearable, though the myopic bot still
+    scores only about three rows in four; the uniform deal (0) is 0.0%
+    clearable.
   - `PUZZLE_MIN_PAR` (7): the lowest par the band accepts.
   - `PUZZLE_MIN_ONLY_MOVES` (2): the fewest only-moves on the par line the band
     accepts. With the two above, about one plant in seven is accepted.

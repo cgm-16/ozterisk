@@ -64,6 +64,12 @@ replayable runs on a public URL, so it leaves before the merge.
 - [ ] **Amend `docs/spec/ui-i18n.md`**: §1.12, the one-row rack at capacity 5 and
       the ledger (order, ink marks, no new motion); §1.15, the Puzzle share
       format.
+- [ ] **The layout check's source.** The design spec's §7 Gallery line says
+      the layout check reads the gallery's answering state. It reads the app
+      from `/` (Ori, 2026-10-19): on a phone the gallery stacks its picker
+      above the stage, so it cannot host a no-page-scroll reading. Rewrite the
+      line to say so, and use the same wording wherever the `docs/spec/**`
+      amendment names the check.
 - [ ] **Traceability.** Add each new requirement to `docs/plan/traceability.md`
       with its owning task (T85–T89) and evidence (test file and name).
 - [ ] **Roadmap.** Mark `M8` closed with its merge SHA once merged.

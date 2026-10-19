@@ -263,7 +263,8 @@ const ANSWERING_CLASSIC_15_STATE = classicAt(15);
 const ANSWERING_CLASSIC_10_STATE = classicAt(10);
 
 // Puzzle (spec §7): the sample at row 1, its hand dealt, every row still to
-// play. It is the state e2e/puzzle-fit.spec.ts reads in the app.
+// play. e2e/puzzle-fit.spec.ts measures the same screen in the app, dealt from
+// the title screen.
 const ANSWERING_PUZZLE_STATE = makeAnsweringState(PUZZLE_SAMPLE.rows[0].equation, {
   mode: "puzzle",
   table: PUZZLE_SAMPLE,

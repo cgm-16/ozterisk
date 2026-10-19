@@ -8,9 +8,11 @@ export interface GameHudProps {
   round: number;
   /** Classic's live capacity. Endless omits it: its CapacityMeter says it. */
   capacity?: number;
+  /** Puzzle's par, the best score its table allows. The other modes omit it. */
+  par?: number;
 }
 
-export function GameHud({ score, currentStreak, round, capacity }: GameHudProps) {
+export function GameHud({ score, currentStreak, round, capacity, par }: GameHudProps) {
   const { t } = useI18n();
 
   // 10e needs a number that is no longer in state: the count that falls is the
@@ -65,6 +67,12 @@ export function GameHud({ score, currentStreak, round, capacity }: GameHudProps)
         <div className={styles.entry}>
           <dt>{t("hud.capacity")}</dt>
           <dd>{capacity}</dd>
+        </div>
+      )}
+      {par !== undefined && (
+        <div className={styles.entry}>
+          <dt>{t("hud.par")}</dt>
+          <dd>{par}</dd>
         </div>
       )}
     </dl>

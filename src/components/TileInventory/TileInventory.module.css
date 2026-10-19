@@ -289,6 +289,13 @@
   --rack-pad: var(--space-2);
 }
 
+/* Puzzle's five sockets, at Endless's tiers: one row. The Endless rack's
+   `5 x 2` would leave Puzzle's five an empty second row. */
+.rack[data-size="row"] > .rail,
+.rack[data-size="row"] > .inventory {
+  --rack-rows: 1;
+}
+
 /* Where the arena cannot hold the small size's tray, it falls back to 6 x 44
    (§1.12). 350px is 7 x 44's tray (tiles, gaps, 8px padding a side, the 1px
    border). The fallback needs 280px: the 281px the 320px gate leaves with a

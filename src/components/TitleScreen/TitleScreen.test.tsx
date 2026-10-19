@@ -135,6 +135,23 @@ describe("TitleScreen", () => {
     ).toBeInTheDocument();
   });
 
+  // Puzzle's playtesters are told the title-screen rules only, and the
+  // always-visible ones are Endless's, so its rule has to be under More.
+  it("lists the Puzzle topic under More", async () => {
+    render(
+      <I18nProvider initialLanguage="en">
+        <TitleScreen onStart={vi.fn()} />
+      </I18nProvider>,
+    );
+
+    const more = screen.getByText("More");
+    await userEvent.click(more);
+
+    expect(
+      within(more.closest("details")!).getByText(/Puzzle deals five tiles and eight equations face up/),
+    ).toBeInTheDocument();
+  });
+
   it("states the four material rules on the felt, outside the disclosure", () => {
     render(
       <I18nProvider initialLanguage="en">

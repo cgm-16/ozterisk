@@ -43,6 +43,8 @@ const en = {
       "Classic starts with twenty sockets and closes one every second submission, correct or not. Keep enough tiles to reach five sockets and the run is complete.",
     keyboard:
       "Press a digit key to select a matching tile or, during a discard, to mark it and complete the discard, Backspace to return the most recently selected tile, Escape to clear your selection, Enter to submit or continue, and R to play again once the run ends.",
+    puzzle:
+      "Puzzle deals five tiles and eight equations face up, each printed with the tiles it pays. A correct answer takes its row's tiles, and your hand holds five. Par is the best score the table allows. A wrong answer is a legal move.",
   },
   action: {
     start: "Start Run",
@@ -62,6 +64,15 @@ const en = {
     // localised template rather than an interpolated "of", which rendered the
     // Korean name as "용량 10 of 10".
     capacityStatus: "{label} {held} of {total}",
+    par: "Par",
+  },
+  // Puzzle's table. Each row is one accessible string; the pay is joined by
+  // Intl.ListFormat in the current language, so no "and" is written here.
+  ledger: {
+    label: "Table",
+    row: "Row {row}, {left} × {right}, pays {pay}",
+    answered: "answered",
+    missed: "missed",
   },
   result: {
     correct: "Correct",
@@ -143,6 +154,8 @@ const ko = {
       "클래식은 스무 칸으로 시작해 정답 여부와 관계없이 두 번 제출할 때마다 한 칸씩 닫힙니다. 다섯 칸에 도달할 때까지 타일을 지키면 완주합니다.",
     keyboard:
       "숫자 키를 누르면 일치하는 타일을 선택하거나, 버리기 중에는 타일을 표시해 바로 버리기를 완료하며, Backspace 키로 가장 최근에 선택한 타일을 되돌리고, Escape 키로 선택을 지우며, Enter 키로 제출하거나 다음으로 진행하고, 게임이 끝나면 R 키로 다시 시작합니다.",
+    puzzle:
+      "묘수풀이는 타일 다섯 개와 문제 여덟 개를 모두 펼쳐 놓고 시작하며, 문제마다 받을 타일이 적혀 있습니다. 정답을 맞히면 그 줄의 타일을 받고, 손에는 다섯 개까지 보관합니다. 목표는 이 판에서 낼 수 있는 가장 높은 점수입니다. 오답도 둘 수 있는 한 수입니다.",
   },
   action: {
     start: "게임 시작",
@@ -159,6 +172,13 @@ const ko = {
     round: "라운드",
     capacity: "용량",
     capacityStatus: "{label} {total} 중 {held}",
+    par: "목표",
+  },
+  ledger: {
+    label: "판",
+    row: "{row}번째 줄, {left} × {right}, 보상 {pay}",
+    answered: "정답",
+    missed: "오답",
   },
   result: {
     correct: "정답",

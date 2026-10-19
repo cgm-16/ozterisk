@@ -4,7 +4,7 @@ import { GameScreen } from "../components/GameScreen/GameScreen";
 import { LanguageToggle } from "../components/LanguageToggle/LanguageToggle";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { CLASSIC_FLOOR, CLASSIC_SEAL_EVERY, CLASSIC_START_CAPACITY } from "../game/balance";
-import { createInitialInventory, sortTiles } from "../game/factories";
+import { createInitialInventory, createTiles, sortTiles } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
 import type { GamePhase, GameState, Tile } from "../game/types";
 import { getShareStats, type ShareDependencies } from "../services/sharing";
@@ -16,6 +16,7 @@ import {
   makeGameOverState,
   makeNbrTile,
   makeTile,
+  PUZZLE_SAMPLE,
   sequentialIds,
 } from "../test/fixtures";
 import { ControlBoard, CopyPressedOnMount, FaceBoard, ReducedMotionBoard } from "./harness";
@@ -261,6 +262,31 @@ const classicAt = (capacity: number) => {
 const ANSWERING_CLASSIC_15_STATE = classicAt(15);
 const ANSWERING_CLASSIC_10_STATE = classicAt(10);
 
+// Puzzle (spec §7): the sample at row 1, its hand dealt, every row still to
+// play. It is the state e2e/puzzle-fit.spec.ts reads in the app.
+const ANSWERING_PUZZLE_STATE = makeAnsweringState(PUZZLE_SAMPLE.rows[0].equation, {
+  mode: "puzzle",
+  table: PUZZLE_SAMPLE,
+  rowResults: [],
+  inventory: sortTiles(createTiles(PUZZLE_SAMPLE.hand, sequentialIds())),
+});
+
+// Row 4 of the sample's par line: the sacrifice missed, 14 and 9 answered, so
+// the ledger draws both marks beside the frame and the pays still to come. The
+// hand is what that line holds there, and the streak is the two answers since
+// the miss.
+const ANSWERING_PUZZLE_ROW_4_STATE = makeAnsweringState(PUZZLE_SAMPLE.rows[3].equation, {
+  mode: "puzzle",
+  table: PUZZLE_SAMPLE,
+  rowResults: ["incorrect", "correct", "correct"],
+  inventory: sortTiles(createTiles([1, 2, 6, 7, 8], sequentialIds())),
+  round: 4,
+  totalRounds: 3,
+  score: 2,
+  currentStreak: 2,
+  longestStreak: 2,
+});
+
 // The feedback a discard leaves behind: no Next Round, because the round
 // advances on its own once the departing tile has played (§1.7). In the
 // gallery nothing departs, so this is the resting frame of that moment.
@@ -405,6 +431,16 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
       id: "answering-depleted",
       label: "Answering — a depleted rack",
       render: () => renderGameScreen(ANSWERING_DEPLETED_STATE),
+    },
+    {
+      id: "answering-puzzle",
+      label: "Answering — Puzzle, the sample at row 1",
+      render: () => renderGameScreen(ANSWERING_PUZZLE_STATE),
+    },
+    {
+      id: "answering-puzzle-row-4",
+      label: "Answering — Puzzle at row 4, three rows marked",
+      render: () => renderGameScreen(ANSWERING_PUZZLE_ROW_4_STATE),
     },
   ],
   feedback: [

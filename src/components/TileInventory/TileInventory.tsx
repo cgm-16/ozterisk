@@ -368,7 +368,7 @@ export function TileInventory({
   };
 
   return (
-    <div ref={rackRef} className={styles.rack} data-size={tier?.size}>
+    <div ref={rackRef} className={styles.rack} data-size={tier?.size ?? (capacity <= 5 ? "row" : undefined)}>
       {/* The rail is in flow above the tray, and 8a·2's offsets were measured
           with it there. It stays, empty and one tile high, until the last
           dropping tile lands: gone with the fall, it would lift every seat by

@@ -1,0 +1,64 @@
+hard tables with >=3 only-moves among 20,000 seeds: 425; top seeds 5482,16641,3538,6762,17939,16265,7806,5379
+
+=== seed 5482: hand [8 6 9 2 4] cap 5
+  row 1: 1 x 2 = 2  pays [6 1]
+  row 2: 2 x 2 = 4  pays [3 4]
+  row 3: 3 x 3 = 9  pays [4 4]
+  row 4: 2 x 3 = 6  pays [5 1]
+  row 5: 7 x 2 = 14  pays [3 1 0]
+  row 6: 8 x 6 = 48  pays [3 9 7]
+  row 7: 2 x 4 = 8  pays [8 6]
+  row 8: 6 x 9 = 54  pays [7 6 8]
+  par 7/8  histogram(score 0..K) 53,290,1237,4669,14587,24151,15730,36,0  lines 60753  par lines 36  only-moves 4/8 decisions  sacrifice required true  states 884
+  par line row 1: correct, discard 1  (options 9, keep-par 2)  -> hand 4 6 6 8 9
+  par line row 2: correct, discard 3  (options 8, keep-par 3)  -> hand 4 6 6 8 9
+  par line row 3: correct, discard 4  (options 6, keep-par 2)  -> hand 4 4 6 6 8
+  par line row 4: correct, discard 6  (options 7, keep-par 1)  -> hand 1 4 4 5 8
+  par line row 5: correct, discard 0  (options 13, keep-par 3)  -> hand 1 3 4 5 8
+  par line row 6: MISS spending 1+3  (options 15, keep-par 1)  -> hand 4 5 8
+  par line row 7: correct  (options 3, keep-par 1)  -> hand 4 5 6 8
+  par line row 8: correct  (options 7, keep-par 1)  -> hand 6 6 7 8 8
+  myopic 4: correct, discard 6 | correct, discard 9 | MISS spending 8 | correct | correct, discard 3 | MISS spending 1+5 | MISS spending 3 | MISS spending 0+1
+  lookahead 6: correct, discard 6 | correct, discard 3 | correct, discard 4 | correct, discard 1 | correct, discard 3 | correct, discard 9 | MISS spending 7 | MISS spending 3+5
+
+=== seed 16641: hand [5 9 1 4 7] cap 5
+  row 1: 3 x 5 = 15  pays [9 5 5]
+  row 2: 7 x 2 = 14  pays [8 1 6]
+  row 3: 3 x 3 = 9  pays [2 7]
+  row 4: 1 x 7 = 7  pays [4 4]
+  row 5: 4 x 1 = 4  pays [6 2]
+  row 6: 8 x 3 = 24  pays [0 7 7]
+  row 7: 2 x 3 = 6  pays [8 8]
+  row 8: 3 x 4 = 12  pays [2 0 2]
+  par 7/8  histogram(score 0..K) 24,115,176,624,2580,7644,5692,38,0  lines 16893  par lines 38  only-moves 4/8 decisions  sacrifice required true  states 714
+  par line row 1: MISS spending 5+7  (options 14, keep-par 1)  -> hand 1 4 9
+  par line row 2: correct  (options 4, keep-par 1)  -> hand 1 6 8 9
+  par line row 3: correct  (options 4, keep-par 1)  -> hand 1 2 6 7 8
+  par line row 4: correct, discard 6  (options 9, keep-par 2)  -> hand 1 2 4 4 8
+  par line row 5: correct, discard 8  (options 8, keep-par 1)  -> hand 1 2 2 4 6
+  par line row 6: correct, discard 0  (options 12, keep-par 2)  -> hand 1 2 6 7 7
+  par line row 7: correct, discard 7  (options 7, keep-par 2)  -> hand 1 2 7 8 8
+  par line row 8: correct, discard 0  (options 11, keep-par 4)  -> hand 2 2 7 8 8
+  myopic 2: correct, discard 9 | MISS spending 5+9 | MISS spending 7 | MISS spending 5 | correct | MISS spending 2+6
+  lookahead 6: correct, discard 9 | MISS spending 5+5 | correct | correct | correct, discard 4 | correct, discard 7 | correct, discard 8 | MISS spending 7+8
+
+=== seed 3538: hand [8 6 1 2 9] cap 5
+  row 1: 8 x 1 = 8  pays [7 5]
+  row 2: 4 x 3 = 12  pays [7 7 0]
+  row 3: 2 x 3 = 6  pays [9 7]
+  row 4: 1 x 1 = 1  pays [9 0]
+  row 5: 4 x 5 = 20  pays [9 5 9]
+  row 6: 1 x 7 = 7  pays [2 3]
+  row 7: 1 x 3 = 3  pays [7 3]
+  row 8: 7 x 5 = 35  pays [4 9 3]
+  par 7/8  histogram(score 0..K) 32,320,562,826,1577,1563,379,60,0  lines 5319  par lines 60  only-moves 4/8 decisions  sacrifice required true  states 414
+  par line row 1: correct, discard 5  (options 10, keep-par 3)  -> hand 1 2 6 7 9
+  par line row 2: MISS spending 7+9  (options 14, keep-par 1)  -> hand 1 2 6
+  par line row 3: correct  (options 3, keep-par 1)  -> hand 1 2 7 9
+  par line row 4: correct  (options 4, keep-par 1)  -> hand 0 2 7 9 9
+  par line row 5: correct, discard 9  (options 10, keep-par 1)  -> hand 5 7 9 9 9
+  par line row 6: correct, discard 2  (options 6, keep-par 2)  -> hand 3 5 9 9 9
+  par line row 7: correct, discard 7  (options 6, keep-par 2)  -> hand 3 5 9 9 9
+  par line row 8: correct, discard 3  (options 7, keep-par 3)  -> hand 4 9 9 9 9
+  myopic 3: correct, discard 9 | correct, discard 7 | correct, discard 7 | MISS spending 7 | MISS spending 7+9 | MISS spending 5 | MISS spending 0
+  lookahead 6: correct, discard 9 | correct, discard 7 | correct, discard 7 | MISS spending 7 | MISS spending 0+9 | correct | correct | correct

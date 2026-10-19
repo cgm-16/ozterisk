@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 390 900" width="390" height="900" role="img" aria-labelledby="t d">
+  <title id="t">Puzzle mode, row 1: the sacrifice</title>
+  <desc id="d">A 390px phone screen. The HUD reads row 1 of 8, score 0, streak 0, par 7. The current ledger row shows 3 × 5 with the tiles 5 and 7 placed in its two answer slots, a deliberate wrong answer; it would pay 9, 5, 5. Rows 2 to 8 are listed below with their pays. The rack holds 1, 4 and 9, with two sockets on loan. A caption explains why giving up 15 is the only line to par.</desc>
+  <defs>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fdf8ec"/>
+      <stop offset="1" stop-color="#e6d7ba"/>
+    </linearGradient>
+    <!-- full tile 52 x 64 with a 5px bottom edge -->
+    <g id="tileL">
+      <rect width="52" height="64" rx="6" fill="#b3a184"/>
+      <rect width="52" height="59" rx="6" fill="url(#face)"/>
+    </g>
+    <!-- tile seated in a 64 x 80 answer slot -->
+    <g id="tileS">
+      <rect width="58" height="74" rx="6" fill="#b3a184"/>
+      <rect width="58" height="69" rx="6" fill="url(#face)"/>
+    </g>
+    <!-- compact tile 30 x 38 with a 3px bottom edge -->
+    <g id="tileC">
+      <rect width="30" height="38" rx="5" fill="#b3a184"/>
+      <rect width="30" height="35" rx="5" fill="url(#face)"/>
+    </g>
+  </defs>
+
+  <!-- surround and felt -->
+  <rect width="390" height="900" fill="#071711"/>
+  <rect x="0" y="0" width="390" height="724" fill="#14342a"/>
+
+  <!-- HUD on an opaque carrier plate -->
+  <rect x="16" y="12" width="358" height="50" rx="8" fill="#0b211b"/>
+  <g font-family="'Zen Kaku Gothic New', 'Helvetica Neue', Arial, sans-serif" font-size="10" letter-spacing="1.5" fill="#f7f0e2" fill-opacity="0.55" text-anchor="middle">
+    <text x="61" y="30">ROW</text>
+    <text x="150" y="30">SCORE</text>
+    <text x="240" y="30">STREAK</text>
+    <text x="329" y="30">PAR</text>
+  </g>
+  <g font-family="'EB Garamond', Georgia, 'Times New Roman', serif" fill="#f7f0e2" text-anchor="middle">
+    <text x="61" y="54" font-size="22">1<tspan font-size="15" fill-opacity="0.55">/8</tspan></text>
+    <text x="150" y="54" font-size="18">0</text>
+    <text x="240" y="54" font-size="18">0</text>
+    <text x="329" y="54" font-size="18">7</text>
+  </g>
+
+  <!-- current row: raised felt, gold rule -->
+  <rect x="16" y="74" width="358" height="148" rx="10" fill="#1b4436" stroke="#c9a54a" stroke-width="1"/>
+  <text x="30" y="96" font-family="'Zen Kaku Gothic New', 'Helvetica Neue', Arial, sans-serif" font-size="11" letter-spacing="1.5" fill="#f7f0e2" fill-opacity="0.55">1</text>
+  <text x="34" y="146" font-family="'EB Garamond', Georgia, 'Times New Roman', serif" font-size="40" fill="#f7f0e2">3 × 5</text>
+  <!-- answer slots (64 x 80) holding 5 then 7: spells 57, not 15 -->
+  <rect x="190.5" y="86.5" width="63" height="79" rx="7" fill="none" stroke="#c9a54a" stroke-width="1" stroke-dasharray="4 3" stroke-opacity="0.5"/>
+  <rect x="262.5" y="86.5" width="63" height="79" rx="7" fill="none" stroke="#c9a54a" stroke-width="1" stroke-dasharray="4 3" stroke-opacity="0.5"/>
+  <g font-family="'EB Garamond', Georgia, 'Times New Roman', serif" font-size="38" fill="#16352b" text-anchor="middle">
+    <use xlink:href="#tileS" x="193" y="89"/><text x="222" y="139">5</text>
+    <use xlink:href="#tileS" x="265" y="89"/><text x="294" y="139">7</text>
+  </g>
+  <!-- this row's pay -->
+  <text x="34" y="200" font-family="'Zen Kaku Gothic New', 'Helvetica Neue', Arial, sans-serif" font-size="10" letter-spacing="1.5" fill="#f7f0e2" fill-opacity="0.55">PAYS</text>
+  <g font-family="'EB Garamond', Georgia, 'Times New Roman', serif" font-size="21" fill="#16352b" text-anchor="middle">
+    <use xlink:href="#tileC" x="80" y="176"/><text x="95" y="201">9</text>
+    <use xlink:href="#tileC" x="114" y="176"/><text x="129" y="201">5</text>
+    <use xlink:href="#tileC" x="148" y="176"/><text x="163" y="201">5</text>
+  </g>
+
+  <!-- future rows -->
+  <g font-family="'Zen Kaku Gothic New', 'Helvetica Neue', Arial, sans-serif" font-size="10" letter-spacing="1.5" fill="#f7f0e2" fill-opacity="0.4">
+    <text x="30" y="240">NEXT</text>
+    <text x="366" y="240" text-anchor="end">PAYS</text>
+  </g>
+  <g stroke="#f7f0e2" stroke-opacity="0.1" stroke-width="1">
+    <line x1="24" y1="290.5" x2="366" y2="290.5"/><line x1="24" y1="334.5" x2="366" y2="334.5"/>
+    <line x1="24" y1="378.5" x2="366" y2="378.5"/><line x1="24" y1="422.5" x2="366" y2="422.5"/>
+    <line x1="24" y1="466.5" x2="366" y2="466.5"/><line x1="24" y1="510.5" x2="366" y2="510.5"/>
+  </g>
+  <g font-family="'Zen Kaku Gothic New', 'Helvetica Neue', Arial, sans-serif" font-size="11" fill="#f7f0e2" fill-opacity="0.4">
+    <text x="30" y="273">2</text><text x="30" y="317">3</text><text x="30" y="361">4</text><text x="30" y="405">5</text>
+    <text x="30" y="449">6</text><text x="30" y="493">7</text><text x="30" y="537">8</text>
+  </g>
+  <g font-family="'EB Garamond', Georgia, 'Times New Roman', serif" font-size="22" fill="#f7f0e2">
+    <text x="52" y="275">7 × 2</text><text x="52" y="319">3 × 3</text><text x="52" y="363">1 × 7</text><text x="52" y="407">4 × 1</text>
+    <text x="52" y="451">8 × 3</text><text x="52" y="495">2 × 3</text><text x="52" y="539">3 × 4</text>
+  </g>
+  <g font-family="'EB Garamond', Georgia, 'Times New Roman', serif" font-size="21" fill="#16352b" text-anchor="middle">
+    <!-- row 2 pays 8 1 6 -->
+    <use xlink:href="#tileC" x="268" y="249"/><text x="283" y="274">8</text>
+    <use xlink:href="#tileC" x="302" y="249"/><text x="317" y="274">1</text>
+    <use xlink:href="#tileC" x="336" y="249"/><text x="351" y="274">6</text>
+    <!-- row 3 pays 2 7 -->
+    <use xlink:href="#tileC" x="302" y="293"/><text x="317" y="318">2</text>
+    <use xlink:href="#tileC" x="336" y="293"/><text x="351" y="318">7</text>
+    <!-- row 4 pays 4 4 -->
+    <use xlink:href="#tileC" x="302" y="337"/><text x="317" y="362">4</text>
+    <use xlink:href="#tileC" x="336" y="337"/><text x="351" y="362">4</text>
+    <!-- row 5 pays 6 2 -->
+    <use xlink:href="#tileC" x="302" y="381"/><text x="317" y="406">6</text>
+    <use xlink:href="#tileC" x="336" y="381"/><text x="351" y="406">2</text>
+    <!-- row 6 pays 0 7 7 -->
+    <use xlink:href="#tileC" x="268" y="425"/><text x="283" y="450">0</text>
+    <use xlink:href="#tileC" x="302" y="425"/><text x="317" y="450">7</text>
+    <use xlink:href="#tileC" x="336" y="425"/><text x="351" y="450">7</text>
+    <!-- row 7 pays 8 8 -->
+    <use xlink:href="#tileC" x="302" y="469"/><text x="317" y="494">8</text>
+    <use xlink:href="#tileC" x="336" y="469"/><text x="351" y="494">8</text>
+    <!-- row 8 pays 2 0 2 -->
+    <use xlink:href="#tileC" x="268" y="513"/><text x="283" y="538">2</text>
+    <use xlink:href="#tileC" x="302" y="513"/><text x="317" y="538">0</text>
+    <use xlink:href="#tileC" x="336" y="513"/><text x="351" y="538">2</text>
+  </g>
+
+  <!-- actions: Submit enabled (both slots filled), Clear -->
+  <g font-family="'Zen Kaku Gothic New', 'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="2" text-anchor="middle">
+    <rect x="79.5" y="568.5" width="110" height="40" rx="6" fill="none" stroke="#c9a54a"/>
+    <text x="134.5" y="592" fill="#e8cd85">SUBMIT</text>
+    <rect x="200.5" y="568.5" width="110" height="40" rx="6" fill="none" stroke="#f7f0e2" stroke-opacity="0.4"/>
+    <text x="255.5" y="592" fill="#f7f0e2" fill-opacity="0.72">CLEAR</text>
+  </g>
+
+  <!-- rack: one row of five sockets; 5 and 7 are on loan to the slots -->
+  <rect x="41" y="624" width="308" height="84" rx="10" fill="#0b211b"/>
+  <g fill="#081a14">
+    <rect x="49" y="634" width="52" height="64" rx="6"/><rect x="109" y="634" width="52" height="64" rx="6"/>
+    <rect x="169" y="634" width="52" height="64" rx="6"/><rect x="229" y="634" width="52" height="64" rx="6"/>
+    <rect x="289" y="634" width="52" height="64" rx="6"/>
+  </g>
+  <g fill="none" stroke="#f7f0e2" stroke-opacity="0.4" stroke-dasharray="3 3">
+    <rect x="173.5" y="638.5" width="43" height="55" rx="4"/>
+    <rect x="233.5" y="638.5" width="43" height="55" rx="4"/>
+  </g>
+  <g font-family="'EB Garamond', Georgia, 'Times New Roman', serif" font-size="34" fill="#16352b" text-anchor="middle">
+    <use xlink:href="#tileL" x="49" y="634"/><text x="75" y="676">1</text>
+    <use xlink:href="#tileL" x="109" y="634"/><text x="135" y="676">4</text>
+    <use xlink:href="#tileL" x="289" y="634"/><text x="315" y="676">9</text>
+  </g>
+
+  <!-- caption, off the phone -->
+  <line x1="16" y1="744.5" x2="374" y2="744.5" stroke="#9a7f36" stroke-width="1"/>
+  <text x="16" y="768" font-family="'Zen Kaku Gothic New', 'Helvetica Neue', Arial, sans-serif" font-size="11" font-weight="700" letter-spacing="1.5" fill="#c9a54a">KEY MOVE · ROW 1 · SACRIFICE</text>
+  <g font-family="'Zen Kaku Gothic New', 'Helvetica Neue', Arial, sans-serif" font-size="13" fill="#f7f0e2" fill-opacity="0.72">
+    <text x="16" y="792">15 and the next row's 14 both need your only 1.</text>
+    <text x="16" y="811">Only 14 pays a 1 back, so give 15 up: place 5, 7</text>
+    <text x="16" y="830">(57 is wrong) to keep 1, 4 and 9 for rows 2 and 3.</text>
+    <text x="16" y="849">Answering 15 caps the table at 6. Par is 7.</text>
+  </g>
+  <text x="16" y="878" font-family="'Zen Kaku Gothic New', 'Helvetica Neue', Arial, sans-serif" font-size="11" fill="#f7f0e2" fill-opacity="0.55">Solver-verified · 38 of 16,893 lines make par</text>
+</svg>

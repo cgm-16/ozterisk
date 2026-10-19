@@ -1,0 +1,29 @@
+
+=== showcase (seed 16641): hand [5 9 1 4 7] cap 5
+  row 1: 3 x 5 = 15  pays [9 5 5]
+  row 2: 7 x 2 = 14  pays [8 1 6]
+  row 3: 3 x 3 = 9  pays [2 7]
+  row 4: 1 x 7 = 7  pays [4 4]
+  row 5: 4 x 1 = 4  pays [6 2]
+  row 6: 8 x 3 = 24  pays [0 7 7]
+  row 7: 2 x 3 = 6  pays [8 8]
+  row 8: 3 x 4 = 12  pays [2 0 2]
+  par 7/8  histogram(score 0..K) 24,115,176,624,2580,7644,5692,38,0  lines 16893  par lines 38  only-moves 4/8 decisions  sacrifice required true  states 714
+  par line row 1: MISS spending 5+7  (options 14, keep-par 1)  -> hand 1 4 9
+  par line row 2: correct  (options 4, keep-par 1)  -> hand 1 6 8 9
+  par line row 3: correct  (options 4, keep-par 1)  -> hand 1 2 6 7 8
+  par line row 4: correct, discard 6  (options 9, keep-par 2)  -> hand 1 2 4 4 8
+  par line row 5: correct, discard 8  (options 8, keep-par 1)  -> hand 1 2 2 4 6
+  par line row 6: correct, discard 0  (options 12, keep-par 2)  -> hand 1 2 6 7 7
+  par line row 7: correct, discard 7  (options 7, keep-par 2)  -> hand 1 2 7 8 8
+  par line row 8: correct, discard 0  (options 11, keep-par 4)  -> hand 2 2 7 8 8
+  myopic 2: correct, discard 9 | MISS spending 5+9 | MISS spending 7 | MISS spending 5 | correct | MISS spending 2+6
+  lookahead 6: correct, discard 9 | MISS spending 5+5 | correct | correct | correct, discard 4 | correct, discard 7 | correct, discard 8 | MISS spending 7+8
+[real reducer] par line: score 7 (solver 7), ended complete, hands 0100100001 0100001011 0110001110 0110200010 0120101000 0110001200 0110000120 0020000120
+[real reducer] myopic: score 2 (solver 2), ended loss, hands 0000120101 0000110100 0000110000 0000100000 0010001000 0000000000
+[real reducer] lookahead: score 6 (solver 6), ended complete, hands 0000120101 0000100101 0010100200 0010300100 0020101100 1010001200 1010000210 1010000100
+answer 15, discard 4: best total 6
+answer 15, discard 5: best total 6
+answer 15, discard 7: best total 6
+answer 15, discard 9: best total 6
+row-1 options keeping par: 1 of 14

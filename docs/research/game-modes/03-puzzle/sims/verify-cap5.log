@@ -1,0 +1,9 @@
+real getCapacity("endless") under this runner = 5
+[calibration] b(10) = 0.479 (repo: ~0.48), 20,000 uniform hands
+[cross-check] memoized histogram == naive enumeration on 300 tables (K=4, cap 5, P and W)
+[replay] 2000 random lines (6326 submissions, 1986 ending in the loss) agree with the real gameReducer at capacity 5: hand after every submission and final score
+[replay] 400 canonical par lines score exactly par on the real gameReducer
+[negative] reversed answer claimed correct: "reducer rejected SUBMIT_CORRECT in phase answering"
+[negative] corrupted first reward: replay disagrees with the solver on 46 of 46 lines
+[negative] spells-nothing table: par 0, histogram 1,0,0,0,0,0,0, myopic 0, lookahead 0
+[negative] no-0 table (needs 40): par 3 of 4, clearable = false

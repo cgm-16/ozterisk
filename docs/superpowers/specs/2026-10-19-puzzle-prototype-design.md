@@ -15,8 +15,9 @@ tiles it pays, and judges the run against **par**, the best score the table
 allows. Classic and Endless ask *what do I keep, given what might come?*
 Puzzle asks *what do I keep, given what will come?*
 
-This branch exists to run the draft's kill playtest (§7): five people, three
-tables each, watched by a person, told the title-screen rules only. It answers
+This branch exists to run the draft's kill playtest (its §7, as amended in
+§6.1 here): five people, four tables each, watched by a person, told the
+title-screen rules only. It answers
 **do they read the board and plan?** The answer picks the research pool's
 Batch 2: Well if yes, Four Winds lite if they enjoy the arc but not the reading.
 
@@ -245,6 +246,30 @@ Ori allowed this exception on the preview only (journal 2026-10-19).
   `main.tsx`. No game code changes with it, and a green full suite afterwards
   shows nothing else depended on it.
 
+### 6.1 Protocol
+
+Fixed before the first tester, so the result cannot move the bar.
+
+- **Tables.** Each tester plays four: Medium, Hard, the sample, then one live
+  deal. The wiring above already deals live after the set, so the fourth table
+  needs no code.
+- **Recorded per table, by the observer** (the draft's §7): seconds before the
+  first submission; whether they look at the ledger; after missing par, whether
+  they can name the move they would change; score against par.
+- **The planning verdict** is the kill test, and it is judged on tables 1, 2 and
+  4 only. Drop the direction if, on those tables, most testers submit row 1
+  within about 5 s *and* cannot name a move to change. Also drop it if Medium
+  and Hard feel the same. This narrows the draft's "on every table": once
+  merged, Puzzle deals only live tables, and about 1 accepted table in 140
+  needs a sacrifice (0.7%, the draft's §5). A pass must not rest on the sample,
+  which the draft calls a showcase.
+- **The sacrifice probe** is table 3, judged apart: does the tester find the
+  sacrifice, and do they want more tables like it? It neither passes nor fails
+  the playtest. If it lands, a merged Puzzle needs a source of sacrifice tables,
+  such as the shipped pool in the draft's §8 Q5. That is decided after the
+  playtest, with its own spec reading. If it does not land, nothing ships for it.
+- **The result** goes to `main` in its own journal PR (§9.2).
+
 ## 7. Screens and copy
 
 - **Title.** `MODES` gains `"puzzle"`. `MORE_TOPICS` gains `"puzzle"`, after
@@ -304,22 +329,22 @@ Ori allowed this exception on the preview only (journal 2026-10-19).
 
 ### 7.1 Copy
 
-Korean is a draft for Ori to judge. "Par" is rendered 최선 ("the best
-possible"), which says what par is; 파 and 목표 are the alternatives.
+"Par" is rendered 목표 ("the target"), Ori's choice over 최선 and 파. The rest of
+the Korean is a draft for Ori to judge.
 
 | Key | English | Korean |
 |---|---|---|
 | `mode.puzzle` | Puzzle | 묘수풀이 |
 | `mode.puzzleHint` | Every tile face up | 모든 타일을 펼쳐 놓고 |
-| `howToPlay.puzzle` | Puzzle deals five tiles and eight equations face up, each printed with the tiles it pays. A correct answer takes its row's tiles, and your hand holds five. Par is the best score the table allows. A wrong answer is a legal move. | 묘수풀이는 타일 다섯 개와 문제 여덟 개를 모두 펼쳐 놓고 시작하며, 문제마다 받을 타일이 적혀 있습니다. 정답을 맞히면 그 줄의 타일을 받고, 손에는 다섯 개까지 보관합니다. 최선은 이 판에서 낼 수 있는 가장 높은 점수입니다. 오답도 둘 수 있는 한 수입니다. |
-| `hud.par` | Par | 최선 |
+| `howToPlay.puzzle` | Puzzle deals five tiles and eight equations face up, each printed with the tiles it pays. A correct answer takes its row's tiles, and your hand holds five. Par is the best score the table allows. A wrong answer is a legal move. | 묘수풀이는 타일 다섯 개와 문제 여덟 개를 모두 펼쳐 놓고 시작하며, 문제마다 받을 타일이 적혀 있습니다. 정답을 맞히면 그 줄의 타일을 받고, 손에는 다섯 개까지 보관합니다. 목표는 이 판에서 낼 수 있는 가장 높은 점수입니다. 오답도 둘 수 있는 한 수입니다. |
+| `hud.par` | Par | 목표 |
 | `ledger.row` | Row {row}, {left} × {right}, pays {pay} | {row}번째 줄, {left} × {right}, 보상 {pay} |
 | `ledger.answered` | answered | 정답 |
 | `ledger.missed` | missed | 오답 |
-| `gameOver.parTitle` | Made par | 최선 달성 |
-| `gameOver.shortTitle` | {short} short of par | 최선까지 {short}점 부족 |
+| `gameOver.parTitle` | Made par | 목표 달성 |
+| `gameOver.shortTitle` | {short} short of par | 목표까지 {short}점 부족 |
 | `gameOver.tableReason` | All eight rows played. | 여덟 줄을 모두 풀었습니다. |
-| `share.puzzleAsk` | Can you make par? | 최선에 닿을 수 있나요? |
+| `share.puzzleAsk` | Can you make par? | 목표를 달성할 수 있나요? |
 
 The Korean share heading uses `mode.puzzle` and the titles above, as Classic's
 does.

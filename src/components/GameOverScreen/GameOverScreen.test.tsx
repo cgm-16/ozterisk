@@ -361,9 +361,23 @@ describe("GameOverScreen, Puzzle", () => {
   it("names the shortfall in ink when par is missed on a finished table", () => {
     renderScreen({ stats: { ...PUZZLE_STATS, won: false, score: 5 } });
 
-    expect(screen.getByRole("heading", { name: "2 short of par" })).not.toHaveClass(styles.won);
+    const heading = screen.getByRole("heading", { name: "2 short of par" });
+    expect(heading).not.toHaveClass(styles.won);
+    // Ink, not Game Over's vermilion: a short table is a score to read, not a
+    // tile leaving. Read by computed colour, which jsdom resolves from the
+    // cascade without substituting var().
+    expect(heading).toHaveClass(styles.shortOfPar);
+    expect(getComputedStyle(heading).color).toBe("var(--text-primary)");
     expect(screen.getByText("All eight rows played.")).toBeInTheDocument();
     expect(statValue("Score")).toBe("5 / 8");
+  });
+
+  it("keeps Game Over vermilion", () => {
+    renderScreen({ stats: { ...STATS, mode: "classic", won: false } });
+
+    expect(getComputedStyle(screen.getByRole("heading", { name: "Game Over" })).color).toBe(
+      "var(--verm-400)",
+    );
   });
 
   it("keeps the terminal equation and the loss reason when the run ended early", () => {

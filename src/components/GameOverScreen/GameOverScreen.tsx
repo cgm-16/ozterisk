@@ -62,6 +62,7 @@ export function GameOverScreen({
     : classicWon
       ? "gameOver.winReason"
       : "gameOver.reason";
+  const shortOfPar = stats.mode === "puzzle" && !stats.won;
   const title =
     stats.mode === "puzzle"
       ? stats.won
@@ -99,7 +100,9 @@ export function GameOverScreen({
             thing it explains. */}
         <p className={styles.reason}>{t(reason)}</p>
       </div>
-      <h1 className={`${styles.title} ${stats.won ? styles.won : ""}`}>{title}</h1>
+      <h1 className={`${styles.title} ${stats.won ? styles.won : shortOfPar ? styles.shortOfPar : ""}`}>
+        {title}
+      </h1>
       <dl className={styles.stats}>
         {/* Puzzle's score is read against its table, so Rounds played, which
             repeats the score's denominator, gives way to Par. */}

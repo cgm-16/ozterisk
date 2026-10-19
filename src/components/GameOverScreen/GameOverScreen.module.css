@@ -56,6 +56,13 @@
   color: var(--gold-500);
 }
 
+/* A Puzzle table that fell short of par is a score to read against its par,
+   not a tile leaving, so it keeps the ink of the figures beneath it instead of
+   the loss's vermilion. */
+.title.shortOfPar {
+  color: var(--text-primary);
+}
+
 /* The final hand, on the panel surface so the sockets read as a rack rather
    than as loose marks on the surround. */
 .finalHand {

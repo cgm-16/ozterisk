@@ -254,6 +254,11 @@ Ori allowed this exception on the preview only (journal 2026-10-19).
 
 Fixed before the first tester, so the result cannot move the bar.
 
+- **Rules.** Before table 1 the observer opens "More" on the title screen with
+  every tester, so Puzzle's rule is read, not folded away. The always-visible
+  title rules are written for Endless ("at most ten tiles"). A tester who never
+  saw Puzzle's rule could fail to plan for want of it, and the playtest asks
+  whether people plan once they know the rules (Ori, 2026-10-19).
 - **Tables.** Each tester plays four: Medium, Hard, the sample, then one live
   deal. The wiring above already deals live after the set, so the fourth table
   needs no code.

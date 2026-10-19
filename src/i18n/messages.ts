@@ -19,6 +19,8 @@ const en = {
     endlessHint: "Ten sockets, no end",
     classic: "Classic",
     classicHint: "Twenty closing to five",
+    puzzle: "Puzzle",
+    puzzleHint: "Every tile face up",
   },
   language: {
     groupLabel: "Language",
@@ -120,6 +122,8 @@ const ko = {
     endlessHint: "열 칸, 끝없이",
     classic: "클래식",
     classicHint: "스물에서 다섯까지",
+    puzzle: "묘수풀이",
+    puzzleHint: "모든 타일을 펼쳐 놓고",
   },
   language: {
     groupLabel: "언어",

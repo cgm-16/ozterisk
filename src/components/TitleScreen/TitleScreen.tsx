@@ -10,7 +10,7 @@ export interface TitleScreenProps {
   onStart(mode: GameMode): void;
 }
 
-const MODES = ["endless", "classic"] as const;
+const MODES = ["endless", "classic", "puzzle"] as const;
 
 /**
  * The four material rules, in the design's reading order. Each swatch is the

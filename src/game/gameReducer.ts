@@ -1,4 +1,4 @@
-import type { Equation, GameAction, GameMode, GameState, Tile } from "./types";
+import type { Equation, GameAction, GameMode, GameState, PuzzleTable, Tile } from "./types";
 import { sortTiles } from "./factories";
 import {
   answerMatches,
@@ -7,12 +7,18 @@ import {
   getAnswerLength,
   getOverflowCount,
   getRewardCount,
-  isAtClassicFloor,
+  isRunComplete,
 } from "./selectors";
 
 // Round 1, zero statistics, straight into answering — shared by START_RUN and
 // RESTART_RUN, which both begin a run from action-provided equation/inventory.
-function freshRunState(mode: GameMode, equation: Equation, inventory: Tile[]): GameState {
+// A table makes it a Puzzle run; other modes carry neither Puzzle key.
+function freshRunState(
+  mode: GameMode,
+  equation: Equation,
+  inventory: Tile[],
+  table?: PuzzleTable,
+): GameState {
   return {
     phase: "answering",
     mode,
@@ -26,6 +32,7 @@ function freshRunState(mode: GameMode, equation: Equation, inventory: Tile[]): G
     currentStreak: 0,
     longestStreak: 0,
     lastResult: null,
+    ...(table && { table, rowResults: [] }),
   };
 }
 
@@ -35,7 +42,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     // so title is the only phase it arrives from, and a fresh run owes
     // nothing to the state it replaces.
     case "START_RUN":
-      return freshRunState(action.mode, action.equation, action.inventory);
+      if (action.mode === "puzzle" && !action.table) return state;
+      return freshRunState(action.mode, action.equation, action.inventory, action.table);
 
     case "SELECT_TILE": {
       if (state.phase !== "answering" || state.equation === null) return state;
@@ -66,6 +74,13 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (!answerMatches(state.selectedTiles, state.equation.product)) return state;
       if (action.rewardTiles.length !== getRewardCount(state.selectedTiles.length)) return state;
       if (state.mode !== "classic" && action.rewardTiles.some((tile) => !("digit" in tile))) return state;
+      // A Puzzle row pays the digits printed on it, in order.
+      if (state.table) {
+        const pay = state.table.rows[state.round - 1]?.pay;
+        if (!pay || action.rewardTiles.some((tile, index) => !("digit" in tile) || tile.digit !== pay[index])) {
+          return state;
+        }
+      }
       const inventoryIds = new Set(state.inventory.map((tile) => tile.id));
       if (action.rewardTiles.some((tile) => inventoryIds.has(tile.id))) return state;
 
@@ -102,6 +117,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           submittedTiles: state.selectedTiles,
           rewardTileIds: action.rewardTiles.map((tile) => tile.id),
         },
+        ...(state.rowResults && { rowResults: [...state.rowResults, "correct"] }),
       };
     }
 
@@ -124,6 +140,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
           submittedTiles: state.selectedTiles,
           rewardTileIds: [],
         },
+        ...(state.rowResults && { rowResults: [...state.rowResults, "incorrect"] }),
       };
     }
 
@@ -168,10 +185,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const nextInventory = sortTiles(
         state.inventory.map((tile) => (tile.isNew ? { ...tile, isNew: false } : tile)),
       );
-      // A Classic run at the floor is over before the loss check, so a hand
-      // that could still answer does not play on; isClassicWin tells the win
-      // from an empty-hand loss (§1.8).
-      const canPlay = !isAtClassicFloor(state) && canAttemptEquation(nextInventory, action.equation);
+      // A complete run (Classic at the floor, Puzzle past its last row) is over
+      // before the loss check, so a hand that could still answer does not play
+      // on; isClassicWin tells Classic's win from an empty-hand loss (§1.8).
+      const canPlay = !isRunComplete(state) && canAttemptEquation(nextInventory, action.equation);
       return {
         ...state,
         phase: canPlay ? "answering" : "gameOver",
@@ -186,7 +203,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case "RESTART_RUN":
       if (state.phase !== "gameOver") return state;
-      return freshRunState(state.mode, action.equation, action.inventory);
+      if (state.mode === "puzzle" && !action.table) return state;
+      return freshRunState(state.mode, action.equation, action.inventory, action.table);
 
     case "CLEAR_SELECTION": {
       if (state.phase !== "answering") return state;

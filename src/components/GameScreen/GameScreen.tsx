@@ -16,6 +16,7 @@ import { EquationBoard } from "../EquationBoard/EquationBoard";
 import { FeedbackPanel } from "../FeedbackPanel/FeedbackPanel";
 import { GameHud } from "../GameHud/GameHud";
 import { OverflowControls } from "../OverflowControls/OverflowControls";
+import { PuzzleLedger } from "../PuzzleLedger/PuzzleLedger";
 import { TileInventory } from "../TileInventory/TileInventory";
 import styles from "./GameScreen.module.css";
 
@@ -70,6 +71,7 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
         // Classic states its live capacity as a number; its rack's plugs show
         // the descent, and twenty pips would be a second account of it (§1.10).
         capacity={state.mode === "classic" ? getCapacity(state.mode, state.totalRounds) : undefined}
+        par={state.table?.par}
       />
       {/* Capacity is what you hold, and a tile in an answer slot is still
           yours — you can return it. Reading state.inventory alone would drop
@@ -78,7 +80,13 @@ export function GameScreen({ state, dispatch, onSubmit, onNextRound }: GameScree
       {state.mode === "endless" && (
         <CapacityMeter held={state.inventory.length + state.selectedTiles.length} />
       )}
-      <EquationBoard equation={state.equation} />
+      {/* Puzzle's table is face up: the ledger draws every row, the current
+          one through EquationBoard, so the slots still sit below it (§1.12). */}
+      {state.table ? (
+        <PuzzleLedger table={state.table} round={state.round} rowResults={state.rowResults ?? []} />
+      ) : (
+        <EquationBoard equation={state.equation} />
+      )}
 
       {state.phase === "answering" && (
         <AnswerSlots

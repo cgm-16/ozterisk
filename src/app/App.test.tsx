@@ -5,9 +5,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "../i18n/I18nContext";
 import { LANGUAGE_STORAGE_KEY } from "../i18n/storage";
 import { FACE_RATE_END } from "../game/balance";
-import type { Language } from "../game/types";
+import type { Language, PuzzleTable } from "../game/types";
 import type { ShareDependencies } from "../services/sharing";
-import { sequenceRandom, sequentialIds } from "../test/fixtures";
+import {
+  makePuzzleRow,
+  PUZZLE_SAMPLE,
+  PUZZLE_SAMPLE_PAR_LINE,
+  sequenceRandom,
+  sequentialIds,
+} from "../test/fixtures";
 import { App, type AppDependencies } from "./App";
 
 // Mirrors the 45-entry unordered-pair pool generateEquation samples from
@@ -47,12 +53,18 @@ function makeShareDependencies(): ShareDependencies {
 
 function renderApp(
   randomValues: number[],
-  options: { initialLanguage?: Language; gameUrl?: string; strictMode?: boolean } = {},
+  options: {
+    initialLanguage?: Language;
+    gameUrl?: string;
+    strictMode?: boolean;
+    dealPuzzle?: () => PuzzleTable;
+  } = {},
 ) {
   const dependencies: AppDependencies = {
     random: sequenceRandom(...randomValues),
     nextTileId: sequentialIds(),
     gameUrl: options.gameUrl ?? "https://example.test/",
+    dealPuzzle: options.dealPuzzle ?? (() => PUZZLE_SAMPLE),
   };
   const shareDependencies = makeShareDependencies();
   const tree = (
@@ -514,6 +526,7 @@ describe("App", () => {
       random,
       nextTileId: sequentialIds(),
       gameUrl: "https://example.test/",
+      dealPuzzle: () => PUZZLE_SAMPLE,
     };
 
     render(
@@ -538,5 +551,111 @@ describe("App", () => {
 
     finishDeparture(); // the discard settles and the round advances on its own
     expect(calls).toBe(8); // NEXT_ROUND: one more equation draw (gate + pair + order)
+  });
+});
+
+async function startPuzzle(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole("button", { name: /Puzzle/ }));
+  await user.click(screen.getByRole("button", { name: "Start Run" }));
+}
+
+async function press(user: ReturnType<typeof userEvent.setup>, digits: number[]) {
+  for (const digit of digits) {
+    await user.click(screen.getAllByRole("button", { name: `Digit ${digit}` })[0]!);
+  }
+  await user.click(screen.getByRole("button", { name: "Submit" }));
+}
+
+describe("Puzzle", () => {
+  it("deals the table's hand and shows row 1", async () => {
+    const user = userEvent.setup();
+    renderApp([]);
+    await startPuzzle(user);
+    expect(screen.getByText("3 × 5 =")).toBeInTheDocument();
+    for (const digit of [1, 4, 5, 7, 9]) {
+      expect(screen.getByRole("button", { name: `Digit ${digit}` })).toBeInTheDocument();
+    }
+  });
+
+  // renderApp([]) gives an exhausted RandomSource: any draw throws, so these
+  // rows prove the pay and the next equation come from the table.
+  it("pays the row's printed tiles and advances row by row without drawing randomness", async () => {
+    const user = userEvent.setup();
+    renderApp([]);
+    await startPuzzle(user);
+    await press(user, [5, 7]); // the sacrifice: 57 for 15
+    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    expect(screen.getByText("7 × 2 =")).toBeInTheDocument();
+    await press(user, [1, 4]); // 14, paid 8 1 6
+    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    expect(screen.getByText("3 × 3 =")).toBeInTheDocument();
+    for (const digit of [1, 6, 8, 9]) {
+      expect(screen.getByRole("button", { name: `Digit ${digit}` })).toBeInTheDocument();
+    }
+  });
+
+  it("advances to the next row on its own after a discard", async () => {
+    const user = userEvent.setup();
+    renderApp([]);
+    await startPuzzle(user);
+    await press(user, [5, 7]);
+    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    await press(user, [1, 4]);
+    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    await press(user, [9]);
+    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    await press(user, [7]); // 1 × 7, paid 4 4: six tiles in five sockets
+    await user.click(screen.getByRole("button", { name: "Digit 6" }));
+    finishDeparture();
+    expect(await screen.findByText("4 × 1 =")).toBeInTheDocument();
+  });
+
+  it("deals once per run under StrictMode", async () => {
+    const user = userEvent.setup();
+    const firstTable: PuzzleTable = { hand: [1, 2, 3, 4], rows: [makePuzzleRow(1, 2, [1, 2])], par: 1 };
+    const secondTable: PuzzleTable = { hand: [1, 2, 3, 4], rows: [makePuzzleRow(3, 4, [1, 2])], par: 1 };
+    const dealPuzzle = vi.fn<() => PuzzleTable>().mockReturnValueOnce(firstTable).mockReturnValueOnce(secondTable);
+    renderApp([], { strictMode: true, dealPuzzle });
+    await startPuzzle(user);
+    expect(dealPuzzle).toHaveBeenCalledTimes(1);
+    await press(user, [2]);
+    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    await user.click(screen.getByRole("button", { name: "Play Again" }));
+    expect(dealPuzzle).toHaveBeenCalledTimes(2);
+    expect(screen.getByText("3 × 4 =")).toBeInTheDocument();
+    expect(screen.queryByText("1 × 2 =")).not.toBeInTheDocument();
+  });
+
+  it("plays the sample's par line, sacrifice included, to Made par", async () => {
+    const user = userEvent.setup();
+    renderApp([]);
+    await startPuzzle(user);
+    for (const move of PUZZLE_SAMPLE_PAR_LINE) {
+      await press(user, move.spend);
+      if (move.discard === undefined) {
+        await user.click(screen.getByRole("button", { name: "Next Round" }));
+      } else {
+        // A reward tile is named "Digit 0, New tile", so the digit is matched as a prefix.
+        await user.click(screen.getAllByRole("button", { name: new RegExp(`^Digit ${move.discard}\\b`) })[0]!);
+        finishDeparture();
+      }
+    }
+    expect(await screen.findByRole("heading", { name: "Made par" })).toBeInTheDocument();
+    expect(hudField("Par")).toBe("7");
+  });
+
+  it("ends early when the hand cannot fill the next row, short of par", async () => {
+    const user = userEvent.setup();
+    const twoTiles: PuzzleTable = {
+      hand: [1, 2],
+      rows: [makePuzzleRow(3, 4, [1, 2, 3]), makePuzzleRow(5, 5, [1, 2, 3])],
+      par: 1,
+    };
+    renderApp([], { dealPuzzle: () => twoTiles });
+    await startPuzzle(user);
+    await press(user, [2, 1]); // 21 for 12: the hand is spent
+    await user.click(screen.getByRole("button", { name: "Next Round" }));
+    expect(screen.getByRole("heading", { name: "1 short of par" })).toBeInTheDocument();
+    expect(screen.getByText("Not enough tiles left to answer.")).toBeInTheDocument();
   });
 });

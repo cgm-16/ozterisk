@@ -78,12 +78,16 @@ export interface PuzzleTable {
   par: number;
 }
 
-// GameState gains one optional field, set only in Puzzle:
+// GameState gains two optional fields, set only in Puzzle:
 table?: PuzzleTable;
+/** One entry per submitted row, in order: what the ledger marks ✓ or ✗. */
+rowResults?: RoundResult["kind"][];
 ```
 
 Optional, like `RoundResult.discarded`, so every existing `GameState` literal
-stays valid.
+stays valid. `rowResults` exists because `lastResult` holds only the latest
+submission, and the ledger marks every played row. A run starts it empty, and
+each submission in Puzzle appends its kind.
 
 ### 4.2 Actions
 
@@ -283,7 +287,8 @@ Fixed before the first tester, so the result cannot move the bar.
   - **played rows**: the equation and an ink ✓ or ✗, with no semantic colour,
     since §1.12 allows colour only at the moment of the event;
   - **the current row**: `aria-current="step"`, its equation rendered by
-    `EquationBoard`, so it keeps the existing 10b rise;
+    `EquationBoard`, so it keeps the existing 10b rise, and its pay as small
+    `Tile`s;
   - **later rows**: the equation and the pay as small `Tile`s.
 
   No motion is added. A row's change of state is instant, and rewards arrive in
@@ -338,6 +343,7 @@ the Korean is a draft for Ori to judge.
 | `mode.puzzleHint` | Every tile face up | 모든 타일을 펼쳐 놓고 |
 | `howToPlay.puzzle` | Puzzle deals five tiles and eight equations face up, each printed with the tiles it pays. A correct answer takes its row's tiles, and your hand holds five. Par is the best score the table allows. A wrong answer is a legal move. | 묘수풀이는 타일 다섯 개와 문제 여덟 개를 모두 펼쳐 놓고 시작하며, 문제마다 받을 타일이 적혀 있습니다. 정답을 맞히면 그 줄의 타일을 받고, 손에는 다섯 개까지 보관합니다. 목표는 이 판에서 낼 수 있는 가장 높은 점수입니다. 오답도 둘 수 있는 한 수입니다. |
 | `hud.par` | Par | 목표 |
+| `ledger.label` | Table | 판 |
 | `ledger.row` | Row {row}, {left} × {right}, pays {pay} | {row}번째 줄, {left} × {right}, 보상 {pay} |
 | `ledger.answered` | answered | 정답 |
 | `ledger.missed` | missed | 오답 |
@@ -384,8 +390,8 @@ commit per task (AGENTS.md §4.4):
 |---|---|
 | T85 | `puzzle.ts`: solver, myopic bot, planted deal, `dealPuzzle`; the dials |
 | T86 | Types, selectors, factories and reducer for Puzzle |
-| T87 | App wiring, `AppDependencies.dealPuzzle`, and the playtest set |
-| T88 | Title, HUD and `PuzzleLedger`, the gallery's answering state, and the layout check |
+| T87 | App wiring, `AppDependencies.dealPuzzle`, the playtest set, and Puzzle on the title's mode select |
+| T88 | HUD, `PuzzleLedger`, the one-row rack, the title's Puzzle topic, the gallery's answering states, and the layout check |
 | T89 | Game over, sharing and copy, and the gallery's game-over state |
 | T90 | After a pass only: strip the playtest set and amend the spec (§9.3) |
 

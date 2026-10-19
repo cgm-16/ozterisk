@@ -6,6 +6,7 @@ import {
   FACE_RATE_END,
   FACE_RATE_START,
   INVENTORY_CAPACITY,
+  PUZZLE_CAPACITY,
   REWARD_BONUS,
 } from "./balance";
 
@@ -76,6 +77,9 @@ export function canConstruct(inventory: readonly Tile[], product: number): boole
 // Live capacity after `totalRounds` submissions. Classic seals one socket every
 // CLASSIC_SEAL_EVERY submissions, correct or not, down to the floor (§1.7a).
 export function getCapacity(mode: GameMode, totalRounds: number): number {
+  // Named, since every mode but Endless would otherwise fall through to
+  // Classic's descent.
+  if (mode === "puzzle") return PUZZLE_CAPACITY;
   if (mode === "endless") return INVENTORY_CAPACITY;
   const sealed = Math.floor(totalRounds / CLASSIC_SEAL_EVERY);
   return Math.max(CLASSIC_FLOOR, CLASSIC_START_CAPACITY - sealed);
@@ -102,12 +106,32 @@ export function isAtClassicFloor(state: Pick<GameState, "mode" | "totalRounds">)
   return state.mode === "classic" && getCapacity(state.mode, state.totalRounds) <= CLASSIC_FLOOR;
 }
 
+// A run is complete when its last submission is in: Classic at its floor,
+// Puzzle once every row of its table is submitted. The next advance then ends
+// it (§1.8 step 0).
+export function isRunComplete(state: Pick<GameState, "mode" | "totalRounds" | "table">): boolean {
+  return state.mode === "puzzle"
+    ? state.table !== undefined && state.totalRounds >= state.table.rows.length
+    : isAtClassicFloor(state);
+}
+
 // A Classic run that reaches the floor with tiles in hand is the win; one that
 // reaches it with an empty hand spent its last tile on a miss, and loses (§1.8).
 export function isClassicWin(
   state: Pick<GameState, "phase" | "mode" | "totalRounds" | "inventory">,
 ): boolean {
   return state.phase === "gameOver" && isAtClassicFloor(state) && state.inventory.length > 0;
+}
+
+// Par is made at game over with a score equal to the table's par, however the
+// run ended.
+export function isParMade(state: Pick<GameState, "phase" | "mode" | "score" | "table">): boolean {
+  return (
+    state.phase === "gameOver" &&
+    state.mode === "puzzle" &&
+    state.table !== undefined &&
+    state.score === state.table.par
+  );
 }
 
 export function isSubmissionReady(state: GameState): boolean {

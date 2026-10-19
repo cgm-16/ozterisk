@@ -143,3 +143,21 @@ export const PUZZLE_SAMPLE: PuzzleTable = {
   ],
   par: 7,
 };
+
+/** One row's play: the tiles spent, in slot order, and the overflow discard. */
+export interface PuzzleMove {
+  spend: Digit[];
+  discard?: Digit;
+}
+
+// The sample's canonical par line. Row 1 is the sacrifice: 57 for 15.
+export const PUZZLE_SAMPLE_PAR_LINE: PuzzleMove[] = [
+  { spend: [5, 7] },
+  { spend: [1, 4] },
+  { spend: [9] },
+  { spend: [7], discard: 6 },
+  { spend: [4], discard: 8 },
+  { spend: [2, 4], discard: 0 },
+  { spend: [6], discard: 7 },
+  { spend: [1, 2], discard: 0 },
+];

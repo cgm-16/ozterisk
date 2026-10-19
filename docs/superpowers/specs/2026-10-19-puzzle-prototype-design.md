@@ -137,7 +137,7 @@ the printed-pay model only. The wall model, `randomTable`, the lookahead bot,
 the line histogram and `mulberry32` stay in the research folder; a seeded PRNG
 must not ship.
 
-- **`solvePuzzle(table)`** returns `{ par, onlyMoves }`. A memoized search over
+- **`solvePuzzle(table)`** returns `{ par, onlyMoves, sacrificeRequired }`. A memoized search over
   (row index, digit counts); hand size follows from the counts. Options from a
   state:
   - **correct**, when the counts cover the product's digits: spend them, add
@@ -152,7 +152,9 @@ must not ship.
   Options are counted by digit, not tile identity, since equal digits are
   interchangeable. **Only-moves** are the decisions on the canonical par line
   (first optimal option, correct before miss) that offer two or more options of
-  which exactly one keeps par.
+  which exactly one keeps par. **`sacrificeRequired`** is true when the best
+  score over lines that miss only when no correct answer is available falls
+  below par. It is the one property that proves the sample is a sacrifice table.
 - **`playMyopic(table)`** returns the score of the draft's myopic bot, the
   journal 2026-09-27 T84 bot at skill 100%: it answers whenever it can, never
   sacrifices, discards the digit held in most copies (ties go to the higher
@@ -223,16 +225,25 @@ Ori allowed this exception on the preview only (journal 2026-10-19).
   3. **The sample**: `plantedTable(mulberry32(16641), 5, 8, 0.6, distinct)`,
      opening hand 1 4 5 7 9, par 7, and the key is a sacrifice on row 1.
 - **Picking them.** Tables 1 and 2 are picked offline with the draft's research
-  tooling, which keeps the lookahead bot and the sacrifice check. Their
-  `mulberry32` seeds are research handles, recorded in the T87 commit body and
-  never shown to a player. A unit test checks each table's par and only-moves
-  against `solvePuzzle`.
+  tooling, which keeps the lookahead bot. Their `mulberry32` seeds are research
+  handles, recorded in the T87 commit body and never shown to a player. A unit
+  test checks each table's par, only-moves and `sacrificeRequired` against
+  `solvePuzzle`.
+- **The sample outlives the set.** `src/test/fixtures.ts` owns the sample table
+  and its par line. The par line is transcribed from the draft's §5 table:
+  sacrifice 5 and 7, then 14, 9, 7 (discard 6), 4 (discard 8), 24 (discard 0),
+  6 (discard 7) and 12 (discard 0). The calibration, the reducer replay, the App
+  integration test and the gallery all read the fixture; the gallery already
+  imports from it. `playtestTables.ts` holds its own copy, because production
+  code does not import from `src/test/`, and a test asserts that the two are
+  equal. That test leaves with the file.
 - **Wiring.** `main.tsx` passes App a `dealPuzzle` that returns the three tables
   in order for the first three Puzzle deals of a page load, Start Run and Play
   Again alike, then calls `dealPuzzle(Math.random)`. A reload replays the set.
   There is no URL parameter and no UI.
-- **Removal.** Before merge, T91 deletes `playtestTables.ts` and the wrapper in
-  `main.tsx`. No game code changes with it.
+- **Removal.** Before merge, T90 deletes `playtestTables.ts` and the wrapper in
+  `main.tsx`. No game code changes with it, and a green full suite afterwards
+  shows nothing else depended on it.
 
 ## 7. Screens and copy
 
@@ -260,7 +271,11 @@ Ori allowed this exception on the preview only (journal 2026-10-19).
   `TileInventory.module.css`), so at five it would reserve an empty second row.
   The rack sets `--rack-rows` from the capacity, giving one row of five at
   Endless's tile tiers. Overflow and the rail are Endless's.
-- **Game over.**
+- **Game over.** `won` means a Classic win in three places today: the final
+  hand drawn at `CLASSIC_FLOOR` sockets, `winReason` and `winTitle`. Like
+  `getCapacity`, every mode but Endless would fall into Classic's branch. So
+  `GameOverScreen` and `shareHeading` branch on `stats.mode` first, and
+  Puzzle's `won` picks only its heading and that heading's gold.
   - **Heading:** **Made par** in gold, as Run Complete, or **{n} short of par**
     in ink. It depends only on score against par.
   - **Terminal:** an early end keeps the terminal equation and the existing
@@ -284,8 +299,8 @@ Ori allowed this exception on the preview only (journal 2026-10-19).
   (§1.15).
 - **Keyboard.** Unchanged. `R` at game over deals the next table, and it steps
   through the playtest set too.
-- **Gallery.** It gains a Puzzle answering state (the sample at row 1) and a
-  Puzzle game-over state. The layout check reads them.
+- **Gallery.** It gains a Puzzle answering state (the sample at row 1), which
+  the layout check reads, and a Puzzle game-over state.
 
 ### 7.1 Copy
 
@@ -316,7 +331,8 @@ Test-first throughout. Record each test's expected failure before the code.
 - **`puzzle.ts`**: the §5.3 controls. `dealPuzzle` under a scripted
   `RandomSource` returns an in-band table, and a source that never lands in band
   returns a solved table at the cap. Each playtest table matches its recorded
-  par and only-moves.
+  par, only-moves and `sacrificeRequired`, and the set's third table equals the
+  fixture's sample.
 - **Reducer**: a Puzzle start or restart without a table is refused. The row's
   pay is accepted, and wrong digits, the wrong order or the wrong count are
   refused. A correct answer at five tiles overflows. The run ends after row 8
@@ -344,17 +360,21 @@ commit per task (AGENTS.md §4.4):
 | T85 | `puzzle.ts`: solver, myopic bot, planted deal, `dealPuzzle`; the dials |
 | T86 | Types, selectors, factories and reducer for Puzzle |
 | T87 | App wiring, `AppDependencies.dealPuzzle`, and the playtest set |
-| T88 | Title, HUD and `PuzzleLedger` |
-| T89 | Game over, sharing and copy |
-| T90 | Gallery states and the layout check |
-| T91 | After a pass only: strip the playtest set and amend the spec (§9.3) |
+| T88 | Title, HUD and `PuzzleLedger`, the gallery's answering state, and the layout check |
+| T89 | Game over, sharing and copy, and the gallery's game-over state |
+| T90 | After a pass only: strip the playtest set and amend the spec (§9.3) |
+
+The layout check lands with the ledger, not after it: if eight rows do not fit
+393 × 660, the ledger is redesigned before anything is built on top of it.
 
 ### 9.2 Flow
 
 1. This spec is the branch's first commit.
-2. The draft PR opens early, so Vercel builds a preview to playtest.
+2. The draft PR opens early, so Vercel builds a preview to playtest. The
+   project's previews have no password or SSO protection (Vercel project
+   settings, read 2026-10-19), so testers open the preview link directly.
 3. The playtest result goes to `main` in its own journal PR.
-4. **Pass:** T91 lands, and the PR is marked ready.
+4. **Pass:** T90 lands, and the PR is marked ready.
 5. **Fail:** the PR closes unmerged. The result's journal PR also records that
    `M8`'s row in `roadmap.md` never reached `main`, since it rode on this branch.
 
@@ -372,7 +392,7 @@ commit per task (AGENTS.md §4.4):
 - **Nobody reads the ledger.** This is the draft's own biggest risk, and the
   playtest exists to find it.
 - **The phone layout.** Eight rows, the slots and a rack on a 660px viewport is
-  tight; the draft's mock is 900px tall with its annotation. T90's check is the
+  tight; the draft's mock is 900px tall with its annotation. T88's check is the
   gate, and a failure redesigns the ledger before the playtest, not after.
 - **Port drift.** The calibration in §5.3 is the guard. If the q = 0.6 cell
   misses 14.6% by more than sampling noise, the port is wrong.

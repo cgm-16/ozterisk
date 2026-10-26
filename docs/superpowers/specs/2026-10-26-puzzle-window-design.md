@@ -1,9 +1,8 @@
 # Puzzle Window — design
 
 Date: 2026-10-26
-Status: decisions approved by Ori in session. The dial values (§5.5) and the
-playtest's confound mitigation (§7) are Claude's proposals awaiting Ori. The
-written spec awaits review.
+Status: decisions approved by Ori in session, including the dial values (§5.5)
+and the playtest's confound mitigation (§7). The written spec awaits review.
 Tracking: #207 (milestone `M10 — Puzzle Window`)
 Decision record: `docs/journal/journal-2026-10-26.md` (#208)
 Builds on: `docs/superpowers/specs/2026-10-19-puzzle-prototype-design.md`
@@ -149,9 +148,9 @@ effect documented there:
 
 | Dial | Value | Effect |
 |---|---|---|
-| `PUZZLE_WINDOW` | 4 | Rows in view, the current one included. Larger windows bring par closer to clairvoyant play and give more to read per decision. 8 is M8's face-up table. |
-| `PUZZLE_MIN_WINDOW_PAR` | 6 | The lowest window par the filter accepts. Raising it to 7 cuts acceptance from about 1 in 4 to 1 in 10. |
-| `PUZZLE_MIN_WINDOW_ONLY_MOVES` | 2 | The fewest window only-moves accepted, M8's floor carried over. With the myopic rule, it takes Hard-type tables from 28% of plants to under 1% of deals. |
+| `PUZZLE_WINDOW` | 3 | Rows in view, the current one included. Larger windows bring par closer to clairvoyant play, give more to read per decision, and make a revealed row bite less often. 8 is M8's face-up table. |
+| `PUZZLE_MIN_WINDOW_PAR` | 6 | The lowest window par the filter accepts. Raising it to 7 cuts acceptance from about 1 in 4–5 to 1 in 13. |
+| `PUZZLE_MIN_WINDOW_ONLY_MOVES` | 2 | The fewest window only-moves accepted, M8's floor carried over. With the myopic rule, it takes Hard-type tables from 38% of plants to 1.5–2.0% of deals. |
 
 **Measured basis.**
 - **Instrument.** `docs/research/game-modes/03-puzzle/sims/window/`, with logs
@@ -175,26 +174,39 @@ mean(window − myopic) / mean(clairvoyant − myopic).
 | Captured, seed 2 | 0.098 | 0.496 | 0.732 | 0.869 | 0.944 | 1 |
 | Hard-type plants, seed 1 | 71.5% | 52.8% | 37.8% | 28.5% | 24.1% | 21.4% |
 
-- *k* = 3, the starting value, clears the bar on seed 1 but misses it on seed 2
-  and pooled (0.742). *k* = 4 clears it on both seeds, so the dial is 4.
-- **On the tables the filter accepts, the two are close.** At floors (6, 2) a
-  careful window reader loses 0.09 rows to clairvoyant play at *k* = 4
-  (window 6.37, clairvoyant 6.46) and 0.18 rows at *k* = 3 (6.34, 6.52).
-- *k* = 3 at the same floors accepts 1 plant in 4–5, and 1.5–2.0% of its
-  deals are Hard-type. Choosing between 3 and 4 is open for Ori (#207).
+*k* = 3 clears the bar on seed 1 but misses it on seed 2 and pooled (0.742).
+*k* = 4 clears it on both seeds. **Ori chose *k* = 3 anyway (2026-10-26).**
+The bar is measured on unfiltered plants, and on the tables the filter accepts,
+the two windows are close.
 
-**The filter at *k* = 4, floors (6, 2), seeds 1 and 2:**
-- **Acceptance:** 27.0% and 25.7%.
-- **Hard-type share of accepted deals:** 0.37% and 0.58%.
+**Accepted tables at floors (6, 2), seeds 1 and 2:**
+
+| | *k* = 3 | *k* = 4 |
+|---|---|---|
+| Mean window par / clairvoyant par, seed 1 | 6.34 / 6.52 | 6.37 / 6.46 |
+| Tables where the hidden rows cost the window bot 1 point | 15.8% / 16.3% | 9.4% / 11.1% |
+| Tables where they cost 2 or more (Hard-type) | 1.5% / 2.0% | 0.4% / 0.6% |
+
+The smaller window suits the aim, which is to break up the up-front stare. At
+*k* = 3 a revealed row costs even careful reading a point on about 1 dealt
+table in 6. That gives reveals some bite without bringing back killscreens.
+These figures measure lost score, not changed moves: a reveal can change the
+best move without costing a point, and nothing here counts that. M10's
+playtest records whether testers' thinking spreads across rows (§7).
+
+**The filter at *k* = 3, floors (6, 2), seeds 1 and 2:**
+- **Acceptance:** 23.1% and 20.5%.
+- **Hard-type share of accepted deals:** 1.5% and 2.0%.
 - **Hard-type, defined:** the window bot's run ends before row 8, or its par is
   2 or more below clairvoyant par.
-- **Deal time on a Mac:** a median of 1.9 ms and a maximum of 17 ms over 300
+- **Deal time on a Mac:** a median of 1.6 ms and a maximum of 16 ms over 300
   deals, with no cap hits. Phone time is unmeasured; §8's manual check covers
   it.
-- **M8's band through a window:** read at *k* = 4, 13% of M8-band tables are
-  Hard-type (26% at *k* = 3). M8's band therefore cannot carry over unchanged.
-- **The three M8 playtest tables at *k* = 4:** window par 6 against
-  clairvoyant 7, and none is Hard-type.
+- **M8's band through a window:** read at *k* = 3, 26% of M8-band tables are
+  Hard-type (13% at *k* = 4). M8's band therefore cannot carry over unchanged.
+- **The three M8 playtest tables at *k* = 3:** window par 6, 4 and 6 against
+  clairvoyant 7. The second, M8's Hard, is Hard-type here, and the filter
+  would reject it.
 
 ## 6. Screens and copy
 
@@ -224,12 +236,12 @@ check (`puzzle-fit`, 393 × 660 and 375 × 660, en and ko) still applies.
 
 The name stays Puzzle / 묘수풀이 for the prototype. Whether 묘수풀이 (a problem
 seen whole) still fits is decided after M10's playtest. The Korean below is a
-draft for Ori to judge. Each "four" follows *k*.
+draft for Ori to judge. Each "three" follows *k*.
 
 | Key | English | Korean |
 |---|---|---|
-| `mode.puzzleHint` | Four rows in view | 네 줄씩 내다보며 |
-| `howToPlay.puzzle` | Puzzle deals five tiles and a table of eight equations, each printed with the tiles it pays. You see four rows at a time, and the next one turns up as you play. A correct answer takes its row's tiles, and your hand holds five. Par is what careful play on the same four rows scores. A wrong answer is a legal move. | 묘수풀이는 타일 다섯 개와 문제 여덟 개로 시작하며, 문제마다 받을 타일이 적혀 있습니다. 한 번에 네 줄만 보이고, 풀 때마다 다음 줄이 나타납니다. 정답을 맞히면 그 줄의 타일을 받고, 손에는 다섯 개까지 보관합니다. 목표는 같은 네 줄을 보고 신중하게 두었을 때의 점수입니다. 오답도 둘 수 있는 한 수입니다. |
+| `mode.puzzleHint` | Three rows in view | 세 줄씩 내다보며 |
+| `howToPlay.puzzle` | Puzzle deals five tiles and a table of eight equations, each printed with the tiles it pays. You see three rows at a time, and the next one turns up as you play. A correct answer takes its row's tiles, and your hand holds five. Par is what careful play on the same three rows scores. A wrong answer is a legal move. | 묘수풀이는 타일 다섯 개와 문제 여덟 개로 시작하며, 문제마다 받을 타일이 적혀 있습니다. 한 번에 세 줄만 보이고, 풀 때마다 다음 줄이 나타납니다. 정답을 맞히면 그 줄의 타일을 받고, 손에는 다섯 개까지 보관합니다. 목표는 같은 세 줄을 보고 신중하게 두었을 때의 점수입니다. 오답도 둘 수 있는 한 수입니다. |
 | `ledger.hidden` | Row {row}, not yet shown | {row}번째 줄, 아직 가려짐 |
 | `gameOver.parMargin` | {par} (+{margin}) | {par} (+{margin}) |
 
@@ -261,8 +273,9 @@ and is cancelled if most baseline testers never looked at the ledger (journal
   - seconds spent on each row, which shows whether thinking spreads across the
     run or bunches up front;
   - score against par per table;
-  - afterwards: "Which would you rather play again: this, or the face-up
-    version?"
+  - afterwards: "Which would you rather play again: this, or the last
+    face-up table you played?" That table is the fourth of M8's protocol, a
+    live deal.
 - **Kill condition.** Drop M10 if most testers do not start another table
   unprompted, **or** most would rather play face-up. Seconds per row are
   recorded, not gated.
@@ -275,11 +288,12 @@ and is cancelled if most baseline testers never looked at the ledger (journal
   - A preference for M10 may be a preference for easier tables, or for
     familiarity, rather than for the window.
 
-  The mitigation is open for Ori and must be settled before the first tester
-  (#207). The proposal: ask the preference question against the tester's
-  *fourth* face-up table, which M8's protocol already deals live (about 85%
-  of live deals are Medium). That removes most of the difficulty gap. The
-  order effect stays, recorded as a known limit.
+  **Mitigation** (Ori, 2026-10-26): the preference question names the tester's
+  *fourth* face-up table. M8's protocol already deals that table live, and
+  about 85% of live deals are Medium, so this removes most of the difficulty
+  gap. The order effect stays as a known limit, to be read with the result. A
+  tester who never reached a fourth face-up table answers against face-up in
+  general, and the observer notes it.
 - **The result** goes to `main` in its own journal PR, under the 2026-10-19
   rule.
 
@@ -294,7 +308,7 @@ Test-first throughout. Record each test's expected failure before the code.
   - only-moves on a hand-built table with one known trap.
 - **Port gate.** A one-off script run, recorded in the PR as M8's calibration
   was. `playWindow` matches `lib.ts`'s window par plant for plant on seed 1's
-  2,000 plants at *k* = 4. The shipped filter accepts 540 of them (27.0%) at
+  2,000 plants at *k* = 3. The shipped filter accepts 462 of them (23.1%) at
   floors (6, 2). A miss means the port is wrong, not the dials.
 - **`dealPuzzle`**: under a scripted `RandomSource`, the table it returns passes
   the three rules. A source that never passes returns a table at the cap with
@@ -330,13 +344,15 @@ Test-first throughout. Record each test's expected failure before the code.
 - **The tie-break sets par.** A different tie-break gives a different par, and
   it is a judgement, not a measurement. The instrument check at *k* = 8 bounds
   the bot but does not justify its tie-breaks.
-- **Four rows may still go unread.** The baseline result decides whether M10
+- **Three rows may still go unread.** The baseline result decides whether M10
   is built at all (§7).
-- **The preference question is confounded** (§7).
-- **On dealt tables, the window costs a careful reader almost nothing.** At
-  *k* = 4 and floors (6, 2), the window bot's par sits 0.09 rows below
-  clairvoyant play (§5.5). That follows from the filter, which rejects tables
-  where the hidden rows punish careful reading.
+- **The preference question is confounded** (§7). The mitigation removes the
+  difficulty gap but not the order effect.
+- **On dealt tables, the window costs a careful reader little.** At *k* = 3 and
+  floors (6, 2), the window bot's par sits 0.18 rows below clairvoyant play on
+  average. A revealed row costs it a point on about 1 table in 6 (§5.5). That
+  follows from the filter, which rejects tables where the hidden rows punish
+  careful reading.
   - The window therefore changes *when* the player thinks, not what a careful
     player can score. That is the redesign's aim.
   - What separates players is reading: the myopic bot scores below par on

@@ -1,0 +1,4 @@
+k=3 floors window>=6 only>=2, mulberry32(3), 50 warm-up + 300 timed: median 1.63 ms, p95 6.37 ms, max 15.88 ms; mean attempts 5.0, max attempts 29, cap hits 0
+k=3 floors window>=7 only>=2, mulberry32(3), 50 warm-up + 300 timed: median 3.75 ms, p95 15.30 ms, max 39.37 ms; mean attempts 14.2, max attempts 125, cap hits 0
+k=4 floors window>=6 only>=2, mulberry32(3), 50 warm-up + 300 timed: median 1.87 ms, p95 7.92 ms, max 16.92 ms; mean attempts 4.0, max attempts 23, cap hits 0
+k=4 floors window>=7 only>=2, mulberry32(3), 50 warm-up + 300 timed: median 4.60 ms, p95 16.29 ms, max 34.53 ms; mean attempts 10.5, max attempts 64, cap hits 0

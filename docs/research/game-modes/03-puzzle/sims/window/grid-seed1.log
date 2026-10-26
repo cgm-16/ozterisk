@@ -1,0 +1,66 @@
+
+seed 1, k=3, 2000 plants. Cell: accept% | Hard% of accepted | mean window | mean clair | 1/p | capped E | P(cap hit)
+window>=  only>=0 / 1 / 2 / 3 / 4 as accept%/Hard%
+k=3 par>=4 only>=0: accept 1093 (54.65%) | Hard 111 (10.16%) | window 5.78 | clair 6.11 | 1/p 1.8 | capped 1.8 | P(cap) 2.1e-69
+k=3 par>=4 only>=1: accept 965 (48.25%) | Hard 84 (8.70%) | window 5.65 | clair 5.95 | 1/p 2.1 | capped 2.1 | P(cap) 6.1e-58
+k=3 par>=4 only>=2: accept 817 (40.85%) | Hard 48 (5.88%) | window 5.62 | clair 5.89 | 1/p 2.4 | capped 2.4 | P(cap) 2.5e-46
+k=3 par>=4 only>=3: accept 535 (26.75%) | Hard 23 (4.30%) | window 5.40 | clair 5.64 | 1/p 3.7 | capped 3.7 | P(cap) 9.2e-28
+k=3 par>=4 only>=4: accept 299 (14.95%) | Hard 7 (2.34%) | window 5.26 | clair 5.42 | 1/p 6.7 | capped 6.7 | P(cap) 8.6e-15
+4  54.6/10.2  48.3/8.7  40.8/5.9  26.8/4.3  14.9/2.3
+k=3 par>=5 only>=0: accept 938 (46.90%) | Hard 51 (5.44%) | window 6.07 | clair 6.36 | 1/p 2.1 | capped 2.1 | P(cap) 1.0e-55
+k=3 par>=5 only>=1: accept 822 (41.10%) | Hard 35 (4.26%) | window 5.93 | clair 6.21 | 1/p 2.4 | capped 2.4 | P(cap) 1.1e-46
+k=3 par>=5 only>=2: accept 706 (35.30%) | Hard 27 (3.82%) | window 5.88 | clair 6.12 | 1/p 2.8 | capped 2.8 | P(cap) 1.5e-38
+k=3 par>=5 only>=3: accept 455 (22.75%) | Hard 13 (2.86%) | window 5.65 | clair 5.85 | 1/p 4.4 | capped 4.4 | P(cap) 3.8e-23
+k=3 par>=5 only>=4: accept 253 (12.65%) | Hard 4 (1.58%) | window 5.49 | clair 5.61 | 1/p 7.9 | capped 7.9 | P(cap) 1.8e-12
+5  46.9/5.4  41.1/4.3  35.3/3.8  22.8/2.9  12.7/1.6
+k=3 par>=6 only>=0: accept 653 (32.65%) | Hard 15 (2.30%) | window 6.54 | clair 6.75 | 1/p 3.1 | capped 3.1 | P(cap) 4.7e-35
+k=3 par>=6 only>=1: accept 552 (27.60%) | Hard 10 (1.81%) | window 6.39 | clair 6.59 | 1/p 3.6 | capped 3.6 | P(cap) 8.9e-29
+k=3 par>=6 only>=2: accept 462 (23.10%) | Hard 7 (1.52%) | window 6.34 | clair 6.52 | 1/p 4.3 | capped 4.3 | P(cap) 1.5e-23
+k=3 par>=6 only>=3: accept 264 (13.20%) | Hard 4 (1.52%) | window 6.12 | clair 6.27 | 1/p 7.6 | capped 7.6 | P(cap) 5.1e-13
+k=3 par>=6 only>=4: accept 122 (6.10%) | Hard 0 (0.00%) | window 6.01 | clair 6.07 | 1/p 16.4 | capped 16.4 | P(cap) 3.4e-6
+6  32.6/2.3  27.6/1.8  23.1/1.5  13.2/1.5  6.1/0.0
+k=3 par>=7 only>=0: accept 289 (14.45%) | Hard 0 (0.00%) | window 7.22 | clair 7.31 | 1/p 6.9 | capped 6.9 | P(cap) 2.8e-14
+k=3 par>=7 only>=1: accept 209 (10.45%) | Hard 0 (0.00%) | window 7.03 | clair 7.13 | 1/p 9.6 | capped 9.6 | P(cap) 2.6e-10
+k=3 par>=7 only>=2: accept 154 (7.70%) | Hard 0 (0.00%) | window 7.03 | clair 7.12 | 1/p 13.0 | capped 13.0 | P(cap) 1.1e-7
+k=3 par>=7 only>=3: accept 32 (1.60%) | Hard 0 (0.00%) | window 7.00 | clair 7.03 | 1/p 62.5 | capped 60.0 | P(cap) 4.0e-2
+k=3 par>=7 only>=4: accept 1 (0.05%) | Hard 0 (0.00%) | window 7.00 | clair 7.00 | 1/p 2000.0 | capped 190.4 | P(cap) 9.0e-1
+7  14.4/0.0  10.4/0.0  7.7/0.0  1.6/0.0  0.1/0.0
+k=3 par>=8 only>=0: accept 63 (3.15%) | Hard 0 (0.00%) | window 8.00 | clair 8.00 | 1/p 31.7 | capped 31.7 | P(cap) 1.7e-3
+k=3 par>=8 only>=1: accept 7 (0.35%) | Hard 0 (0.00%) | window 8.00 | clair 8.00 | 1/p 285.7 | capped 144.0 | P(cap) 5.0e-1
+k=3 par>=8 only>=2: accept 4 (0.20%) | Hard 0 (0.00%) | window 8.00 | clair 8.00 | 1/p 500.0 | capped 165.0 | P(cap) 6.7e-1
+k=3 par>=8 only>=3: accept 0 (0.00%) | Hard 0 (NaN%) | window NaN | clair NaN | 1/p Infinity | capped NaN | P(cap) 1.0e+0
+k=3 par>=8 only>=4: accept 0 (0.00%) | Hard 0 (NaN%) | window NaN | clair NaN | 1/p Infinity | capped NaN | P(cap) 1.0e+0
+8  3.1/0.0  0.4/0.0  0.2/0.0  0.0/NaN  0.0/NaN
+
+seed 1, k=4, 2000 plants. Cell: accept% | Hard% of accepted | mean window | mean clair | 1/p | capped E | P(cap hit)
+window>=  only>=0 / 1 / 2 / 3 / 4 as accept%/Hard%
+k=4 par>=4 only>=0: accept 1222 (61.10%) | Hard 79 (6.46%) | window 5.88 | clair 6.09 | 1/p 1.6 | capped 1.6 | P(cap) 9.8e-83
+k=4 par>=4 only>=1: accept 1076 (53.80%) | Hard 58 (5.39%) | window 5.72 | clair 5.91 | 1/p 1.9 | capped 1.9 | P(cap) 8.5e-68
+k=4 par>=4 only>=2: accept 920 (46.00%) | Hard 31 (3.37%) | window 5.66 | clair 5.83 | 1/p 2.2 | capped 2.2 | P(cap) 3.0e-54
+k=4 par>=4 only>=3: accept 629 (31.45%) | Hard 13 (2.07%) | window 5.45 | clair 5.60 | 1/p 3.2 | capped 3.2 | P(cap) 1.6e-33
+k=4 par>=4 only>=4: accept 368 (18.40%) | Hard 4 (1.09%) | window 5.28 | clair 5.40 | 1/p 5.4 | capped 5.4 | P(cap) 2.2e-18
+4  61.1/6.5  53.8/5.4  46.0/3.4  31.4/2.1  18.4/1.1
+k=4 par>=5 only>=0: accept 1057 (52.85%) | Hard 30 (2.84%) | window 6.18 | clair 6.35 | 1/p 1.9 | capped 1.9 | P(cap) 5.0e-66
+k=4 par>=5 only>=1: accept 918 (45.90%) | Hard 16 (1.74%) | window 6.02 | clair 6.17 | 1/p 2.2 | capped 2.2 | P(cap) 4.4e-54
+k=4 par>=5 only>=2: accept 788 (39.40%) | Hard 12 (1.52%) | window 5.94 | clair 6.08 | 1/p 2.5 | capped 2.5 | P(cap) 3.1e-44
+k=4 par>=5 only>=3: accept 531 (26.55%) | Hard 5 (0.94%) | window 5.71 | clair 5.84 | 1/p 3.8 | capped 3.8 | P(cap) 1.6e-27
+k=4 par>=5 only>=4: accept 305 (15.25%) | Hard 1 (0.33%) | window 5.54 | clair 5.63 | 1/p 6.6 | capped 6.6 | P(cap) 4.2e-15
+5  52.8/2.8  45.9/1.7  39.4/1.5  26.6/0.9  15.3/0.3
+k=4 par>=6 only>=0: accept 775 (38.75%) | Hard 6 (0.77%) | window 6.61 | clair 6.72 | 1/p 2.6 | capped 2.6 | P(cap) 2.6e-43
+k=4 par>=6 only>=1: accept 650 (32.50%) | Hard 2 (0.31%) | window 6.43 | clair 6.54 | 1/p 3.1 | capped 3.1 | P(cap) 7.3e-35
+k=4 par>=6 only>=2: accept 540 (27.00%) | Hard 2 (0.37%) | window 6.37 | clair 6.46 | 1/p 3.7 | capped 3.7 | P(cap) 4.6e-28
+k=4 par>=6 only>=3: accept 323 (16.15%) | Hard 2 (0.62%) | window 6.17 | clair 6.26 | 1/p 6.2 | capped 6.2 | P(cap) 5.0e-16
+k=4 par>=6 only>=4: accept 159 (7.95%) | Hard 0 (0.00%) | window 6.04 | clair 6.07 | 1/p 12.6 | capped 12.6 | P(cap) 6.4e-8
+6  38.8/0.8  32.5/0.3  27.0/0.4  16.2/0.6  8.0/0.0
+k=4 par>=7 only>=0: accept 374 (18.70%) | Hard 0 (0.00%) | window 7.26 | clair 7.30 | 1/p 5.3 | capped 5.3 | P(cap) 1.0e-18
+k=4 par>=7 only>=1: accept 266 (13.30%) | Hard 0 (0.00%) | window 7.06 | clair 7.11 | 1/p 7.5 | capped 7.5 | P(cap) 4.0e-13
+k=4 par>=7 only>=2: accept 190 (9.50%) | Hard 0 (0.00%) | window 7.04 | clair 7.08 | 1/p 10.5 | capped 10.5 | P(cap) 2.1e-9
+k=4 par>=7 only>=3: accept 55 (2.75%) | Hard 0 (0.00%) | window 7.02 | clair 7.04 | 1/p 36.4 | capped 36.2 | P(cap) 3.8e-3
+k=4 par>=7 only>=4: accept 6 (0.30%) | Hard 0 (0.00%) | window 7.00 | clair 7.00 | 1/p 333.3 | capped 150.6 | P(cap) 5.5e-1
+7  18.7/0.0  13.3/0.0  9.5/0.0  2.8/0.0  0.3/0.0
+k=4 par>=8 only>=0: accept 96 (4.80%) | Hard 0 (0.00%) | window 8.00 | clair 8.00 | 1/p 20.8 | capped 20.8 | P(cap) 5.3e-5
+k=4 par>=8 only>=1: accept 16 (0.80%) | Hard 0 (0.00%) | window 8.00 | clair 8.00 | 1/p 125.0 | capped 99.9 | P(cap) 2.0e-1
+k=4 par>=8 only>=2: accept 8 (0.40%) | Hard 0 (0.00%) | window 8.00 | clair 8.00 | 1/p 250.0 | capped 137.8 | P(cap) 4.5e-1
+k=4 par>=8 only>=3: accept 1 (0.05%) | Hard 0 (0.00%) | window 8.00 | clair 8.00 | 1/p 2000.0 | capped 190.4 | P(cap) 9.0e-1
+k=4 par>=8 only>=4: accept 0 (0.00%) | Hard 0 (NaN%) | window NaN | clair NaN | 1/p Infinity | capped NaN | P(cap) 1.0e+0
+8  4.8/0.0  0.8/0.0  0.4/0.0  0.1/0.0  0.0/NaN

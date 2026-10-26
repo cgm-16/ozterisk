@@ -1,7 +1,8 @@
 // Window bot for "Puzzle Window" (research only). The move generator and the
 // clairvoyant memo come from the branch's createSearch (scratch copy with only
 // `export` added, see puzzle-search.ts); plantTable/playMyopic/solvePuzzle
-// are imported untouched from the snapshot.
+// are imported untouched from src/game.
+// Describes 3ccd37b. M10 removes playtestTables.ts and M8's band dials, so after its build re-run from `git archive 3ccd37b`.
 import { createSearch } from "./puzzle-search.ts";
 import { plantTable, playMyopic, solvePuzzle } from "../../../../../../src/game/puzzle.ts";
 import type { PuzzleDeal, RandomSource } from "../../../../../../src/game/types.ts";

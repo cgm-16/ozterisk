@@ -106,6 +106,12 @@ M8 shipped them. The clairvoyant solver is still needed: window only-moves
   deterministic.
 - **The score** is the bot's correct answers over the whole table, played to its
   end under the end rule. That score is the table's par.
+- **Reference.** `docs/research/game-modes/03-puzzle/sims/window/lib.ts` is the
+  reference implementation of the window bot, window only-moves and Hard-type.
+  Two readings in it set par:
+  - a line that stops early inside the window is ranked by the hand it held
+    when it stopped;
+  - a run "ends before row 8" when it makes fewer than eight submissions.
 
 Instrument check: at *k* = 8 the bot sees every row, so its score must equal
 `solvePuzzle`'s par on every table. M10's tests check it on the sample (§8).
@@ -153,9 +159,14 @@ effect documented there:
 - **Code.** Run against `feat/M8-puzzle-prototype` at 3ccd37b, and re-run on
   this branch with identical output except timing.
 - **Caveat.** These are bot scores, not player data.
+- **Drift.** The sims describe 3ccd37b. M10's build removes
+  `playtestTables.ts` and M8's band dials, which they import, so after the build
+  they are re-run from `git archive 3ccd37b`.
 
-**Choosing *k*.** The bar was set before the sweep ran: the smallest *k* whose
-**captured share** reaches 0.75 on unfiltered plants. Captured share is
+**Choosing *k*.** Ori approved the rule "the smallest *k* where reading the
+window captures most of what seeing everything is worth". Claude read "most" as
+0.75 and wrote that bar into the sim's brief before it ran: the smallest *k*
+whose **captured share** reaches 0.75 on unfiltered plants. Captured share is
 mean(window − myopic) / mean(clairvoyant − myopic).
 
 | *k* | 1 | 2 | 3 | 4 | 5 | 8 |
@@ -281,6 +292,10 @@ Test-first throughout. Record each test's expected failure before the code.
   - at *k* = 1 on a hand-built table, a tie-break changes the bot's move, and
     the test pins the move;
   - only-moves on a hand-built table with one known trap.
+- **Port gate.** A one-off script run, recorded in the PR as M8's calibration
+  was. `playWindow` matches `lib.ts`'s window par plant for plant on seed 1's
+  2,000 plants at *k* = 4. The shipped filter accepts 540 of them (27.0%) at
+  floors (6, 2). A miss means the port is wrong, not the dials.
 - **`dealPuzzle`**: under a scripted `RandomSource`, the table it returns passes
   the three rules. A source that never passes returns a table at the cap with
   its window par.

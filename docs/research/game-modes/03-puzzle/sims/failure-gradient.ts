@@ -1,4 +1,5 @@
 // Failure gradient for Puzzle: how much one mistake costs. Research only.
+// Describes 3ccd37b. M10 removes playtestTables.ts and M8's band dials, so after its build re-run from `git archive 3ccd37b`.
 // usage: SEED=1 node docs/research/game-modes/_runner/run.mjs docs/research/game-modes/03-puzzle/sims/failure-gradient.ts (SEED, N env vars for the live deals)
 import { makeSolver, mulberry32, plantedTable, type Table } from "./solver.ts";
 import { PLAYTEST_TABLES } from "../../../../../src/game/playtestTables.ts";

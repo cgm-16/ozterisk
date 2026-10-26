@@ -1,4 +1,5 @@
 // Counts reachable states where the skip rule would fire (k < K, 0 < size < len), per playtest table.
+// Describes 3ccd37b. M10 removes playtestTables.ts and M8's band dials, so after its build re-run from `git archive 3ccd37b`.
 import { makeSolver, type Table } from "./solver.ts";
 import { PLAYTEST_TABLES } from "../../../../../src/game/playtestTables.ts";
 for (const p of PLAYTEST_TABLES) {

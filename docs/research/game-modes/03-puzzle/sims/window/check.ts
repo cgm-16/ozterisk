@@ -1,4 +1,5 @@
 // Instrument check: at k = 8 the window bot must equal clairvoyant par.
+// Describes 3ccd37b. M10 removes playtestTables.ts and M8's band dials, so after its build re-run from `git archive 3ccd37b`.
 import { analyze, createSearch, mulberry32, plantTable, playMyopic, solvePuzzle, windowLine } from "./lib.ts";
 import { PLAYTEST_TABLES } from "../../../../../../src/game/playtestTables.ts";
 import type { PuzzleDeal } from "../../../../../../src/game/types.ts";

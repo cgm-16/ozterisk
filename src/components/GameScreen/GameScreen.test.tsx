@@ -1,20 +1,27 @@
 import { StrictMode } from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import type { GameState } from "../../game/types";
+import { createTiles, sortTiles } from "../../game/factories";
+import { gameReducer } from "../../game/gameReducer";
+import type { GameState, PuzzleTable } from "../../game/types";
 import { I18nProvider } from "../../i18n/I18nContext";
 import {
   makeAnsweringState,
   makeEquation,
   makeFaceTile,
   makeFeedbackState,
+  makeGameOverState,
   makeNbrTile,
   makeOverflowInventory,
   makeOverflowState,
+  makePuzzleRow,
   makeTile,
+  PUZZLE_SAMPLE,
+  sequentialIds,
 } from "../../test/fixtures";
 import slotStyles from "../AnswerSlots/AnswerSlots.module.css";
+import rackStyles from "../TileInventory/TileInventory.module.css";
 import { GameScreen, type GameScreenProps } from "./GameScreen";
 
 // A 12-tile inventory (excess 2), where a first mark is only a mark.
@@ -824,3 +831,58 @@ describe("GameScreen with Classic's stepped rack", () => {
   });
 });
 
+
+describe("GameScreen in Puzzle", () => {
+  // The gallery's answering-puzzle state: the sample at row 1, its hand dealt.
+  const SAMPLE_AT_ROW_1 = makeAnsweringState(PUZZLE_SAMPLE.rows[0].equation, {
+    mode: "puzzle",
+    table: PUZZLE_SAMPLE,
+    rowResults: [],
+    inventory: sortTiles(createTiles(PUZZLE_SAMPLE.hand, sequentialIds())),
+  });
+
+  it("shows the ledger and par, and no capacity meter", () => {
+    renderScreen(SAMPLE_AT_ROW_1);
+    expect(screen.getByRole("list", { name: "Table" })).toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: /^Capacity/ })).not.toBeInTheDocument();
+    expect(screen.getByText("Par").nextElementSibling).toHaveTextContent("7");
+  });
+
+  it("draws the rack as one row of exactly five sockets", () => {
+    renderScreen(SAMPLE_AT_ROW_1);
+    const rack = screen.getByRole("button", { name: "Digit 1" }).closest(`.${rackStyles.rack}`);
+    expect(rack).toHaveAttribute("data-size", "row");
+    expect(rack!.querySelector(`.${rackStyles.inventory}`)!.children).toHaveLength(5);
+  });
+
+  // Review Focus 4: a stale table would show, and check pays against, the run
+  // that ended.
+  it("shows a replayed run's own table, from its row 1", () => {
+    const next: PuzzleTable = {
+      hand: [1, 2, 4, 6, 8],
+      rows: [makePuzzleRow(2, 6, [1, 3, 5]), makePuzzleRow(4, 2, [6, 0])],
+      par: 1,
+    };
+    const over = makeGameOverState(PUZZLE_SAMPLE.rows[3].equation, {
+      mode: "puzzle",
+      table: PUZZLE_SAMPLE,
+      rowResults: ["incorrect", "correct", "correct"],
+      round: 4,
+      totalRounds: 3,
+    });
+    renderScreen(
+      gameReducer(over, {
+        type: "RESTART_RUN",
+        equation: next.rows[0].equation,
+        inventory: sortTiles(createTiles(next.hand, sequentialIds())),
+        table: next,
+      }),
+    );
+
+    const rows = within(screen.getByRole("list", { name: "Table" })).getAllByRole("listitem");
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toHaveAttribute("aria-current", "step");
+    expect(rows[0]).toHaveTextContent("Row 1, 2 × 6, pays 1, 3, and 5");
+    expect(rows[0]).not.toHaveTextContent("missed");
+  });
+});

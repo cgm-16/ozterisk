@@ -3,11 +3,11 @@ import { GameOverScreen } from "../components/GameOverScreen/GameOverScreen";
 import { GameScreen } from "../components/GameScreen/GameScreen";
 import { LanguageToggle } from "../components/LanguageToggle/LanguageToggle";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
-import { createInitialInventory, createTitleState } from "../game/factories";
+import { createInitialInventory, createTiles, createTitleState, sortTiles } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
 import { generateKindEquation, generateRewardTiles } from "../game/generators";
-import { answerMatches, getCapacity, getRewardCount, isAtClassicFloor } from "../game/selectors";
-import type { GameMode, RandomSource, TileIdFactory } from "../game/types";
+import { answerMatches, getCapacity, getRewardCount, isRunComplete } from "../game/selectors";
+import type { Equation, GameMode, PuzzleTable, RandomSource, Tile, TileIdFactory } from "../game/types";
 import { getShareStats, type ShareDependencies } from "../services/sharing";
 import styles from "./App.module.css";
 
@@ -15,6 +15,8 @@ export interface AppDependencies {
   random: RandomSource;
   nextTileId: TileIdFactory;
   gameUrl: string;
+  /** Deals Puzzle's next table. Called only from event handlers, once per run. */
+  dealPuzzle(): PuzzleTable;
 }
 
 export interface AppProps {
@@ -22,24 +24,37 @@ export interface AppProps {
   shareDependencies: ShareDependencies;
 }
 
+// What a run opens with. The opening hand fills the mode's starting capacity
+// (§1.3); Puzzle's hand and first equation come from the table it deals.
+function startState(
+  dependencies: AppDependencies,
+  mode: GameMode,
+): { equation: Equation; inventory: Tile[]; table?: PuzzleTable } {
+  if (mode === "puzzle") {
+    const table = dependencies.dealPuzzle();
+    return {
+      equation: table.rows[0].equation,
+      inventory: sortTiles(createTiles(table.hand, dependencies.nextTileId)),
+      table,
+    };
+  }
+  const inventory = createInitialInventory(dependencies.nextTileId, getCapacity(mode, 0));
+  return { equation: generateKindEquation(dependencies.random, inventory), inventory };
+}
+
 export function App({ dependencies, shareDependencies }: AppProps) {
   const [state, dispatch] = useReducer(gameReducer, undefined, createTitleState);
 
-  // The opening hand fills the mode's starting capacity (§1.3).
   const handleStart = useCallback(
     (mode: GameMode) => {
-      const inventory = createInitialInventory(dependencies.nextTileId, getCapacity(mode, 0));
-      const equation = generateKindEquation(dependencies.random, inventory);
-      dispatch({ type: "START_RUN", mode, equation, inventory });
+      dispatch({ type: "START_RUN", mode, ...startState(dependencies, mode) });
     },
     [dependencies],
   );
 
   // RESTART_RUN keeps the run's mode, so the hand is dealt for it too.
   const handleRestart = useCallback(() => {
-    const inventory = createInitialInventory(dependencies.nextTileId, getCapacity(state.mode, 0));
-    const equation = generateKindEquation(dependencies.random, inventory);
-    dispatch({ type: "RESTART_RUN", equation, inventory });
+    dispatch({ type: "RESTART_RUN", ...startState(dependencies, state.mode) });
   }, [dependencies, state.mode]);
 
   const handleSubmit = useCallback(() => {
@@ -47,30 +62,44 @@ export function App({ dependencies, shareDependencies }: AppProps) {
     // only renders in `answering`, so this only guards the type.
     if (state.equation === null) return;
     if (answerMatches(state.selectedTiles, state.equation.product)) {
-      const rewardTiles = generateRewardTiles(
-        getRewardCount(state.selectedTiles.length),
-        dependencies.random,
-        dependencies.nextTileId,
-        state.mode,
-        state.totalRounds,
-      );
+      // A Puzzle row pays the tiles printed on it; the other modes draw theirs.
+      const rewardTiles = state.table
+        ? createTiles(state.table.rows[state.round - 1].pay, dependencies.nextTileId)
+        : generateRewardTiles(
+            getRewardCount(state.selectedTiles.length),
+            dependencies.random,
+            dependencies.nextTileId,
+            state.mode,
+            state.totalRounds,
+          );
       dispatch({ type: "SUBMIT_CORRECT", rewardTiles });
     } else {
       dispatch({ type: "SUBMIT_INCORRECT" });
     }
-  }, [state.equation, state.selectedTiles, state.mode, state.totalRounds, dependencies]);
+  }, [
+    state.equation,
+    state.selectedTiles,
+    state.mode,
+    state.totalRounds,
+    state.table,
+    state.round,
+    dependencies,
+  ]);
 
   const handleNextRound = useCallback(() => {
-    // At the floor the advance ends the run (§1.8 step 0): no equation is drawn,
-    // and the current one, never shown again, keeps the reducer's invariant.
-    if (isAtClassicFloor(state)) {
+    // At Classic's floor or Puzzle's last row the advance ends the run (§1.8
+    // step 0): no equation is drawn, and the current one, never shown again,
+    // keeps the reducer's invariant.
+    if (isRunComplete(state)) {
       if (state.equation === null) return;
       dispatch({ type: "NEXT_ROUND", equation: state.equation });
       return;
     }
     // state.inventory is already final (post-discard) at `feedback`; a stale
     // capture here would silently bias equations against the previous round's hand.
-    const equation = generateKindEquation(dependencies.random, state.inventory);
+    const equation = state.table
+      ? state.table.rows[state.round].equation
+      : generateKindEquation(dependencies.random, state.inventory);
     dispatch({ type: "NEXT_ROUND", equation });
   }, [dependencies, state]);
 

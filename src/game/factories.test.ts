@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Tile } from "./types";
-import { createInitialInventory, createTitleState, sortTiles } from "./factories";
+import { createInitialInventory, createTiles, createTitleState, sortTiles } from "./factories";
 import { tileDigits } from "./selectors";
 import { makeFaceTile, makeNbrTile, makeTile, sequentialIds } from "../test/fixtures";
 
@@ -82,6 +82,16 @@ describe("sortTiles", () => {
       "face-low",
       "nbr-6",
       "face-high",
+    ]);
+  });
+});
+
+describe("createTiles", () => {
+  it("builds tiles from digits in the given order", () => {
+    expect(createTiles([5, 9, 1], sequentialIds())).toEqual([
+      { id: "tile-0", digit: 5, isNew: false },
+      { id: "tile-1", digit: 9, isNew: false },
+      { id: "tile-2", digit: 1, isNew: false },
     ]);
   });
 });

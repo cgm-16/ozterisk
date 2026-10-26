@@ -36,6 +36,7 @@ hoc at branch time.
 | `M6e — Discard Scroll` | A discard brings the rack on screen with one instant scroll (`T83`) | At 393 × 660 the prompt, rail and whole rack are on screen at every discard; nothing scrolls when the rack is already in view; no new motion moment |
 | `M7 — Special Tiles` | Face-set tiles in Classic — Wildcard, Odd, Even, Low, High and Neighbours — each counting as its slot's digit when the digit is in its set (`T76`–`T81`) | Faces arrive as Classic rewards at `FACE_RATE` 0.08 and never in Endless; `canConstruct` searches assignments; the floor is 5; one Classic run in en and ko places a face right and one wrong |
 | `M7b — Face Rate Ramp` | Classic's face rate ramps from `5%` to `20%` across the run (`T84`) | `getClassicFaceRate` rises one equal step per submission, first to last; Endless still draws no face; the simulated win rate and faces per run recorded against the flat `8%` |
+| `M8 — Puzzle Prototype` | A third mode that deals a face-up table and judges the run against par, on a preview with a fixed playtest set (`T85`–`T90`, #196) | The sample's par line replays to `7` on the real reducer; at `393 × 660` the ledger, slots and rack fit without scrolling; **merges only after the kill playtest passes** (`docs/superpowers/specs/2026-10-19-puzzle-prototype-design.md` §6.1) and `T90` has amended `docs/spec/**` |
 
 `M4`, `M5`, `M5.5a`, `M5.5b`, `M5.5c`, `M5.5d`, `M5.5e`, `M5.5f` and `M5.5g` are
 closed, merged as `16f2ff6`, `ecd76a1`, `f30929e`, `b933ca7`, `29708b8`,

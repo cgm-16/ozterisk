@@ -27,7 +27,13 @@ export function createInitialInventory(
   count = ALL_DIGITS.length,
 ): Tile[] {
   const digits = Array.from({ length: count }, (_, index) => ALL_DIGITS[index % ALL_DIGITS.length]);
-  return sortTiles(digits.map((digit) => ({ id: idFactory(), digit, isNew: false })));
+  return sortTiles(createTiles(digits, idFactory));
+}
+
+// Digit tiles in the given order, unsorted: a Puzzle pay arrives in its printed
+// order.
+export function createTiles(digits: readonly Digit[], idFactory: TileIdFactory): Tile[] {
+  return digits.map((digit) => ({ id: idFactory(), digit, isNew: false }));
 }
 
 // Rack order (§1.4a): digits ascending, then ✳, O, E, then the ranges by their

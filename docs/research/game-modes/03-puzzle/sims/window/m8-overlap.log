@@ -1,0 +1,2 @@
+k=3: M8 band 296/2000; window par 0..8 among them: 0 0 5 12 17 39 73 146 4; Hard 76; pass (6,2) 184, pass (7,2) 137
+k=4: M8 band 296/2000; window par 0..8 among them: 0 0 0 4 9 23 64 188 8; Hard 39; pass (6,2) 221, pass (7,2) 181

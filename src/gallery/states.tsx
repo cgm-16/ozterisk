@@ -4,7 +4,7 @@ import { GameScreen } from "../components/GameScreen/GameScreen";
 import { LanguageToggle } from "../components/LanguageToggle/LanguageToggle";
 import { TitleScreen } from "../components/TitleScreen/TitleScreen";
 import { CLASSIC_FLOOR, CLASSIC_SEAL_EVERY, CLASSIC_START_CAPACITY } from "../game/balance";
-import { createInitialInventory, sortTiles } from "../game/factories";
+import { createInitialInventory, createTiles, sortTiles } from "../game/factories";
 import { gameReducer } from "../game/gameReducer";
 import type { GamePhase, GameState, Tile } from "../game/types";
 import { getShareStats, type ShareDependencies } from "../services/sharing";
@@ -16,6 +16,7 @@ import {
   makeGameOverState,
   makeNbrTile,
   makeTile,
+  PUZZLE_SAMPLE,
   sequentialIds,
 } from "../test/fixtures";
 import { ControlBoard, CopyPressedOnMount, FaceBoard, ReducedMotionBoard } from "./harness";
@@ -261,6 +262,32 @@ const classicAt = (capacity: number) => {
 const ANSWERING_CLASSIC_15_STATE = classicAt(15);
 const ANSWERING_CLASSIC_10_STATE = classicAt(10);
 
+// Puzzle (spec §7): the sample at row 1, its hand dealt, every row still to
+// play. e2e/puzzle-fit.spec.ts measures the same screen in the app, dealt from
+// the title screen.
+const ANSWERING_PUZZLE_STATE = makeAnsweringState(PUZZLE_SAMPLE.rows[0].equation, {
+  mode: "puzzle",
+  table: PUZZLE_SAMPLE,
+  rowResults: [],
+  inventory: sortTiles(createTiles(PUZZLE_SAMPLE.hand, sequentialIds())),
+});
+
+// Row 4 of the sample's par line: the sacrifice missed, 14 and 9 answered, so
+// the ledger draws both marks beside the frame and the pays still to come. The
+// hand is what that line holds there, and the streak is the two answers since
+// the miss.
+const ANSWERING_PUZZLE_ROW_4_STATE = makeAnsweringState(PUZZLE_SAMPLE.rows[3].equation, {
+  mode: "puzzle",
+  table: PUZZLE_SAMPLE,
+  rowResults: ["incorrect", "correct", "correct"],
+  inventory: sortTiles(createTiles([1, 2, 6, 7, 8], sequentialIds())),
+  round: 4,
+  totalRounds: 3,
+  score: 2,
+  currentStreak: 2,
+  longestStreak: 2,
+});
+
 // The feedback a discard leaves behind: no Next Round, because the round
 // advances on its own once the departing tile has played (§1.7). In the
 // gallery nothing departs, so this is the resting frame of that moment.
@@ -279,6 +306,21 @@ const GAME_OVER_CLASSIC_WIN_STATE = makeGameOverState(makeEquation(7, 8), {
   round: CLASSIC_TO_FLOOR + 1,
   // Fewer tiles than sockets, so the final hand shows both.
   inventory: [makeTile(1, "win-a"), makeTile(4, "win-b"), makeTile(4, "win-c"), makeFaceTile("wild", "win-d")],
+});
+
+// Puzzle's game over (spec §7) after the sample's par line: the table played to
+// its end with par made, so the heading is gold and no equation is shown. The
+// hand is what that line holds after row 8, and the streak is the seven
+// answers since the sacrifice.
+const GAME_OVER_PUZZLE_STATE = makeGameOverState(PUZZLE_SAMPLE.rows[7].equation, {
+  mode: "puzzle",
+  table: PUZZLE_SAMPLE,
+  rowResults: ["incorrect", "correct", "correct", "correct", "correct", "correct", "correct", "correct"],
+  inventory: sortTiles(createTiles([2, 2, 7, 8, 8], sequentialIds())),
+  score: 7,
+  totalRounds: 8,
+  round: 9,
+  longestStreak: 7,
 });
 
 // Face tiles (§1.4a) are Classic's. A rack at sixteen, the 7 x 44 size that
@@ -406,6 +448,16 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
       label: "Answering — a depleted rack",
       render: () => renderGameScreen(ANSWERING_DEPLETED_STATE),
     },
+    {
+      id: "answering-puzzle",
+      label: "Answering — Puzzle, the sample at row 1",
+      render: () => renderGameScreen(ANSWERING_PUZZLE_STATE),
+    },
+    {
+      id: "answering-puzzle-row-4",
+      label: "Answering — Puzzle at row 4, three rows marked",
+      render: () => renderGameScreen(ANSWERING_PUZZLE_ROW_4_STATE),
+    },
   ],
   feedback: [
     {
@@ -471,6 +523,11 @@ export const GALLERY_STATES: Record<GamePhase | "interaction", GalleryEntry[]> =
       id: "game-over-classic-win",
       label: "Game over — Classic, run complete",
       render: () => renderGameOverScreen(GAME_OVER_CLASSIC_WIN_STATE, RESOLVING_SHARE_DEPENDENCIES),
+    },
+    {
+      id: "game-over-puzzle",
+      label: "Game over — Puzzle, made par",
+      render: () => renderGameOverScreen(GAME_OVER_PUZZLE_STATE, RESOLVING_SHARE_DEPENDENCIES),
     },
     {
       id: "game-over-copy-succeeded",

@@ -397,6 +397,17 @@ describe("TileInventory", () => {
     expect(cellCount(sparse)).toBe(19);
   });
 
+  // The non-stepped grid is five columns wide, so five sockets fill one row and
+  // six need the second.
+  it("draws one row for five sockets and keeps two rows for six", () => {
+    const { container: five } = renderInventory({ capacity: 5 });
+    expect(five.querySelector(`.${rackStyles.rack}`)).toHaveAttribute("data-size", "row");
+    cleanup();
+
+    const { container: six } = renderInventory({ capacity: 6 });
+    expect(six.querySelector(`.${rackStyles.rack}`)).not.toHaveAttribute("data-size");
+  });
+
   // The reducer seats a surviving rail tile in the freed socket in the same
   // action that drops the discarded one. Splicing the departing tile back in
   // would shove every later tile one cell over; the rack instead keeps

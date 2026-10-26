@@ -1,0 +1,63 @@
+== calibration
+  Medium(seed 20): literal == plantedTable; par 7; lines 3801; par lines 56; onlyMoves 2; sacrificeRequired false; myopic 2; lookahead 7 -> tier Medium; DP marginal == solver histogram
+  Hard(seed 18): literal == plantedTable; par 7; lines 11474; par lines 180; onlyMoves 3; sacrificeRequired false; myopic 2; lookahead 6 -> tier Hard; DP marginal == solver histogram
+  Sample(seed 16641): literal == plantedTable; par 7; lines 16893; par lines 38; onlyMoves 4; sacrificeRequired true; myopic 2; lookahead 6 -> tier Hard; DP marginal == solver histogram
+  sample: par 7, 38/16893 lines, sacrifice 5+7 on row 1 is the 1 keeper of 14, answering 15 (4 discards) caps at 6: OK
+  memoized (score,end) DP == naive line walk on all 3 tables under both rules
+  controls: five 1s vs 7x8 par 0; README 4-row control par 3; hand [1] rows 12,1: ship par 0, skip par 1: OK
+  live: seed 1, 2050 plants -> 300 in band (14.6%), Medium 85.7% / Hard 14.3%, 889 ms
+  shipped dealPuzzle on mulberry32(1): 300/300 tables identical to research plant+band
+
+== rule: SHIPPED (too few tiles ends the run)
+Medium(seed 20): par 7; lines 3801; par 1.5% | -1 17.4% | -2 32.4% | -3 27.8% | <=-4 20.9%; end early 45.1%, complete 54.9%
+  [3] off-par lines (3745) end: r1 0.0%, r2 0.0%, r3 0.0%, r4 0.6%, r5 2.7%, r6 6.1%, r7 11.1%, r8 25.3%, done 54.2%
+  [2] keep/opts, cost{cost x n}: r1 2/9 cost{2x1 4x1 6x1 7x4} doom6 bestdies6 ; r2 2/12 cost{2x1 4x1 5x1 6x7} doom9 bestdies9 ; r3 2/15 cost{1x1 2x2 4x3 5x7} doom10 bestdies10 ; r4 2/8 cost{1x1 2x3 4x2} doom2 bestdies2 ; r5 3/11 cost{1x1 2x6 3x1} doom1 bestdies1 ; r6 2/5 cost{1x3} ; r7 1/2 cost{2x1} ; r8 1/7 cost{1x6}
+  [2] by kind: discard n13 mean 2.62 doom 4; spend n3 mean 1.00 doom 0; missed n38 mean 3.95 doom 24; all n54 mean 3.46 cost1 22.2% doom 28
+  [5] row 1: 9 options, 2 keep par (canonical row-1 move {"kind":"correct","discard":1})
+Hard(seed 18): par 7; lines 11474; par 1.6% | -1 9.4% | -2 27.0% | -3 41.8% | <=-4 20.1%; end early 45.0%, complete 55.0%
+  [3] off-par lines (11294) end: r1 0.0%, r2 0.0%, r3 0.0%, r4 0.2%, r5 0.7%, r6 5.1%, r7 39.4%, r8 0.3%, done 54.3%
+  [2] keep/opts, cost{cost x n}: r1 3/9 cost{2x1 3x1 5x2 7x2} doom4 bestdies4 ; r2 2/12 cost{1x1 2x3 5x5 6x1} doom6 bestdies6 ; r3 2/14 cost{1x1 2x2 4x5 5x4} doom9 bestdies9 ; r4 3/6 cost{1x1 2x2} ; r5 1/5 cost{1x2 3x2} doom2 bestdies2 ; r6 1/3 cost{3x2} doom2 bestdies2 ; r7 1/7 cost{1x3 2x3} ; r8 6/10 cost{1x4}
+  [2] by kind: discard n8 mean 2.00 doom 1; spend n4 mean 2.00 doom 2; missed n35 mean 3.43 doom 20; all n47 mean 3.06 cost1 25.5% doom 23
+  [5] row 1: 9 options, 3 keep par (canonical row-1 move {"kind":"correct","discard":0})
+Sample(seed 16641): par 7; lines 16893; par 0.2% | -1 33.7% | -2 45.2% | -3 15.3% | <=-4 5.6%; end early 5.2%, complete 94.8%
+  [3] off-par lines (16855) end: r1 0.0%, r2 0.0%, r3 0.0%, r4 0.1%, r5 0.0%, r6 0.7%, r7 0.8%, r8 3.6%, done 94.8%
+  [2] keep/opts, cost{cost x n}: r1 1/14 cost{1x4 2x6 6x1 7x2} doom3 bestdies3 ; r2 1/4 cost{2x1 7x2} doom2 bestdies2 ; r3 1/4 cost{6x3} doom3 bestdies3 ; r4 2/9 cost{1x3 4x3 5x1} doom1 bestdies1 ; r5 1/8 cost{1x4 3x2 4x1} doom1 bestdies1 ; r6 2/12 cost{1x4 2x5 3x1} ; r7 2/7 cost{1x3 2x2} ; r8 4/11 cost{1x7}
+  [2] by kind: discard n12 mean 1.00 doom 0; spend n9 mean 3.56 doom 3; missed n30 mean 2.90 doom 7; answered n4 mean 1.00 doom 0; all n55 mean 2.45 cost1 45.5% doom 10
+  [5] row 1: 14 options, 1 keep par (canonical row-1 move {"kind":"miss","spend":[5,7]})
+LIVE n=300: par 7:281 8:19
+  [1] median/mean of per-deal line share: par 5.8%/8.4% | -1 21.6%/22.5% | -2 29.8%/31.3% | -3 21.4%/21.9% | <=-4 13.3%/15.9%; end early 12.1%/18.4%; lines median 14295.5
+  [3] off-par end row, mean of per-deal shares: r1 0.0%, r2 0.0%, r3 0.1%, r4 0.4%, r5 1.4%, r6 3.2%, r7 5.3%, r8 9.2%, done 80.4%
+  [2] pooled deviations n=14061: cost 1: 31.9%, 2: 19.0%, 3: 12.1%, >=4: 37.0%; doomed 39.7%; max-score continuation dies 39.7%; per-deal mean cost median 3.12
+  [2] by kind: discard n2561 mean 2.00 cost1 55.1% doom 20.3%; spend n1450 mean 3.20 cost1 31.7% doom 42.8%; missed n10030 mean 3.35 cost1 25.9% doom 44.3%; answered n20 mean 1.80 cost1 55.0% doom 15.0%
+  [2] mean cost by row: r1 4.85 (n2742), r2 4.17 (n1948), r3 3.64 (n1729), r4 3.00 (n1676), r5 2.46 (n1664), r6 1.95 (n1556), r7 1.52 (n1442), r8 1.00 (n1304)
+  [2] doomed by row: r1 65.8%, r2 61.8%, r3 59.1%, r4 48.2%, r5 34.4%, r6 11.3%, r7 0.0%, r8 0.0%
+  [2] discard-kind only, doomed by row: r1 38.4%, r2 31.3%, r3 24.8%, r4 14.0%, r5 5.1%, r6 0.0%, r7 0.0%, r8 -
+  [2] discard-kind only, mean cost by row: r1 2.95 (n580), r2 2.40 (n463), r3 1.98 (n347), r4 1.66 (n342), r5 1.45 (n335), r6 1.24 (n274), r7 1.00 (n220), r8 - (n0)
+  [5] row 1 options median 10 mean 11.8; keep-par median 3 mean 2.65; only one keeps par on 17.3%; row-1 keeper is a miss on 16.0%
+
+== rule: COUNTERFACTUAL (unattemptable row scores 0, play continues; 0 tiles ends)
+Medium(seed 20): par 7 (shipped 7); lines 3801; par 1.5% | -1 17.4% | -2 32.4% | -3 27.8% | <=-4 20.9%; end early 45.1%, complete 54.9%
+  [3] off-par lines (3745) end: r1 0.0%, r2 0.0%, r3 0.0%, r4 0.6%, r5 2.7%, r6 6.1%, r7 11.1%, r8 25.3%, done 54.2%
+  [2] keep/opts, cost{cost x n}: r1 2/9 cost{2x1 4x1 6x1 7x4} doom6 bestdies6 ; r2 2/12 cost{2x1 4x1 5x1 6x7} doom9 bestdies9 ; r3 2/15 cost{1x1 2x2 4x3 5x7} doom10 bestdies10 ; r4 2/8 cost{1x1 2x3 4x2} doom2 bestdies2 ; r5 3/11 cost{1x1 2x6 3x1} doom1 bestdies1 ; r6 2/5 cost{1x3} ; r7 1/2 cost{2x1} ; r8 1/7 cost{1x6}
+  [2] by kind: discard n13 mean 2.62 doom 4; spend n3 mean 1.00 doom 0; missed n38 mean 3.95 doom 24; all n54 mean 3.46 cost1 22.2% doom 28
+  [5] row 1: 9 options, 2 keep par (canonical row-1 move {"kind":"correct","discard":1})
+Hard(seed 18): par 7 (shipped 7); lines 11474; par 1.6% | -1 9.4% | -2 33.5% | -3 35.5% | <=-4 20.0%; end early 18.1%, complete 81.9%
+  [3] off-par lines (11294) end: r1 0.0%, r2 0.0%, r3 0.0%, r4 0.2%, r5 0.7%, r6 4.1%, r7 12.9%, r8 0.3%, done 81.7%
+  [2] keep/opts, cost{cost x n}: r1 3/9 cost{2x1 3x1 4x1 5x1 7x2} doom3 bestdies3 ; r2 2/12 cost{1x1 2x3 4x2 5x3 6x1} doom4 bestdies4 ; r3 2/14 cost{1x1 2x2 4x5 5x4} doom6 bestdies6 ; r4 3/6 cost{1x1 2x2} ; r5 1/5 cost{1x2 3x2} ; r6 1/3 cost{3x2} ; r7 1/7 cost{1x3 2x3} ; r8 6/10 cost{1x4}
+  [2] by kind: discard n8 mean 1.88 doom 0; spend n4 mean 2.00 doom 0; missed n35 mean 3.37 doom 13; all n47 mean 3.00 cost1 25.5% doom 13
+  [5] row 1: 9 options, 3 keep par (canonical row-1 move {"kind":"correct","discard":0})
+Sample(seed 16641): par 7 (shipped 7); lines 16893; par 0.2% | -1 33.7% | -2 45.2% | -3 15.3% | <=-4 5.6%; end early 1.8%, complete 98.2%
+  [3] off-par lines (16855) end: r1 0.0%, r2 0.0%, r3 0.0%, r4 0.1%, r5 0.0%, r6 0.3%, r7 0.8%, r8 0.6%, done 98.2%
+  [2] keep/opts, cost{cost x n}: r1 1/14 cost{1x4 2x6 5x1 7x2} doom2 bestdies2 ; r2 1/4 cost{2x1 7x2} doom2 bestdies2 ; r3 1/4 cost{5x2 6x1} doom1 bestdies1 ; r4 2/9 cost{1x3 4x3 5x1} doom1 bestdies1 ; r5 1/8 cost{1x4 3x2 4x1} ; r6 2/12 cost{1x4 2x5 3x1} ; r7 2/7 cost{1x3 2x2} ; r8 4/11 cost{1x7}
+  [2] by kind: discard n12 mean 1.00 doom 0; spend n9 mean 3.44 doom 2; missed n30 mean 2.83 doom 4; answered n4 mean 1.00 doom 0; all n55 mean 2.40 cost1 45.5% doom 6
+  [5] row 1: 14 options, 1 keep par (canonical row-1 move {"kind":"miss","spend":[5,7]})
+LIVE n=300: par 7:281 8:19; par rose on 0, by 0:300
+  [1] median/mean of per-deal line share: par 5.8%/8.4% | -1 21.6%/22.5% | -2 29.9%/31.3% | -3 21.8%/22.1% | <=-4 13.3%/15.7%; end early 6.7%/11.4%; lines median 14313
+  [3] off-par end row, mean of per-deal shares: r1 0.0%, r2 0.0%, r3 0.0%, r4 0.2%, r5 0.5%, r6 1.6%, r7 3.2%, r8 6.7%, done 87.8%
+  [2] pooled deviations n=14061: cost 1: 31.9%, 2: 19.6%, 3: 13.0%, >=4: 35.5%; doomed 29.3%; max-score continuation dies 29.6%; per-deal mean cost median 3.07
+  [2] by kind: discard n2561 mean 1.94 cost1 55.1% doom 10.9%; spend n1450 mean 3.13 cost1 31.7% doom 33.9%; missed n10030 mean 3.28 cost1 25.9% doom 33.3%; answered n20 mean 1.75 cost1 55.0% doom 10.0%
+  [2] mean cost by row: r1 4.71 (n2742), r2 4.04 (n1948), r3 3.54 (n1729), r4 2.93 (n1676), r5 2.44 (n1664), r6 1.95 (n1556), r7 1.52 (n1442), r8 1.00 (n1304)
+  [2] doomed by row: r1 55.2%, r2 48.4%, r3 43.3%, r4 31.9%, r5 18.9%, r6 4.2%, r7 0.0%, r8 0.0%
+  [2] discard-kind only, doomed by row: r1 24.5%, r2 18.1%, r3 10.4%, r4 5.3%, r5 0.0%, r6 0.0%, r7 0.0%, r8 -
+  [2] discard-kind only, mean cost by row: r1 2.82 (n580), r2 2.29 (n463), r3 1.90 (n347), r4 1.65 (n342), r5 1.45 (n335), r6 1.24 (n274), r7 1.00 (n220), r8 - (n0)
+  [5] row 1 options median 10 mean 11.8; keep-par median 3 mean 2.65; only one keeps par on 17.3%; row-1 keeper is a miss on 16.0%

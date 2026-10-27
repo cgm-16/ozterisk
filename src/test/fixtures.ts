@@ -4,6 +4,8 @@ import type {
   Equation,
   FaceKind,
   GameState,
+  PuzzleRow,
+  PuzzleTable,
   RandomSource,
   Tile,
   TileIdFactory,
@@ -16,6 +18,18 @@ export const sequenceRandom = (...values: number[]): RandomSource => {
     if (value === undefined) throw new Error("Random sequence exhausted");
     index += 1;
     return value;
+  };
+};
+
+// mulberry32, for tests only: the research tables were dealt with it, so a
+// seeded source can replay them. Production never seeds a run.
+export const seededRandom = (seed: number): RandomSource => {
+  let state = seed;
+  return () => {
+    state = (state + 0x6d2b79f5) | 0;
+    let x = Math.imul(state ^ (state >>> 15), 1 | state);
+    x = (x + Math.imul(x ^ (x >>> 7), 61 | x)) ^ x;
+    return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
   };
 };
 
@@ -107,3 +121,43 @@ export const makeGameOverState = (
   longestStreak: 4,
   ...overrides,
 });
+
+export const makePuzzleRow = (left: number, right: number, pay: Digit[]): PuzzleRow => ({
+  equation: makeEquation(left, right),
+  pay,
+});
+
+// The draft's showcase table (its §5): mulberry32 seed 16641, par 7, and par
+// needs a sacrifice on row 1. Hand in deal order.
+export const PUZZLE_SAMPLE: PuzzleTable = {
+  hand: [5, 9, 1, 4, 7],
+  rows: [
+    makePuzzleRow(3, 5, [9, 5, 5]),
+    makePuzzleRow(7, 2, [8, 1, 6]),
+    makePuzzleRow(3, 3, [2, 7]),
+    makePuzzleRow(1, 7, [4, 4]),
+    makePuzzleRow(4, 1, [6, 2]),
+    makePuzzleRow(8, 3, [0, 7, 7]),
+    makePuzzleRow(2, 3, [8, 8]),
+    makePuzzleRow(3, 4, [2, 0, 2]),
+  ],
+  par: 7,
+};
+
+/** One row's play: the tiles spent, in slot order, and the overflow discard. */
+export interface PuzzleMove {
+  spend: Digit[];
+  discard?: Digit;
+}
+
+// The sample's canonical par line. Row 1 is the sacrifice: 57 for 15.
+export const PUZZLE_SAMPLE_PAR_LINE: PuzzleMove[] = [
+  { spend: [5, 7] },
+  { spend: [1, 4] },
+  { spend: [9] },
+  { spend: [7], discard: 6 },
+  { spend: [4], discard: 8 },
+  { spend: [2, 4], discard: 0 },
+  { spend: [6], discard: 7 },
+  { spend: [1, 2], discard: 0 },
+];

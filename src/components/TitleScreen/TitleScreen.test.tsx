@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { I18nProvider } from "../../i18n/I18nContext";
@@ -18,6 +18,17 @@ describe("TitleScreen", () => {
     expect(screen.getByRole("button", { name: /^Classic/ })).toHaveAttribute("aria-pressed", "false");
   });
 
+  it("offers Puzzle as the third mode", () => {
+    render(
+      <I18nProvider initialLanguage="en">
+        <TitleScreen onStart={vi.fn()} />
+      </I18nProvider>,
+    );
+    const group = screen.getByRole("group", { name: "Mode" });
+    expect(within(group).getAllByRole("button")).toHaveLength(3);
+    expect(within(group).getByRole("button", { name: /^Puzzle/ })).toHaveAttribute("aria-pressed", "false");
+  });
+
   it("starts the run in the chosen mode", async () => {
     const onStart = vi.fn();
     render(
@@ -29,6 +40,18 @@ describe("TitleScreen", () => {
     expect(screen.getByRole("button", { name: /^Classic/ })).toHaveAttribute("aria-pressed", "true");
     await userEvent.click(screen.getByRole("button", { name: "Start Run" }));
     expect(onStart).toHaveBeenCalledWith("classic");
+  });
+
+  it("starts a Puzzle run when Puzzle is chosen", async () => {
+    const onStart = vi.fn();
+    render(
+      <I18nProvider initialLanguage="en">
+        <TitleScreen onStart={onStart} />
+      </I18nProvider>,
+    );
+    await userEvent.click(screen.getByRole("button", { name: /^Puzzle/ }));
+    await userEvent.click(screen.getByRole("button", { name: "Start Run" }));
+    expect(onStart).toHaveBeenCalledWith("puzzle");
   });
 
   it("starts only from the explicit action", async () => {
@@ -109,6 +132,23 @@ describe("TitleScreen", () => {
     // Classic's twenty closing to six, and that the floor is the win (§1.14)
     expect(
       screen.getByText(/Classic starts with twenty sockets .* reach five sockets and the run is complete/),
+    ).toBeInTheDocument();
+  });
+
+  // Puzzle's playtesters are told the title-screen rules only, and the
+  // always-visible ones are Endless's, so its rule has to be under More.
+  it("lists the Puzzle topic under More", async () => {
+    render(
+      <I18nProvider initialLanguage="en">
+        <TitleScreen onStart={vi.fn()} />
+      </I18nProvider>,
+    );
+
+    const more = screen.getByText("More");
+    await userEvent.click(more);
+
+    expect(
+      within(more.closest("details")!).getByText(/Puzzle deals five tiles and eight equations face up/),
     ).toBeInTheDocument();
   });
 

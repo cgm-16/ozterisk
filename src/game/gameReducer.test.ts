@@ -1,17 +1,22 @@
 import { describe, expect, it } from "vitest";
-import type { Digit, GameAction, GameState } from "./types";
+import type { Digit, GameAction, GameState, PuzzleTable, Tile, TileIdFactory } from "./types";
 import { gameReducer } from "./gameReducer";
-import { createInitialInventory, createTitleState, sortTiles } from "./factories";
+import { createInitialInventory, createTiles, createTitleState, sortTiles } from "./factories";
 import {
+  answerMatches,
   getAnswerLength,
   getCapacity,
   getOverflowCount,
   getRewardCount,
   isClassicWin,
+  isParMade,
   tileDigits,
 } from "./selectors";
 import { CLASSIC_FLOOR, CLASSIC_SEAL_EVERY, CLASSIC_START_CAPACITY } from "./balance";
 import {
+  PUZZLE_SAMPLE,
+  PUZZLE_SAMPLE_PAR_LINE,
+  type PuzzleMove,
   makeAnsweringState,
   makeEquation,
   makeFaceTile,
@@ -1121,5 +1126,125 @@ describe("face tiles in a submission", () => {
     expect(
       gameReducer(state, { type: "SUBMIT_CORRECT", rewardTiles: [makeTile(2, "r1"), makeTile(4, "r2"), makeTile(6, "r3")] }),
     ).toBe(state);
+  });
+});
+
+const puzzleStart = (table = PUZZLE_SAMPLE, ids = sequentialIds()): GameState =>
+  gameReducer(createTitleState(), {
+    type: "START_RUN",
+    mode: "puzzle",
+    equation: table.rows[0]!.equation,
+    inventory: sortTiles(createTiles(table.hand, ids)),
+    table,
+  });
+
+const tileWith = (state: GameState, digit: Digit): Tile =>
+  state.inventory.find((tile) => "digit" in tile && tile.digit === digit)!;
+
+// Plays rows through the reducer exactly as App does: select, submit with the
+// row's pay, discard if asked, advance to the next row's equation.
+function play(state: GameState, line: PuzzleMove[], ids: TileIdFactory): GameState {
+  const table = state.table!;
+  for (const [index, move] of line.entries()) {
+    for (const digit of move.spend) {
+      state = gameReducer(state, { type: "SELECT_TILE", tileId: tileWith(state, digit).id });
+    }
+    const row = table.rows[index]!;
+    state = answerMatches(state.selectedTiles, row.equation.product)
+      ? gameReducer(state, { type: "SUBMIT_CORRECT", rewardTiles: createTiles(row.pay, ids) })
+      : gameReducer(state, { type: "SUBMIT_INCORRECT" });
+    if (move.discard !== undefined) {
+      state = gameReducer(state, { type: "TOGGLE_DISCARD", tileId: tileWith(state, move.discard).id });
+    }
+    const next = table.rows[index + 1]?.equation ?? row.equation;
+    state = gameReducer(state, { type: "NEXT_ROUND", equation: next });
+  }
+  return state;
+}
+
+const digitsOf = (tiles: readonly Tile[]) => tiles.map((tile) => ("digit" in tile ? tile.digit : -1));
+
+describe("Puzzle", () => {
+  it("starts with the table, its hand and row 1", () => {
+    const state = puzzleStart();
+    expect(state.phase).toBe("answering");
+    expect(state.mode).toBe("puzzle");
+    expect(state.table).toBe(PUZZLE_SAMPLE);
+    expect(digitsOf(state.inventory)).toEqual([1, 4, 5, 7, 9]);
+    expect(state.rowResults).toEqual([]);
+  });
+
+  it("records each row's result in order, and only in Puzzle", () => {
+    const ids = sequentialIds();
+    const state = play(puzzleStart(PUZZLE_SAMPLE, ids), PUZZLE_SAMPLE_PAR_LINE.slice(0, 3), ids);
+    expect(state.rowResults).toEqual(["incorrect", "correct", "correct"]);
+    const endless = gameReducer(createTitleState(), {
+      type: "START_RUN",
+      mode: "endless",
+      equation: makeEquation(2, 3),
+      inventory: createInitialInventory(sequentialIds()),
+    });
+    expect(endless).not.toHaveProperty("rowResults");
+    expect(endless).not.toHaveProperty("table");
+  });
+
+  it("refuses a Puzzle start without a table", () => {
+    const title = createTitleState();
+    const next = gameReducer(title, {
+      type: "START_RUN",
+      mode: "puzzle",
+      equation: PUZZLE_SAMPLE.rows[0]!.equation,
+      inventory: createTiles(PUZZLE_SAMPLE.hand, sequentialIds()),
+    });
+    expect(next).toBe(title);
+  });
+
+  it("accepts the row's pay and refuses other digits, another order or a face", () => {
+    const ids = sequentialIds();
+    let state = puzzleStart(PUZZLE_SAMPLE, ids);
+    // Row 1 is 3 × 5: answer 15 and offer row 1's pay, 9 5 5.
+    state = gameReducer(state, { type: "SELECT_TILE", tileId: tileWith(state, 1).id });
+    state = gameReducer(state, { type: "SELECT_TILE", tileId: tileWith(state, 5).id });
+    for (const wrong of [
+      createTiles([9, 5, 6], ids),
+      createTiles([5, 9, 5], ids),
+      [...createTiles([9, 5], ids), makeFaceTile("wild", "face-pay")],
+    ]) {
+      expect(gameReducer(state, { type: "SUBMIT_CORRECT", rewardTiles: wrong })).toBe(state);
+    }
+    const paid = gameReducer(state, { type: "SUBMIT_CORRECT", rewardTiles: createTiles([9, 5, 5], ids) });
+    expect(paid.score).toBe(1);
+  });
+
+  it("overflows at five tiles", () => {
+    const ids = sequentialIds();
+    const state = play(puzzleStart(PUZZLE_SAMPLE, ids), PUZZLE_SAMPLE_PAR_LINE.slice(0, 3), ids);
+    // Hand 1 2 6 7 8; row 4 (1 × 7) spends 7 and pays 4 4: six tiles in five sockets.
+    let next = gameReducer(state, { type: "SELECT_TILE", tileId: tileWith(state, 7).id });
+    next = gameReducer(next, { type: "SUBMIT_CORRECT", rewardTiles: createTiles([4, 4], ids) });
+    expect(next.phase).toBe("overflow");
+    expect(getOverflowCount(next)).toBe(1);
+  });
+
+  it("replays the sample's par line to 7 and ends after row 8", () => {
+    const ids = sequentialIds();
+    const end = play(puzzleStart(PUZZLE_SAMPLE, ids), PUZZLE_SAMPLE_PAR_LINE, ids);
+    expect(end.phase).toBe("gameOver");
+    expect(end.score).toBe(7);
+    expect(end.totalRounds).toBe(8);
+    expect(digitsOf(end.inventory)).toEqual([2, 2, 7, 8, 8]);
+    expect(isParMade(end)).toBe(true);
+  });
+
+  it("restarts with the new table, refusing a restart without one", () => {
+    const ids = sequentialIds();
+    const end = play(puzzleStart(PUZZLE_SAMPLE, ids), PUZZLE_SAMPLE_PAR_LINE, ids);
+    const other: PuzzleTable = { ...PUZZLE_SAMPLE, hand: [0, 2, 3, 6, 8], par: 5 };
+    const restart = { type: "RESTART_RUN", equation: other.rows[0]!.equation, inventory: createTiles(other.hand, ids) } as const;
+    expect(gameReducer(end, restart)).toBe(end);
+    const next = gameReducer(end, { ...restart, table: other });
+    expect(next.table).toBe(other);
+    expect(next.mode).toBe("puzzle");
+    expect(next.score).toBe(0);
   });
 });

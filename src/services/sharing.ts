@@ -1,4 +1,4 @@
-import { isClassicWin } from "../game/selectors";
+import { isClassicWin, isParMade } from "../game/selectors";
 import type { GameState, Language } from "../game/types";
 import { messages } from "../i18n/messages";
 
@@ -10,27 +10,45 @@ export type ShareStats = {
   | { mode: "endless"; won: false }
   /** `won`: a Classic run that reached the floor with tiles in hand. */
   | { mode: "classic"; won: boolean }
+  /** `won`: made par. `rows`: the table's length, so a finished table is totalRounds === rows. */
+  | { mode: "puzzle"; won: boolean; par: number; rows: number }
 );
 
 /** The statistics a finished run shows and shares. */
 export function getShareStats(state: GameState): ShareStats {
   const figures = { score: state.score, totalRounds: state.totalRounds, longestStreak: state.longestStreak };
+  const { table } = state;
+  if (state.mode === "puzzle" && table) {
+    return { mode: "puzzle", won: isParMade(state), par: table.par, rows: table.rows.length, ...figures };
+  }
   return state.mode === "classic"
     ? { mode: "classic", won: isClassicWin(state), ...figures }
     : { mode: "endless", won: false, ...figures };
 }
 
-// §1.15: Classic names its mode and outcome ahead of the rounds; Endless's
-// first line is unchanged. The words are the dictionary's, so the shared text
-// and the screen cannot drift apart.
+// §1.15: Classic and Puzzle name their mode and outcome ahead of the figures;
+// Endless's first line is unchanged. The words are the dictionary's, so the
+// shared text and the screen cannot drift apart.
 function shareHeading(stats: ShareStats, language: Language): string {
   if (stats.mode === "endless") return "ozterisk";
   const { mode, gameOver } = messages[language];
+  if (stats.mode === "puzzle") {
+    const short = String(stats.par - stats.score);
+    const outcome = stats.won ? gameOver.parTitle : gameOver.shortTitle.replace("{short}", short);
+    return `ozterisk ${mode.puzzle} — ${outcome}`;
+  }
   return `ozterisk ${mode.classic} — ${stats.won ? gameOver.winTitle : gameOver.title}`;
 }
 
 export function formatShareText(stats: ShareStats, language: Language, url: string): string {
   const heading = shareHeading(stats, language);
+  if (stats.mode === "puzzle") {
+    const { puzzleAsk } = messages[language].share;
+    const { score, rows, par, longestStreak } = stats;
+    return language === "ko"
+      ? `${heading} — 점수: ${score}/${rows} · 목표 ${par}\n최장 연속 정답: ${longestStreak}\n\n${puzzleAsk}\n${url}`
+      : `${heading} — Score: ${score}/${rows} · par ${par}\nLongest streak: ${longestStreak}\n\n${puzzleAsk}\n${url}`;
+  }
   if (language === "ko") {
     return `${heading} — 라운드: ${stats.totalRounds}\n점수: ${stats.score}\n최장 연속 정답: ${stats.longestStreak}\n\n이 기록을 넘을 수 있나요?\n${url}`;
   }

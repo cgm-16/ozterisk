@@ -39,6 +39,17 @@ describe("GameHud", () => {
     expect(screen.queryByText("Capacity")).not.toBeInTheDocument();
   });
 
+  it("states a par only when given one, after the three figures", () => {
+    renderHud({ par: 7 });
+    const terms = screen.getAllByRole("term").map((term) => term.textContent);
+    expect(terms).toEqual(["Round", "Score", "Streak", "Par"]);
+    expect(screen.getByText("Par").nextElementSibling).toHaveTextContent("7");
+    cleanup();
+
+    renderHud();
+    expect(screen.queryByText("Par")).not.toBeInTheDocument();
+  });
+
   it("labels round, score and streak with their values", () => {
     renderHud({ score: 12, currentStreak: 3, round: 4 });
     expect(screen.getByText("Round").nextElementSibling).toHaveTextContent("4");

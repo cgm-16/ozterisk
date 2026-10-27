@@ -10,6 +10,8 @@ import {
   getOverflowCount,
   getRewardCount,
   isClassicWin,
+  isParMade,
+  isRunComplete,
   isSubmissionReady,
   tileDigits,
 } from "./selectors";
@@ -20,10 +22,12 @@ import {
   FACE_RATE_END,
   FACE_RATE_START,
   INVENTORY_CAPACITY,
+  PUZZLE_CAPACITY,
   REWARD_BONUS,
 } from "./balance";
 import { createTitleState } from "./factories";
 import {
+  PUZZLE_SAMPLE,
   makeAnsweringState,
   makeEquation,
   makeFaceTile,
@@ -313,5 +317,28 @@ describe("isClassicWin", () => {
     expect(
       isClassicWin({ ...gameOver, phase: "feedback", mode: "classic", totalRounds: atFloor }),
     ).toBe(false);
+  });
+});
+
+describe("Puzzle selectors", () => {
+  it("holds five sockets at every submission", () => {
+    for (const totalRounds of [0, 1, 7, 8]) expect(getCapacity("puzzle", totalRounds)).toBe(PUZZLE_CAPACITY);
+  });
+
+  it("completes a Puzzle run once every row is submitted, and Classic at its floor", () => {
+    const table = PUZZLE_SAMPLE;
+    expect(isRunComplete({ mode: "puzzle", totalRounds: 7, table })).toBe(false);
+    expect(isRunComplete({ mode: "puzzle", totalRounds: 8, table })).toBe(true);
+    const floor = (CLASSIC_START_CAPACITY - CLASSIC_FLOOR) * CLASSIC_SEAL_EVERY;
+    expect(isRunComplete({ mode: "classic", totalRounds: floor })).toBe(true);
+    expect(isRunComplete({ mode: "endless", totalRounds: 999 })).toBe(false);
+  });
+
+  it("makes par only at game over with score equal to par", () => {
+    const table = PUZZLE_SAMPLE;
+    expect(isParMade({ phase: "gameOver", mode: "puzzle", score: 7, table })).toBe(true);
+    expect(isParMade({ phase: "gameOver", mode: "puzzle", score: 6, table })).toBe(false);
+    expect(isParMade({ phase: "feedback", mode: "puzzle", score: 7, table })).toBe(false);
+    expect(isParMade({ phase: "gameOver", mode: "classic", score: 7 })).toBe(false);
   });
 });

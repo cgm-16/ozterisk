@@ -98,10 +98,8 @@ daily streak.
 
 - The game has its own name, in English and Korean, and its own identity. It
   reuses none of ozterisk's name, wordmark, Tile House palette or type.
-- The identity is being designed on a Claude design canvas:
-  https://claude.ai/artifact/EsGp1rWQKWY88ahJccRuAe (private to Ori). It holds a
-  brief and screenshots of M8. The brief predates the Daily and Practice
-  decision and is updated to match this design.
+- The identity is being designed on a Claude design canvas, private to Ori. It
+  holds a brief, updated to match this design, and screenshots of M8.
 - **Screens:**
   - title, with the choice of Daily or Practice;
   - a table in play, including the state after a miss and the overflow
